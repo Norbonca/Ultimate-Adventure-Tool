@@ -442,10 +442,14 @@ export default function ProfilePage() {
       const { error } = await supabase
         .from("user_privacy_settings")
         .upsert({
-          ...privacySettings,
           user_id: user.id,
-        })
-        .eq("user_id", user.id);
+          profile_visibility: privacySettings.profile_visibility || "public",
+          email_visibility: privacySettings.email_visibility || "hidden",
+          phone_visibility: privacySettings.phone_visibility || "hidden",
+          location_precision: privacySettings.location_precision || "city_country",
+          trip_history_visibility: privacySettings.trip_history_visibility || "public",
+          online_status_visible: privacySettings.online_status_visible ?? true,
+        }, { onConflict: "user_id" });
 
       if (error) {
         showToast("Adatvédelmi beállítások mentése sikertelen", "error");
