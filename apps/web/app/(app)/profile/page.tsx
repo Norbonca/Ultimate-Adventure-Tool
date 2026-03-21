@@ -248,14 +248,38 @@ export default function ProfilePage() {
           return;
         }
 
-        const loadedProfile: Profile = profileData || {
+        let loadedProfile: Profile | null = profileData;
+
+        // Profile doesn't exist yet - create it (handles edge case of pre-trigger registration)
+        if (!loadedProfile && authUser) {
+          const { data: newProfile } = await supabase
+            .from("profiles")
+            .upsert({
+              id: authUser.id,
+              email: authUser.email || "",
+              display_name: authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || "Felhasználó",
+              slug: authUser.email?.split('@')[0] || "user",
+              first_name: authUser.user_metadata?.first_name || "",
+              last_name: authUser.user_metadata?.last_name || "",
+              avatar_url: authUser.user_metadata?.avatar_url || null,
+            }, { onConflict: 'id' })
+            .select()
+            .single();
+
+          if (newProfile) {
+            loadedProfile = newProfile;
+          }
+        }
+
+        // Fallback if profile still doesn't exist
+        const finalProfile: Profile = loadedProfile || {
           id: authUser.id,
           email: authUser.email || "",
           display_name: authUser.user_metadata?.full_name || "",
         };
 
-        setProfile(loadedProfile);
-        setSettingsForm(loadedProfile);
+        setProfile(finalProfile);
+        setSettingsForm(finalProfile);
 
         // Fetch follow counts
         const [followersRes, followingRes, tripsRes] = await Promise.all([
@@ -324,7 +348,15 @@ export default function ProfilePage() {
             trip_history_visibility: "public",
             online_status_visible: true,
           };
-          setPrivacySettings(defaultPrivacy);
+          
+          // Auto-create privacy settings if they don't exist
+          const { data: createdPrivacy } = await supabase
+            .from("user_privacy_settings")
+            .upsert(defaultPrivacy, { onConflict: 'user_id' })
+            .select()
+            .single();
+          
+          setPrivacySettings(createdPrivacy || defaultPrivacy);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -378,8 +410,7 @@ export default function ProfilePage() {
 
       const { error: profileError } = await supabase
         .from("profiles")
-        .update(updateData)
-        .eq("id", user.id);
+        .upsert({ ...updateData, id: user.id }, { onConflict: 'id' });
 
       if (profileError) {
         showToast("Profil mentése sikertelen", "error");
