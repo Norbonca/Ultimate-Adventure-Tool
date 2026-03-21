@@ -30,7 +30,7 @@ interface Profile {
 interface AdventureInterest {
   id: string;
   name: string;
-  name_localized?: string;
+  name_localized?: Record<string, string> | string;
   icon_name?: string;
   color_hex?: string;
 }
@@ -44,8 +44,18 @@ interface UserSkill {
 interface SubDiscipline {
   id: string;
   name: string;
-  name_localized?: string;
+  name_localized?: Record<string, string> | string;
   category_id: string;
+}
+
+// Helper: safely extract localized name from JSONB object or string
+function getLocalizedName(localized: Record<string, string> | string | undefined | null, fallback: string, lang = "hu"): string {
+  if (!localized) return fallback;
+  if (typeof localized === "string") return localized;
+  if (typeof localized === "object") {
+    return localized[lang] || localized["en"] || localized["hu"] || fallback;
+  }
+  return fallback;
 }
 
 interface PrivacySettings {
@@ -815,7 +825,7 @@ export default function ProfilePage() {
                               >
                                 <span className="text-2xl">{CATEGORY_ICONS[iconKey] || "⭐"}</span>
                                 <span className="text-sm font-medium text-center text-navy-900">
-                                  {category.name_localized || category.name}
+                                  {getLocalizedName(category.name_localized, category.name)}
                                 </span>
                               </button>
                             );
@@ -840,7 +850,7 @@ export default function ProfilePage() {
                               >
                                 <span>{CATEGORY_ICONS[interest.name?.toLowerCase()?.replace(" ", "_")] || "⭐"}</span>
                                 <span className="text-sm font-medium text-navy-900">
-                                  {interest.name_localized || interest.name}
+                                  {getLocalizedName(interest.name_localized, interest.name)}
                                 </span>
                               </div>
                             ))}
@@ -1208,7 +1218,7 @@ export default function ProfilePage() {
                                   {CATEGORY_ICONS[category.name?.toLowerCase()?.replace(" ", "_")] || "⭐"}
                                 </span>
                                 <span className="font-semibold text-navy-900">
-                                  {category.name_localized || category.name}
+                                  {getLocalizedName(category.name_localized, category.name)}
                                 </span>
                               </div>
                               <span className="text-navy-500">{isExpanded ? "▼" : "▶"}</span>
@@ -1228,7 +1238,7 @@ export default function ProfilePage() {
                                       className="flex items-center justify-between py-3 px-4 bg-white rounded-xl border border-navy-200"
                                     >
                                       <span className="text-sm font-medium text-navy-900">
-                                        {subDisc.name_localized || subDisc.name}
+                                        {getLocalizedName(subDisc.name_localized, subDisc.name)}
                                       </span>
                                       <div className="flex gap-2">
                                         {["any", "intermediate", "advanced", "expert"].map((level) => (
