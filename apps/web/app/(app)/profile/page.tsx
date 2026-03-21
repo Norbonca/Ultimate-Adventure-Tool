@@ -344,7 +344,7 @@ export default function ProfilePage() {
             profile_visibility: "public",
             email_visibility: "hidden",
             phone_visibility: "hidden",
-            location_precision: "city",
+            location_precision: "city_country",
             trip_history_visibility: "public",
             online_status_visible: true,
           };
@@ -480,13 +480,14 @@ export default function ProfilePage() {
           const subDiscipline = subDisciplines.find((s) => s.id === subDisciplineId);
           return {
             user_id: user.id,
-            category_id: subDiscipline?.category_id || "",
+            category_id: subDiscipline?.category_id,
             skill_level: level,
           };
-        });
+        })
+        .filter((s) => s.category_id); // Filter out entries without valid category_id
 
       if (skillsToInsert.length > 0) {
-        const { error } = await supabase.from("user_skills").insert(skillsToInsert);
+        const { error } = await supabase.from("user_skills").upsert(skillsToInsert, { onConflict: 'user_id,category_id' });
 
         if (error) {
           showToast("Készségek mentése sikertelen", "error");
