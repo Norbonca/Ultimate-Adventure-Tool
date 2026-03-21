@@ -55,20 +55,20 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-green-50 to-white">
+    <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#F8FAFC] to-[#E6F7F5]">
       <div className="w-full max-w-md mx-auto p-8">
         <div className="text-center mb-8">
-          <div className="inline-flex h-14 w-14 items-center justify-center rounded-xl bg-adventure-forest text-white text-xl font-bold mb-4">
-            UAT
+          <div className="inline-flex h-14 w-14 items-center justify-center rounded-xl bg-trevu-600 text-white text-xl font-bold mb-4 shadow-trevu">
+            T
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Regisztráció</h1>
-          <p className="text-gray-600 mt-1">
-            Csatlakozz az Ultimate Adventure Tool közösségéhez
+          <h1 className="text-2xl font-bold text-navy-900">Regisztráció</h1>
+          <p className="text-navy-500 mt-1">
+            Csatlakozz a <span className="text-trevu-600 font-semibold">Tre</span><span className="font-semibold">vu</span> közösségéhez
           </p>
         </div>
 
         {error && (
-          <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm mb-6">
+          <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm mb-6">
             {error}
           </div>
         )}
@@ -77,7 +77,7 @@ export default function RegisterPage() {
         <button
           onClick={handleGoogleSignUp}
           disabled={googleLoading}
-          className="w-full rounded-lg bg-white border border-gray-300 py-2.5 text-gray-700 font-semibold hover:bg-gray-50 hover:border-gray-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-3 mb-6"
+          className="w-full rounded-xl bg-white border border-navy-300 py-2.5 text-navy-700 font-semibold hover:bg-navy-50 hover:border-navy-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-3 mb-6"
         >
           <svg
             width="20"
@@ -108,14 +108,14 @@ export default function RegisterPage() {
 
         {/* Divider */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="flex-1 border-t border-gray-300"></div>
-          <span className="text-sm text-gray-500">vagy</span>
-          <div className="flex-1 border-t border-gray-300"></div>
+          <div className="flex-1 border-t border-navy-200"></div>
+          <span className="text-sm text-navy-400">vagy</span>
+          <div className="flex-1 border-t border-navy-200"></div>
         </div>
 
         <form onSubmit={handleRegister} className="space-y-4">
           <div>
-            <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="fullName" className="block text-sm font-medium text-navy-700 mb-1">
               Teljes név
             </label>
             <input
@@ -124,13 +124,13 @@ export default function RegisterPage() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none"
+              className="input-trevu"
               placeholder="Kovács János"
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-navy-700 mb-1">
               Email
             </label>
             <input
@@ -139,13 +139,13 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none"
+              className="input-trevu"
               placeholder="nev@email.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="password" className="block text-sm font-medium text-navy-700 mb-1">
               Jelszó (min. 6 karakter)
             </label>
             <input
@@ -155,7 +155,7 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none"
+              className="input-trevu"
               placeholder="••••••••"
             />
           </div>
@@ -163,15 +163,15 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-adventure-forest py-2.5 text-white font-semibold hover:bg-green-800 transition-colors disabled:opacity-50"
+            className="w-full rounded-xl bg-trevu-600 py-3 text-white font-semibold hover:bg-trevu-700 transition-colors disabled:opacity-50 shadow-trevu"
           >
             {loading ? "Regisztráció..." : "Regisztráció"}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-600 mt-6">
+        <p className="text-center text-sm text-navy-500 mt-6">
           Már van fiókod?{" "}
-          <Link href="/login" className="text-adventure-forest font-semibold hover:underline">
+          <Link href="/login" className="text-trevu-600 font-semibold hover:text-trevu-700 hover:underline">
             Bejelentkezés
           </Link>
         </p>

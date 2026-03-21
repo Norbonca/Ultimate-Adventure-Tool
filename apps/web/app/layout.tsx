@@ -2,16 +2,18 @@ import type { Metadata } from "next";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
-  title: "Ultimate Adventure Tool",
+  title: "Trevu — Trek Beyond Ordinary",
   description:
-    "Tervezd meg a tökéletes kalandot — túrák szervezése, költségmegosztás, helyi túravezetők",
+    "Discover, plan, and share unforgettable outdoor adventures. Trevu connects adventurers with expert-led trips across hiking, climbing, sailing, and more.",
   keywords: [
+    "trevu",
     "adventure",
     "túra",
     "kaland",
     "utazás",
-    "költségmegosztás",
-    "túravezető",
+    "hiking",
+    "climbing",
+    "sailing",
   ],
 };
 
@@ -22,7 +24,19 @@ export default function RootLayout({
 }) {
   return (
     <html lang="hu">
-      <body className="min-h-screen bg-white text-gray-900 antialiased">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="min-h-screen bg-[#F8FAFC] text-navy-900 antialiased">
         {children}
       </body>
     </html>

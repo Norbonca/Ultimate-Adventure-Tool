@@ -199,9 +199,9 @@ function getInitials(firstName?: string, lastName?: string, email?: string): str
 function Toast({ message, type = "success" }: { message: string; type?: "success" | "error" }) {
   return (
     <div
-      className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-sm font-medium transition-opacity ${
+      className={`fixed bottom-4 right-4 px-4 py-3 rounded-xl text-sm font-medium transition-opacity ${
         type === "success"
-          ? "bg-green-500 text-white"
+          ? "bg-trevu-500 text-white"
           : "bg-red-500 text-white"
       }`}
     >
@@ -585,20 +585,20 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-gray-50">
-        <header className="bg-white border-b border-gray-200">
+      <main className="min-h-screen bg-navy-50">
+        <header className="bg-white border-b border-navy-200">
           <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Link href="/dashboard" className="h-9 w-9 rounded-lg bg-adventure-forest text-white flex items-center justify-center font-bold text-sm hover:bg-green-800 transition-colors">
-                UAT
+              <Link href="/dashboard" className="h-9 w-9 rounded-xl bg-trevu-600 text-white flex items-center justify-center font-bold text-sm hover:bg-trevu-700 transition-colors">
+                T
               </Link>
-              <h1 className="text-lg font-semibold text-gray-900">Profil</h1>
+              <h1 className="text-lg font-semibold text-navy-900">Profil</h1>
             </div>
           </div>
         </header>
         <div className="max-w-6xl mx-auto px-4 py-8">
-          <div className="bg-white rounded-xl border border-gray-200 p-8">
-            <p className="text-gray-600">Betöltés...</p>
+          <div className="bg-white rounded-xl border border-navy-200 p-8">
+            <p className="text-navy-600">Betöltés...</p>
           </div>
         </div>
       </main>
@@ -607,19 +607,19 @@ export default function ProfilePage() {
 
   if (!profile || !user) {
     return (
-      <main className="min-h-screen bg-gray-50">
-        <header className="bg-white border-b border-gray-200">
+      <main className="min-h-screen bg-navy-50">
+        <header className="bg-white border-b border-navy-200">
           <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Link href="/dashboard" className="h-9 w-9 rounded-lg bg-adventure-forest text-white flex items-center justify-center font-bold text-sm hover:bg-green-800 transition-colors">
-                UAT
+              <Link href="/dashboard" className="h-9 w-9 rounded-xl bg-trevu-600 text-white flex items-center justify-center font-bold text-sm hover:bg-trevu-700 transition-colors">
+                T
               </Link>
-              <h1 className="text-lg font-semibold text-gray-900">Profil</h1>
+              <h1 className="text-lg font-semibold text-navy-900">Profil</h1>
             </div>
           </div>
         </header>
         <div className="max-w-6xl mx-auto px-4 py-8">
-          <div className="bg-white rounded-xl border border-gray-200 p-8">
+          <div className="bg-white rounded-xl border border-navy-200 p-8">
             <p className="text-red-600">Profil nem található</p>
           </div>
         </div>
@@ -631,20 +631,20 @@ export default function ProfilePage() {
   const memberSince = formatMonthYear(profile.created_at);
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-navy-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
+      <header className="bg-white border-b border-navy-200">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="h-9 w-9 rounded-lg bg-adventure-forest text-white flex items-center justify-center font-bold text-sm hover:bg-green-800 transition-colors">
-              UAT
+            <Link href="/dashboard" className="h-9 w-9 rounded-xl bg-trevu-600 text-white flex items-center justify-center font-bold text-sm hover:bg-trevu-700 transition-colors">
+              T
             </Link>
-            <h1 className="text-lg font-semibold text-gray-900">Profil</h1>
+            <h1 className="text-lg font-semibold text-navy-900">Profil</h1>
           </div>
           <div className="flex items-center gap-6">
-            <span className="text-sm text-gray-600">{user.email}</span>
+            <span className="text-sm text-navy-600">{user.email}</span>
             <form action="/api/v1/auth/signout" method="POST">
-              <button className="text-sm text-gray-500 hover:text-gray-700">
+              <button className="text-sm text-navy-500 hover:text-navy-700">
                 Kijelentkezés
               </button>
             </form>
@@ -657,16 +657,16 @@ export default function ProfilePage() {
         <div className="flex gap-6">
           {/* LEFT SIDEBAR */}
           <aside className="w-72 flex-shrink-0">
-            <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-8">
+            <div className="bg-white rounded-xl border border-navy-200 p-6 sticky top-8">
               {/* Avatar */}
               <div className="flex justify-center mb-4">
-                <div className="h-20 w-20 rounded-full bg-adventure-forest text-white flex items-center justify-center font-bold text-2xl">
+                <div className="h-20 w-20 rounded-full bg-trevu-600 text-white flex items-center justify-center font-bold text-2xl">
                   {initials}
                 </div>
               </div>
 
               {/* Name */}
-              <h2 className="text-xl font-bold text-gray-900 text-center">
+              <h2 className="text-xl font-bold text-navy-900 text-center">
                 {profile.first_name || profile.last_name
                   ? `${profile.first_name || ""} ${profile.last_name || ""}`.trim()
                   : "Felhasználó"}
@@ -674,7 +674,7 @@ export default function ProfilePage() {
 
               {/* Bio */}
               {profile.bio && (
-                <p className="text-sm text-gray-600 text-center mt-2 line-clamp-2">
+                <p className="text-sm text-navy-600 text-center mt-2 line-clamp-2">
                   {profile.bio}
                 </p>
               )}
@@ -682,32 +682,32 @@ export default function ProfilePage() {
               {/* Edit Profile Button */}
               <button
                 onClick={() => setActiveTab("settings")}
-                className="w-full mt-4 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                className="w-full mt-4 px-4 py-2 border border-navy-300 rounded-xl text-navy-700 font-medium hover:bg-navy-50 transition-colors"
               >
                 Profil szerkesztése
               </button>
 
               {/* Stats Row */}
-              <div className="grid grid-cols-3 gap-2 mt-6 pt-6 border-t border-gray-200">
+              <div className="grid grid-cols-3 gap-2 mt-6 pt-6 border-t border-navy-200">
                 <div className="text-center">
-                  <p className="text-lg font-bold text-gray-900">{followCounts.trips}</p>
-                  <p className="text-xs text-gray-500">Túrák</p>
+                  <p className="text-lg font-bold text-navy-900">{followCounts.trips}</p>
+                  <p className="text-xs text-navy-500">Túrák</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-lg font-bold text-gray-900">{followCounts.followers}</p>
-                  <p className="text-xs text-gray-500">Követők</p>
+                  <p className="text-lg font-bold text-navy-900">{followCounts.followers}</p>
+                  <p className="text-xs text-navy-500">Követők</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-lg font-bold text-gray-900">{followCounts.following}</p>
-                  <p className="text-xs text-gray-500">Követett</p>
+                  <p className="text-lg font-bold text-navy-900">{followCounts.following}</p>
+                  <p className="text-xs text-navy-500">Követett</p>
                 </div>
               </div>
 
               {/* Location */}
-              <div className="mt-6 pt-6 border-t border-gray-200">
+              <div className="mt-6 pt-6 border-t border-navy-200">
                 <div className="flex items-start gap-2">
                   <span className="text-lg">📍</span>
-                  <p className="text-sm text-gray-900">
+                  <p className="text-sm text-navy-900">
                     {profile.location_city && profile.country_code
                       ? `${profile.location_city}, ${refCountries.find(c => c.code === profile.country_code)?.name_hu || COUNTRY_MAP[profile.country_code] || profile.country_code}`
                       : profile.location_city || refCountries.find(c => c.code === (profile.country_code || ""))?.name_hu || COUNTRY_MAP[profile.country_code || ""] || "—"}
@@ -716,14 +716,14 @@ export default function ProfilePage() {
               </div>
 
               {/* Member Since */}
-              <p className="text-xs text-gray-500 mt-4">
+              <p className="text-xs text-navy-500 mt-4">
                 Tag: {memberSince}
               </p>
 
               {/* Verified Badge */}
               {profile.verified_organizer && (
-                <div className="mt-4 px-3 py-2 bg-green-50 rounded-lg flex items-center gap-2">
-                  <span className="text-green-600">✓</span>
+                <div className="mt-4 px-3 py-2 bg-trevu-50 rounded-xl flex items-center gap-2">
+                  <span className="text-trevu-600">✓</span>
                   <span className="text-xs font-medium text-green-700">Hitelesített szervező</span>
                 </div>
               )}
@@ -731,7 +731,7 @@ export default function ProfilePage() {
               {/* Subscription Tier */}
               {profile.subscription_tier === "free" && (
                 <div className="mt-4">
-                  <button className="w-full px-4 py-2 bg-adventure-forest text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors">
+                  <button className="w-full px-4 py-2 bg-trevu-600 text-white rounded-xl text-sm font-medium hover:bg-trevu-700 transition-colors">
                     Frissítés Pro-ra
                   </button>
                 </div>
@@ -742,7 +742,7 @@ export default function ProfilePage() {
           {/* RIGHT CONTENT AREA */}
           <div className="flex-1">
             {/* Tab Navigation */}
-            <div className="bg-white rounded-t-xl border border-gray-200 border-b-0 p-0">
+            <div className="bg-white rounded-t-xl border border-navy-200 border-b-0 p-0">
               <div className="flex gap-0">
                 {[
                   { id: "overview", label: "Áttekintés" },
@@ -755,8 +755,8 @@ export default function ProfilePage() {
                     onClick={() => setActiveTab(tab.id as any)}
                     className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
                       activeTab === tab.id
-                        ? "text-adventure-forest border-adventure-forest"
-                        : "text-gray-600 border-transparent hover:text-gray-900"
+                        ? "text-trevu-600 border-adventure-forest"
+                        : "text-navy-600 border-transparent hover:text-navy-900"
                     }`}
                   >
                     {tab.label}
@@ -766,14 +766,14 @@ export default function ProfilePage() {
             </div>
 
             {/* Tab Content */}
-            <div className="bg-white rounded-b-xl border border-gray-200 border-t-0 p-6">
+            <div className="bg-white rounded-b-xl border border-navy-200 border-t-0 p-6">
               {/* OVERVIEW TAB */}
               {activeTab === "overview" && (
                 <div className="space-y-6">
                   {/* Adventure Interests */}
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-bold text-gray-900">Kaland érdeklődés</h3>
+                      <h3 className="text-lg font-bold text-navy-900">Kaland érdeklődés</h3>
                       <button
                         onClick={() => {
                           if (!isEditingInterests) {
@@ -781,7 +781,7 @@ export default function ProfilePage() {
                           }
                           setIsEditingInterests(!isEditingInterests);
                         }}
-                        className="px-3 py-1 text-sm font-medium text-adventure-forest hover:bg-green-50 rounded transition-colors"
+                        className="px-3 py-1 text-sm font-medium text-trevu-600 hover:bg-trevu-50 rounded transition-colors"
                       >
                         {isEditingInterests ? "Mentés" : "Szerkesztés"}
                       </button>
@@ -802,10 +802,10 @@ export default function ProfilePage() {
                                       : [...prev, category.id]
                                   );
                                 }}
-                                className={`p-4 rounded-lg border-2 transition-all flex flex-col items-center gap-2 ${
+                                className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
                                   isSelected
                                     ? "border-adventure-forest"
-                                    : "border-gray-200 opacity-50 hover:opacity-75"
+                                    : "border-navy-200 opacity-50 hover:opacity-75"
                                 }`}
                                 style={
                                   isSelected
@@ -814,7 +814,7 @@ export default function ProfilePage() {
                                 }
                               >
                                 <span className="text-2xl">{CATEGORY_ICONS[iconKey] || "⭐"}</span>
-                                <span className="text-sm font-medium text-center text-gray-900">
+                                <span className="text-sm font-medium text-center text-navy-900">
                                   {category.name_localized || category.name}
                                 </span>
                               </button>
@@ -823,7 +823,7 @@ export default function ProfilePage() {
                         </div>
                         <button
                           onClick={handleSaveInterests}
-                          className="px-4 py-2 bg-adventure-forest text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors"
+                          className="px-4 py-2 bg-trevu-600 text-white rounded-xl text-sm font-medium hover:bg-trevu-700 transition-colors"
                         >
                           Mentés
                         </button>
@@ -839,30 +839,30 @@ export default function ProfilePage() {
                                 style={{ backgroundColor: interest.color_hex || "#e5e7eb" }}
                               >
                                 <span>{CATEGORY_ICONS[interest.name?.toLowerCase()?.replace(" ", "_")] || "⭐"}</span>
-                                <span className="text-sm font-medium text-gray-900">
+                                <span className="text-sm font-medium text-navy-900">
                                   {interest.name_localized || interest.name}
                                 </span>
                               </div>
                             ))}
                           </div>
                         ) : (
-                          <p className="text-gray-500">Még nem adtál meg kaland érdeklődéseket</p>
+                          <p className="text-navy-500">Még nem adtál meg kaland érdeklődéseket</p>
                         )}
                       </>
                     )}
                   </div>
 
                   {/* Experience Level */}
-                  <div className="pt-6 border-t border-gray-200">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Szint</h3>
+                  <div className="pt-6 border-t border-navy-200">
+                    <h3 className="text-lg font-bold text-navy-900 mb-4">Szint</h3>
                     <div className="space-y-2">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700">Szint {profile.reputation_level || 1}/5</span>
-                        <span className="text-sm text-gray-600">{profile.reputation_points || 0} XP</span>
+                        <span className="text-sm font-medium text-navy-700">Szint {profile.reputation_level || 1}/5</span>
+                        <span className="text-sm text-navy-600">{profile.reputation_points || 0} XP</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
-                          className="bg-adventure-forest h-2 rounded-full"
+                          className="bg-trevu-600 h-2 rounded-full"
                           style={{ width: `${((profile.reputation_level || 1) / 5) * 100}%` }}
                         />
                       </div>
@@ -870,29 +870,29 @@ export default function ProfilePage() {
                   </div>
 
                   {/* Activity Stats */}
-                  <div className="pt-6 border-t border-gray-200">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Aktivitás statisztika</h3>
+                  <div className="pt-6 border-t border-navy-200">
+                    <h3 className="text-lg font-bold text-navy-900 mb-4">Aktivitás statisztika</h3>
                     <div className="grid grid-cols-3 gap-4">
-                      <div className="bg-gray-50 rounded-lg p-4 text-center">
-                        <p className="text-2xl font-bold text-gray-900">0 km</p>
-                        <p className="text-sm text-gray-600 mt-1">Megtett távolság</p>
+                      <div className="bg-navy-50 rounded-xl p-4 text-center">
+                        <p className="text-2xl font-bold text-navy-900">0 km</p>
+                        <p className="text-sm text-navy-600 mt-1">Megtett távolság</p>
                       </div>
-                      <div className="bg-gray-50 rounded-lg p-4 text-center">
-                        <p className="text-2xl font-bold text-gray-900">0 m</p>
-                        <p className="text-sm text-gray-600 mt-1">Szintemelkedés</p>
+                      <div className="bg-navy-50 rounded-xl p-4 text-center">
+                        <p className="text-2xl font-bold text-navy-900">0 m</p>
+                        <p className="text-sm text-navy-600 mt-1">Szintemelkedés</p>
                       </div>
-                      <div className="bg-gray-50 rounded-lg p-4 text-center">
-                        <p className="text-2xl font-bold text-gray-900">0 h</p>
-                        <p className="text-sm text-gray-600 mt-1">Aktív idő</p>
+                      <div className="bg-navy-50 rounded-xl p-4 text-center">
+                        <p className="text-2xl font-bold text-navy-900">0 h</p>
+                        <p className="text-sm text-navy-600 mt-1">Aktív idő</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Recent Trips */}
-                  <div className="pt-6 border-t border-gray-200">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Közelmúltbeli túrák</h3>
-                    <div className="bg-gray-50 rounded-lg p-8 text-center">
-                      <p className="text-gray-600">Hamarosan elérhető</p>
+                  <div className="pt-6 border-t border-navy-200">
+                    <h3 className="text-lg font-bold text-navy-900 mb-4">Közelmúltbeli túrák</h3>
+                    <div className="bg-navy-50 rounded-xl p-8 text-center">
+                      <p className="text-navy-600">Hamarosan elérhető</p>
                     </div>
                   </div>
                 </div>
@@ -903,59 +903,59 @@ export default function ProfilePage() {
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-navy-700 mb-2">
                         Keresztnév
                       </label>
                       <input
                         type="text"
                         value={settingsForm.first_name || ""}
                         onChange={(e) => handleSettingsChange("first_name", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-adventure-forest"
+                        className="w-full px-3 py-2 border border-navy-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-adventure-forest"
                         placeholder="Keresztnév"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-navy-700 mb-2">
                         Vezetéknév
                       </label>
                       <input
                         type="text"
                         value={settingsForm.last_name || ""}
                         onChange={(e) => handleSettingsChange("last_name", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-adventure-forest"
+                        className="w-full px-3 py-2 border border-navy-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-adventure-forest"
                         placeholder="Vezetéknév"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-navy-700 mb-2">
                         Felhasználónév
                       </label>
                       <input
                         type="text"
                         value={profile.slug || ""}
                         disabled
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
+                        className="w-full px-3 py-2 border border-navy-300 rounded-xl bg-navy-50 text-navy-600 cursor-not-allowed"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Nem módosítható</p>
+                      <p className="text-xs text-navy-500 mt-1">Nem módosítható</p>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-navy-700 mb-2">
                         Email
                       </label>
                       <input
                         type="email"
                         value={profile.email || ""}
                         disabled
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
+                        className="w-full px-3 py-2 border border-navy-300 rounded-xl bg-navy-50 text-navy-600 cursor-not-allowed"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Nem módosítható</p>
+                      <p className="text-xs text-navy-500 mt-1">Nem módosítható</p>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-navy-700 mb-2">
                         Telefonszám
                       </label>
                       <div className="flex gap-2">
@@ -971,7 +971,7 @@ export default function ProfilePage() {
                             const number = oldCode ? currentPhone.slice(oldCode.length) : currentPhone.replace(/^\+\d+/, "");
                             handleSettingsChange("phone", e.target.value + number);
                           }}
-                          className="w-28 px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-adventure-forest bg-white text-sm"
+                          className="w-28 px-2 py-2 border border-navy-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-adventure-forest bg-white text-sm"
                         >
                           <option value="">--</option>
                           {refCountries.map((country) => (
@@ -993,33 +993,33 @@ export default function ProfilePage() {
                             const code = match?.phone_code || "";
                             handleSettingsChange("phone", code + e.target.value);
                           }}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-adventure-forest"
+                          className="flex-1 px-3 py-2 border border-navy-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-adventure-forest"
                           placeholder="Telefonszám"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-navy-700 mb-2">
                         Város
                       </label>
                       <input
                         type="text"
                         value={settingsForm.location_city || ""}
                         onChange={(e) => handleSettingsChange("location_city", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-adventure-forest"
+                        className="w-full px-3 py-2 border border-navy-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-adventure-forest"
                         placeholder="Város"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-navy-700 mb-2">
                         Ország
                       </label>
                       <select
                         value={settingsForm.country_code || ""}
                         onChange={(e) => handleSettingsChange("country_code", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-adventure-forest bg-white"
+                        className="w-full px-3 py-2 border border-navy-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-adventure-forest bg-white"
                       >
                         <option value="">-- Válassz országot --</option>
                         {refCountries.map((country) => (
@@ -1031,13 +1031,13 @@ export default function ProfilePage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-navy-700 mb-2">
                         Preferált nyelv
                       </label>
                       <select
                         value={settingsForm.preferred_language || ""}
                         onChange={(e) => handleSettingsChange("preferred_language", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-adventure-forest bg-white"
+                        className="w-full px-3 py-2 border border-navy-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-adventure-forest bg-white"
                       >
                         <option value="">-- Válassz nyelvet --</option>
                         {refLanguages.map((lang) => (
@@ -1049,13 +1049,13 @@ export default function ProfilePage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-navy-700 mb-2">
                         Preferált valuta
                       </label>
                       <select
                         value={settingsForm.preferred_currency || ""}
                         onChange={(e) => handleSettingsChange("preferred_currency", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-adventure-forest bg-white"
+                        className="w-full px-3 py-2 border border-navy-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-adventure-forest bg-white"
                       >
                         <option value="">-- Válassz valutát --</option>
                         {refCurrencies.map((curr) => (
@@ -1067,13 +1067,13 @@ export default function ProfilePage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-navy-700 mb-2">
                         Időzóna
                       </label>
                       <select
                         value={(settingsForm as any).timezone || ""}
                         onChange={(e) => handleSettingsChange("timezone" as any, e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-adventure-forest bg-white"
+                        className="w-full px-3 py-2 border border-navy-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-adventure-forest bg-white"
                       >
                         <option value="">-- Válassz időzónát --</option>
                         {refTimezones.map((tz) => (
@@ -1087,47 +1087,47 @@ export default function ProfilePage() {
 
                   {/* Bio */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-navy-700 mb-2">
                       Bemutatkozás
                     </label>
                     <textarea
                       value={settingsForm.bio || ""}
                       onChange={(e) => handleSettingsChange("bio", e.target.value.slice(0, 500))}
                       maxLength={500}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-adventure-forest resize-none"
+                      className="w-full px-3 py-2 border border-navy-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-adventure-forest resize-none"
                       rows={4}
                       placeholder="Beszélj magadról..."
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-navy-500 mt-1">
                       {(settingsForm.bio || "").length}/500 karakter
                     </p>
                   </div>
 
                   {/* Emergency Contact */}
-                  <div className="pt-6 border-t border-gray-200">
-                    <h4 className="text-base font-bold text-gray-900 mb-4">Vészhelyzeti kapcsolat</h4>
+                  <div className="pt-6 border-t border-navy-200">
+                    <h4 className="text-base font-bold text-navy-900 mb-4">Vészhelyzeti kapcsolat</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-navy-700 mb-2">
                           Kapcsolat neve
                         </label>
                         <input
                           type="text"
                           value={settingsForm.emergency_contact?.name || ""}
                           onChange={(e) => handleEmergencyContactChange("name", e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-adventure-forest"
+                          className="w-full px-3 py-2 border border-navy-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-adventure-forest"
                           placeholder="Név"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-navy-700 mb-2">
                           Kapcsolat
                         </label>
                         <select
                           value={settingsForm.emergency_contact?.relationship || ""}
                           onChange={(e) => handleEmergencyContactChange("relationship", e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-adventure-forest bg-white"
+                          className="w-full px-3 py-2 border border-navy-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-adventure-forest bg-white"
                         >
                           <option value="">-- Válassz --</option>
                           {RELATIONSHIP_OPTIONS.map((rel) => (
@@ -1139,14 +1139,14 @@ export default function ProfilePage() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-navy-700 mb-2">
                           Telefonszám
                         </label>
                         <input
                           type="tel"
                           value={settingsForm.emergency_contact?.phone || ""}
                           onChange={(e) => handleEmergencyContactChange("phone", e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-adventure-forest"
+                          className="w-full px-3 py-2 border border-navy-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-adventure-forest"
                           placeholder="Telefonszám"
                         />
                       </div>
@@ -1154,17 +1154,17 @@ export default function ProfilePage() {
                   </div>
 
                   {/* Buttons */}
-                  <div className="flex gap-3 pt-6 border-t border-gray-200">
+                  <div className="flex gap-3 pt-6 border-t border-navy-200">
                     <button
                       onClick={handleSaveSettings}
                       disabled={isSavingSettings}
-                      className="px-6 py-2 bg-adventure-forest text-white rounded-lg font-medium hover:bg-green-800 transition-colors disabled:opacity-60"
+                      className="px-6 py-2 bg-trevu-600 text-white rounded-xl font-medium hover:bg-trevu-700 transition-colors disabled:opacity-60"
                     >
                       {isSavingSettings ? "Mentés..." : "Módosítások mentése"}
                     </button>
                     <button
                       onClick={() => setSettingsForm(profile)}
-                      className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                      className="px-6 py-2 border border-navy-300 text-navy-700 rounded-xl font-medium hover:bg-navy-50 transition-colors"
                     >
                       Mégse
                     </button>
@@ -1176,11 +1176,11 @@ export default function ProfilePage() {
               {activeTab === "skills" && (
                 <div className="space-y-6">
                   {adventureInterests.length === 0 ? (
-                    <div className="bg-gray-50 rounded-lg p-8 text-center">
-                      <p className="text-gray-600 mb-4">Előbb add meg a kaland érdeklődéseidet</p>
+                    <div className="bg-navy-50 rounded-xl p-8 text-center">
+                      <p className="text-navy-600 mb-4">Előbb add meg a kaland érdeklődéseidet</p>
                       <button
                         onClick={() => setActiveTab("overview")}
-                        className="px-4 py-2 bg-adventure-forest text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors"
+                        className="px-4 py-2 bg-trevu-600 text-white rounded-xl text-sm font-medium hover:bg-trevu-700 transition-colors"
                       >
                         Vissza az Áttekintéshez
                       </button>
@@ -1194,28 +1194,28 @@ export default function ProfilePage() {
                         return (
                           <div
                             key={category.id}
-                            className="border border-gray-200 rounded-lg overflow-hidden"
+                            className="border border-navy-200 rounded-xl overflow-hidden"
                           >
                             <button
                               onClick={() =>
                                 setExpandedSkillCategory(isExpanded ? null : category.id)
                               }
-                              className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                              className="w-full px-6 py-4 flex items-center justify-between hover:bg-navy-50 transition-colors"
                               style={{ backgroundColor: isExpanded ? (category.color_hex || "#f3f4f6") + "20" : "transparent" }}
                             >
                               <div className="flex items-center gap-3">
                                 <span className="text-2xl">
                                   {CATEGORY_ICONS[category.name?.toLowerCase()?.replace(" ", "_")] || "⭐"}
                                 </span>
-                                <span className="font-semibold text-gray-900">
+                                <span className="font-semibold text-navy-900">
                                   {category.name_localized || category.name}
                                 </span>
                               </div>
-                              <span className="text-gray-500">{isExpanded ? "▼" : "▶"}</span>
+                              <span className="text-navy-500">{isExpanded ? "▼" : "▶"}</span>
                             </button>
 
                             {isExpanded && (
-                              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 space-y-4">
+                              <div className="px-6 py-4 bg-navy-50 border-t border-navy-200 space-y-4">
                                 {categorySubDisciplines.map((subDisc) => {
                                   const currentLevel =
                                     skillsToSave[subDisc.id] ||
@@ -1225,9 +1225,9 @@ export default function ProfilePage() {
                                   return (
                                     <div
                                       key={subDisc.id}
-                                      className="flex items-center justify-between py-3 px-4 bg-white rounded-lg border border-gray-200"
+                                      className="flex items-center justify-between py-3 px-4 bg-white rounded-xl border border-navy-200"
                                     >
-                                      <span className="text-sm font-medium text-gray-900">
+                                      <span className="text-sm font-medium text-navy-900">
                                         {subDisc.name_localized || subDisc.name}
                                       </span>
                                       <div className="flex gap-2">
@@ -1265,11 +1265,11 @@ export default function ProfilePage() {
                       })}
 
                       {/* Save Button */}
-                      <div className="flex gap-3 pt-6 border-t border-gray-200">
+                      <div className="flex gap-3 pt-6 border-t border-navy-200">
                         <button
                           onClick={handleSaveSkills}
                           disabled={isSavingSkills}
-                          className="px-6 py-2 bg-adventure-forest text-white rounded-lg font-medium hover:bg-green-800 transition-colors disabled:opacity-60"
+                          className="px-6 py-2 bg-trevu-600 text-white rounded-xl font-medium hover:bg-trevu-700 transition-colors disabled:opacity-60"
                         >
                           {isSavingSkills ? "Mentés..." : "Készségek mentése"}
                         </button>
@@ -1284,10 +1284,10 @@ export default function ProfilePage() {
                 <div className="space-y-6">
                   {/* Profile Visibility */}
                   <div>
-                    <h4 className="text-base font-bold text-gray-900 mb-4">Profil láthatósága</h4>
+                    <h4 className="text-base font-bold text-navy-900 mb-4">Profil láthatósága</h4>
                     <div className="space-y-3">
                       {["public", "registered", "private"].map((option) => (
-                        <label key={option} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                        <label key={option} className="flex items-center gap-3 p-3 border border-navy-200 rounded-xl cursor-pointer hover:bg-navy-50">
                           <input
                             type="radio"
                             name="profile_visibility"
@@ -1302,12 +1302,12 @@ export default function ProfilePage() {
                             className="w-4 h-4 accent-adventure-forest"
                           />
                           <div>
-                            <p className="font-medium text-gray-900">
+                            <p className="font-medium text-navy-900">
                               {option === "public" && "Nyilvános"}
                               {option === "registered" && "Csak regisztrált felhasználók"}
                               {option === "private" && "Privát"}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-navy-500">
                               {option === "public" && "Mindenki láthatja a profilodat"}
                               {option === "registered" && "Csak bejelentkezve lehet megtekinteni"}
                               {option === "private" && "Csak te láthatod"}
@@ -1319,14 +1319,14 @@ export default function ProfilePage() {
                   </div>
 
                   {/* Email Visibility */}
-                  <div className="pt-6 border-t border-gray-200">
-                    <h4 className="text-base font-bold text-gray-900 mb-4">Email láthatósága</h4>
+                  <div className="pt-6 border-t border-navy-200">
+                    <h4 className="text-base font-bold text-navy-900 mb-4">Email láthatósága</h4>
                     <div className="space-y-3">
                       {[
                         { value: "public", label: "Nyilvános" },
                         { value: "hidden", label: "Rejtett" },
                       ].map((option) => (
-                        <label key={option.value} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                        <label key={option.value} className="flex items-center gap-3 p-3 border border-navy-200 rounded-xl cursor-pointer hover:bg-navy-50">
                           <input
                             type="radio"
                             name="email_visibility"
@@ -1340,21 +1340,21 @@ export default function ProfilePage() {
                             }
                             className="w-4 h-4 accent-adventure-forest"
                           />
-                          <p className="font-medium text-gray-900">{option.label}</p>
+                          <p className="font-medium text-navy-900">{option.label}</p>
                         </label>
                       ))}
                     </div>
                   </div>
 
                   {/* Phone Visibility */}
-                  <div className="pt-6 border-t border-gray-200">
-                    <h4 className="text-base font-bold text-gray-900 mb-4">Telefonszám láthatósága</h4>
+                  <div className="pt-6 border-t border-navy-200">
+                    <h4 className="text-base font-bold text-navy-900 mb-4">Telefonszám láthatósága</h4>
                     <div className="space-y-3">
                       {[
                         { value: "trip_companions_only", label: "Csak túratársak" },
                         { value: "hidden", label: "Rejtett" },
                       ].map((option) => (
-                        <label key={option.value} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                        <label key={option.value} className="flex items-center gap-3 p-3 border border-navy-200 rounded-xl cursor-pointer hover:bg-navy-50">
                           <input
                             type="radio"
                             name="phone_visibility"
@@ -1368,22 +1368,22 @@ export default function ProfilePage() {
                             }
                             className="w-4 h-4 accent-adventure-forest"
                           />
-                          <p className="font-medium text-gray-900">{option.label}</p>
+                          <p className="font-medium text-navy-900">{option.label}</p>
                         </label>
                       ))}
                     </div>
                   </div>
 
                   {/* Location Precision */}
-                  <div className="pt-6 border-t border-gray-200">
-                    <h4 className="text-base font-bold text-gray-900 mb-4">Helyadatok pontossága</h4>
+                  <div className="pt-6 border-t border-navy-200">
+                    <h4 className="text-base font-bold text-navy-900 mb-4">Helyadatok pontossága</h4>
                     <div className="space-y-3">
                       {[
                         { value: "city_country", label: "Város + Ország" },
                         { value: "country_only", label: "Csak ország" },
                         { value: "hidden", label: "Rejtett" },
                       ].map((option) => (
-                        <label key={option.value} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                        <label key={option.value} className="flex items-center gap-3 p-3 border border-navy-200 rounded-xl cursor-pointer hover:bg-navy-50">
                           <input
                             type="radio"
                             name="location_precision"
@@ -1397,22 +1397,22 @@ export default function ProfilePage() {
                             }
                             className="w-4 h-4 accent-adventure-forest"
                           />
-                          <p className="font-medium text-gray-900">{option.label}</p>
+                          <p className="font-medium text-navy-900">{option.label}</p>
                         </label>
                       ))}
                     </div>
                   </div>
 
                   {/* Trip History Visibility */}
-                  <div className="pt-6 border-t border-gray-200">
-                    <h4 className="text-base font-bold text-gray-900 mb-4">Túrázás történet láthatósága</h4>
+                  <div className="pt-6 border-t border-navy-200">
+                    <h4 className="text-base font-bold text-navy-900 mb-4">Túrázás történet láthatósága</h4>
                     <div className="space-y-3">
                       {[
                         { value: "public", label: "Nyilvános" },
                         { value: "followers_only", label: "Csak követők" },
                         { value: "private", label: "Privát" },
                       ].map((option) => (
-                        <label key={option.value} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                        <label key={option.value} className="flex items-center gap-3 p-3 border border-navy-200 rounded-xl cursor-pointer hover:bg-navy-50">
                           <input
                             type="radio"
                             name="trip_history_visibility"
@@ -1426,16 +1426,16 @@ export default function ProfilePage() {
                             }
                             className="w-4 h-4 accent-adventure-forest"
                           />
-                          <p className="font-medium text-gray-900">{option.label}</p>
+                          <p className="font-medium text-navy-900">{option.label}</p>
                         </label>
                       ))}
                     </div>
                   </div>
 
                   {/* Online Status */}
-                  <div className="pt-6 border-t border-gray-200">
-                    <h4 className="text-base font-bold text-gray-900 mb-4">Online státusz</h4>
-                    <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                  <div className="pt-6 border-t border-navy-200">
+                    <h4 className="text-base font-bold text-navy-900 mb-4">Online státusz</h4>
+                    <label className="flex items-center gap-3 p-3 border border-navy-200 rounded-xl cursor-pointer hover:bg-navy-50">
                       <input
                         type="checkbox"
                         checked={privacySettings.online_status_visible}
@@ -1447,16 +1447,16 @@ export default function ProfilePage() {
                         }
                         className="w-4 h-4 accent-adventure-forest"
                       />
-                      <p className="font-medium text-gray-900">Online státusz zvisible</p>
+                      <p className="font-medium text-navy-900">Online státusz zvisible</p>
                     </label>
                   </div>
 
                   {/* Save Button */}
-                  <div className="flex gap-3 pt-6 border-t border-gray-200">
+                  <div className="flex gap-3 pt-6 border-t border-navy-200">
                     <button
                       onClick={handleSavePrivacy}
                       disabled={isSavingPrivacy}
-                      className="px-6 py-2 bg-adventure-forest text-white rounded-lg font-medium hover:bg-green-800 transition-colors disabled:opacity-60"
+                      className="px-6 py-2 bg-trevu-600 text-white rounded-xl font-medium hover:bg-trevu-700 transition-colors disabled:opacity-60"
                     >
                       {isSavingPrivacy ? "Mentés..." : "Adatvédelmi beállítások mentése"}
                     </button>
