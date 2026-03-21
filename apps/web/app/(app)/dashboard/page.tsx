@@ -23,8 +23,17 @@ export default async function DashboardPage() {
               Ultimate Adventure Tool
             </h1>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <span className="text-sm text-gray-600">{user.email}</span>
+            <Link
+              href="/profile"
+              className="h-9 w-9 rounded-lg bg-adventure-forest text-white flex items-center justify-center font-bold text-xs hover:bg-green-800 transition-colors"
+              title="Profil"
+            >
+              {(user.user_metadata?.full_name || user.email || "U")
+                .charAt(0)
+                .toUpperCase()}
+            </Link>
             <form action="/api/v1/auth/signout" method="POST">
               <button className="text-sm text-gray-500 hover:text-gray-700">
                 Kijelentkezés
