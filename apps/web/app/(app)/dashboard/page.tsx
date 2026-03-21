@@ -70,7 +70,7 @@ export default async function DashboardPage() {
           </Link>
 
           <Link
-            href="/trips"
+            href="/trips/new"
             className="p-6 bg-white rounded-2xl border border-navy-200 hover:border-trevu-400 hover:shadow-trevu-lg transition-all group"
           >
             <div className="w-12 h-12 rounded-xl bg-trevu-50 flex items-center justify-center mb-4">
@@ -109,7 +109,7 @@ export default async function DashboardPage() {
         <div className="p-4 rounded-xl bg-trevu-50 border border-trevu-200">
           <p className="text-sm text-trevu-800">
             <span className="font-semibold">Rendszer státusz:</span>{" "}
-            MVP infrastruktúra aktív — M01 User Management beüzemelve
+            MVP infrastruktúra aktív — M01 User Management + M02 Trip Wizard beüzemelve
           </p>
         </div>
       </div>
