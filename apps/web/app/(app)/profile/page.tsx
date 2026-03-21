@@ -396,21 +396,29 @@ export default function ProfilePage() {
           
           setPrivacySettings(createdPrivacy || defaultPrivacy);
         }
-        // Populate reference data from hardcoded maps
-        setRefCountries(Object.entries(COUNTRY_MAP).map(([code, name]) => ({
-          code, alpha3: "", name_en: name, name_hu: name, phone_code: code === "HU" ? "+36" : code === "AT" ? "+43" : code === "DE" ? "+49" : code === "SK" ? "+421" : code === "CZ" ? "+420" : code === "HR" ? "+385" : code === "SI" ? "+386" : code === "RO" ? "+40" : code === "CH" ? "+41" : code === "PL" ? "+48" : code === "IT" ? "+39" : "", default_currency: "EUR", flag_emoji: "", is_eu: true,
-        })));
-        setRefLanguages(Object.entries(LANGUAGE_MAP).map(([code, name]) => ({
-          code, name_en: name, name_hu: name, name_native: name, is_app_supported: true,
-        })));
-        setRefCurrencies(Object.entries(CURRENCY_MAP).map(([code, name]) => ({
-          code, name_en: name, name_hu: name, symbol: code === "EUR" ? "€" : code === "HUF" ? "Ft" : code === "CZK" ? "Kč" : code === "HRK" ? "kn" : code === "RON" ? "lei" : "",
-        })));
-        setRefTimezones([
-          { tz_id: "Europe/Budapest", display_name: "Budapest (CET)", utc_offset_text: "UTC+1", country_code: "HU" },
-          { tz_id: "Europe/Vienna", display_name: "Bécs (CET)", utc_offset_text: "UTC+1", country_code: "AT" },
-          { tz_id: "Europe/Berlin", display_name: "Berlin (CET)", utc_offset_text: "UTC+1", country_code: "DE" },
-        ]);
+        // Fallback: if ref_* tables don't exist yet, populate from hardcoded maps
+        if (!countriesRes.data?.length) {
+          setRefCountries(Object.entries(COUNTRY_MAP).map(([code, name]) => ({
+            code, alpha3: "", name_en: name, name_hu: name, phone_code: code === "HU" ? "+36" : code === "AT" ? "+43" : code === "DE" ? "+49" : code === "SK" ? "+421" : code === "CZ" ? "+420" : code === "HR" ? "+385" : code === "SI" ? "+386" : code === "RO" ? "+40" : code === "CH" ? "+41" : code === "PL" ? "+48" : code === "IT" ? "+39" : "", default_currency: "EUR", flag_emoji: "", is_eu: true,
+          })));
+        }
+        if (!languagesRes.data?.length) {
+          setRefLanguages(Object.entries(LANGUAGE_MAP).map(([code, name]) => ({
+            code, name_en: name, name_hu: name, name_native: name, is_app_supported: true,
+          })));
+        }
+        if (!currenciesRes.data?.length) {
+          setRefCurrencies(Object.entries(CURRENCY_MAP).map(([code, name]) => ({
+            code, name_en: name, name_hu: name, symbol: code === "EUR" ? "€" : code === "HUF" ? "Ft" : code === "CZK" ? "Kč" : code === "HRK" ? "kn" : code === "RON" ? "lei" : "",
+          })));
+        }
+        if (!timezonesRes.data?.length) {
+          setRefTimezones([
+            { tz_id: "Europe/Budapest", display_name: "Budapest (CET)", utc_offset_text: "UTC+1", country_code: "HU" },
+            { tz_id: "Europe/Vienna", display_name: "Bécs (CET)", utc_offset_text: "UTC+1", country_code: "AT" },
+            { tz_id: "Europe/Berlin", display_name: "Berlin (CET)", utc_offset_text: "UTC+1", country_code: "DE" },
+          ]);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
         showToast("Hiba az adatok betöltésekor", "error");
@@ -701,8 +709,8 @@ export default function ProfilePage() {
                   <span className="text-lg">📍</span>
                   <p className="text-sm text-gray-900">
                     {profile.location_city && profile.country_code
-                      ? `${profile.location_city}, ${COUNTRY_MAP[profile.country_code] || profile.country_code}`
-                      : profile.location_city || COUNTRY_MAP[profile.country_code || ""] || "—"}
+                      ? `${profile.location_city}, ${refCountries.find(c => c.code === profile.country_code)?.name_hu || COUNTRY_MAP[profile.country_code] || profile.country_code}`
+                      : profile.location_city || refCountries.find(c => c.code === (profile.country_code || ""))?.name_hu || COUNTRY_MAP[profile.country_code || ""] || "—"}
                   </p>
                 </div>
               </div>
