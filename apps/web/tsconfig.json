@@ -1,0 +1,14 @@
+{
+  "extends": "../../tooling/typescript/nextjs.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./*"],
+      "@uat/db": ["../../packages/db/src"],
+      "@uat/core": ["../../packages/core/src"],
+      "@uat/validators": ["../../packages/validators/src"],
+      "@uat/config": ["../../packages/config/src"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

@@ -1,0 +1,20 @@
+[project]
+id = "rpwajsbxrvypeqaalhvd"
+name = "ultimate-adventure-tool"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+
+[db]
+port = 54322
+
+[auth]
+site_url = "https://ttvk.hu"
+additional_redirect_urls = ["http://localhost:3000/auth/callback"]
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = true
