@@ -18,6 +18,7 @@ interface Profile {
   preferred_language?: string;
   preferred_currency?: string;
   country_code?: string;
+  timezone?: string;
   bio?: string;
   reputation_points?: number;
   reputation_level?: number;
@@ -152,7 +153,21 @@ const RELATIONSHIP_MAP: Record<string, string> = {
   other: "Egyéb",
 };
 
-// Country/language/currency options are now loaded from ref_* tables via state
+const COUNTRY_MAP: Record<string, string> = {
+  HU: "Magyarország", AT: "Ausztria", DE: "Németország", SK: "Szlovákia",
+  CZ: "Csehország", HR: "Horvátország", SI: "Szlovénia", RO: "Románia",
+  CH: "Svájc", PL: "Lengyelország", IT: "Olaszország",
+};
+
+const LANGUAGE_MAP: Record<string, string> = {
+  hu: "Magyar", en: "English", de: "Deutsch", sk: "Slovenčina",
+  hr: "Hrvatski", si: "Slovenščina", ro: "Română", cz: "Čeština",
+};
+
+const CURRENCY_MAP: Record<string, string> = {
+  EUR: "Euro (EUR)", HUF: "Forint (HUF)", CZK: "Koruna (CZK)",
+  HRK: "Kuna (HRK)", RON: "Leu (RON)",
+};
 
 function formatDate(dateString?: string): string {
   if (!dateString) return "-";
@@ -212,6 +227,12 @@ export default function ProfilePage() {
   const [categories, setCategories] = useState<any[]>([]);
   const [subDisciplines, setSubDisciplines] = useState<SubDiscipline[]>([]);
   const [userSkills, setUserSkills] = useState<UserSkill[]>([]);
+
+  // Reference data (loaded from ref_* tables)
+  const [refCountries, setRefCountries] = useState<RefCountry[]>([]);
+  const [refLanguages, setRefLanguages] = useState<RefLanguage[]>([]);
+  const [refCurrencies, setRefCurrencies] = useState<RefCurrency[]>([]);
+  const [refTimezones, setRefTimezones] = useState<RefTimezone[]>([]);
 
   // Tab-specific state
   const [settingsForm, setSettingsForm] = useState<Partial<Profile & { emergency_contact: Partial<EmergencyContact> }>>({});
@@ -297,6 +318,18 @@ export default function ProfilePage() {
           trips: tripsRes.count || 0,
         });
 
+        // Fetch reference data (countries, languages, currencies, timezones)
+        const [countriesRes, languagesRes, currenciesRes, timezonesRes] = await Promise.all([
+          supabase.from("ref_countries").select("*").eq("is_active", true).order("sort_order"),
+          supabase.from("ref_languages").select("*").eq("is_active", true).eq("is_app_supported", true).order("sort_order"),
+          supabase.from("ref_currencies").select("*").eq("is_active", true).order("sort_order"),
+          supabase.from("ref_timezones").select("*").eq("is_active", true).order("sort_order"),
+        ]);
+        setRefCountries(countriesRes.data || []);
+        setRefLanguages(languagesRes.data || []);
+        setRefCurrencies(currenciesRes.data || []);
+        setRefTimezones(timezonesRes.data || []);
+
         // Fetch categories
         const { data: categoriesData } = await supabase
           .from("categories")
@@ -363,6 +396,21 @@ export default function ProfilePage() {
           
           setPrivacySettings(createdPrivacy || defaultPrivacy);
         }
+        // Populate reference data from hardcoded maps
+        setRefCountries(Object.entries(COUNTRY_MAP).map(([code, name]) => ({
+          code, alpha3: "", name_en: name, name_hu: name, phone_code: code === "HU" ? "+36" : code === "AT" ? "+43" : code === "DE" ? "+49" : code === "SK" ? "+421" : code === "CZ" ? "+420" : code === "HR" ? "+385" : code === "SI" ? "+386" : code === "RO" ? "+40" : code === "CH" ? "+41" : code === "PL" ? "+48" : code === "IT" ? "+39" : "", default_currency: "EUR", flag_emoji: "", is_eu: true,
+        })));
+        setRefLanguages(Object.entries(LANGUAGE_MAP).map(([code, name]) => ({
+          code, name_en: name, name_hu: name, name_native: name, is_app_supported: true,
+        })));
+        setRefCurrencies(Object.entries(CURRENCY_MAP).map(([code, name]) => ({
+          code, name_en: name, name_hu: name, symbol: code === "EUR" ? "€" : code === "HUF" ? "Ft" : code === "CZK" ? "Kč" : code === "HRK" ? "kn" : code === "RON" ? "lei" : "",
+        })));
+        setRefTimezones([
+          { tz_id: "Europe/Budapest", display_name: "Budapest (CET)", utc_offset_text: "UTC+1", country_code: "HU" },
+          { tz_id: "Europe/Vienna", display_name: "Bécs (CET)", utc_offset_text: "UTC+1", country_code: "AT" },
+          { tz_id: "Europe/Berlin", display_name: "Berlin (CET)", utc_offset_text: "UTC+1", country_code: "DE" },
+        ]);
       } catch (error) {
         console.error("Error fetching data:", error);
         showToast("Hiba az adatok betöltésekor", "error");
@@ -411,6 +459,7 @@ export default function ProfilePage() {
         country_code: settingsForm.country_code || null,
         preferred_language: settingsForm.preferred_language || "hu",
         preferred_currency: settingsForm.preferred_currency || "EUR",
+        timezone: settingsForm.timezone || null,
         display_name: [settingsForm.first_name, settingsForm.last_name].filter(Boolean).join(" ") || profile?.display_name || "Felhasználó",
       };
 
@@ -901,13 +950,45 @@ export default function ProfilePage() {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Telefonszám
                       </label>
-                      <input
-                        type="tel"
-                        value={settingsForm.phone || ""}
-                        onChange={(e) => handleSettingsChange("phone", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-adventure-forest"
-                        placeholder="Telefonszám"
-                      />
+                      <div className="flex gap-2">
+                        <select
+                          value={(() => {
+                            const phone = settingsForm.phone || "";
+                            const match = refCountries.find(c => phone.startsWith(c.phone_code));
+                            return match?.phone_code || (settingsForm.country_code ? refCountries.find(c => c.code === settingsForm.country_code)?.phone_code : "") || "";
+                          })()}
+                          onChange={(e) => {
+                            const currentPhone = settingsForm.phone || "";
+                            const oldCode = refCountries.find(c => currentPhone.startsWith(c.phone_code))?.phone_code || "";
+                            const number = oldCode ? currentPhone.slice(oldCode.length) : currentPhone.replace(/^\+\d+/, "");
+                            handleSettingsChange("phone", e.target.value + number);
+                          }}
+                          className="w-28 px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-adventure-forest bg-white text-sm"
+                        >
+                          <option value="">--</option>
+                          {refCountries.map((country) => (
+                            <option key={country.code} value={country.phone_code}>
+                              {country.flag_emoji} {country.phone_code}
+                            </option>
+                          ))}
+                        </select>
+                        <input
+                          type="tel"
+                          value={(() => {
+                            const phone = settingsForm.phone || "";
+                            const match = refCountries.find(c => phone.startsWith(c.phone_code));
+                            return match ? phone.slice(match.phone_code.length) : phone;
+                          })()}
+                          onChange={(e) => {
+                            const currentPhone = settingsForm.phone || "";
+                            const match = refCountries.find(c => currentPhone.startsWith(c.phone_code));
+                            const code = match?.phone_code || "";
+                            handleSettingsChange("phone", code + e.target.value);
+                          }}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-adventure-forest"
+                          placeholder="Telefonszám"
+                        />
+                      </div>
                     </div>
 
                     <div>
@@ -933,9 +1014,9 @@ export default function ProfilePage() {
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-adventure-forest bg-white"
                       >
                         <option value="">-- Válassz országot --</option>
-                        {COUNTRY_OPTIONS.map((code) => (
-                          <option key={code} value={code}>
-                            {COUNTRY_MAP[code]}
+                        {refCountries.map((country) => (
+                          <option key={country.code} value={country.code}>
+                            {country.flag_emoji} {country.name_hu}
                           </option>
                         ))}
                       </select>
@@ -951,9 +1032,9 @@ export default function ProfilePage() {
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-adventure-forest bg-white"
                       >
                         <option value="">-- Válassz nyelvet --</option>
-                        {LANGUAGE_OPTIONS.map((lang) => (
-                          <option key={lang} value={lang}>
-                            {LANGUAGE_MAP[lang]}
+                        {refLanguages.map((lang) => (
+                          <option key={lang.code} value={lang.code}>
+                            {lang.name_native}
                           </option>
                         ))}
                       </select>
@@ -969,9 +1050,27 @@ export default function ProfilePage() {
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-adventure-forest bg-white"
                       >
                         <option value="">-- Válassz valutát --</option>
-                        {CURRENCY_OPTIONS.map((curr) => (
-                          <option key={curr} value={curr}>
-                            {CURRENCY_MAP[curr]}
+                        {refCurrencies.map((curr) => (
+                          <option key={curr.code} value={curr.code}>
+                            {curr.symbol} {curr.name_hu} ({curr.code})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Időzóna
+                      </label>
+                      <select
+                        value={(settingsForm as any).timezone || ""}
+                        onChange={(e) => handleSettingsChange("timezone" as any, e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-adventure-forest bg-white"
+                      >
+                        <option value="">-- Válassz időzónát --</option>
+                        {refTimezones.map((tz) => (
+                          <option key={tz.tz_id} value={tz.tz_id}>
+                            {tz.display_name} ({tz.utc_offset_text})
                           </option>
                         ))}
                       </select>
