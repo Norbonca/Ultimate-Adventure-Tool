@@ -1163,7 +1163,7 @@ export default function ProfilePage() {
                     <h4 className="text-base font-bold text-gray-900 mb-4">Telefonszám láthatósága</h4>
                     <div className="space-y-3">
                       {[
-                        { value: "companions", label: "Csak túratársak" },
+                        { value: "trip_companions_only", label: "Csak túratársak" },
                         { value: "hidden", label: "Rejtett" },
                       ].map((option) => (
                         <label key={option.value} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
@@ -1191,8 +1191,8 @@ export default function ProfilePage() {
                     <h4 className="text-base font-bold text-gray-900 mb-4">Helyadatok pontossága</h4>
                     <div className="space-y-3">
                       {[
-                        { value: "city", label: "Város + Ország" },
-                        { value: "country", label: "Csak ország" },
+                        { value: "city_country", label: "Város + Ország" },
+                        { value: "country_only", label: "Csak ország" },
                         { value: "hidden", label: "Rejtett" },
                       ].map((option) => (
                         <label key={option.value} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
@@ -1221,7 +1221,7 @@ export default function ProfilePage() {
                     <div className="space-y-3">
                       {[
                         { value: "public", label: "Nyilvános" },
-                        { value: "followers", label: "Csak követők" },
+                        { value: "followers_only", label: "Csak követők" },
                         { value: "private", label: "Privát" },
                       ].map((option) => (
                         <label key={option.value} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
