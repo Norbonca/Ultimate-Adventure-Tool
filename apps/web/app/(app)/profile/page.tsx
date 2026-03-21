@@ -79,38 +79,41 @@ const SUBSCRIPTION_TIER_MAP: Record<string, string> = {
   business: "Expedíció (€39.90/hó)",
 };
 
-const LANGUAGE_MAP: Record<string, string> = {
-  hu: "Magyar",
-  en: "English",
-  de: "Deutsch",
-  sk: "Slovenčina",
-  hr: "Hrvatski",
-  si: "Slovenščina",
-  ro: "Română",
-  cz: "Čeština",
-};
+// Reference data types (loaded from DB)
+interface RefCountry {
+  code: string;
+  alpha3: string;
+  name_en: string;
+  name_hu: string;
+  name_native?: string;
+  phone_code: string;
+  default_currency: string;
+  flag_emoji?: string;
+  is_eu: boolean;
+  market_priority?: number;
+}
 
-const CURRENCY_MAP: Record<string, string> = {
-  EUR: "Euro (EUR)",
-  HUF: "Forint (HUF)",
-  CZK: "Koruna (CZK)",
-  HRK: "Kuna (HRK)",
-  RON: "Leu (RON)",
-};
+interface RefLanguage {
+  code: string;
+  name_en: string;
+  name_hu: string;
+  name_native: string;
+  is_app_supported: boolean;
+}
 
-const COUNTRY_MAP: Record<string, string> = {
-  HU: "Magyarország",
-  AT: "Ausztria",
-  DE: "Németország",
-  SK: "Szlovákia",
-  CZ: "Csehország",
-  HR: "Horvátország",
-  SI: "Szlovénia",
-  RO: "Románia",
-  CH: "Svájc",
-  PL: "Lengyelország",
-  IT: "Olaszország",
-};
+interface RefCurrency {
+  code: string;
+  name_en: string;
+  name_hu: string;
+  symbol: string;
+}
+
+interface RefTimezone {
+  tz_id: string;
+  display_name: string;
+  utc_offset_text: string;
+  country_code: string;
+}
 
 const SKILL_LEVEL_MAP: Record<string, string> = {
   any: "Any",
@@ -149,9 +152,7 @@ const RELATIONSHIP_MAP: Record<string, string> = {
   other: "Egyéb",
 };
 
-const COUNTRY_OPTIONS = ["HU", "AT", "DE", "SK", "CZ", "HR", "SI", "RO", "CH", "PL", "IT"];
-const LANGUAGE_OPTIONS = ["hu", "en", "de", "sk", "hr", "si", "ro", "cz"];
-const CURRENCY_OPTIONS = ["EUR", "HUF", "CZK", "HRK", "RON"];
+// Country/language/currency options are now loaded from ref_* tables via state
 
 function formatDate(dateString?: string): string {
   if (!dateString) return "-";
@@ -220,6 +221,8 @@ export default function ProfilePage() {
   const [skillsToSave, setSkillsToSave] = useState<Record<string, string>>({});
   const [isSavingSkills, setIsSavingSkills] = useState(false);
   const [expandedSkillCategory, setExpandedSkillCategory] = useState<string | null>(null);
+  const [isEditingInterests, setIsEditingInterests] = useState(false);
+  const [selectedInterestIds, setSelectedInterestIds] = useState<string[]>([]);
 
   // Fetch all data on mount
   useEffect(() => {
@@ -302,14 +305,16 @@ export default function ProfilePage() {
 
         setCategories(categoriesData || []);
 
-        // Fetch adventure interests
+        // Fetch adventure interests (just IDs, no join - no FK between tables)
         const { data: interestsData } = await supabase
           .from("user_adventure_interests")
-          .select("*, categories(*)")
+          .select("category_id")
           .eq("user_id", authUser.id);
 
-        if (interestsData) {
-          setAdventureInterests(interestsData.map((i: any) => i.categories));
+        if (interestsData && categoriesData) {
+          const interestCategoryIds = interestsData.map((i: any) => i.category_id);
+          const matchedCategories = categoriesData.filter((c: any) => interestCategoryIds.includes(c.id));
+          setAdventureInterests(matchedCategories);
         }
 
         // Fetch sub-disciplines
@@ -504,6 +509,23 @@ export default function ProfilePage() {
     }
   };
 
+  const handleSaveInterests = async () => {
+    if (!user) return;
+    // Delete all existing interests
+    await supabase.from("user_adventure_interests").delete().eq("user_id", user.id);
+    // Insert selected ones
+    if (selectedInterestIds.length > 0) {
+      await supabase.from("user_adventure_interests").insert(
+        selectedInterestIds.map(catId => ({ user_id: user.id, category_id: catId }))
+      );
+    }
+    // Update local state
+    const matchedCategories = categories.filter(c => selectedInterestIds.includes(c.id));
+    setAdventureInterests(matchedCategories);
+    setIsEditingInterests(false);
+    showToast("Érdeklődések mentve!");
+  };
+
   if (isLoading) {
     return (
       <main className="min-h-screen bg-gray-50">
@@ -693,24 +715,83 @@ export default function ProfilePage() {
                 <div className="space-y-6">
                   {/* Adventure Interests */}
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Kaland érdeklődés</h3>
-                    {adventureInterests.length > 0 ? (
-                      <div className="flex flex-wrap gap-3">
-                        {adventureInterests.map((interest) => (
-                          <div
-                            key={interest.id}
-                            className="px-4 py-2 rounded-full flex items-center gap-2"
-                            style={{ backgroundColor: interest.color_hex || "#e5e7eb" }}
-                          >
-                            <span>{CATEGORY_ICONS[interest.name?.toLowerCase()?.replace(" ", "_")] || "⭐"}</span>
-                            <span className="text-sm font-medium text-gray-900">
-                              {interest.name_localized || interest.name}
-                            </span>
-                          </div>
-                        ))}
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-bold text-gray-900">Kaland érdeklődés</h3>
+                      <button
+                        onClick={() => {
+                          if (!isEditingInterests) {
+                            setSelectedInterestIds(adventureInterests.map(a => a.id));
+                          }
+                          setIsEditingInterests(!isEditingInterests);
+                        }}
+                        className="px-3 py-1 text-sm font-medium text-adventure-forest hover:bg-green-50 rounded transition-colors"
+                      >
+                        {isEditingInterests ? "Mentés" : "Szerkesztés"}
+                      </button>
+                    </div>
+                    {isEditingInterests ? (
+                      <div>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+                          {categories.map((category) => {
+                            const isSelected = selectedInterestIds.includes(category.id);
+                            const iconKey = category.name?.toLowerCase()?.replace(/\s+/g, "_") || category.name?.toLowerCase();
+                            return (
+                              <button
+                                key={category.id}
+                                onClick={() => {
+                                  setSelectedInterestIds((prev) =>
+                                    isSelected
+                                      ? prev.filter((id) => id !== category.id)
+                                      : [...prev, category.id]
+                                  );
+                                }}
+                                className={`p-4 rounded-lg border-2 transition-all flex flex-col items-center gap-2 ${
+                                  isSelected
+                                    ? "border-adventure-forest"
+                                    : "border-gray-200 opacity-50 hover:opacity-75"
+                                }`}
+                                style={
+                                  isSelected
+                                    ? { backgroundColor: `${category.color_hex}20` }
+                                    : {}
+                                }
+                              >
+                                <span className="text-2xl">{CATEGORY_ICONS[iconKey] || "⭐"}</span>
+                                <span className="text-sm font-medium text-center text-gray-900">
+                                  {category.name_localized || category.name}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <button
+                          onClick={handleSaveInterests}
+                          className="px-4 py-2 bg-adventure-forest text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors"
+                        >
+                          Mentés
+                        </button>
                       </div>
                     ) : (
-                      <p className="text-gray-500">Még nem adtál meg kaland érdeklődéseket</p>
+                      <>
+                        {adventureInterests.length > 0 ? (
+                          <div className="flex flex-wrap gap-3">
+                            {adventureInterests.map((interest) => (
+                              <div
+                                key={interest.id}
+                                className="px-4 py-2 rounded-full flex items-center gap-2"
+                                style={{ backgroundColor: interest.color_hex || "#e5e7eb" }}
+                              >
+                                <span>{CATEGORY_ICONS[interest.name?.toLowerCase()?.replace(" ", "_")] || "⭐"}</span>
+                                <span className="text-sm font-medium text-gray-900">
+                                  {interest.name_localized || interest.name}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-gray-500">Még nem adtál meg kaland érdeklődéseket</p>
+                        )}
+                      </>
                     )}
                   </div>
 
