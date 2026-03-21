@@ -400,17 +400,23 @@ export default function ProfilePage() {
       const updateData = {
         first_name: settingsForm.first_name || "",
         last_name: settingsForm.last_name || "",
-        phone: settingsForm.phone || "",
-        bio: settingsForm.bio || "",
-        location_city: settingsForm.location_city || "",
-        country_code: settingsForm.country_code || "",
-        preferred_language: settingsForm.preferred_language || "",
-        preferred_currency: settingsForm.preferred_currency || "",
+        phone: settingsForm.phone || null,
+        bio: settingsForm.bio || null,
+        location_city: settingsForm.location_city || null,
+        country_code: settingsForm.country_code || null,
+        preferred_language: settingsForm.preferred_language || "hu",
+        preferred_currency: settingsForm.preferred_currency || "EUR",
+        display_name: [settingsForm.first_name, settingsForm.last_name].filter(Boolean).join(" ") || profile?.display_name || "Felhasználó",
       };
 
       const { error: profileError } = await supabase
         .from("profiles")
-        .upsert({ ...updateData, id: user.id }, { onConflict: 'id' });
+        .upsert({
+          ...updateData,
+          id: user.id,
+          email: user.email || "",
+          slug: profile?.slug || user.email?.split("@")[0] || "user",
+        }, { onConflict: 'id' });
 
       if (profileError) {
         showToast("Profil mentése sikertelen", "error");
