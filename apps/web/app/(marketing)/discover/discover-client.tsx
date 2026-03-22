@@ -25,56 +25,61 @@ import {
   ChevronDown,
 } from 'lucide-react';
 
+// Types matching Supabase query results exactly
 interface Trip {
   id: string;
   slug: string;
   title: string;
+  short_description: string | null;
   description: string;
-  location: string;
-  region: string;
-  cover_image_url?: string;
-  start_date: string;
-  end_date: string;
+  location_country: string;
+  location_region: string | null;
+  location_city: string | null;
+  cover_image_url: string | null;
+  start_date: string | null;
+  end_date: string | null;
   price_amount: number | null;
-  difficulty_level: string;
+  price_currency: string;
+  is_cost_sharing: boolean;
+  difficulty: number;
   category_id: string;
-  available_spots: number;
-  profiles?: {
-    id: string;
-    name: string;
-    avatar_url?: string;
-    subscription_tier?: string;
-  };
-  organizer?: {
-    id: string;
-    name: string;
-    avatar_url?: string;
-    subscription_tier: string;
-    logo_url?: string;
-  };
+  max_participants: number;
+  current_participants: number;
+  status: string;
+  visibility: string;
+  categories: { id: string; name: string; name_localized: Record<string, string>; icon_name: string; color_hex: string } | { id: string; name: string; name_localized: Record<string, string>; icon_name: string; color_hex: string }[] | null;
+  sub_disciplines: { id: string; name: string; name_localized: Record<string, string> } | null;
+  profiles: { id: string; display_name: string; avatar_url: string | null; slug: string; subscription_tier: string } | { id: string; display_name: string; avatar_url: string | null; slug: string; subscription_tier: string }[] | null;
 }
 
 interface Category {
   id: string;
   name: string;
+  name_localized: Record<string, string>;
+  icon_name: string;
+  color_hex: string;
+  display_order: number;
 }
 
 interface DifficultyLevel {
-  value: string;
+  value: number;
   label: string;
   labelEn: string;
   color: string;
 }
 
+interface CategoryDisplayItem {
+  name: string;
+  nameHu: string;
+  emoji: string;
+  colorHex: string;
+  icon: string;
+  colorBg: string;
+  colorText: string;
+}
+
 interface CategoryDisplay {
-  [key: string]: {
-    emoji: string;
-    colorHex: string;
-    nameHu: string;
-    icon: React.ComponentType<any>;
-    colorBg: string;
-    colorText: string;
-  };
+  [key: string]: CategoryDisplayItem;
 }
 
 interface DiscoverClientProps {
@@ -135,6 +140,13 @@ export default function DiscoverClient({
   const [selectedDuration, setSelectedDuration] = useState<string>('all');
   const [selectedSpots, setSelectedSpots] = useState<string>('all');
 
+  // Helper: resolve Supabase join (can be object or array)
+  const resolveJoin = <T,>(val: T | T[] | null): T | null => {
+    if (!val) return null;
+    if (Array.isArray(val)) return val[0] || null;
+    return val;
+  };
+
   const filteredTrips = trips.filter((trip) => {
     if (activeCategory !== 'all' && trip.category_id !== activeCategory) {
       return false;
@@ -145,20 +157,32 @@ export default function DiscoverClient({
     ) {
       return false;
     }
-    if (selectedDifficulty !== 'all' && trip.difficulty_level !== selectedDifficulty) {
+    if (selectedDifficulty !== 'all' && String(trip.difficulty) !== selectedDifficulty) {
       return false;
     }
     return true;
   });
 
-  const getDifficultyColor = (level: string): string => {
-    const difficulty = difficultyLevels.find((d) => d.value === level);
-    return difficulty?.color || '#6B7280';
+  const getDifficultyLabel = (level: number) => {
+    return difficultyLevels.find((d) => d.value === level) || difficultyLevels[0];
   };
 
-  const getCategoryInfo = (categoryId: string) => {
-    const category = categories.find((c) => c.id === categoryId);
-    return category ? categoryDisplay[category.name] : null;
+  const getCategoryInfo = (trip: Trip) => {
+    const cat = resolveJoin(trip.categories);
+    if (!cat) return null;
+    return { ...categoryDisplay[cat.name], dbCat: cat };
+  };
+
+  const getOrganizer = (trip: Trip) => {
+    return resolveJoin(trip.profiles);
+  };
+
+  const getSpotsLeft = (trip: Trip) => {
+    return trip.max_participants - (trip.current_participants || 0);
+  };
+
+  const getLocation = (trip: Trip) => {
+    return trip.location_city || trip.location_region || trip.location_country || '';
   };
 
   return (
@@ -1226,8 +1250,13 @@ export default function DiscoverClient({
           <>
             <div className="trips-grid">
               {filteredTrips.map((trip) => {
-                const categoryInfo = getCategoryInfo(trip.category_id);
-                const isCorporate = trip.organizer && trip.organizer.subscription_tier !== 'free';
+                const catInfo = getCategoryInfo(trip);
+                const organizer = getOrganizer(trip);
+                const spotsLeft = getSpotsLeft(trip);
+                const diffLevel = getDifficultyLabel(trip.difficulty);
+                const location = getLocation(trip);
+                const isCorporate = organizer && organizer.subscription_tier !== 'free';
+                const CatIcon = catInfo?.dbCat ? getCategoryIcon(catInfo.dbCat.name) : Mountain;
 
                 return (
                   <Link
@@ -1236,133 +1265,83 @@ export default function DiscoverClient({
                     className="trip-card"
                   >
                     {/* Image */}
-                    <div
-                      className="trip-card-image"
-                      style={
-                        trip.cover_image_url
-                          ? undefined
-                          : {
-                              '--category-color-1': categoryInfo?.colorHex || '#0d9488',
-                              '--category-color-2': categoryInfo?.colorBg || '#06b6d4',
-                            } as React.CSSProperties
-                      }
-                    >
-                      {trip.cover_image_url ? (
-                        <Image
-                          src={trip.cover_image_url}
-                          alt={trip.title}
-                          fill
-                          className="trip-card-img"
-                          style={{ objectFit: 'cover' }}
-                        />
-                      ) : categoryInfo ? (
-                        <span>{categoryInfo.emoji}</span>
-                      ) : null}
-
-                      {/* Badges */}
+                    <div className="trip-card-image" style={
+                      !trip.cover_image_url ? {
+                        background: `linear-gradient(135deg, ${catInfo?.colorHex || '#0D9488'}30, ${catInfo?.colorHex || '#0D9488'}60)`
+                      } : undefined
+                    }>
+                      {trip.cover_image_url && (
+                        <img src={trip.cover_image_url} alt={trip.title} loading="lazy" />
+                      )}
                       <div className="trip-card-badges">
-                        {categoryInfo && (
-                          <div
-                            className="badge-category"
-                            style={{ backgroundColor: categoryInfo.colorHex }}
-                          >
-                            <span>{categoryInfo.emoji}</span>
-                            {categoryInfo.nameHu}
-                          </div>
+                        {catInfo && (
+                          <span className="badge-category" style={{ background: catInfo.colorHex }}>
+                            <CatIcon size={12} /> {catInfo.dbCat?.name || ''}
+                          </span>
                         )}
-                        <div className="badge-spots">
-                          {trip.available_spots} spots left
-                        </div>
+                        <span className="badge-spots">
+                          <Users size={12} /> {spotsLeft} spots left
+                        </span>
                       </div>
                     </div>
 
                     {/* Body */}
                     <div className="trip-card-body">
                       <h3 className="trip-card-title">{trip.title}</h3>
-
                       <div className="trip-card-meta">
-                        <div className="meta-item">
-                          <MapPin size={16} />
-                          {trip.location}, {trip.region}
-                        </div>
-                        <div className="meta-item">
-                          <Calendar size={16} />
-                          {formatDateRange(trip.start_date, trip.end_date)}
-                        </div>
+                        <span><MapPin size={14} /> {location}</span>
+                        {trip.start_date && (
+                          <span><Calendar size={14} /> {trip.end_date ? formatDateRange(trip.start_date, trip.end_date) : new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(new Date(trip.start_date))}</span>
+                        )}
                       </div>
-
                       <div className="trip-card-details">
-                        <div
-                          className="badge-difficulty"
-                          style={{
-                            backgroundColor: getDifficultyColor(trip.difficulty_level),
-                          }}
-                        >
-                          {trip.difficulty_level}
-                        </div>
-                        <div
-                          className={`trip-card-price ${
-                            !trip.price_amount || trip.price_amount === 0
-                              ? 'free'
-                              : ''
-                          }`}
-                        >
-                          {formatPrice(trip.price_amount)}
-                        </div>
+                        <span className="badge-difficulty" style={{
+                          background: diffLevel.color + '20',
+                          color: diffLevel.color
+                        }}>
+                          {diffLevel.labelEn}
+                        </span>
+                        {trip.price_amount && trip.price_amount > 0 ? (
+                          <span className="trip-card-price">€{trip.price_amount} <span>/person</span></span>
+                        ) : (
+                          <span className="trip-card-price" style={{ color: '#22C55E' }}>Free</span>
+                        )}
                       </div>
                     </div>
 
                     {/* Footer */}
-                    {isCorporate ? (
-                      <div className="trip-card-footer corporate">
-                        <div className="corp-row">
-                          {trip.organizer?.logo_url && (
-                            <div className="corp-logo">
-                              <Image
-                                src={trip.organizer.logo_url}
-                                alt={trip.organizer.name}
-                                width={36}
-                                height={36}
-                              />
+                    <div className={`trip-card-footer${isCorporate ? ' corporate' : ''}`}>
+                      {isCorporate ? (
+                        <>
+                          <div className="corp-row">
+                            <div className="corp-logo" style={{ background: catInfo?.colorHex || '#0D9488' }}>
+                              {(organizer?.display_name || 'O')[0]}
                             </div>
-                          )}
-                          <div className="corp-name">
-                            {trip.organizer?.name}
+                            <span className="corp-name">{organizer?.display_name}</span>
+                            <span className="corp-spacer"></span>
                             <span className="verified-badge">
-                              ✓ Verified Org
+                              <span className="verified-badge-logo">T</span> Verified Org
                             </span>
                           </div>
-                        </div>
-                        <div className="guide-row">
-                          <Users size={16} />
-                          Professional guides included
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="trip-card-footer">
-                        <div className="organizer">
-                          <div className="organizer-avatar">
-                            {trip.profiles?.avatar_url && (
-                              <Image
-                                src={trip.profiles.avatar_url}
-                                alt={trip.profiles.name}
-                                width={36}
-                                height={36}
-                              />
-                            )}
+                          <div className="guide-row">
+                            <div className="organizer-avatar" style={{ background: catInfo?.colorHex || '#0D9488', width: 20, height: 20 }}></div>
+                            <span className="organizer-name">Guide: {organizer?.display_name}</span>
+                            <span className="corp-spacer"></span>
+                            <div className="organizer-rating"><Star size={12} /> 4.8</div>
                           </div>
-                          <div className="organizer-info">
-                            <div className="organizer-name">
-                              {trip.profiles?.name || 'Unknown'}
-                            </div>
-                            <div className="organizer-rating">
-                              <Star size={14} />
-                              <span>4.8 (24)</span>
-                            </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="organizer">
+                            <div className="organizer-avatar" style={{ background: catInfo?.colorHex || '#0D9488' }}></div>
+                            <span className="organizer-name">{organizer?.display_name || 'Organizer'}</span>
                           </div>
-                        </div>
-                      </div>
-                    )}
+                          <div className="organizer-rating">
+                            <Star size={14} /> 4.8
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </Link>
                 );
               })}

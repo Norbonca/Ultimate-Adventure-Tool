@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORY_DISPLAY, DIFFICULTY_LEVELS } from "@/lib/categories";
-import { DiscoverClient } from "./discover-client";
+import DiscoverClient from "./discover-client";
 
 export const metadata = {
   title: "Discover Adventures — Trevu",
