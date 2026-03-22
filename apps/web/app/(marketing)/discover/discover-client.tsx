@@ -507,80 +507,53 @@ export default function DiscoverClient({
 
         /* FILTER BAR */
         .filter-bar {
-          background-color: white;
-          border-bottom: 1px solid #e5e7eb;
-          padding: 1.5rem 2rem;
           display: flex;
-          gap: 1rem;
-          flex-wrap: wrap;
           align-items: center;
-        }
-
-        .filter-bar-content {
-          max-width: 1280px;
-          margin: 0 auto;
-          width: 100%;
-          display: flex;
-          gap: 1rem;
-          flex-wrap: wrap;
-          align-items: center;
+          justify-content: space-between;
+          padding: 12px 80px;
+          background: #FFFFFF;
+          border-bottom: 1px solid var(--border-subtle, #E2E8F0);
         }
 
         .filter-group {
           display: flex;
+          gap: 12px;
           align-items: center;
-          gap: 0.5rem;
-        }
-
-        .filter-group label {
-          font-size: 0.875rem;
-          color: #6b7280;
-          font-weight: 500;
         }
 
         .filter-select {
-          padding: 0.5rem 1rem;
-          border: 1px solid #e5e7eb;
-          border-radius: 6px;
-          background-color: #f9fafb;
-          font-size: 0.9rem;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 8px 28px 8px 14px;
+          border: 1px solid var(--border-subtle, #E2E8F0);
+          border-radius: 8px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          font-weight: 500;
+          color: var(--text-secondary, #475569);
+          background: #fff;
           cursor: pointer;
-          color: #1f2937;
+          transition: border-color 0.2s;
+          appearance: none;
+          -webkit-appearance: none;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 10px center;
         }
 
-        .filter-select:hover {
-          border-color: #0d9488;
-        }
-
-        .filter-select:focus {
-          outline: none;
-          border-color: #0d9488;
-          box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.1);
-        }
+        .filter-select:hover { border-color: var(--trevu-teal, #0D9488); }
 
         .sort-toggle {
-          margin-left: auto;
           display: flex;
           align-items: center;
-          gap: 0.5rem;
-          padding: 0.5rem 1rem;
-          background-color: white;
-          border: 1px solid #e5e7eb;
-          border-radius: 6px;
+          gap: 6px;
+          font-size: 13px;
+          font-weight: 500;
+          color: var(--text-secondary, #475569);
           cursor: pointer;
-          font-size: 0.9rem;
-          color: #1f2937;
-          transition: all 0.3s;
-        }
-
-        .sort-toggle:hover {
-          border-color: #0d9488;
-        }
-
-        .sort-toggle svg {
-          width: 16px;
-          height: 16px;
-          color: #0d9488;
+          background: none;
+          border: none;
         }
 
         @media (max-width: 640px) {
@@ -739,13 +712,16 @@ export default function DiscoverClient({
         }
 
         .badge-spots {
-          margin-left: auto;
-          padding: 0.4rem 0.8rem;
-          background-color: rgba(15, 23, 42, 0.9);
-          color: white;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 4px 10px;
           border-radius: 6px;
-          font-size: 0.8rem;
+          font-size: 12px;
           font-weight: 600;
+          background: rgba(255,255,255,0.92);
+          color: var(--text-primary, #0F172A);
+          backdrop-filter: blur(4px);
         }
 
         .trip-card-body {
@@ -765,24 +741,21 @@ export default function DiscoverClient({
 
         .trip-card-meta {
           display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-          margin-bottom: 1rem;
-          font-size: 0.9rem;
-          color: #6b7280;
-        }
-
-        .meta-item {
-          display: flex;
           align-items: center;
-          gap: 0.5rem;
+          gap: 12px;
+          font-size: 13px;
+          color: var(--text-muted, #94A3B8);
         }
 
-        .meta-item svg {
-          width: 16px;
-          height: 16px;
-          color: #0d9488;
-          flex-shrink: 0;
+        .trip-card-meta span {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .trip-card-meta svg {
+          width: 14px;
+          height: 14px;
         }
 
         .trip-card-details {
@@ -794,17 +767,23 @@ export default function DiscoverClient({
         }
 
         .badge-difficulty {
-          padding: 0.4rem 0.8rem;
+          display: inline-flex;
+          padding: 3px 10px;
           border-radius: 6px;
-          font-size: 0.8rem;
+          font-size: 12px;
           font-weight: 600;
-          color: white;
         }
 
         .trip-card-price {
-          font-size: 1.1rem;
+          font-size: 16px;
           font-weight: 700;
-          color: #0d9488;
+          color: var(--deep-navy, #0F172A);
+        }
+
+        .trip-card-price span {
+          font-size: 13px;
+          font-weight: 400;
+          color: var(--text-muted, #94A3B8);
         }
 
         .trip-card-price.free {
@@ -1123,74 +1102,39 @@ export default function DiscoverClient({
 
       {/* FILTER BAR */}
       <div className="filter-bar">
-        <div className="filter-bar-content">
-          <div className="filter-group">
-            <label htmlFor="difficulty">Difficulty</label>
-            <select
-              id="difficulty"
-              className="filter-select"
-              value={selectedDifficulty}
-              onChange={(e) => setSelectedDifficulty(e.target.value)}
-            >
-              <option value="all">All Levels</option>
-              {difficultyLevels.map((level) => (
-                <option key={level.value} value={level.value}>
-                  {level.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="filter-group">
-            <label htmlFor="price">Price Range</label>
-            <select
-              id="price"
-              className="filter-select"
-              value={selectedPrice}
-              onChange={(e) => setSelectedPrice(e.target.value)}
-            >
-              <option value="all">All Prices</option>
-              <option value="free">Free</option>
-              <option value="budget">&lt;€300</option>
-              <option value="mid">€300-€600</option>
-              <option value="premium">&gt;€600</option>
-            </select>
-          </div>
-
-          <div className="filter-group">
-            <label htmlFor="duration">Duration</label>
-            <select
-              id="duration"
-              className="filter-select"
-              value={selectedDuration}
-              onChange={(e) => setSelectedDuration(e.target.value)}
-            >
-              <option value="all">Any Duration</option>
-              <option value="weekend">Weekend</option>
-              <option value="week">1 Week</option>
-              <option value="long">2+ Weeks</option>
-            </select>
-          </div>
-
-          <div className="filter-group">
-            <label htmlFor="spots">Available Spots</label>
-            <select
-              id="spots"
-              className="filter-select"
-              value={selectedSpots}
-              onChange={(e) => setSelectedSpots(e.target.value)}
-            >
-              <option value="all">Any</option>
-              <option value="1">1-3 Spots</option>
-              <option value="4">4+ Spots</option>
-              <option value="10">10+ Spots</option>
-            </select>
-          </div>
-
-          <button className="sort-toggle">
-            <ArrowUpDown size={16} />
-            Most Recent
-          </button>
+        <div className="filter-group">
+          <select className="filter-select" value={selectedDifficulty} onChange={(e) => setSelectedDifficulty(e.target.value)}>
+            <option value="all" disabled={selectedDifficulty !== 'all'}>Difficulty</option>
+            {difficultyLevels.map((level) => (
+              <option key={level.value} value={String(level.value)}>{level.labelEn}</option>
+            ))}
+          </select>
+          <select className="filter-select" value={selectedPrice} onChange={(e) => setSelectedPrice(e.target.value)}>
+            <option value="all">Price Range</option>
+            <option value="free">Free</option>
+            <option value="under50">Under €50</option>
+            <option value="50-200">€50 – €200</option>
+            <option value="200-500">€200 – €500</option>
+            <option value="500+">€500+</option>
+          </select>
+          <select className="filter-select" value={selectedDuration} onChange={(e) => setSelectedDuration(e.target.value)}>
+            <option value="all">Duration</option>
+            <option value="1">1 day</option>
+            <option value="2-3">2–3 days</option>
+            <option value="4-7">4–7 days</option>
+            <option value="1-2w">1–2 weeks</option>
+            <option value="2w+">2+ weeks</option>
+          </select>
+          <select className="filter-select" value={selectedSpots} onChange={(e) => setSelectedSpots(e.target.value)}>
+            <option value="all">Available Spots</option>
+            <option value="1-3">1–3 spots</option>
+            <option value="4-8">4–8 spots</option>
+            <option value="9+">9+ spots</option>
+          </select>
+        </div>
+        <div className="sort-toggle">
+          <ArrowUpDown size={16} />
+          <span>Most Recent</span>
         </div>
       </div>
 
@@ -1200,7 +1144,7 @@ export default function DiscoverClient({
           <div className="results-count">
             {filteredTrips.length === 0
               ? 'No trips yet'
-              : `${filteredTrips.length} trips available`}
+              : `${filteredTrips.length} trip${filteredTrips.length !== 1 ? 's' : ''} available`}
           </div>
           <div className="view-toggle">
             <button
