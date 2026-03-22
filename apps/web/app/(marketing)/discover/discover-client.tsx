@@ -389,85 +389,68 @@ export default function DiscoverClient({
         }
 
         .search-bar {
-          background-color: white;
-          border-radius: 12px;
-          padding: 1.5rem;
-          margin: 0 auto;
-          max-width: 600px;
           display: flex;
-          flex-direction: column;
-          gap: 1rem;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .search-fields {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 1rem;
+          background: var(--text-white, #fff);
+          border-radius: 12px;
+          overflow: hidden;
+          width: 100%;
+          max-width: 720px;
+          margin: 0 auto;
+          box-shadow: 0 4px 24px rgba(0,0,0,0.15);
         }
 
         .search-field {
+          flex: 1;
           display: flex;
           align-items: center;
-          gap: 0.75rem;
-          padding: 0.75rem 1rem;
-          border: 1px solid #e5e7eb;
-          border-radius: 8px;
-          background-color: #f9fafb;
+          gap: 10px;
+          padding: 14px 20px;
+          border-right: 1px solid var(--border-subtle, #E2E8F0);
         }
+
+        .search-field:last-of-type { border-right: none; }
+
+        .search-field svg { color: var(--text-muted, #94A3B8); flex-shrink: 0; }
 
         .search-field input,
         .search-field select {
-          flex: 1;
           border: none;
-          background: none;
           outline: none;
-          font-size: 1rem;
-          color: #1f2937;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 14px;
+          color: var(--text-primary, #0F172A);
+          background: transparent;
+          width: 100%;
         }
 
-        .search-field input::placeholder {
-          color: #9ca3af;
-        }
-
-        .search-field select {
-          color: #6b7280;
-        }
-
-        .search-field svg {
-          color: #0d9488;
-          flex-shrink: 0;
-        }
+        .search-field input::placeholder,
+        .search-field select { color: var(--text-muted, #94A3B8); }
+        .search-field select option { color: var(--text-primary, #0F172A); }
 
         .search-btn {
-          width: 100%;
-          padding: 0.75rem 1rem;
-          background-color: #0d9488;
-          color: white;
-          border: none;
-          border-radius: 8px;
-          font-size: 1rem;
-          font-weight: 600;
-          cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.5rem;
-          transition: background-color 0.3s;
+          padding: 14px 20px;
+          background: var(--trevu-teal, #0D9488);
+          border: none;
+          cursor: pointer;
+          transition: background 0.2s;
+          flex-shrink: 0;
+          color: white;
         }
 
-        .search-btn:hover {
-          background-color: #0f766e;
+        .search-btn:hover { background: var(--trevu-teal-dark, #0F766E); }
+
+        @media (max-width: 1024px) {
+          .search-bar { flex-direction: column; max-width: 500px; }
+          .search-field { border-right: none; border-bottom: 1px solid var(--border-subtle, #E2E8F0); }
+          .search-field:last-of-type { border-bottom: none; }
         }
 
         @media (min-width: 768px) {
-          .search-fields {
-            grid-template-columns: 1fr 1fr 1fr;
-          }
-
-          .search-btn {
-            width: auto;
-            grid-column: auto;
+          .search-fields-placeholder {
+            display: none;
           }
         }
 
@@ -1084,7 +1067,6 @@ export default function DiscoverClient({
           </p>
 
           <div className="search-bar">
-            <div className="search-fields">
               <div className="search-field">
                 <MapPin size={18} />
                 <input
@@ -1111,10 +1093,8 @@ export default function DiscoverClient({
                 </select>
               </div>
               <button className="search-btn">
-                <Search size={18} />
-                Search
+                <Search size={20} />
               </button>
-            </div>
           </div>
 
           <div className="category-pills">
@@ -1125,15 +1105,14 @@ export default function DiscoverClient({
               All Trips
             </button>
             {categories.map((category) => {
-              const info = categoryDisplay[category.name];
-              const Icon = info?.icon || Mountain;
+              const Icon = getCategoryIcon(category.name);
               return (
                 <button
                   key={category.id}
                   className={`pill ${activeCategory === category.id ? 'pill-active' : 'pill-default'}`}
                   onClick={() => setActiveCategory(category.id)}
                 >
-                  <Icon size={16} />
+                  <Icon size={14} />
                   {category.name}
                 </button>
               );
