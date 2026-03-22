@@ -936,16 +936,16 @@ export default function HomePage() {
 
           {/* Desktop Navigation */}
           <nav className="nav-desktop">
-            <Link href="#features">Features</Link>
-            <Link href="#categories">Categories</Link>
-            <Link href="#discover">Discover Trips</Link>
-            <Link href="#pricing">Pricing</Link>
+            <a href="#features">Features</a>
+            <a href="#categories">Categories</a>
+            <Link href="/discover">Discover Trips</Link>
+            <Link href="/pricing">Pricing</Link>
           </nav>
 
           {/* Right side - Auth buttons */}
           <div className="nav-right">
-            <button className="btn-login">Log in</button>
-            <button className="btn-primary">Get Started</button>
+            <Link href="/login" className="btn-login">Log in</Link>
+            <Link href="/register" className="btn-primary">Get Started</Link>
           </div>
 
           {/* Mobile Menu */}
@@ -968,10 +968,12 @@ export default function HomePage() {
               borderTop: '1px solid #E2E8F0',
             }}
           >
-            <Link href="#features">Features</Link>
-            <Link href="#categories">Categories</Link>
-            <Link href="#discover">Discover Trips</Link>
-            <Link href="#pricing">Pricing</Link>
+            <a href="#features" onClick={() => setMobileMenuOpen(false)}>Features</a>
+            <a href="#categories" onClick={() => setMobileMenuOpen(false)}>Categories</a>
+            <Link href="/discover" onClick={() => setMobileMenuOpen(false)}>Discover Trips</Link>
+            <Link href="/pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</Link>
+            <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Log in</Link>
+            <Link href="/register" className="btn-primary" style={{textAlign:'center'}} onClick={() => setMobileMenuOpen(false)}>Get Started</Link>
           </nav>
         )}
       </header>
@@ -993,8 +995,8 @@ export default function HomePage() {
           </p>
 
           <div className="hero-ctas">
-            <button className="btn-cta-primary">Start Planning Free →</button>
-            <button className="btn-cta-secondary">Explore Trips</button>
+            <Link href="/register" className="btn-cta-primary">Start Planning Free →</Link>
+            <Link href="/discover" className="btn-cta-secondary">Explore Trips</Link>
           </div>
 
           <img
@@ -1262,7 +1264,7 @@ export default function HomePage() {
             Join thousands of adventurers across Central Europe who plan, share,
             and explore with trevu.
           </p>
-          <button className="btn-final-cta">Start Planning Free →</button>
+          <Link href="/register" className="btn-final-cta">Start Planning Free →</Link>
           <div className="final-trust">
             Free forever for personal use. No credit card required.
           </div>
@@ -1285,16 +1287,16 @@ export default function HomePage() {
               <h3>Product</h3>
               <ul>
                 <li>
-                  <Link href="#features">Features</Link>
+                  <a href="#features">Features</a>
                 </li>
                 <li>
-                  <Link href="#categories">Categories</Link>
+                  <a href="#categories">Categories</a>
                 </li>
                 <li>
-                  <Link href="#pricing">Pricing</Link>
+                  <Link href="/pricing">Pricing</Link>
                 </li>
                 <li>
-                  <Link href="#roadmap">Roadmap</Link>
+                  <a href="#">Roadmap</a>
                 </li>
               </ul>
             </div>
@@ -1303,16 +1305,16 @@ export default function HomePage() {
               <h3>Company</h3>
               <ul>
                 <li>
-                  <Link href="#about">About</Link>
+                  <a href="#">About</a>
                 </li>
                 <li>
-                  <Link href="#blog">Blog</Link>
+                  <a href="#">Blog</a>
                 </li>
                 <li>
-                  <Link href="#careers">Careers</Link>
+                  <a href="#">Careers</a>
                 </li>
                 <li>
-                  <Link href="#contact">Contact</Link>
+                  <a href="#">Contact</a>
                 </li>
               </ul>
             </div>
@@ -1321,13 +1323,13 @@ export default function HomePage() {
               <h3>Legal</h3>
               <ul>
                 <li>
-                  <Link href="#privacy">Privacy Policy</Link>
+                  <a href="#">Privacy Policy</a>
                 </li>
                 <li>
-                  <Link href="#terms">Terms of Service</Link>
+                  <a href="#">Terms of Service</a>
                 </li>
                 <li>
-                  <Link href="#cookies">Cookie Policy</Link>
+                  <a href="#">Cookie Policy</a>
                 </li>
               </ul>
             </div>
