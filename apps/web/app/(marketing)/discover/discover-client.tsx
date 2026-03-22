@@ -82,11 +82,20 @@ interface CategoryDisplay {
   [key: string]: CategoryDisplayItem;
 }
 
+interface CurrentUser {
+  id: string;
+  display_name: string;
+  avatar_url: string | null;
+  slug: string;
+  initials: string;
+}
+
 interface DiscoverClientProps {
   trips: Trip[];
   categories: Category[];
   categoryDisplay: CategoryDisplay;
   difficultyLevels: DifficultyLevel[];
+  currentUser: CurrentUser | null;
 }
 
 const categoryIconMap: Record<string, React.ComponentType<any>> = {
@@ -131,6 +140,7 @@ export default function DiscoverClient({
   categories,
   categoryDisplay,
   difficultyLevels,
+  currentUser,
 }: DiscoverClientProps) {
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -139,6 +149,7 @@ export default function DiscoverClient({
   const [selectedPrice, setSelectedPrice] = useState<string>('all');
   const [selectedDuration, setSelectedDuration] = useState<string>('all');
   const [selectedSpots, setSelectedSpots] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<string>('recent');
 
   // Helper: resolve Supabase join (can be object or array)
   const resolveJoin = <T,>(val: T | T[] | null): T | null => {
@@ -147,20 +158,70 @@ export default function DiscoverClient({
     return val;
   };
 
+  // Helper: calculate trip duration in days
+  const getTripDurationDays = (trip: Trip): number => {
+    if (!trip.start_date || !trip.end_date) return 0;
+    const start = new Date(trip.start_date);
+    const end = new Date(trip.end_date);
+    return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  };
+
   const filteredTrips = trips.filter((trip) => {
+    // Category filter
     if (activeCategory !== 'all' && trip.category_id !== activeCategory) {
       return false;
     }
-    if (
-      searchQuery &&
-      !trip.title.toLowerCase().includes(searchQuery.toLowerCase())
-    ) {
-      return false;
+    // Search filter
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const loc = (trip.location_city || '') + (trip.location_region || '') + (trip.location_country || '');
+      if (!trip.title.toLowerCase().includes(q) && !loc.toLowerCase().includes(q)) {
+        return false;
+      }
     }
+    // Difficulty filter
     if (selectedDifficulty !== 'all' && String(trip.difficulty) !== selectedDifficulty) {
       return false;
     }
+    // Price filter
+    if (selectedPrice !== 'all') {
+      const price = trip.price_amount || 0;
+      if (selectedPrice === 'free' && price > 0) return false;
+      if (selectedPrice === 'under50' && (price === 0 || price >= 50)) return false;
+      if (selectedPrice === '50-200' && (price < 50 || price > 200)) return false;
+      if (selectedPrice === '200-500' && (price < 200 || price > 500)) return false;
+      if (selectedPrice === '500+' && price < 500) return false;
+    }
+    // Duration filter
+    if (selectedDuration !== 'all') {
+      const days = getTripDurationDays(trip);
+      if (selectedDuration === '1' && days > 1) return false;
+      if (selectedDuration === '2-3' && (days < 2 || days > 3)) return false;
+      if (selectedDuration === '4-7' && (days < 4 || days > 7)) return false;
+      if (selectedDuration === '1-2w' && (days < 7 || days > 14)) return false;
+      if (selectedDuration === '2w+' && days < 14) return false;
+    }
+    // Available spots filter
+    if (selectedSpots !== 'all') {
+      const spots = trip.max_participants - (trip.current_participants || 0);
+      if (selectedSpots === '1-3' && (spots < 1 || spots > 3)) return false;
+      if (selectedSpots === '4-8' && (spots < 4 || spots > 8)) return false;
+      if (selectedSpots === '9+' && spots < 9) return false;
+    }
     return true;
+  });
+
+  // Sort
+  const sortedTrips = [...filteredTrips].sort((a, b) => {
+    if (sortBy === 'price-low') return (a.price_amount || 0) - (b.price_amount || 0);
+    if (sortBy === 'price-high') return (b.price_amount || 0) - (a.price_amount || 0);
+    if (sortBy === 'date') {
+      if (!a.start_date) return 1;
+      if (!b.start_date) return -1;
+      return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+    }
+    // Default: recent (by published order, which is how Supabase returns them)
+    return 0;
   });
 
   const getDifficultyLabel = (level: number) => {
@@ -632,20 +693,46 @@ export default function DiscoverClient({
 
         .trips-grid {
           display: grid;
-          grid-template-columns: 1fr;
-          gap: 2rem;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 24px;
           margin-bottom: 3rem;
         }
 
-        @media (min-width: 640px) {
+        .trips-grid.list-view {
+          grid-template-columns: 1fr;
+        }
+
+        .trips-grid.list-view .trip-card {
+          display: flex;
+          flex-direction: row;
+        }
+
+        .trips-grid.list-view .trip-card-image {
+          width: 280px;
+          min-width: 280px;
+          height: auto;
+        }
+
+        @media (max-width: 1024px) {
           .trips-grid {
             grid-template-columns: repeat(2, 1fr);
           }
+          .trips-grid.list-view .trip-card-image {
+            width: 200px;
+            min-width: 200px;
+          }
         }
 
-        @media (min-width: 1024px) {
+        @media (max-width: 640px) {
           .trips-grid {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: 1fr;
+          }
+          .trips-grid.list-view .trip-card {
+            flex-direction: column;
+          }
+          .trips-grid.list-view .trip-card-image {
+            width: 100%;
+            min-width: auto;
           }
         }
 
@@ -1023,12 +1110,21 @@ export default function DiscoverClient({
           </div>
 
           <div className="header-right">
-            <button className="bell-btn">
-              <Bell size={20} />
-            </button>
-            <Link href="/profile" className="user-avatar">
-              MK
-            </Link>
+            {currentUser ? (
+              <>
+                <button className="bell-btn">
+                  <Bell size={20} />
+                </button>
+                <Link href="/profile" className="user-avatar">
+                  {currentUser.initials}
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/login" style={{fontSize:14, fontWeight:500, color:'var(--text-secondary, #475569)'}}>Log in</Link>
+                <Link href="/register" style={{display:'inline-flex', alignItems:'center', padding:'8px 20px', background:'var(--trevu-teal, #0D9488)', color:'#fff', fontSize:14, fontWeight:600, borderRadius:10, transition:'background 0.2s'}}>Get Started</Link>
+              </>
+            )}
           </div>
 
           <button className="mobile-menu-btn">
@@ -1132,10 +1228,12 @@ export default function DiscoverClient({
             <option value="9+">9+ spots</option>
           </select>
         </div>
-        <div className="sort-toggle">
-          <ArrowUpDown size={16} />
-          <span>Most Recent</span>
-        </div>
+        <select className="filter-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)} style={{marginLeft:'auto'}}>
+          <option value="recent">Most Recent</option>
+          <option value="price-low">Price: Low → High</option>
+          <option value="price-high">Price: High → Low</option>
+          <option value="date">Soonest First</option>
+        </select>
       </div>
 
       {/* MAIN CONTENT */}
@@ -1171,8 +1269,8 @@ export default function DiscoverClient({
           </div>
         ) : (
           <>
-            <div className="trips-grid">
-              {filteredTrips.map((trip) => {
+            <div className={`trips-grid${viewMode === 'list' ? ' list-view' : ''}`}>
+              {sortedTrips.map((trip) => {
                 const catInfo = getCategoryInfo(trip);
                 const organizer = getOrganizer(trip);
                 const spotsLeft = getSpotsLeft(trip);

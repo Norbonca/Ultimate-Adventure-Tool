@@ -53,10 +53,31 @@ async function fetchActiveCategories() {
   return data || [];
 }
 
+async function fetchCurrentUser() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("id, display_name, avatar_url, slug")
+    .eq("id", user.id)
+    .single();
+
+  return profile ? {
+    id: profile.id,
+    display_name: profile.display_name,
+    avatar_url: profile.avatar_url,
+    slug: profile.slug,
+    initials: (profile.display_name || user.email || "U").slice(0, 2).toUpperCase(),
+  } : null;
+}
+
 export default async function DiscoverPage() {
-  const [trips, categories] = await Promise.all([
+  const [trips, categories, currentUser] = await Promise.all([
     fetchPublishedTrips(),
     fetchActiveCategories(),
+    fetchCurrentUser(),
   ]);
 
   return (
@@ -65,6 +86,7 @@ export default async function DiscoverPage() {
       categories={categories}
       categoryDisplay={CATEGORY_DISPLAY}
       difficultyLevels={DIFFICULTY_LEVELS}
+      currentUser={currentUser}
     />
   );
 }
