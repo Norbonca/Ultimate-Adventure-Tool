@@ -1200,7 +1200,7 @@ export default function DiscoverClient({
       <div className="filter-bar">
         <div className="filter-group">
           <select className="filter-select" value={selectedDifficulty} onChange={(e) => setSelectedDifficulty(e.target.value)}>
-            <option value="all" disabled={selectedDifficulty !== 'all'}>Difficulty</option>
+            <option value="all">Difficulty</option>
             {difficultyLevels.map((level) => (
               <option key={level.value} value={String(level.value)}>{level.labelEn}</option>
             ))}
