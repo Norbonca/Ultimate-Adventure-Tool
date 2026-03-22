@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trevu — Trek Beyond Ordinary</title>
+  <meta name="description" content="The all-in-one adventure platform that replaces your trip planner, expense splitter, offline maps, and five other apps.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/trevu-design-system.css">
+  <link rel="stylesheet" href="css/trevu-landing.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* ========== CSS RESET & VARIABLES ========== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --trevu-teal: #0D9488;
+      --trevu-teal-light: #14B8A6;
+      --trevu-teal-dark: #0F766E;
+      --deep-navy: #0F172A;
+      --navy-800: #1E293B;
+      --navy-700: #334155;
+      --arctic-white: #F8FAFC;
+      --card-bg: #F1F5F9;
+      --sunrise-coral: #F97066;
+      --trail-sage: #6EE7B7;
+      --golden-hour: #FBBF24;
+      --dusk-violet: #8B5CF6;
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #94A3B8;
+      --text-white: #FFFFFF;
+      --border-subtle: #E2E8F0;
+      --hiking-green: #22C55E;
+      --mountain-orange: #F97316;
+      --water-blue: #3B82F6;
+      --motorsport-red: #B91C1C;
+      --cycling-yellow: #EAB308;
+      --running-red: #EF4444;
+      --winter-cyan: #06B6D4;
+      --expedition-violet: #8B5CF6;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text-primary);
+      background: var(--arctic-white);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img { max-width: 100%; display: block; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ========== UTILITIES ========== */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .section-tag {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .section-headline {
+      font-size: 48px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: var(--deep-navy);
+      line-height: 1.15;
+    }
+
+    .section-desc {
+      font-size: 18px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 680px;
+    }
+
+    .section-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      text-align: center;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 32px;
+      background: var(--trevu-teal);
+      color: var(--text-white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover { background: var(--trevu-teal-dark); }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 32px;
+      background: transparent;
+      color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      border-radius: 12px;
+      border: 2px solid var(--border-subtle);
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .btn-secondary:hover { border-color: var(--text-muted); }
+
+    /* ========== HEADER ========== */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 80px;
+      background: rgba(255, 255, 255, 0.93);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+
+    .header-logo {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--trevu-teal);
+      letter-spacing: -1px;
+    }
+
+    .header-logo span {
+      color: var(--deep-navy);
+    }
+
+    .header-nav {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .header-nav a {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: color 0.2s;
+    }
+
+    .header-nav a:hover { color: var(--text-primary); }
+
+    .header-right {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .header-login {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .header-cta {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 24px;
+      background: var(--trevu-teal);
+      color: var(--text-white);
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .header-cta:hover { background: var(--trevu-teal-dark); }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-primary);
+    }
+
+    /* ========== HERO ========== */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+      padding: 80px 80px 60px;
+      background: linear-gradient(to bottom, #F8FAFC 0%, #E6F7F5 60%, #CCEFEB 100%);
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(13, 148, 136, 0.08);
+      border-radius: 20px;
+    }
+
+    .hero-badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--trevu-teal);
+    }
+
+    .hero-badge-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--trevu-teal-dark);
+    }
+
+    .hero-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      max-width: 900px;
+    }
+
+    .hero-headline {
+      font-size: 72px;
+      font-weight: 800;
+      color: var(--deep-navy);
+      letter-spacing: -2px;
+      text-align: center;
+      line-height: 1.05;
+    }
+
+    .hero-subheadline {
+      font-size: 20px;
+      color: var(--text-secondary);
+      text-align: center;
+      line-height: 1.6;
+      max-width: 700px;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .hero-screenshot {
+      width: 100%;
+      max-width: 1100px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(15, 23, 42, 0.18);
+    }
+
+    .hero-screenshot img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .hero-trust {
+      display: flex;
+      gap: 40px;
+      align-items: center;
+      padding-top: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .hero-trust-label {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .hero-trust-flag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    /* ========== PROBLEM SECTION ========== */
+    .problem {
+      padding: 100px 24px;
+      background: #FFFFFF;
+    }
+
+    .problem-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 64px;
+    }
+
+    .steps-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      width: 100%;
+    }
+
+    .step-card {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 36px;
+      background: var(--card-bg);
+      border-radius: 20px;
+    }
+
+    .step-num {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--trevu-teal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-white);
+      flex-shrink: 0;
+    }
+
+    .step-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--deep-navy);
+    }
+
+    .step-desc {
+      font-size: 16px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ========== CORE FEATURES ========== */
+    .features {
+      padding: 100px 24px;
+      background: var(--arctic-white);
+    }
+
+    .features-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 80px;
+    }
+
+    .feature-block {
+      display: flex;
+      gap: 64px;
+      align-items: center;
+    }
+
+    .feature-block.reverse { flex-direction: row-reverse; }
+
+    .feature-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .feature-icon-wrap {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .feature-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--deep-navy);
+      letter-spacing: -0.5px;
+    }
+
+    .feature-desc {
+      font-size: 17px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .feature-image {
+      flex: 1;
+      height: 360px;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .feature-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ========== CATEGORIES ========== */
+    .categories {
+      padding: 100px 24px;
+      background: var(--deep-navy);
+    }
+
+    .categories-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 64px;
+    }
+
+    .categories .section-headline { color: var(--text-white); }
+    .categories .section-desc { color: #94A3B8; }
+    .categories .section-tag { color: var(--trevu-teal-light); }
+
+    .categories-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+    }
+
+    .categories-row {
+      display: grid;
+      gap: 20px;
+    }
+
+    .categories-row:first-child { grid-template-columns: repeat(4, 1fr); }
+    .categories-row:last-child { grid-template-columns: repeat(4, 1fr); }
+
+    .category-card {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 28px;
+      background: var(--navy-800);
+      border-radius: 20px;
+    }
+
+    .category-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .category-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-white);
+    }
+
+    .category-desc {
+      font-size: 14px;
+      color: #94A3B8;
+      line-height: 1.5;
+    }
+
+    /* ========== SECONDARY FEATURES ========== */
+    .secondary-features {
+      padding: 100px 24px;
+      background: #FFFFFF;
+    }
+
+    .secondary-features-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 64px;
+    }
+
+    .secondary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      width: 100%;
+    }
+
+    .sf-card {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 32px;
+      background: var(--card-bg);
+      border-radius: 20px;
+    }
+
+    .sf-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--deep-navy);
+    }
+
+    .sf-desc {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ========== SOCIAL PROOF ========== */
+    .social-proof {
+      padding: 100px 24px;
+      background: var(--arctic-white);
+    }
+
+    .social-proof-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 64px;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      width: 100%;
+      gap: 24px;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 56px;
+      font-weight: 800;
+      color: var(--trevu-teal);
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .stat-divider {
+      width: 1px;
+      height: 80px;
+      background: var(--border-subtle);
+      flex-shrink: 0;
+    }
+
+    .testimonials-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      width: 100%;
+    }
+
+    .testimonial-card {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      padding: 36px;
+      background: #FFFFFF;
+      border-radius: 20px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .testimonial-quote {
+      font-size: 16px;
+      color: var(--text-primary);
+      line-height: 1.7;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .testimonial-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .testimonial-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .testimonial-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--deep-navy);
+    }
+
+    .testimonial-role {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ========== FINAL CTA ========== */
+    .final-cta {
+      padding: 120px 24px;
+      background: linear-gradient(to bottom, #0F172A 0%, #134E4A 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      text-align: center;
+    }
+
+    .final-cta-headline {
+      font-size: 52px;
+      font-weight: 800;
+      color: var(--text-white);
+      letter-spacing: -1px;
+      line-height: 1.15;
+      max-width: 700px;
+    }
+
+    .final-cta-subline {
+      font-size: 20px;
+      color: #94A3B8;
+      line-height: 1.6;
+      max-width: 600px;
+    }
+
+    .final-cta .btn-primary {
+      padding: 18px 40px;
+      font-size: 18px;
+      font-weight: 700;
+      background: var(--trevu-teal-light);
+      border-radius: 14px;
+      margin-top: 16px;
+    }
+
+    .final-cta .btn-primary:hover { background: var(--trevu-teal); }
+
+    .final-cta-trust {
+      font-size: 14px;
+      color: #64748B;
+    }
+
+    /* ========== FOOTER ========== */
+    .footer {
+      padding: 64px 80px 32px;
+      background: var(--deep-navy);
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+    }
+
+    .footer-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 64px;
+    }
+
+    .footer-brand { max-width: 320px; }
+
+    .footer-logo {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--trevu-teal-light);
+      letter-spacing: -1px;
+    }
+
+    .footer-tagline {
+      font-size: 14px;
+      color: #64748B;
+      line-height: 1.6;
+      margin-top: 16px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 80px;
+    }
+
+    .footer-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .footer-col-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #94A3B8;
+    }
+
+    .footer-col a {
+      font-size: 14px;
+      color: #64748B;
+      transition: color 0.2s;
+    }
+
+    .footer-col a:hover { color: #94A3B8; }
+
+    .footer-divider {
+      width: 100%;
+      height: 1px;
+      background: var(--navy-800);
+    }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-copyright {
+      font-size: 13px;
+      color: #475569;
+    }
+
+    .footer-social {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .footer-social a {
+      color: #64748B;
+      transition: color 0.2s;
+      display: flex;
+    }
+
+    .footer-social a:hover { color: #94A3B8; }
+
+    /* ========== RESPONSIVE: TABLET (<=1024px) ========== */
+    @media (max-width: 1024px) {
+      .header { padding: 16px 32px; }
+      .header-nav { display: none; }
+      .mobile-menu-btn { display: block; }
+
+      .hero { padding: 60px 32px 40px; }
+      .hero-headline { font-size: 52px; }
+      .hero-subheadline { font-size: 18px; }
+
+      .section-headline { font-size: 38px; }
+
+      .steps-row { grid-template-columns: 1fr; gap: 20px; }
+
+      .feature-block,
+      .feature-block.reverse { flex-direction: column; }
+      .feature-image { width: 100%; height: 280px; }
+
+      .categories-row { grid-template-columns: repeat(2, 1fr); }
+
+      .secondary-grid { grid-template-columns: repeat(2, 1fr); }
+
+      .stats-row { flex-wrap: wrap; justify-content: center; }
+      .stat-divider { display: none; }
+      .stat { min-width: 140px; }
+
+      .testimonials-row { grid-template-columns: 1fr; }
+
+      .final-cta-headline { font-size: 40px; }
+
+      .footer { padding: 48px 32px 24px; }
+      .footer-top { flex-direction: column; gap: 40px; }
+      .footer-links { gap: 48px; flex-wrap: wrap; }
+    }
+
+    /* ========== RESPONSIVE: MOBILE (<=640px) ========== */
+    @media (max-width: 640px) {
+      .header { padding: 12px 20px; }
+      .header-logo { font-size: 24px; }
+      .header-login { display: none; }
+      .header-cta { padding: 8px 16px; font-size: 14px; }
+
+      .hero { padding: 40px 20px 32px; gap: 28px; }
+      .hero-headline { font-size: 36px; letter-spacing: -1px; }
+      .hero-subheadline { font-size: 16px; max-width: 100%; }
+      .hero-ctas { flex-direction: column; width: 100%; }
+      .hero-ctas .btn-primary,
+      .hero-ctas .btn-secondary { width: 100%; justify-content: center; }
+      .hero-trust { gap: 16px; }
+      .hero-trust-label { width: 100%; text-align: center; }
+
+      .problem { padding: 64px 20px; }
+      .problem-inner { gap: 40px; }
+      .section-headline { font-size: 30px; }
+      .section-desc { font-size: 16px; }
+
+      .features { padding: 64px 20px; }
+      .features-inner { gap: 48px; }
+      .feature-title { font-size: 26px; }
+      .feature-block { gap: 32px; }
+      .feature-image { height: 220px; }
+
+      .categories { padding: 64px 20px; }
+      .categories-row:first-child,
+      .categories-row:last-child { grid-template-columns: 1fr; }
+
+      .secondary-features { padding: 64px 20px; }
+      .secondary-grid { grid-template-columns: 1fr; }
+
+      .social-proof { padding: 64px 20px; }
+      .stats-row { gap: 32px; }
+      .stat-value { font-size: 40px; }
+
+      .final-cta { padding: 80px 20px; }
+      .final-cta-headline { font-size: 32px; }
+      .final-cta-subline { font-size: 17px; }
+      .final-cta .btn-primary { width: 100%; justify-content: center; }
+
+      .footer { padding: 40px 20px 20px; }
+      .footer-links { gap: 32px; }
+      .footer-bottom { flex-direction: column; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <a href="index.html" class="header-logo">tre<span>vu</span></a>
+    <nav class="header-nav" id="headerNav">
+      <a href="#features">Features</a>
+      <a href="#categories">Categories</a>
+      <a href="discover.html">Discover Trips</a>
+      <a href="pricing.html">Pricing</a>
+    </nav>
+    <div class="header-right">
+      <a href="registration.html" class="header-login">Log in</a>
+      <a href="registration.html" class="header-cta">Get Started</a>
+    </div>
+    <button class="mobile-menu-btn" aria-label="Menu" onclick="toggleMobileMenu()">
+      <i data-lucide="menu" style="width:24px;height:24px;"></i>
+    </button>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      <span class="hero-badge-text">Now in Early Access — Central Europe</span>
+    </div>
+    <div class="hero-text">
+      <h1 class="hero-headline">Trek beyond ordinary</h1>
+      <p class="hero-subheadline">The all-in-one adventure platform that replaces your trip planner, expense splitter, offline maps, and five other apps — so you can focus on the trail ahead.</p>
+    </div>
+    <div class="hero-ctas">
+      <a href="registration.html" class="btn-primary">Start Planning Free <i data-lucide="arrow-right" style="width:20px;height:20px;"></i></a>
+      <a href="discover.html" class="btn-secondary">Explore Trips <i data-lucide="compass" style="width:20px;height:20px;"></i></a>
+    </div>
+    <div class="hero-screenshot">
+      <img src="https://images.unsplash.com/photo-1504681869696-d977211a5f4c?w=1200&q=80&fit=crop&auto=format" alt="Sailboat cruising through crystal-clear Adriatic waters at golden hour" loading="lazy">
+    </div>
+    <div class="hero-trust">
+      <span class="hero-trust-label">Trusted by adventurers across</span>
+      <span class="hero-trust-flag"><i data-lucide="map-pin" style="width:16px;height:16px;"></i> Hungary</span>
+      <span class="hero-trust-flag"><i data-lucide="map-pin" style="width:16px;height:16px;"></i> Slovakia</span>
+      <span class="hero-trust-flag"><i data-lucide="map-pin" style="width:16px;height:16px;"></i> Croatia</span>
+      <span class="hero-trust-flag"><i data-lucide="map-pin" style="width:16px;height:16px;"></i> Germany</span>
+    </div>
+  </section>
+
+  <!-- PROBLEM / SOLUTION -->
+  <section class="problem">
+    <div class="problem-inner">
+      <div class="section-header">
+        <span class="section-tag" style="color: var(--sunrise-coral);">THE PROBLEM</span>
+        <h2 class="section-headline">One adventure. Seven apps. Zero fun.</h2>
+        <p class="section-desc">Trip planner here, expense tracker there, offline maps somewhere else. By the time you've organized your tools, you've lost the spark that made you want to go in the first place.</p>
+      </div>
+      <div class="steps-row">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <h3 class="step-title">Plan your adventure</h3>
+          <p class="step-desc">Choose from 8 adventure categories. Add waypoints, set difficulty, pack the right gear — all in one place.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <h3 class="step-title">Go together, split fairly</h3>
+          <p class="step-desc">Invite your crew, split costs in any currency, and settle debts with one tap. No more awkward spreadsheets after the trip.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <h3 class="step-title">Stay connected, even offline</h3>
+          <p class="step-desc">Full offline support means your plans, maps, and packing lists work at the summit, on the water, or deep in the forest.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CORE FEATURES -->
+  <section class="features" id="features">
+    <div class="features-inner">
+      <div class="section-header">
+        <span class="section-tag" style="color: var(--trevu-teal);">CORE FEATURES</span>
+        <h2 class="section-headline">Your adventure multitool</h2>
+        <p class="section-desc" style="max-width: 600px;">Everything you need, nothing you don't. Each feature is purpose-built for outdoor adventures.</p>
+      </div>
+
+      <!-- Feature 1 -->
+      <div class="feature-block">
+        <div class="feature-content">
+          <div class="feature-icon-wrap" style="background: rgba(13,148,136,0.13);">
+            <i data-lucide="map" style="width:28px;height:28px;color:var(--trevu-teal);"></i>
+          </div>
+          <h3 class="feature-title">Smart Trip Planning</h3>
+          <p class="feature-desc">Build trips across 8 adventure categories with category-specific planning tools. From elevation profiles for hikers to avalanche risk for skiers — every sport gets the intelligence it deserves.</p>
+        </div>
+        <div class="feature-image">
+          <img src="https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=80&fit=crop&auto=format" alt="Hiker navigating a mountain trail at sunrise" loading="lazy">
+        </div>
+      </div>
+
+      <!-- Feature 2 (reversed) -->
+      <div class="feature-block reverse">
+        <div class="feature-content">
+          <div class="feature-icon-wrap" style="background: rgba(249,112,102,0.13);">
+            <i data-lucide="wallet" style="width:28px;height:28px;color:var(--sunrise-coral);"></i>
+          </div>
+          <h3 class="feature-title">Effortless Expense Splitting</h3>
+          <p class="feature-desc">Multi-currency cost splitting that actually understands group trips. Add expenses on the go, see who owes what instantly, and export clean reports when you're home.</p>
+        </div>
+        <div class="feature-image">
+          <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80&fit=crop&auto=format" alt="Group of friends laughing together on an outdoor adventure" loading="lazy">
+        </div>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="feature-block">
+        <div class="feature-content">
+          <div class="feature-icon-wrap" style="background: rgba(139,92,246,0.13);">
+            <i data-lucide="wifi-off" style="width:28px;height:28px;color:var(--dusk-violet);"></i>
+          </div>
+          <h3 class="feature-title">Offline-First, Always Ready</h3>
+          <p class="feature-desc">Your plans, maps, and packing lists work without internet. Because summits, rivers, and forests don't come with Wi-Fi. Everything syncs automatically when you're back online.</p>
+        </div>
+        <div class="feature-image">
+          <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80&fit=crop&auto=format" alt="Dramatic mountain peak rising above the clouds" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="categories" id="categories">
+    <div class="categories-inner">
+      <div class="section-header">
+        <span class="section-tag">8 ADVENTURE CATEGORIES</span>
+        <h2 class="section-headline">One platform. Every adventure.</h2>
+        <p class="section-desc">Whether you're summiting peaks, catching waves, or pedaling through valleys — trevu speaks your sport's language.</p>
+      </div>
+      <div class="categories-grid">
+        <div class="categories-row">
+          <div class="category-card">
+            <div class="category-icon" style="background: rgba(34,197,94,0.13);">
+              <i data-lucide="mountain" style="width:24px;height:24px;color:var(--hiking-green);"></i>
+            </div>
+            <h4 class="category-title">Hiking</h4>
+            <p class="category-desc">Distance, elevation, terrain difficulty</p>
+          </div>
+          <div class="category-card">
+            <div class="category-icon" style="background: rgba(249,115,22,0.13);">
+              <i data-lucide="triangle" style="width:24px;height:24px;color:var(--mountain-orange);"></i>
+            </div>
+            <h4 class="category-title">Mountain</h4>
+            <p class="category-desc">Technical grades, via ferrata, gear lists</p>
+          </div>
+          <div class="category-card">
+            <div class="category-icon" style="background: rgba(59,130,246,0.13);">
+              <i data-lucide="waves" style="width:24px;height:24px;color:var(--water-blue);"></i>
+            </div>
+            <h4 class="category-title">Water Sports</h4>
+            <p class="category-desc">Sailing, kayaking, surfing, kite</p>
+          </div>
+          <div class="category-card">
+            <div class="category-icon" style="background: rgba(234,179,8,0.13);">
+              <i data-lucide="bike" style="width:24px;height:24px;color:var(--cycling-yellow);"></i>
+            </div>
+            <h4 class="category-title">Cycling</h4>
+            <p class="category-desc">Road, MTB, gravel touring, eBike</p>
+          </div>
+        </div>
+        <div class="categories-row">
+          <div class="category-card">
+            <div class="category-icon" style="background: rgba(185,28,28,0.13);">
+              <i data-lucide="gauge" style="width:24px;height:24px;color:var(--motorsport-red);"></i>
+            </div>
+            <h4 class="category-title">Motorsport</h4>
+            <p class="category-desc">Motorcycle touring, 4x4 off-road</p>
+          </div>
+          <div class="category-card">
+            <div class="category-icon" style="background: rgba(239,68,68,0.13);">
+              <i data-lucide="timer" style="width:24px;height:24px;color:var(--running-red);"></i>
+            </div>
+            <h4 class="category-title">Running</h4>
+            <p class="category-desc">Road, trail, ultra, race planning</p>
+          </div>
+          <div class="category-card">
+            <div class="category-icon" style="background: rgba(6,182,212,0.13);">
+              <i data-lucide="snowflake" style="width:24px;height:24px;color:var(--winter-cyan);"></i>
+            </div>
+            <h4 class="category-title">Winter Sports</h4>
+            <p class="category-desc">Skiing, snowboard, avalanche risk alerts</p>
+          </div>
+          <div class="category-card">
+            <div class="category-icon" style="background: rgba(139,92,246,0.13);">
+              <i data-lucide="compass" style="width:24px;height:24px;color:var(--expedition-violet);"></i>
+            </div>
+            <h4 class="category-title">Expedition</h4>
+            <p class="category-desc">Multi-sport combined adventures</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECONDARY FEATURES -->
+  <section class="secondary-features">
+    <div class="secondary-features-inner">
+      <div class="section-header">
+        <span class="section-tag" style="color: var(--trevu-teal);">MORE TO EXPLORE</span>
+        <h2 class="section-headline">Built for the way adventurers actually travel</h2>
+      </div>
+      <div class="secondary-grid">
+        <div class="sf-card">
+          <i data-lucide="users" style="width:28px;height:28px;color:var(--trevu-teal);"></i>
+          <h4 class="sf-title">Community &amp; Social</h4>
+          <p class="sf-desc">Follow adventurers, share trip reports, and discover hidden gems from the community.</p>
+        </div>
+        <div class="sf-card">
+          <i data-lucide="shield-check" style="width:28px;height:28px;color:var(--sunrise-coral);"></i>
+          <h4 class="sf-title">Safety &amp; Emergency</h4>
+          <p class="sf-desc">SOS button, safety check-ins, and emergency contacts. Because adventure should be bold, not reckless.</p>
+        </div>
+        <div class="sf-card">
+          <i data-lucide="package" style="width:28px;height:28px;color:var(--golden-hour);"></i>
+          <h4 class="sf-title">Smart Packing Lists</h4>
+          <p class="sf-desc">Auto-generated packing lists based on your activity, weather forecast, and trip duration.</p>
+        </div>
+        <div class="sf-card">
+          <i data-lucide="cloud-sun" style="width:28px;height:28px;color:var(--winter-cyan);"></i>
+          <h4 class="sf-title">Weather Intelligence</h4>
+          <p class="sf-desc">Real-time forecasts, historical weather data, and alerts tailored to your specific adventure location.</p>
+        </div>
+        <div class="sf-card">
+          <i data-lucide="plane" style="width:28px;height:28px;color:var(--dusk-violet);"></i>
+          <h4 class="sf-title">Booking Integration</h4>
+          <p class="sf-desc">Search flights, find accommodation, and book activities — all without leaving your trip plan.</p>
+        </div>
+        <div class="sf-card">
+          <i data-lucide="languages" style="width:28px;height:28px;color:var(--hiking-green);"></i>
+          <h4 class="sf-title">7 Languages</h4>
+          <p class="sf-desc">Available in Hungarian, English, German, Slovak, Croatian, Slovenian, Romanian, and Czech.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOCIAL PROOF -->
+  <section class="social-proof">
+    <div class="social-proof-inner">
+      <div class="stats-row">
+        <div class="stat">
+          <span class="stat-value">8</span>
+          <span class="stat-label">Adventure Categories</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-value">100%</span>
+          <span class="stat-label">Offline Capable</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-value">16+</span>
+          <span class="stat-label">Integrated Services</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-value">7</span>
+          <span class="stat-label">Languages Supported</span>
+        </div>
+      </div>
+      <div class="testimonials-row">
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"Finally, one app that understands hiking isn't the same as cycling. The category-specific planning is a game changer for our mountain club."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=96&q=80&fit=crop&auto=format" alt="Márta K.">
+            </div>
+            <div>
+              <div class="testimonial-name">Márta K.</div>
+              <div class="testimonial-role">Mountain Club Organizer, Budapest</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"We used to lose hours reconciling expenses after every group trip. With trevu, costs are split in real-time and everyone stays in the loop."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=96&q=80&fit=crop&auto=format" alt="Tomáš R.">
+            </div>
+            <div>
+              <div class="testimonial-name">Tomáš R.</div>
+              <div class="testimonial-role">Trail Running Group Leader, Bratislava</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"Offline maps that actually work at 2,500m elevation? That alone sold me. But the packing lists and weather alerts make it indispensable."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">
+              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=96&q=80&fit=crop&auto=format" alt="Lukas H.">
+            </div>
+            <div>
+              <div class="testimonial-name">Lukas H.</div>
+              <div class="testimonial-role">Alpine Guide, Innsbruck</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <h2 class="final-cta-headline">Your next adventure starts here</h2>
+    <p class="final-cta-subline">Join thousands of adventurers across Central Europe who plan, share, and explore with trevu.</p>
+    <a href="registration.html" class="btn-primary">Start Planning Free <i data-lucide="arrow-right" style="width:22px;height:22px;"></i></a>
+    <p class="final-cta-trust">Free forever for personal use. No credit card required.</p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="footer-logo">trevu</div>
+          <p class="footer-tagline">Trek beyond ordinary. The all-in-one adventure platform for Central Europe and beyond.</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-col">
+            <span class="footer-col-title">Product</span>
+            <a href="#features">Features</a>
+            <a href="#categories">Categories</a>
+            <a href="pricing.html">Pricing</a>
+            <a href="#">Roadmap</a>
+          </div>
+          <div class="footer-col">
+            <span class="footer-col-title">Company</span>
+            <a href="#">About</a>
+            <a href="#">Blog</a>
+            <a href="#">Careers</a>
+            <a href="#">Contact</a>
+          </div>
+          <div class="footer-col">
+            <span class="footer-col-title">Legal</span>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Cookie Policy</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-bottom">
+        <span class="footer-copyright">© 2026 Trevu. All rights reserved.</span>
+        <div class="footer-social">
+          <a href="#" aria-label="Instagram"><i data-lucide="instagram" style="width:20px;height:20px;"></i></a>
+          <a href="#" aria-label="Twitter"><i data-lucide="twitter" style="width:20px;height:20px;"></i></a>
+          <a href="#" aria-label="Facebook"><i data-lucide="facebook" style="width:20px;height:20px;"></i></a>
+          <a href="#" aria-label="YouTube"><i data-lucide="youtube" style="width:20px;height:20px;"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    function toggleMobileMenu() {
+      var nav = document.getElementById('headerNav');
+      nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
+    }
+  </script>
+</body>
+</html>

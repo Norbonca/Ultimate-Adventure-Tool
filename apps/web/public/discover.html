@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discover Adventures — Trevu</title>
+  <meta name="description" content="Browse organized adventure trips across Central Europe. Hiking, climbing, sailing, cycling and more — find your next adventure.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/trevu-design-system.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* ========== CSS RESET & VARIABLES ========== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --trevu-teal: #0D9488;
+      --trevu-teal-light: #14B8A6;
+      --trevu-teal-dark: #0F766E;
+      --deep-navy: #0F172A;
+      --navy-800: #1E293B;
+      --navy-700: #334155;
+      --arctic-white: #F8FAFC;
+      --card-bg: #F1F5F9;
+      --sunrise-coral: #F97066;
+      --trail-sage: #6EE7B7;
+      --golden-hour: #FBBF24;
+      --dusk-violet: #8B5CF6;
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #94A3B8;
+      --text-white: #FFFFFF;
+      --border-subtle: #E2E8F0;
+      --hiking-green: #22C55E;
+      --mountain-orange: #F97316;
+      --water-blue: #3B82F6;
+      --motorsport-red: #B91C1C;
+      --cycling-yellow: #EAB308;
+      --running-red: #EF4444;
+      --winter-cyan: #06B6D4;
+      --expedition-violet: #8B5CF6;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text-primary);
+      background: var(--arctic-white);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img { max-width: 100%; display: block; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ========== HEADER ========== */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      padding: 12px 80px;
+      background: rgba(255, 255, 255, 0.95);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .header-logo {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--trevu-teal);
+      letter-spacing: -1px;
+      flex-shrink: 0;
+    }
+
+    .header-logo span {
+      color: var(--deep-navy);
+    }
+
+    .header-nav {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .header-nav a {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+
+    .header-nav a:hover { color: var(--text-primary); }
+    .header-nav a.active { color: var(--trevu-teal); font-weight: 600; }
+
+    .header-search {
+      flex: 1;
+      max-width: 400px;
+      position: relative;
+    }
+
+    .header-search input {
+      width: 100%;
+      padding: 8px 16px 8px 36px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      color: var(--text-primary);
+      background: var(--arctic-white);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .header-search input:focus { border-color: var(--trevu-teal); }
+    .header-search input::placeholder { color: var(--text-muted); }
+
+    .header-search .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+
+    .header-right {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .bell-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .bell-btn:hover { color: var(--text-primary); background: #F1F5F9; }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--trevu-teal);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-primary);
+    }
+
+    /* ========== HERO ========== */
+    .hero {
+      background: var(--deep-navy);
+      padding: 56px 80px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .hero-title {
+      font-size: 40px;
+      font-weight: 800;
+      color: var(--text-white);
+      text-align: center;
+      letter-spacing: -1px;
+    }
+
+    .hero-subtitle {
+      font-size: 16px;
+      color: #94A3B8;
+      text-align: center;
+      max-width: 520px;
+    }
+
+    /* Search Bar */
+    .search-bar {
+      display: flex;
+      background: var(--text-white);
+      border-radius: 12px;
+      overflow: hidden;
+      width: 100%;
+      max-width: 720px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+    }
+
+    .search-field {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-right: 1px solid var(--border-subtle);
+    }
+
+    .search-field:last-of-type { border-right: none; }
+
+    .search-field i { color: var(--text-muted); flex-shrink: 0; }
+
+    .search-field input,
+    .search-field select {
+      border: none;
+      outline: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      color: var(--text-primary);
+      background: transparent;
+      width: 100%;
+    }
+
+    .search-field input::placeholder,
+    .search-field select { color: var(--text-muted); }
+
+    .search-field select option { color: var(--text-primary); }
+
+    .search-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 20px;
+      background: var(--trevu-teal);
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+
+    .search-btn:hover { background: var(--trevu-teal-dark); }
+    .search-btn i { color: var(--text-white); }
+
+    /* Category Pills */
+    .category-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+
+    .pill-default {
+      background: var(--navy-800);
+      color: #94A3B8;
+      border-color: var(--navy-700);
+    }
+
+    .pill-default:hover { background: var(--navy-700); color: var(--text-white); }
+
+    .pill-active {
+      background: var(--trevu-teal);
+      color: var(--text-white);
+    }
+
+    .pill i { width: 14px; height: 14px; }
+
+    /* ========== FILTER BAR ========== */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 80px;
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .filter-select {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: var(--text-white);
+      cursor: pointer;
+      transition: border-color 0.2s;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 28px;
+    }
+
+    .filter-select:hover { border-color: var(--trevu-teal); }
+
+    .sort-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .sort-toggle i { width: 16px; height: 16px; }
+
+    /* ========== MAIN CONTENT ========== */
+    .main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .results-count {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .view-toggle {
+      display: flex;
+      gap: 4px;
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 4px;
+    }
+
+    .view-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .view-btn.active {
+      background: var(--text-white);
+      color: var(--text-primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .view-btn i { width: 16px; height: 16px; }
+
+    /* ========== TRIP CARDS GRID ========== */
+    .trips-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .trip-card {
+      background: var(--text-white);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .trip-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+    }
+
+    .trip-card-image {
+      position: relative;
+      height: 200px;
+      background: var(--card-bg);
+      overflow: hidden;
+    }
+
+    .trip-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .trip-card-badges {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .badge-category {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-white);
+    }
+
+    .badge-category i { width: 12px; height: 12px; }
+
+    .badge-spots {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255,255,255,0.92);
+      color: var(--text-primary);
+      backdrop-filter: blur(4px);
+    }
+
+    .badge-spots i { width: 12px; height: 12px; }
+
+    .trip-card-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .trip-card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--deep-navy);
+      line-height: 1.3;
+    }
+
+    .trip-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .trip-card-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .trip-card-meta i { width: 14px; height: 14px; }
+
+    .trip-card-details {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .badge-difficulty {
+      display: inline-flex;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .trip-card-price {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--deep-navy);
+    }
+
+    .trip-card-price span {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .trip-card-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .organizer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .organizer-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .organizer-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .organizer-rating {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--golden-hour);
+    }
+
+    .organizer-rating i { width: 14px; height: 14px; }
+
+    /* ========== CORPORATE ORGANIZER ========== */
+    .trip-card-footer.corporate {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+    }
+    .corp-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .corp-logo {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 10px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .corp-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .corp-spacer { flex: 1; }
+    .verified-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: #F0FDFA;
+      border: 1px solid var(--trevu-teal);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--trevu-teal);
+    }
+    .verified-badge-logo {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      background: var(--trevu-teal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .guide-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .guide-row .organizer-avatar { width: 20px; height: 20px; }
+    .guide-row .organizer-name { font-size: 11px; }
+    .guide-row .organizer-rating { font-size: 11px; }
+    .guide-row .organizer-rating i { width: 12px; height: 12px; }
+    .corp-link { cursor: pointer; position: relative; z-index: 2; }
+    .corp-link:hover { text-decoration: underline; }
+
+    /* ========== LOAD MORE ========== */
+    .load-more {
+      display: flex;
+      justify-content: center;
+      margin-top: 40px;
+    }
+
+    .btn-load-more {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 32px;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-load-more:hover {
+      border-color: var(--trevu-teal);
+      color: var(--trevu-teal);
+    }
+
+    .btn-load-more i { width: 18px; height: 18px; }
+
+    /* ========== CTA BANNER ========== */
+    .cta-banner {
+      background: var(--deep-navy);
+      padding: 56px 80px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cta-banner-text {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .cta-banner-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-white);
+    }
+
+    .cta-banner-subtitle {
+      font-size: 15px;
+      color: #94A3B8;
+    }
+
+    .btn-create-trip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: var(--trevu-teal);
+      color: var(--text-white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-create-trip:hover { background: var(--trevu-teal-dark); }
+    .btn-create-trip i { width: 18px; height: 18px; }
+
+    /* ========== RESPONSIVE: TABLET (<=1024px) ========== */
+    @media (max-width: 1024px) {
+      .header {
+        padding: 12px 24px;
+        gap: 16px;
+      }
+      .header-nav { display: none; }
+      .header-search { max-width: 300px; }
+      .mobile-menu-btn { display: block; }
+
+      .hero { padding: 40px 24px 32px; }
+      .hero-title { font-size: 32px; }
+
+      .search-bar { flex-direction: column; max-width: 500px; }
+      .search-field { border-right: none; border-bottom: 1px solid var(--border-subtle); }
+      .search-field:last-of-type { border-bottom: none; }
+
+      .filter-bar {
+        padding: 12px 24px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .trips-grid { grid-template-columns: repeat(2, 1fr); }
+
+      .cta-banner {
+        padding: 40px 24px;
+        flex-direction: column;
+        gap: 24px;
+        text-align: center;
+      }
+    }
+
+    /* ========== RESPONSIVE: MOBILE (<=640px) ========== */
+    @media (max-width: 640px) {
+      .header { padding: 12px 16px; gap: 12px; }
+      .header-logo { font-size: 22px; }
+      .header-search { display: none; }
+
+      .hero { padding: 32px 16px 24px; gap: 20px; }
+      .hero-title { font-size: 26px; }
+      .hero-subtitle { font-size: 14px; }
+
+      .category-pills { gap: 6px; }
+      .pill { padding: 6px 12px; font-size: 12px; }
+
+      .filter-bar { padding: 12px 16px; }
+      .filter-group { flex-wrap: wrap; }
+
+      .main-content { padding: 24px 16px 48px; }
+
+      .trips-grid { grid-template-columns: 1fr; }
+
+      .cta-banner { padding: 32px 16px; }
+      .cta-banner-title { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <a href="index.html" class="header-logo">tre<span>vu</span></a>
+    <nav class="header-nav" id="headerNav">
+      <a href="discover.html" class="active">Discover</a>
+      <a href="my-trips.html">My Trips</a>
+      <a href="travel-planner.html">Travel Planner</a>
+      <a href="community.html">Community</a>
+    </nav>
+    <div class="header-search">
+      <i data-lucide="search" class="search-icon" style="width:16px;height:16px;"></i>
+      <input type="text" placeholder="Search trips, locations...">
+    </div>
+    <div class="header-right">
+      <button class="bell-btn" aria-label="Notifications">
+        <i data-lucide="bell" style="width:22px;height:22px;"></i>
+      </button>
+      <a href="profile.html" class="user-avatar">MK</a>
+    </div>
+    <button class="mobile-menu-btn" aria-label="Menu" onclick="toggleMobileMenu()">
+      <i data-lucide="menu" style="width:24px;height:24px;"></i>
+    </button>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1 class="hero-title">Find your next adventure</h1>
+    <p class="hero-subtitle">Browse trips organized by experienced adventurers across Central Europe</p>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <div class="search-field">
+        <i data-lucide="map-pin" style="width:18px;height:18px;"></i>
+        <input type="text" placeholder="Where to?">
+      </div>
+      <div class="search-field">
+        <i data-lucide="calendar" style="width:18px;height:18px;"></i>
+        <input type="text" placeholder="When?">
+      </div>
+      <div class="search-field">
+        <i data-lucide="compass" style="width:18px;height:18px;"></i>
+        <select>
+          <option value="" disabled selected>Activity type</option>
+          <option>Hiking</option>
+          <option>Mountain</option>
+          <option>Water Sports</option>
+          <option>Motorsport</option>
+          <option>Cycling</option>
+          <option>Running</option>
+          <option>Winter Sports</option>
+          <option>Expedition</option>
+        </select>
+      </div>
+      <button class="search-btn" aria-label="Search">
+        <i data-lucide="search" style="width:20px;height:20px;"></i>
+      </button>
+    </div>
+
+    <!-- Category Pills -->
+    <div class="category-pills">
+      <span class="pill pill-active">All Trips</span>
+      <span class="pill pill-default"><i data-lucide="mountain"></i> Hiking</span>
+      <span class="pill pill-default"><i data-lucide="triangle"></i> Mountain</span>
+      <span class="pill pill-default"><i data-lucide="waves"></i> Water</span>
+      <span class="pill pill-default"><i data-lucide="gauge"></i> Motorsport</span>
+      <span class="pill pill-default"><i data-lucide="bike"></i> Cycling</span>
+      <span class="pill pill-default"><i data-lucide="timer"></i> Running</span>
+      <span class="pill pill-default"><i data-lucide="snowflake"></i> Winter</span>
+      <span class="pill pill-default"><i data-lucide="compass"></i> Expedition</span>
+    </div>
+  </section>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <select class="filter-select">
+        <option disabled selected>Difficulty</option>
+        <option>Beginner</option>
+        <option>Intermediate</option>
+        <option>Advanced</option>
+        <option>Expert</option>
+        <option>Professional</option>
+      </select>
+      <select class="filter-select">
+        <option disabled selected>Price Range</option>
+        <option>Free</option>
+        <option>Under €50</option>
+        <option>€50 – €200</option>
+        <option>€200 – €500</option>
+        <option>€500+</option>
+      </select>
+      <select class="filter-select">
+        <option disabled selected>Duration</option>
+        <option>1 day</option>
+        <option>2–3 days</option>
+        <option>4–7 days</option>
+        <option>1–2 weeks</option>
+        <option>2+ weeks</option>
+      </select>
+      <select class="filter-select">
+        <option disabled selected>Available Spots</option>
+        <option>Any</option>
+        <option>1–3 spots</option>
+        <option>4–8 spots</option>
+        <option>9+ spots</option>
+      </select>
+    </div>
+    <div class="sort-toggle">
+      <i data-lucide="arrow-up-down"></i>
+      <span>Most Recent</span>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <div class="results-header">
+      <span class="results-count">24 trips available</span>
+      <div class="view-toggle">
+        <button class="view-btn active" aria-label="Grid view">
+          <i data-lucide="layout-grid"></i>
+        </button>
+        <button class="view-btn" aria-label="List view">
+          <i data-lucide="list"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- TRIPS GRID -->
+    <div class="trips-grid">
+
+      <!-- Card 1: Sailing -->
+      <a href="trip-detail.html" class="trip-card">
+        <div class="trip-card-image">
+          <img src="https://images.unsplash.com/photo-1500514966906-fe245eea9344?w=600&h=400&fit=crop" alt="Adriatic Offshore Sailing Adventure">
+          <div class="trip-card-badges">
+            <span class="badge-category" style="background: var(--water-blue);"><i data-lucide="waves"></i> Sailing</span>
+            <span class="badge-spots"><i data-lucide="users"></i> 4 spots left</span>
+          </div>
+        </div>
+        <div class="trip-card-body">
+          <h3 class="trip-card-title">Adriatic Offshore Sailing Adventure</h3>
+          <div class="trip-card-meta">
+            <span><i data-lucide="map-pin"></i> Split, Croatia</span>
+            <span><i data-lucide="calendar"></i> Mar 15–22</span>
+          </div>
+          <div class="trip-card-details">
+            <span class="badge-difficulty" style="background: #FEF3C7; color: #D97706;">Intermediate</span>
+            <span class="trip-card-price">€450 <span>/person</span></span>
+          </div>
+        </div>
+        <div class="trip-card-footer corporate">
+          <div class="corp-row">
+            <div class="corp-logo" style="background: var(--trevu-teal);">A</div>
+            <span class="corp-name corp-link" onclick="event.preventDefault();event.stopPropagation();window.location='org-public-landing.html'">Adriatic Adventures</span>
+            <span class="corp-spacer"></span>
+            <span class="verified-badge"><span class="verified-badge-logo">T</span> Verified Org</span>
+          </div>
+          <div class="guide-row">
+            <div class="organizer-avatar" style="background: var(--trevu-teal);"></div>
+            <span class="organizer-name">Guide: Marko P.</span>
+            <span class="corp-spacer"></span>
+            <div class="organizer-rating"><i data-lucide="star"></i> 4.9</div>
+          </div>
+        </div>
+      </a>
+
+      <!-- Card 2: Hiking -->
+      <a href="trip-detail.html" class="trip-card">
+        <div class="trip-card-image">
+          <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&h=400&fit=crop" alt="Sunrise Hike to Eagle Peak">
+          <div class="trip-card-badges">
+            <span class="badge-category" style="background: var(--hiking-green);"><i data-lucide="mountain"></i> Hiking</span>
+            <span class="badge-spots"><i data-lucide="users"></i> 8 spots left</span>
+          </div>
+        </div>
+        <div class="trip-card-body">
+          <h3 class="trip-card-title">Sunrise Hike to Eagle Peak</h3>
+          <div class="trip-card-meta">
+            <span><i data-lucide="map-pin"></i> High Tatras, SK</span>
+            <span><i data-lucide="calendar"></i> Apr 5–6</span>
+          </div>
+          <div class="trip-card-details">
+            <span class="badge-difficulty" style="background: #DBEAFE; color: #3B82F6;">Advanced</span>
+            <span class="trip-card-price">€35 <span>/person</span></span>
+          </div>
+        </div>
+        <div class="trip-card-footer">
+          <div class="organizer">
+            <div class="organizer-avatar" style="background: var(--hiking-green);"></div>
+            <span class="organizer-name">Jana K.</span>
+          </div>
+          <div class="organizer-rating">
+            <i data-lucide="star"></i> 4.7
+          </div>
+        </div>
+      </a>
+
+      <!-- Card 3: Cycling -->
+      <a href="trip-detail.html" class="trip-card">
+        <div class="trip-card-image">
+          <img src="https://images.unsplash.com/photo-1541625602330-2277a4c46182?w=600&h=400&fit=crop" alt="Danube Gravel Trail 200km">
+          <div class="trip-card-badges">
+            <span class="badge-category" style="background: var(--cycling-yellow);"><i data-lucide="bike"></i> Cycling</span>
+            <span class="badge-spots"><i data-lucide="users"></i> 12 spots left</span>
+          </div>
+        </div>
+        <div class="trip-card-body">
+          <h3 class="trip-card-title">Danube Gravel Trail 200km</h3>
+          <div class="trip-card-meta">
+            <span><i data-lucide="map-pin"></i> Budapest, HU</span>
+            <span><i data-lucide="calendar"></i> May 10–12</span>
+          </div>
+          <div class="trip-card-details">
+            <span class="badge-difficulty" style="background: #F1F5F9; color: #64748B;">Beginner</span>
+            <span class="trip-card-price" style="color: var(--hiking-green);">Free</span>
+          </div>
+        </div>
+        <div class="trip-card-footer">
+          <div class="organizer">
+            <div class="organizer-avatar" style="background: var(--cycling-yellow);"></div>
+            <span class="organizer-name">Tamas B.</span>
+          </div>
+          <div class="organizer-rating">
+            <i data-lucide="star"></i> 5.0
+          </div>
+        </div>
+      </a>
+
+      <!-- Card 4: Winter Sports -->
+      <a href="trip-detail.html" class="trip-card">
+        <div class="trip-card-image">
+          <img src="https://images.unsplash.com/photo-1551524559-8af4e6624178?w=600&h=400&fit=crop" alt="Freeride Week in Zillertal">
+          <div class="trip-card-badges">
+            <span class="badge-category" style="background: var(--winter-cyan);"><i data-lucide="snowflake"></i> Winter</span>
+            <span class="badge-spots"><i data-lucide="users"></i> 2 spots left</span>
+          </div>
+        </div>
+        <div class="trip-card-body">
+          <h3 class="trip-card-title">Freeride Week in Zillertal</h3>
+          <div class="trip-card-meta">
+            <span><i data-lucide="map-pin"></i> Zillertal, AT</span>
+            <span><i data-lucide="calendar"></i> Mar 1–7</span>
+          </div>
+          <div class="trip-card-details">
+            <span class="badge-difficulty" style="background: #EDE9FE; color: #8B5CF6;">Expert</span>
+            <span class="trip-card-price">€680 <span>/person</span></span>
+          </div>
+        </div>
+        <div class="trip-card-footer corporate">
+          <div class="corp-row">
+            <div class="corp-logo" style="background: #06B6D4;">A</div>
+            <span class="corp-name">Alpine Pro Guides</span>
+            <span class="corp-spacer"></span>
+            <span class="verified-badge"><span class="verified-badge-logo">T</span> Verified Org</span>
+          </div>
+          <div class="guide-row">
+            <div class="organizer-avatar" style="background: #3B82F6;"></div>
+            <span class="organizer-name">Guide: Stefan W.</span>
+            <span class="corp-spacer"></span>
+            <div class="organizer-rating"><i data-lucide="star"></i> 4.8</div>
+          </div>
+        </div>
+      </a>
+
+      <!-- Card 5: Running -->
+      <a href="trip-detail.html" class="trip-card">
+        <div class="trip-card-image">
+          <img src="https://images.unsplash.com/photo-1483721310020-03333e577078?w=600&h=400&fit=crop" alt="Velebit Mountain Ultra 80K">
+          <div class="trip-card-badges">
+            <span class="badge-category" style="background: var(--running-red);"><i data-lucide="timer"></i> Trail Run</span>
+            <span class="badge-spots"><i data-lucide="users"></i> 6 spots left</span>
+          </div>
+        </div>
+        <div class="trip-card-body">
+          <h3 class="trip-card-title">Velebit Mountain Ultra 80K</h3>
+          <div class="trip-card-meta">
+            <span><i data-lucide="map-pin"></i> Zadar, HR</span>
+            <span><i data-lucide="calendar"></i> Jun 14</span>
+          </div>
+          <div class="trip-card-details">
+            <span class="badge-difficulty" style="background: #FEE2E2; color: #DC2626;">Professional</span>
+            <span class="trip-card-price">€120 <span>/person</span></span>
+          </div>
+        </div>
+        <div class="trip-card-footer">
+          <div class="organizer">
+            <div class="organizer-avatar" style="background: var(--running-red);"></div>
+            <span class="organizer-name">Ivan L.</span>
+          </div>
+          <div class="organizer-rating">
+            <i data-lucide="star"></i> 4.6
+          </div>
+        </div>
+      </a>
+
+      <!-- Card 6: Expedition -->
+      <a href="trip-detail.html" class="trip-card">
+        <div class="trip-card-image">
+          <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop" alt="Carpathian Wilderness Trek">
+          <div class="trip-card-badges">
+            <span class="badge-category" style="background: var(--expedition-violet);"><i data-lucide="compass"></i> Expedition</span>
+            <span class="badge-spots"><i data-lucide="users"></i> 3 spots left</span>
+          </div>
+        </div>
+        <div class="trip-card-body">
+          <h3 class="trip-card-title">Carpathian Wilderness Trek</h3>
+          <div class="trip-card-meta">
+            <span><i data-lucide="map-pin"></i> Sibiu, RO</span>
+            <span><i data-lucide="calendar"></i> Jul 20–27</span>
+          </div>
+          <div class="trip-card-details">
+            <span class="badge-difficulty" style="background: #FEF3C7; color: #D97706;">Intermediate</span>
+            <span class="trip-card-price">€290 <span>/person</span></span>
+          </div>
+        </div>
+        <div class="trip-card-footer corporate">
+          <div class="corp-row">
+            <div class="corp-logo" style="background: var(--expedition-violet);">W</div>
+            <span class="corp-name">Wild Romania Expeditions</span>
+            <span class="corp-spacer"></span>
+            <span class="verified-badge"><span class="verified-badge-logo">T</span> Verified Org</span>
+          </div>
+          <div class="guide-row">
+            <div class="organizer-avatar" style="background: var(--expedition-violet);"></div>
+            <span class="organizer-name">Guide: Anca M.</span>
+            <span class="corp-spacer"></span>
+            <div class="organizer-rating"><i data-lucide="star"></i> 4.9</div>
+          </div>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- LOAD MORE -->
+    <div class="load-more">
+      <button class="btn-load-more">
+        <i data-lucide="chevron-down"></i> Load More Trips
+      </button>
+    </div>
+  </div>
+
+  <!-- CTA BANNER -->
+  <section class="cta-banner">
+    <div class="cta-banner-text">
+      <h2 class="cta-banner-title">Ready to organize your own adventure?</h2>
+      <p class="cta-banner-subtitle">Create a trip, set crew positions, and let adventurers find you.</p>
+    </div>
+    <a href="wizard-step0.html" class="btn-create-trip">
+      <i data-lucide="plus"></i> Create a Trip
+    </a>
+  </section>
+
+  <script>
+    lucide.createIcons();
+
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+      var nav = document.getElementById('headerNav');
+      nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    // Category pill toggle
+    document.querySelectorAll('.pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.pill').forEach(p => {
+          p.classList.remove('pill-active');
+          p.classList.add('pill-default');
+        });
+        pill.classList.remove('pill-default');
+        pill.classList.add('pill-active');
+      });
+    });
+
+    // View toggle
+    document.querySelectorAll('.view-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>
