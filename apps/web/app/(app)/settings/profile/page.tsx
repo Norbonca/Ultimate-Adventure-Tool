@@ -186,10 +186,11 @@ export default function ProfileSettingsPage() {
         {/* Name row */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-navy-700 mb-1.5">
+            <label htmlFor="first-name" className="block text-sm font-semibold text-navy-700 mb-1.5">
               {t('profile.settings.firstName')}
             </label>
             <input
+              id="first-name"
               type="text"
               value={form.first_name}
               onChange={(e) => setForm({ ...form, first_name: e.target.value })}
@@ -198,10 +199,11 @@ export default function ProfileSettingsPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-navy-700 mb-1.5">
+            <label htmlFor="last-name" className="block text-sm font-semibold text-navy-700 mb-1.5">
               {t('profile.settings.lastName')}
             </label>
             <input
+              id="last-name"
               type="text"
               value={form.last_name}
               onChange={(e) => setForm({ ...form, last_name: e.target.value })}
@@ -213,10 +215,11 @@ export default function ProfileSettingsPage() {
 
         {/* Phone */}
         <div>
-          <label className="block text-sm font-semibold text-navy-700 mb-1.5">
+          <label htmlFor="phone" className="block text-sm font-semibold text-navy-700 mb-1.5">
             {t('profile.settings.phone')}
           </label>
           <input
+            id="phone"
             type="tel"
             value={form.phone}
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
@@ -228,10 +231,11 @@ export default function ProfileSettingsPage() {
         {/* City + Country */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-navy-700 mb-1.5">
+            <label htmlFor="city" className="block text-sm font-semibold text-navy-700 mb-1.5">
               {t('profile.settings.city')}
             </label>
             <input
+              id="city"
               type="text"
               value={form.location_city}
               onChange={(e) => setForm({ ...form, location_city: e.target.value })}
@@ -318,7 +322,7 @@ export default function ProfileSettingsPage() {
             placeholder={t('profile.settings.bioPlaceholder')}
           />
           <p className="text-xs text-navy-400 mt-1">
-            {form.bio.length}{t('profile.settings.bioCharCount')}
+            {t('profile.settings.bioCharCount', { count: form.bio.length })}
           </p>
         </div>
 
@@ -332,10 +336,11 @@ export default function ProfileSettingsPage() {
           </p>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-navy-700 mb-1.5">
+              <label htmlFor="emergency-name" className="block text-sm font-semibold text-navy-700 mb-1.5">
                 {t('profile.emergency.name')}
               </label>
               <input
+                id="emergency-name"
                 type="text"
                 value={emergency.name}
                 onChange={(e) => setEmergency({ ...emergency, name: e.target.value })}
@@ -362,10 +367,11 @@ export default function ProfileSettingsPage() {
             </div>
           </div>
           <div className="mt-4">
-            <label className="block text-sm font-semibold text-navy-700 mb-1.5">
+            <label htmlFor="emergency-phone" className="block text-sm font-semibold text-navy-700 mb-1.5">
               {t('profile.emergency.phone')}
             </label>
             <input
+              id="emergency-phone"
               type="tel"
               value={emergency.phone}
               onChange={(e) => setEmergency({ ...emergency, phone: e.target.value })}

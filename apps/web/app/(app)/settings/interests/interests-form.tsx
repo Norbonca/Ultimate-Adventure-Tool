@@ -166,6 +166,8 @@ export function InterestsForm({ categories, subDisciplines, initialInterests, in
               {/* Category header */}
               <button
                 onClick={() => isSelected ? toggleExpand(cat.id) : toggleCategory(cat.id)}
+                aria-expanded={isSelected ? isExpanded : undefined}
+                aria-label={catName}
                 className="flex items-center gap-3 w-full px-5 py-4 text-left transition-colors"
                 style={{ backgroundColor: isSelected ? `${colorHex}10` : undefined }}
               >
@@ -183,12 +185,15 @@ export function InterestsForm({ categories, subDisciplines, initialInterests, in
                   </div>
                 </div>
                 {isSelected && (
-                  <button
+                  <div
+                    role="button"
+                    tabIndex={0}
                     onClick={(e) => { e.stopPropagation(); toggleCategory(cat.id); }}
-                    className="text-xs font-medium text-navy-400 hover:text-red-500 px-2 py-1"
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); toggleCategory(cat.id); } }}
+                    className="text-xs font-medium text-navy-400 hover:text-red-500 px-2 py-1 cursor-pointer"
                   >
                     {t('common.remove')}
-                  </button>
+                  </div>
                 )}
                 <svg
                   className={`h-5 w-5 text-navy-400 transition-transform ${isExpanded ? "rotate-180" : ""}`}

@@ -16,11 +16,13 @@ import {
   fetchCategoryParameters,
   fetchParameterOptions,
 } from "../actions";
+import { Step0Template, type PlanningMode } from "./steps/step0-template";
 import { Step1Category } from "./steps/step1-category";
 import { Step2Basics } from "./steps/step2-basics";
 import { Step3Details } from "./steps/step3-details";
 import { Step4Publish } from "./steps/step4-publish";
 import { CATEGORY_DISPLAY } from "@/lib/categories";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 interface WizardFormProps {
   categories: CategoryRow[];
@@ -28,15 +30,17 @@ interface WizardFormProps {
   userId: string;
 }
 
-const STEPS = [
-  { num: 1, label: "Kategória" },
-  { num: 2, label: "Alapadatok" },
-  { num: 3, label: "Részletek" },
-  { num: 4, label: "Publikálás" },
+const STEP_KEYS = [
+  { num: 1, key: "stepCategory" },
+  { num: 2, key: "stepBasicInfo" },
+  { num: 3, key: "stepDetails" },
+  { num: 4, key: "stepPublish" },
 ];
 
 export function WizardForm({ categories, countries, userId }: WizardFormProps) {
-  const [currentStep, setCurrentStep] = useState(1);
+  const { t } = useTranslation();
+  const [currentStep, setCurrentStep] = useState(0);
+  const [planningMode, setPlanningMode] = useState<PlanningMode | null>(null);
   const [formData, setFormData] = useState<WizardFormData>(INITIAL_FORM_DATA);
   const [tripId, setTripId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -45,7 +49,6 @@ export function WizardForm({ categories, countries, userId }: WizardFormProps) {
   const [subDisciplines, setSubDisciplines] = useState<SubDisciplineRow[]>([]);
   const [parameters, setParameters] = useState<CategoryParameterRow[]>([]);
   const [paramOptions, setParamOptions] = useState<ParameterOptionRow[]>([]);
-
   // Status messages
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -84,6 +87,7 @@ export function WizardForm({ categories, countries, userId }: WizardFormProps) {
           const opts = await fetchParameterOptions(selectParams);
           setParamOptions(opts);
         }
+
       });
     },
     [updateForm]
@@ -129,8 +133,24 @@ export function WizardForm({ categories, countries, userId }: WizardFormProps) {
     }
   }, [formData, tripId]);
 
+  // ── Template selected ──
+  const onSelectTemplate = useCallback(
+    (_templateId: string) => {
+      // TODO: pre-fill formData from template data
+      setPlanningMode("template");
+      setCurrentStep(1);
+    },
+    []
+  );
+
   // ── Next step ──
   const goNext = useCallback(async () => {
+    // Step 0 → 1: just advance
+    if (currentStep === 0) {
+      setCurrentStep(1);
+      return;
+    }
+
     // Save draft on Step 2 → 3 transition (first save)
     if (currentStep === 2 && !tripId) {
       setSaveStatus("saving");
@@ -154,13 +174,13 @@ export function WizardForm({ categories, countries, userId }: WizardFormProps) {
   }, [currentStep, formData, tripId]);
 
   const goBack = useCallback(() => {
-    setCurrentStep((prev) => Math.max(prev - 1, 1));
+    setCurrentStep((prev) => Math.max(prev - 1, 0));
   }, []);
 
   // ── Publish ──
   const doPublish = useCallback(async () => {
     if (!tripId) {
-      setErrorMsg("Először mentsd el a piszkozatot");
+      setErrorMsg(t("trips.wizard.saveDraftFirst"));
       return;
     }
 
@@ -170,34 +190,33 @@ export function WizardForm({ categories, countries, userId }: WizardFormProps) {
       setSaveStatus("error");
       setErrorMsg(result.error);
     } else {
-      // Success! redirect to the trip detail page
       window.location.href = `/trips/${result.slug}`;
     }
-  }, [tripId, formData]);
+  }, [tripId, formData, t]);
 
   // ── Step 3 label adapts to category ──
   const step3Label =
     formData.category_name
       ? CATEGORY_DISPLAY[formData.category_name]?.nameHu || formData.category_name
-      : "Részletek";
+      : t("trips.wizard.stepDetails");
 
   const canGoNext =
-    currentStep === 1
-      ? !!formData.category_id
-      : currentStep === 2
-        ? !!formData.title && !!formData.start_date && !!formData.end_date && !!formData.description
-        : currentStep === 3
-          ? true
+    currentStep === 0
+      ? !!planningMode
+      : currentStep === 1
+        ? !!formData.category_id
+        : currentStep === 2
+          ? !!formData.title && !!formData.start_date && !!formData.end_date && !!formData.description
           : true;
 
   return (
     <div>
       {/* ── Stepper ── */}
       <div className="flex items-center justify-center mb-10">
-        {STEPS.map((step, i) => {
+        {STEP_KEYS.map((step, i) => {
           const isActive = currentStep === step.num;
           const isCompleted = currentStep > step.num;
-          const label = step.num === 3 ? step3Label : step.label;
+          const label = step.num === 3 ? step3Label : t(`trips.wizard.${step.key}`);
 
           return (
             <div key={step.num} className="flex items-center">
@@ -225,7 +244,7 @@ export function WizardForm({ categories, countries, userId }: WizardFormProps) {
                   {label}
                 </span>
               </div>
-              {i < STEPS.length - 1 && (
+              {i < STEP_KEYS.length - 1 && (
                 <div
                   className={`w-16 sm:w-24 h-0.5 mx-2 mt-[-16px] ${
                     currentStep > step.num ? "bg-trevu-400" : "bg-navy-200"
@@ -239,11 +258,21 @@ export function WizardForm({ categories, countries, userId }: WizardFormProps) {
 
       {/* ── Step Content ── */}
       <div className="bg-white rounded-2xl border border-navy-200 shadow-sm p-6 sm:p-8">
+        {currentStep === 0 && (
+          <Step0Template
+            selectedMode={planningMode}
+            onSelectMode={setPlanningMode}
+            onSelectTemplate={onSelectTemplate}
+          />
+        )}
+
         {currentStep === 1 && (
           <Step1Category
             categories={categories}
             selectedCategoryId={formData.category_id}
+            tripType={formData.trip_type}
             onSelect={onCategorySelect}
+            onTripTypeChange={(type) => updateForm({ trip_type: type })}
             isLoading={isPending}
           />
         )}
@@ -280,12 +309,12 @@ export function WizardForm({ categories, countries, userId }: WizardFormProps) {
       {/* ── Navigation Footer ── */}
       <div className="flex items-center justify-between mt-6">
         <div>
-          {currentStep > 1 && (
+          {currentStep > 0 && (
             <button
               onClick={goBack}
               className="px-5 py-2.5 text-sm font-medium text-navy-600 bg-white border border-navy-200 rounded-xl hover:bg-navy-50 transition-colors"
             >
-              ← Vissza
+              ← {t("trips.wizard.back")}
             </button>
           )}
         </div>
@@ -293,10 +322,10 @@ export function WizardForm({ categories, countries, userId }: WizardFormProps) {
         <div className="flex items-center gap-3">
           {/* Save status */}
           {saveStatus === "saving" && (
-            <span className="text-xs text-navy-400 animate-pulse">Mentés...</span>
+            <span className="text-xs text-navy-400 animate-pulse">{t("common.saving")}</span>
           )}
           {saveStatus === "saved" && (
-            <span className="text-xs text-green-600">✓ Mentve</span>
+            <span className="text-xs text-green-600">✓ {t("trips.wizard.saved")}</span>
           )}
           {saveStatus === "error" && (
             <span className="text-xs text-red-500">{errorMsg}</span>
@@ -309,7 +338,7 @@ export function WizardForm({ categories, countries, userId }: WizardFormProps) {
               disabled={saveStatus === "saving"}
               className="px-4 py-2.5 text-sm font-medium text-navy-500 bg-navy-50 border border-navy-200 rounded-xl hover:bg-navy-100 transition-colors disabled:opacity-50"
             >
-              Piszkozat mentése
+              {t("trips.wizard.saveDraft")}
             </button>
           )}
 
@@ -320,7 +349,7 @@ export function WizardForm({ categories, countries, userId }: WizardFormProps) {
               disabled={!canGoNext || isPending}
               className="px-6 py-2.5 text-sm font-bold text-white bg-trevu-600 rounded-xl hover:bg-trevu-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
             >
-              Tovább →
+              {t("trips.wizard.next")} →
             </button>
           ) : (
             <button
@@ -328,7 +357,7 @@ export function WizardForm({ categories, countries, userId }: WizardFormProps) {
               disabled={saveStatus === "saving"}
               className="px-6 py-2.5 text-sm font-bold text-white bg-trevu-600 rounded-xl hover:bg-trevu-700 transition-colors disabled:opacity-50 shadow-lg shadow-trevu-600/30"
             >
-              🚀 Túra publikálása
+              🚀 {t("trips.wizard.publish")}
             </button>
           )}
         </div>

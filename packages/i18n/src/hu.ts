@@ -67,6 +67,12 @@ const hu = {
     loadFailed: "Az adatok betöltése sikertelen.",
     fileTooLarge: "A fájl túl nagy. Maximum {max} MB megengedett.",
     invalidFormat: "Érvénytelen formátum.",
+    notAuthenticated: "Nincs bejelentkezett felhasználó.",
+    profileCreateFailed: "Profil létrehozása sikertelen: {error}",
+    noFileSelected: "Nincs fájl kiválasztva.",
+    unsupportedFileFormat: "Nem támogatott fájlformátum. Használj JPEG, PNG vagy WebP formátumot.",
+    fileSizeLimitExceeded: "A fájl mérete meghaladja a 10MB-os limitet.",
+    uploadFailed: "Feltöltés sikertelen: {error}",
   },
 
   toasts: {
@@ -131,6 +137,7 @@ const hu = {
     loginFeature3: "Működik offline is — még a csúcson is",
     freeForever: "Személyes használatra örökre ingyenes",
     phoneTab: "Telefon",
+    phonePlaceholder: "+36 20 123 4567",
     phoneNumber: "Telefonszám",
     sendOTP: "SMS kód küldése",
     phoneComingSoon: "A telefonszámos bejelentkezés hamarosan elérhető",
@@ -527,7 +534,7 @@ const hu = {
       onlineStatusVisible: "Online státusz zvisible",
       options: {
         public: "Nyilvános",
-        registered: "Csak regisztrált felhasználok",
+        registered: "Csak regisztrált felhasználók",
         private: "Privát",
         hidden: "Rejtett",
         followersOnly: "Csak követők",
