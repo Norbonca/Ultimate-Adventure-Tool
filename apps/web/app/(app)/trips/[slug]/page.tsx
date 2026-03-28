@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { fetchTripBySlug, fetchCategoryParametersForDisplay } from "../actions";
 import { CATEGORY_DISPLAY, DIFFICULTY_LEVELS } from "@/lib/categories";
+import { getServerT, getServerLocale } from "@/lib/i18n/server";
+import { AppHeader } from "@/components/AppHeader";
+import { BackButton } from "@/components/BackButton";
 
 interface TripDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -16,14 +19,16 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
     notFound();
   }
 
-  // Check if current user is the organizer
+  const { t } = await getServerT();
+  const locale = await getServerLocale();
+  const dateLocale = locale === "en" ? "en-US" : "hu-HU";
+
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   const isOrganizer = user?.id === trip.organizer_id;
 
-  // Fetch parameter definitions for category detail display
   const paramDefs = await fetchCategoryParametersForDisplay(
     trip.category_id,
     trip.sub_discipline_id
@@ -55,26 +60,35 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
   } | null;
 
   const catDisplay = category ? CATEGORY_DISPLAY[category.name] : null;
-  const diffLabel = DIFFICULTY_LEVELS.find((l) => l.value === trip.difficulty);
+  const diffLevel = DIFFICULTY_LEVELS.find((l) => l.value === trip.difficulty);
+  const diffLabelText = diffLevel
+    ? locale === "en" ? diffLevel.labelEn : diffLevel.label
+    : "";
   const categoryDetails = (trip.category_details || {}) as Record<string, unknown>;
 
-  // Format dates
+  // Localized category/sub-discipline names
+  const categoryName = category
+    ? (category.name_localized as Record<string, string>)?.[locale] || category.name
+    : "";
+  const subDiscName = subDisc
+    ? (subDisc.name_localized as Record<string, string>)?.[locale] || subDisc.name
+    : "";
+
   const startDate = trip.start_date
-    ? new Date(trip.start_date).toLocaleDateString("hu-HU", {
+    ? new Date(trip.start_date).toLocaleDateString(dateLocale, {
         year: "numeric",
         month: "long",
         day: "numeric",
       })
     : null;
   const endDate = trip.end_date
-    ? new Date(trip.end_date).toLocaleDateString("hu-HU", {
+    ? new Date(trip.end_date).toLocaleDateString(dateLocale, {
         year: "numeric",
         month: "long",
         day: "numeric",
       })
     : null;
 
-  // Calculate days
   const dayCount =
     trip.start_date && trip.end_date
       ? Math.ceil(
@@ -88,42 +102,16 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
 
   return (
     <main className="min-h-screen bg-[#F8FAFC]">
-      {/* Header */}
-      <header className="bg-white/95 border-b border-navy-200 sticky top-0 z-50 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <div className="h-9 w-9 rounded-lg bg-trevu-600 text-white flex items-center justify-center font-bold text-sm shadow-trevu-sm">
-                T
-              </div>
-              <span className="text-xl font-extrabold tracking-tight">
-                <span className="text-trevu-600">Tre</span>
-                <span className="text-navy-900">vu</span>
-              </span>
-            </Link>
-            <span className="text-navy-300 mx-1">/</span>
-            <Link
-              href="/trips"
-              className="text-sm text-navy-500 hover:text-trevu-600 transition-colors"
-            >
-              Túráim
-            </Link>
-            <span className="text-navy-300 mx-1">/</span>
-            <span className="text-sm font-medium text-navy-700 truncate max-w-[200px]">
-              {trip.title}
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            {isOrganizer && (
-              <span className="text-xs bg-trevu-50 text-trevu-700 px-2.5 py-1 rounded-full font-medium">
-                Szervező
-              </span>
-            )}
-            {/* Status badge */}
-            <TripStatusBadge status={trip.status} />
-          </div>
-        </div>
-      </header>
+      <AppHeader
+        anchors={[
+          { label: t('nav.description'), href: '#description' },
+          { label: t('nav.details'), href: '#details' },
+          { label: t('nav.location'), href: '#location' },
+        ]}
+        user={user ? { email: user.email ?? "", displayName: user.user_metadata?.full_name } : null}
+      />
+
+      <BackButton fallback="/discover" label={t('common.back')} />
 
       {/* Hero Section */}
       <div
@@ -135,12 +123,15 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+        {trip.cover_image_source === "user_upload" && (
+          <span className="absolute top-4 right-4 text-[11px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-tl-lg">
+            ✨ {t("imagePicker.ownPhoto")}
+          </span>
+        )}
         <div className="absolute bottom-6 left-6 right-6 max-w-6xl mx-auto">
           <div className="flex items-end gap-4">
             {catDisplay && (
-              <div
-                className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl bg-white/90 backdrop-blur-sm shadow-lg"
-              >
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl bg-white/90 backdrop-blur-sm shadow-lg">
                 {catDisplay.emoji}
               </div>
             )}
@@ -151,15 +142,12 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                     className="text-xs font-bold px-2 py-0.5 rounded-full text-white"
                     style={{ backgroundColor: category.color_hex }}
                   >
-                    {(category.name_localized as Record<string, string>)?.hu ||
-                      category.name}
+                    {categoryName}
                   </span>
                 )}
                 {subDisc && (
                   <span className="text-xs font-medium text-white/80">
-                    /{" "}
-                    {(subDisc.name_localized as Record<string, string>)?.hu ||
-                      subDisc.name}
+                    / {subDiscName}
                   </span>
                 )}
               </div>
@@ -186,7 +174,9 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                     {endDate && startDate !== endDate ? ` → ${endDate}` : ""}
                   </span>
                   {dayCount && (
-                    <span className="text-navy-400">({dayCount} nap)</span>
+                    <span className="text-navy-400">
+                      ({dayCount} {t("trips.detail.days")})
+                    </span>
                   )}
                 </span>
               )}
@@ -198,23 +188,23 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                     .join(", ")}
                 </span>
               </span>
-              {diffLabel && (
+              {diffLevel && (
                 <span
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border"
                   style={{
-                    borderColor: diffLabel.color,
-                    color: diffLabel.color,
-                    backgroundColor: `${diffLabel.color}10`,
+                    borderColor: diffLevel.color,
+                    color: diffLevel.color,
+                    backgroundColor: `${diffLevel.color}10`,
                   }}
                 >
-                  <span className="font-bold">{diffLabel.label}</span>
+                  <span className="font-bold">{diffLabelText}</span>
                   <span className="opacity-60">({trip.difficulty}/5)</span>
                 </span>
               )}
               <span className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-navy-200">
                 <span className="text-navy-400">👥</span>
                 <span className="font-medium text-navy-700">
-                  {trip.current_participants || 0}/{trip.max_participants} fő
+                  {trip.current_participants || 0}/{trip.max_participants} {t("trips.detail.people")}
                 </span>
               </span>
             </div>
@@ -222,7 +212,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
             {/* Description */}
             <div className="bg-white rounded-2xl border border-navy-200 p-6">
               <h2 className="text-lg font-bold text-navy-900 mb-3">
-                Leírás
+                {t("trips.detail.description")}
               </h2>
               {trip.short_description && (
                 <p className="text-trevu-700 font-medium mb-3">
@@ -239,7 +229,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
               Object.keys(categoryDetails).length > 0 && (
                 <div className="bg-white rounded-2xl border border-navy-200 p-6">
                   <h2 className="text-lg font-bold text-navy-900 mb-4">
-                    {catDisplay?.nameHu || "Kategória"} részletek
+                    {categoryName} {t("trips.detail.details")}
                   </h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                     {paramDefs.map((param) => {
@@ -247,8 +237,8 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                       if (val === null || val === undefined || val === "")
                         return null;
 
-                      const labelHu =
-                        (param.label_localized as Record<string, string>)?.hu ||
+                      const paramLabel =
+                        (param.label_localized as Record<string, string>)?.[locale] ||
                         param.label;
 
                       return (
@@ -257,13 +247,14 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                           className="bg-navy-50 rounded-xl p-3"
                         >
                           <span className="text-xs text-navy-400 block mb-0.5">
-                            {labelHu}
+                            {paramLabel}
                           </span>
                           <span className="text-sm font-semibold text-navy-800">
                             <DetailValue
                               value={val}
                               fieldType={param.field_type}
                               unit={param.unit}
+                              locale={locale}
                             />
                           </span>
                         </div>
@@ -297,16 +288,16 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                   <span className="text-3xl font-extrabold text-navy-900">
                     {trip.price_currency} {Number(trip.price_amount).toFixed(0)}
                   </span>
-                  <span className="text-navy-400 text-sm"> / fő</span>
+                  <span className="text-navy-400 text-sm"> / {t("trips.detail.perPerson")}</span>
                 </div>
               ) : (
                 <div className="text-center">
                   <span className="text-xl font-bold text-trevu-600">
-                    Ingyenes
+                    {t("trips.detail.free")}
                   </span>
                   {trip.is_cost_sharing && (
                     <span className="block text-xs text-navy-400 mt-1">
-                      Költségmegosztással
+                      {t("trips.detail.withCostSharing")}
                     </span>
                   )}
                 </div>
@@ -316,23 +307,25 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                 <span
                   className={`font-bold ${spotsLeft > 0 ? "text-trevu-600" : "text-red-500"}`}
                 >
-                  {spotsLeft > 0 ? `${spotsLeft} szabad hely` : "Betelt"}
+                  {spotsLeft > 0
+                    ? `${spotsLeft} ${t("trips.detail.spotsLeft")}`
+                    : t("trips.detail.full")}
                 </span>
                 <span className="text-navy-300"> / {trip.max_participants}</span>
               </div>
 
               {!isOrganizer && spotsLeft > 0 && (
                 <button className="w-full py-3 bg-trevu-600 text-white font-bold rounded-xl hover:bg-trevu-700 transition-colors shadow-lg shadow-trevu-600/20">
-                  Jelentkezem
+                  {t("trips.detail.apply")}
                 </button>
               )}
 
               {isOrganizer && (
                 <Link
-                  href={`/trips/new?edit=${trip.id}`}
+                  href={`/trips/${slug}/edit`}
                   className="block w-full py-3 text-center bg-navy-100 text-navy-700 font-bold rounded-xl hover:bg-navy-200 transition-colors"
                 >
-                  Szerkesztés
+                  {t("trips.detail.edit")}
                 </Link>
               )}
             </div>
@@ -341,7 +334,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
             {organizer && (
               <div className="bg-white rounded-2xl border border-navy-200 p-5">
                 <h3 className="text-xs font-semibold text-navy-400 uppercase tracking-wider mb-3">
-                  Szervező
+                  {t("trips.detail.organizer")}
                 </h3>
                 <div className="flex items-center gap-3">
                   <div className="w-11 h-11 rounded-full bg-trevu-600 text-white flex items-center justify-center font-bold text-sm">
@@ -349,7 +342,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                   </div>
                   <div>
                     <span className="text-sm font-semibold text-navy-900">
-                      {organizer.display_name || "Felhasználó"}
+                      {organizer.display_name || t("common.user")}
                     </span>
                     {organizer.subscription_tier &&
                       organizer.subscription_tier !== "free" && (
@@ -370,40 +363,34 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
             {/* Trip Meta */}
             <div className="bg-white rounded-2xl border border-navy-200 p-5 space-y-3 text-sm">
               <h3 className="text-xs font-semibold text-navy-400 uppercase tracking-wider">
-                Részletek
+                {t("trips.detail.details")}
               </h3>
               <div className="flex justify-between">
-                <span className="text-navy-500">Láthatóság</span>
-                <span className="font-medium text-navy-700 capitalize">
+                <span className="text-navy-500">{t("trips.wizard.visibility")}</span>
+                <span className="font-medium text-navy-700">
                   {trip.visibility === "public"
-                    ? "🌍 Nyilvános"
+                    ? `🌍 ${t("trips.wizard.visPublic")}`
                     : trip.visibility === "followers_only"
-                      ? "👥 Követők"
-                      : "🔒 Privát"}
+                      ? `👥 ${t("trips.wizard.visFollowers")}`
+                      : `🔒 ${t("trips.wizard.visPrivate")}`}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-navy-500">Jóváhagyás</span>
+                <span className="text-navy-500">{t("trips.detail.approval")}</span>
                 <span className="font-medium text-navy-700">
-                  {trip.require_approval ? "Szükséges" : "Automatikus"}
+                  {trip.require_approval
+                    ? t("trips.detail.required")
+                    : t("trips.detail.automatic")}
                 </span>
               </div>
               {trip.registration_deadline && (
                 <div className="flex justify-between">
-                  <span className="text-navy-500">Jelentkezési határidő</span>
+                  <span className="text-navy-500">{t("trips.wizard.registrationDeadline")}</span>
                   <span className="font-medium text-navy-700">
-                    {new Date(trip.registration_deadline).toLocaleDateString(
-                      "hu-HU"
-                    )}
+                    {new Date(trip.registration_deadline).toLocaleDateString(dateLocale)}
                   </span>
                 </div>
               )}
-              <div className="flex justify-between">
-                <span className="text-navy-500">Nyelv</span>
-                <span className="font-medium text-navy-700">
-                  {trip.language === "hu" ? "🇭🇺 Magyar" : trip.language}
-                </span>
-              </div>
             </div>
           </div>
         </div>
@@ -414,24 +401,20 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
 
 // ── Helper Components ──
 
-function TripStatusBadge({ status }: { status: string }) {
-  const config: Record<string, { label: string; bg: string; text: string }> = {
-    draft: { label: "Piszkozat", bg: "bg-navy-100", text: "text-navy-600" },
-    published: { label: "Publikált", bg: "bg-trevu-50", text: "text-trevu-700" },
-    registration_open: {
-      label: "Jelentkezés nyitva",
-      bg: "bg-green-50",
-      text: "text-green-700",
-    },
-    active: { label: "Aktív", bg: "bg-blue-50", text: "text-blue-700" },
-    completed: { label: "Befejezett", bg: "bg-navy-100", text: "text-navy-600" },
-    cancelled: { label: "Lemondva", bg: "bg-red-50", text: "text-red-600" },
-    archived: { label: "Archivált", bg: "bg-navy-50", text: "text-navy-400" },
+function TripStatusBadge({ status, t }: { status: string; t: (key: string) => string }) {
+  const config: Record<string, { bg: string; text: string; key: string }> = {
+    draft: { bg: "bg-navy-100", text: "text-navy-600", key: "trips.status.draft" },
+    published: { bg: "bg-trevu-50", text: "text-trevu-700", key: "trips.status.published" },
+    registration_open: { bg: "bg-green-50", text: "text-green-700", key: "trips.status.registrationOpen" },
+    active: { bg: "bg-blue-50", text: "text-blue-700", key: "trips.status.active" },
+    completed: { bg: "bg-navy-100", text: "text-navy-600", key: "trips.status.completed" },
+    cancelled: { bg: "bg-red-50", text: "text-red-600", key: "trips.status.cancelled" },
+    archived: { bg: "bg-navy-50", text: "text-navy-400", key: "trips.status.archived" },
   };
   const c = config[status] || config.draft;
   return (
     <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${c.bg} ${c.text}`}>
-      {c.label}
+      {t(c.key)}
     </span>
   );
 }
@@ -440,13 +423,15 @@ function DetailValue({
   value,
   fieldType,
   unit,
+  locale,
 }: {
   value: unknown;
   fieldType: string;
   unit: string | null;
+  locale: string;
 }) {
   if (typeof value === "boolean") {
-    return <>{value ? "✅ Igen" : "❌ Nem"}</>;
+    return <>{value ? "✅" : "❌"}</>;
   }
   if (Array.isArray(value)) {
     return <>{value.join(", ")}</>;
@@ -454,7 +439,7 @@ function DetailValue({
   if (typeof value === "number") {
     return (
       <>
-        {value}
+        {value.toLocaleString(locale === "en" ? "en-US" : "hu-HU")}
         {unit ? ` ${unit}` : ""}
       </>
     );
