@@ -22,7 +22,6 @@ const hu = {
     delete: "Törlés",
     edit: "Szerkesztés",
     close: "Bezárás",
-    back: "Vissza",
     next: "Tovább",
     previous: "Előző",
     search: "Keresés",

@@ -23,7 +23,6 @@ const en: TranslationKeys = {
     delete: "Delete",
     edit: "Edit",
     close: "Close",
-    back: "Back",
     next: "Next",
     previous: "Previous",
     search: "Search",
