@@ -230,7 +230,7 @@ export function InterestsForm({ categories, subDisciplines, initialInterests, in
                             </span>
                           )}
                         </div>
-                        {sd.description && (
+                        {sd.description && locale === 'en' && (
                           <p className="text-xs text-navy-400 mb-2">{sd.description}</p>
                         )}
                         {/* Skill level bar */}
