@@ -31,7 +31,7 @@ export async function saveDraft(
   formData: Partial<WizardFormData>,
   existingTripId?: string
 ): Promise<{ tripId: string; error?: string }> {
-  const t = await getServerT();
+  const { t } = await getServerT();
   const supabase = await createClient();
   const {
     data: { user },
@@ -164,7 +164,7 @@ export async function publishTrip(
   tripId: string,
   formData: WizardFormData
 ): Promise<{ slug: string; error?: string }> {
-  const t = await getServerT();
+  const { t } = await getServerT();
   const supabase = await createClient();
   const {
     data: { user },
@@ -496,7 +496,7 @@ export async function fetchExperienceLevels(categoryId?: string) {
 export async function uploadCoverImage(
   formDataFile: FormData
 ): Promise<{ url: string; error?: string }> {
-  const t = await getServerT();
+  const { t } = await getServerT();
   const supabase = await createClient();
   const {
     data: { user },

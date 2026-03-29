@@ -216,7 +216,7 @@ export function WizardForm({ categories, countries, userId }: WizardFormProps) {
         {STEP_KEYS.map((step, i) => {
           const isActive = currentStep === step.num;
           const isCompleted = currentStep > step.num;
-          const label = step.num === 3 ? step3Label : t(`trips.wizard.${step.key}`);
+          const label = step.num === 3 ? step3Label : t(`trips.wizard.${step.key}` as Parameters<typeof t>[0]);
 
           return (
             <div key={step.num} className="flex items-center">

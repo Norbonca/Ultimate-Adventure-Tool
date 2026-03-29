@@ -113,7 +113,7 @@ export function Step3Details({
                 onChange={(val) => setValue(param.parameter_key, val)}
                 options={getOptions(param.id)}
                 locale={locale}
-                t={t}
+                t={t as (key: string, params?: Record<string, string | number>) => string}
               />
             ))}
           </div>
@@ -140,7 +140,7 @@ function ParameterField({
   onChange: (val: unknown) => void;
   options: ParameterOptionRow[];
   locale: string;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
 }) {
   const label =
     locale === 'en'
