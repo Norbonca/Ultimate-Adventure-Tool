@@ -10,6 +10,7 @@ export interface CategoryDisplay {
   name: string;
   nameHu: string;
   nameEn: string;
+  descriptionHu?: string;  // localized description for HU
   icon: string;       // lucide-react icon name
   emoji: string;      // fallback emoji
   colorHex: string;
@@ -27,6 +28,7 @@ export const CATEGORY_DISPLAY: Record<string, CategoryDisplay> = {
     name: "Hiking",
     nameHu: "Túrázás",
     nameEn: "Hiking",
+    descriptionHu: "Túrák és ösvények a természetben",
     icon: "footprints",
     emoji: "🥾",
     colorHex: "#22C55E",
@@ -37,6 +39,7 @@ export const CATEGORY_DISPLAY: Record<string, CategoryDisplay> = {
     name: "Mountaineering",
     nameHu: "Hegymászás",
     nameEn: "Mountaineering",
+    descriptionHu: "Hegymászás és alpinista kalandok",
     icon: "mountain",
     emoji: "🧗",
     colorHex: "#F97316",
@@ -47,6 +50,7 @@ export const CATEGORY_DISPLAY: Record<string, CategoryDisplay> = {
     name: "Mountain",
     nameHu: "Hegymászás",
     nameEn: "Mountain",
+    descriptionHu: "Hegymászás és alpinista kalandok",
     icon: "mountain",
     emoji: "🧗",
     colorHex: "#F97316",
@@ -57,6 +61,7 @@ export const CATEGORY_DISPLAY: Record<string, CategoryDisplay> = {
     name: "Water Sports",
     nameHu: "Vízi sportok",
     nameEn: "Water Sports",
+    descriptionHu: "Vitorlázás, kajak, szörfözés és más",
     icon: "waves",
     emoji: "⛵",
     colorHex: "#3B82F6",
@@ -67,6 +72,7 @@ export const CATEGORY_DISPLAY: Record<string, CategoryDisplay> = {
     name: "Motorsport",
     nameHu: "Motorsport",
     nameEn: "Motorsport",
+    descriptionHu: "Motorozás, enduro és terep off-road",
     icon: "gauge",
     emoji: "🏍️",
     colorHex: "#B91C1C",
@@ -77,6 +83,7 @@ export const CATEGORY_DISPLAY: Record<string, CategoryDisplay> = {
     name: "Cycling",
     nameHu: "Kerékpározás",
     nameEn: "Cycling",
+    descriptionHu: "Országúti, hegyi és gravel kerékpározás",
     icon: "bike",
     emoji: "🚴",
     colorHex: "#EAB308",
@@ -87,6 +94,7 @@ export const CATEGORY_DISPLAY: Record<string, CategoryDisplay> = {
     name: "Running",
     nameHu: "Futás",
     nameEn: "Running",
+    descriptionHu: "Terepfutás, ultra és közúti versenyek",
     icon: "person-standing",
     emoji: "🏃",
     colorHex: "#EF4444",
@@ -97,6 +105,7 @@ export const CATEGORY_DISPLAY: Record<string, CategoryDisplay> = {
     name: "Winter Sports",
     nameHu: "Téli sportok",
     nameEn: "Winter Sports",
+    descriptionHu: "Sítúra, backcountry és hótalpas túrák",
     icon: "snowflake",
     emoji: "⛷️",
     colorHex: "#6366F1",
@@ -107,6 +116,7 @@ export const CATEGORY_DISPLAY: Record<string, CategoryDisplay> = {
     name: "Expedition",
     nameHu: "Expedíció",
     nameEn: "Expedition",
+    descriptionHu: "Többnapos vadon és extrém kalandok",
     icon: "compass",
     emoji: "🎒",
     colorHex: "#8B5CF6",
