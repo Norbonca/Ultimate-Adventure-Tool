@@ -31,10 +31,18 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Védett oldalak — bejelentkezés nélkül átirányítás
-  if (
-    !user &&
-    request.nextUrl.pathname.startsWith("/(app)")
-  ) {
+  const protectedPaths = [
+    "/dashboard", "/trips", "/profile", "/settings", "/admin",
+  ];
+  const publicAdminPaths = ["/admin/login"];
+  const isPublicAdmin = publicAdminPaths.some((p) =>
+    request.nextUrl.pathname.startsWith(p)
+  );
+  const isProtected =
+    !isPublicAdmin &&
+    protectedPaths.some((p) => request.nextUrl.pathname.startsWith(p));
+
+  if (!user && isProtected) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);

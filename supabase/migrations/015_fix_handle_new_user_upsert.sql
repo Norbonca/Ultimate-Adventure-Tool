@@ -29,7 +29,7 @@ BEGIN
       NEW.raw_user_meta_data->>'name',
       CASE WHEN NEW.email IS NOT NULL THEN split_part(NEW.email, '@', 1) ELSE 'User' END
     ),
-    generate_unique_slug(
+    public.generate_unique_slug(
       COALESCE(
         NEW.raw_user_meta_data->>'full_name',
         CASE WHEN NEW.email IS NOT NULL THEN split_part(NEW.email, '@', 1) ELSE 'user-' || left(NEW.id::TEXT, 8) END
@@ -58,4 +58,4 @@ BEGIN
 
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
