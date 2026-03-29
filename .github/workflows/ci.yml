@@ -8,6 +8,7 @@ name: CI
 # 2. Feature branch-re push → PR nyitás main felé
 # 3. Ez a CI workflow automatikusan fut a PR-en
 # 4. Ha zöld → merge main-be → Vercel automatikusan deployol
+#    + supabase db push automatikusan lefut (DB szinkron!)
 # ============================================================
 
 on:
@@ -54,3 +55,29 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+  db-push:
+    name: Supabase DB Push
+    runs-on: ubuntu-latest
+    # Csak main-re push esetén fut (ne fusson PR-en)
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: ci  # Csak ha a build sikeres
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Push DB migrations
+        # SUPABASE_DB_PASSWORD szükséges: Supabase Dashboard → Project Settings → Database → Reset password
+        # Majd: GitHub → Settings → Secrets → SUPABASE_DB_PASSWORD
+        run: |
+          supabase link --project-ref rpwajsbxrvypeqaalhvd
+          supabase db push --yes
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
