@@ -5,6 +5,7 @@ import { useTranslation } from "@/lib/i18n/useTranslation";
 import { saveDraft } from "../../actions";
 import type { CategoryParameterRow, ParameterOptionRow } from "../../types";
 import { ImagePicker } from "@/components/ImagePicker";
+import { DIFFICULTY_LEVELS } from "@/lib/categories";
 
 interface CategoryDisplayInfo {
   emoji: string;
@@ -66,7 +67,8 @@ export function EditTripForm({
   parameterOptions,
   countries,
 }: EditTripFormProps) {
-  const { t } = useTranslation();
+  const { t, locale: clientLocale } = useTranslation();
+  const effectiveLocale = clientLocale || locale;
 
   // Form state
   const [title, setTitle] = useState(trip.title || "");
@@ -164,13 +166,6 @@ export function EditTripForm({
     cardImageUrl, cardImageSource,
   ]);
 
-  const difficultyLabels: Record<number, { hu: string; en: string }> = {
-    1: { hu: "Könnyű", en: "Easy" },
-    2: { hu: "Mérsékelten nehéz", en: "Moderate" },
-    3: { hu: "Közepes", en: "Intermediate" },
-    4: { hu: "Nehéz", en: "Hard" },
-    5: { hu: "Nagyon nehéz", en: "Expert" },
-  };
 
   const labelClass = "block text-sm font-semibold text-navy-700 mb-1.5";
   const inputClass =
@@ -183,7 +178,7 @@ export function EditTripForm({
         <div className="flex items-center gap-3">
           <span className="text-2xl">{categoryDisplay.emoji}</span>
           <span className="text-sm font-bold px-3 py-1 rounded-full" style={{ backgroundColor: categoryDisplay.bgColor, color: categoryDisplay.color }}>
-            {locale === "en" ? categoryDisplay.nameEn : categoryDisplay.nameHu}
+            {effectiveLocale === "en" ? categoryDisplay.nameEn : categoryDisplay.nameHu}
           </span>
         </div>
       )}
@@ -242,7 +237,7 @@ export function EditTripForm({
             <select value={locationCountry} onChange={(e) => setLocationCountry(e.target.value)} className={inputClass}>
               {countries.map((c) => (
                 <option key={c.code} value={c.code}>
-                  {c.flag_emoji} {locale === "en" ? c.name_en : c.name_hu}
+                  {c.flag_emoji} {effectiveLocale === "en" ? c.name_en : c.name_hu}
                 </option>
               ))}
             </select>
@@ -263,7 +258,7 @@ export function EditTripForm({
             <select value={difficulty} onChange={(e) => setDifficulty(Number(e.target.value))} className={inputClass}>
               {[1, 2, 3, 4, 5].map((lvl) => (
                 <option key={lvl} value={lvl}>
-                  {lvl} — {locale === "en" ? difficultyLabels[lvl].en : difficultyLabels[lvl].hu}
+                  {lvl} — {effectiveLocale === "en" ? (DIFFICULTY_LEVELS.find(d => d.value === lvl)?.labelEn ?? lvl) : (DIFFICULTY_LEVELS.find(d => d.value === lvl)?.label ?? lvl)}
                 </option>
               ))}
             </select>
@@ -286,9 +281,9 @@ export function EditTripForm({
 
           {categoryParameters.map((param) => {
             const value = categoryDetails[param.parameter_key] ?? param.default_value ?? "";
-            const label = locale === "en" && param.label_localized?.en
-              ? param.label_localized.en
-              : param.label;
+            const label = effectiveLocale === "en"
+              ? (param.label_localized?.en || param.label)
+              : (param.label_localized?.hu || param.label);
             const options = parameterOptions.filter((o) => o.parameter_id === param.id);
 
             if (param.field_type === "boolean") {
@@ -320,7 +315,7 @@ export function EditTripForm({
                     <option value="">—</option>
                     {options.map((opt) => (
                       <option key={opt.id} value={opt.value}>
-                        {locale === "en" && opt.label_localized?.en ? opt.label_localized.en : opt.label}
+                        {effectiveLocale === "en" ? (opt.label_localized?.en || opt.label) : (opt.label_localized?.hu || opt.label)}
                       </option>
                     ))}
                   </select>
