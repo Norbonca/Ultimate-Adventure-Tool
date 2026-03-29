@@ -1,10 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { getServerT } from "@/lib/i18n/server";
+import { AppHeader } from "@/components/AppHeader";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const { t } = await getServerT();
 
   if (!user) {
     redirect("/login");
@@ -12,44 +15,18 @@ export default async function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-[#F8FAFC]">
-      {/* Header */}
-      <header className="bg-white/95 border-b border-navy-200 sticky top-0 z-50 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="h-9 w-9 rounded-lg bg-trevu-600 text-white flex items-center justify-center font-bold text-sm shadow-trevu-sm">
-                T
-              </div>
-              <span className="text-xl font-extrabold tracking-tight">
-                <span className="text-trevu-600">Tre</span>
-                <span className="text-navy-900">vu</span>
-              </span>
-            </Link>
-          </div>
-          <div className="flex items-center gap-6">
-            <span className="text-sm text-navy-500">{user.email}</span>
-            <Link
-              href="/profile"
-              className="h-9 w-9 rounded-full bg-trevu-600 text-white flex items-center justify-center font-semibold text-xs hover:bg-trevu-700 transition-colors"
-              title="Profil"
-            >
-              {(user.user_metadata?.full_name || user.email || "U")
-                .charAt(0)
-                .toUpperCase()}
-            </Link>
-            <form action="/api/v1/auth/signout" method="POST">
-              <button className="text-sm text-navy-400 hover:text-navy-700 transition-colors">
-                Kijelentkezés
-              </button>
-            </form>
-          </div>
-        </div>
-      </header>
+      <AppHeader
+        anchors={[
+          { label: t('nav.myTrips'), href: '/trips' },
+          { label: t('nav.newTrip'), href: '/trips/new' },
+        ]}
+        user={{ email: user.email ?? "", displayName: user.user_metadata?.full_name }}
+      />
 
       {/* Dashboard Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <h2 className="text-2xl font-bold text-navy-900 mb-6">
-          Üdvözlünk, {user.user_metadata?.full_name || "Kalandor"}!
+          {t('dashboard.welcomeMessage', { name: user.user_metadata?.full_name || t('dashboard.welcomeDefault') })}
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -62,10 +39,10 @@ export default async function DashboardPage() {
               <span className="text-2xl">🏔️</span>
             </div>
             <h3 className="font-semibold text-navy-900 group-hover:text-trevu-600 transition-colors">
-              Túráim
+              {t('dashboard.myTrips')}
             </h3>
             <p className="text-sm text-navy-500 mt-1">
-              Meglévő túrák kezelése
+              {t('dashboard.myTripsDescription')}
             </p>
           </Link>
 
@@ -77,10 +54,10 @@ export default async function DashboardPage() {
               <span className="text-2xl">➕</span>
             </div>
             <h3 className="font-semibold text-navy-900 group-hover:text-trevu-600 transition-colors">
-              Új túra
+              {t('dashboard.newTrip')}
             </h3>
             <p className="text-sm text-navy-500 mt-1">
-              Hozz létre egy új kalandot
+              {t('dashboard.newTripDescription')}
             </p>
           </Link>
 
@@ -88,9 +65,9 @@ export default async function DashboardPage() {
             <div className="w-12 h-12 rounded-xl bg-navy-100 flex items-center justify-center mb-4">
               <span className="text-2xl">💰</span>
             </div>
-            <h3 className="font-semibold text-navy-900">Költségek</h3>
+            <h3 className="font-semibold text-navy-900">{t('dashboard.expenses')}</h3>
             <p className="text-sm text-navy-500 mt-1">
-              Hamarosan elérhető
+              {t('common.comingSoon')}
             </p>
           </div>
 
@@ -98,9 +75,9 @@ export default async function DashboardPage() {
             <div className="w-12 h-12 rounded-xl bg-navy-100 flex items-center justify-center mb-4">
               <span className="text-2xl">🧭</span>
             </div>
-            <h3 className="font-semibold text-navy-900">Túravezetők</h3>
+            <h3 className="font-semibold text-navy-900">{t('dashboard.guides')}</h3>
             <p className="text-sm text-navy-500 mt-1">
-              Hamarosan elérhető
+              {t('common.comingSoon')}
             </p>
           </div>
         </div>
@@ -108,8 +85,8 @@ export default async function DashboardPage() {
         {/* Status */}
         <div className="p-4 rounded-xl bg-trevu-50 border border-trevu-200">
           <p className="text-sm text-trevu-800">
-            <span className="font-semibold">Rendszer státusz:</span>{" "}
-            MVP infrastruktúra aktív — M01 User Management + M02 Trip Wizard beüzemelve
+            <span className="font-semibold">{t('dashboard.systemStatus')}:</span>{" "}
+            {t('dashboard.systemStatusText')}
           </p>
         </div>
       </div>

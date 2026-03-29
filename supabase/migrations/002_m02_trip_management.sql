@@ -65,7 +65,7 @@ COMMENT ON COLUMN categories.name IS 'English system name (Hiking, Mountain, etc
 COMMENT ON COLUMN categories.name_localized IS 'Localized names: {hu:"Túrázás", en:"Hiking", de:"Wandern"}';
 COMMENT ON COLUMN categories.parameter_schema IS 'JSON Schema for category-specific trip fields';
 
-CREATE UNIQUE INDEX idx_categories_status ON categories(status);
+CREATE INDEX idx_categories_status ON categories(status);
 CREATE INDEX idx_categories_order ON categories(display_order);
 
 -- 2.2 sub_disciplines — Subcategories

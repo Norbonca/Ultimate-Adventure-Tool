@@ -56,10 +56,34 @@ export interface ParameterOptionRow {
   display_order: number;
 }
 
+export interface CoverImageRow {
+  id: string;
+  category_id: string | null;
+  url: string;
+  thumbnail_url: string | null;
+  alt_text: string;
+  alt_text_localized: Record<string, string>;
+  source: string;
+  photographer: string | null;
+  tags: string[];
+  is_featured: boolean;
+  sort_order: number;
+}
+
+export interface ExperienceLevelRow {
+  id: string;
+  category_id: string;
+  level: number;
+  label: string;
+  description: string | null;
+  description_localized: Record<string, string> | null;
+}
+
 export interface WizardFormData {
   // Step 1
   category_id: string;
   category_name: string;
+  trip_type: "private" | "public";
 
   // Step 2 — Basic Info
   title: string;
@@ -86,12 +110,18 @@ export interface WizardFormData {
   price_currency: string;
   is_cost_sharing: boolean;
   cover_image_url: string;
+  cover_image_source: "system" | "user_upload";
+  card_image_url: string;
+  card_image_source: "system" | "user_upload";
   tags: string[];
+  crew_positions: string[];
+  show_on_landing: boolean;
 }
 
 export const INITIAL_FORM_DATA: WizardFormData = {
   category_id: "",
   category_name: "",
+  trip_type: "private",
   title: "",
   short_description: "",
   description: "",
@@ -112,5 +142,10 @@ export const INITIAL_FORM_DATA: WizardFormData = {
   price_currency: "EUR",
   is_cost_sharing: true,
   cover_image_url: "",
+  cover_image_source: "system",
+  card_image_url: "",
+  card_image_source: "system",
   tags: [],
+  crew_positions: [],
+  show_on_landing: true,
 };

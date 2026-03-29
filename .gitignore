@@ -35,3 +35,9 @@ supabase/.temp/
 
 # Vercel
 .vercel/
+
+# Backups (lokális mentések, NEM kell git-be)
+.backups/
+
+# Temp files
+_tmp_*

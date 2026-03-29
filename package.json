@@ -10,7 +10,14 @@
     "db:generate": "turbo db:generate",
     "db:migrate": "turbo db:migrate",
     "db:push": "turbo db:push",
-    "db:studio": "pnpm --filter @uat/db studio"
+    "db:studio": "pnpm --filter @uat/db studio",
+    "local:setup": "bash scripts/setup-local-dev.sh",
+    "local:start": "supabase start && echo '✓ Supabase fut — Studio: http://localhost:55323'",
+    "local:stop": "supabase stop",
+    "local:reset": "supabase db reset",
+    "local:status": "supabase status",
+    "test": "turbo test",
+    "test:watch": "pnpm --filter @uat/web test:watch"
   },
   "devDependencies": {
     "turbo": "^2.3.0",

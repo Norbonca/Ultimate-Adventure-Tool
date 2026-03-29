@@ -112,38 +112,38 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION generate_unique_slug(base_name TEXT)
 RETURNS TEXT AS $$
 DECLARE
-  slug TEXT;
-  slug_exists BOOLEAN;
-  counter INTEGER := 0;
+  v_slug TEXT;
+  v_slug_exists BOOLEAN;
+  v_counter INTEGER := 0;
 BEGIN
   -- Alapvető slugification: kisbetű, ékezet eltávolítás, speciális karakterek cseréje
-  slug := lower(trim(base_name));
-  slug := translate(slug, 'áéíóöőúüűÁÉÍÓÖŐÚÜŰ', 'aeiooouuuaeiooouuu');
-  slug := regexp_replace(slug, '[^a-z0-9]+', '-', 'g');
-  slug := regexp_replace(slug, '^-|-$', '', 'g');
-  slug := left(slug, 50);
+  v_slug := lower(trim(base_name));
+  v_slug := translate(v_slug, 'áéíóöőúüűÁÉÍÓÖŐÚÜŰ', 'aeiooouuuaeiooouuu');
+  v_slug := regexp_replace(v_slug, '[^a-z0-9]+', '-', 'g');
+  v_slug := regexp_replace(v_slug, '^-|-$', '', 'g');
+  v_slug := left(v_slug, 50);
 
   -- Ha üres, fallback
-  IF slug = '' OR slug IS NULL THEN
-    slug := 'user';
+  IF v_slug = '' OR v_slug IS NULL THEN
+    v_slug := 'user';
   END IF;
 
   -- Egyediség ellenőrzés + számláló
   LOOP
-    IF counter = 0 THEN
-      SELECT EXISTS(SELECT 1 FROM profiles WHERE profiles.slug = slug) INTO slug_exists;
+    IF v_counter = 0 THEN
+      SELECT EXISTS(SELECT 1 FROM profiles WHERE profiles.slug = v_slug) INTO v_slug_exists;
     ELSE
-      SELECT EXISTS(SELECT 1 FROM profiles WHERE profiles.slug = slug || '-' || counter::TEXT) INTO slug_exists;
+      SELECT EXISTS(SELECT 1 FROM profiles WHERE profiles.slug = v_slug || '-' || v_counter::TEXT) INTO v_slug_exists;
     END IF;
 
-    IF NOT slug_exists THEN
-      IF counter > 0 THEN
-        slug := slug || '-' || counter::TEXT;
+    IF NOT v_slug_exists THEN
+      IF v_counter > 0 THEN
+        v_slug := v_slug || '-' || v_counter::TEXT;
       END IF;
-      RETURN slug;
+      RETURN v_slug;
     END IF;
 
-    counter := counter + 1;
+    v_counter := v_counter + 1;
   END LOOP;
 END;
 $$ LANGUAGE plpgsql;

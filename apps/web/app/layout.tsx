@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "@/styles/globals.css";
+import { cookies } from "next/headers";
+import type { Locale } from "@uat/i18n";
 
 export const metadata: Metadata = {
   title: "Trevu — Trek Beyond Ordinary",
@@ -17,13 +19,16 @@ export const metadata: Metadata = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const locale = (cookieStore.get("trevu-locale")?.value as Locale) || "hu";
+
   return (
-    <html lang="hu">
+    <html lang={locale}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link

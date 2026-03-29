@@ -111,6 +111,7 @@ export const profiles = pgTable('profiles', {
   email: varchar('email', { length: 254 }),
   phone: varchar('phone', { length: 20 }),
   avatarUrl: text('avatar_url'),
+  avatarSource: text('avatar_source').notNull().default('system'),
   bio: varchar('bio', { length: 500 }),
   locationCity: varchar('location_city', { length: 100 }),
   countryCode: varchar('country_code', { length: 2 }),

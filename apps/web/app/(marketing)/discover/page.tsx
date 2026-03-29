@@ -19,7 +19,7 @@ async function fetchPublishedTrips() {
       location_country, location_region, location_city,
       difficulty, max_participants, current_participants,
       price_amount, price_currency, is_cost_sharing,
-      cover_image_url, status, visibility,
+      cover_image_url, cover_image_source, card_image_url, card_image_source, status, visibility,
       category_id,
       categories (id, name, name_localized, icon_name, color_hex),
       sub_disciplines (id, name, name_localized),

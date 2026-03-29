@@ -68,6 +68,12 @@ const en: TranslationKeys = {
     loadFailed: "Failed to load data.",
     fileTooLarge: "File is too large. Maximum {max} MB allowed.",
     invalidFormat: "Invalid format.",
+    notAuthenticated: "Not authenticated.",
+    profileCreateFailed: "Failed to create profile: {error}",
+    noFileSelected: "No file selected.",
+    unsupportedFileFormat: "Unsupported file format. Please use JPEG, PNG, or WebP.",
+    fileSizeLimitExceeded: "File size exceeds the 10MB limit.",
+    uploadFailed: "Upload failed: {error}",
   },
 
   toasts: {
@@ -132,6 +138,7 @@ const en: TranslationKeys = {
     loginFeature3: "Works offline — even at the summit",
     freeForever: "Free forever for personal use",
     phoneTab: "Phone",
+    phonePlaceholder: "+1 555 000 0000",
     phoneNumber: "Phone number",
     sendOTP: "Send SMS code",
     phoneComingSoon: "Phone login coming soon",

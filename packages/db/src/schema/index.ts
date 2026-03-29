@@ -10,3 +10,6 @@ export * from "./m02-trip";
 export * from "./m03-expense";
 export * from "./m17-guides";
 export * from "./reference";
+export * from "./ref-cover-images";
+export * from "./ref-avatar-images";
+export * from "./user-images";

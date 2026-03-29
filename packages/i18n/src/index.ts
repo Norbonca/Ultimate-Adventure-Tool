@@ -134,6 +134,44 @@ export function getSection<K extends keyof TranslationKeys>(
 }
 
 // ============================================================================
+// Locale-bound translator (server-safe, no shared state)
+// ============================================================================
+
+/**
+ * Create a locale-bound `t` function.
+ * Safe for server components — no shared module-level state.
+ *
+ * @example
+ *   const t = createT('en');
+ *   t('auth.login')  // "Log in"
+ */
+export function createT(locale: Locale) {
+  const dict = translations[locale] || translations[DEFAULT_LOCALE];
+  return (key: TranslationKey, params?: Record<string, string | number>): string => {
+    let value = getNestedValue(dict as unknown as Record<string, unknown>, key);
+
+    // Fallback to default locale
+    if (value === undefined && locale !== DEFAULT_LOCALE) {
+      value = getNestedValue(translations[DEFAULT_LOCALE] as unknown as Record<string, unknown>, key);
+    }
+
+    // Fallback to key itself
+    if (value === undefined) {
+      return key;
+    }
+
+    // Interpolation
+    if (params) {
+      for (const [param, val] of Object.entries(params)) {
+        value = value.replace(new RegExp(`\\{${param}\\}`, 'g'), String(val));
+      }
+    }
+
+    return value;
+  };
+}
+
+// ============================================================================
 // Re-exports
 // ============================================================================
 

@@ -213,6 +213,9 @@ export const trips = pgTable(
     shortDescription: varchar('short_description', { length: 280 }),
     description: text('description').notNull(),
     coverImageUrl: text('cover_image_url'),
+    coverImageSource: text('cover_image_source').notNull().default('system'),
+    cardImageUrl: text('card_image_url'),
+    cardImageSource: text('card_image_source').notNull().default('system'),
 
     // Difficulty & Location
     difficulty: integer('difficulty').notNull(),

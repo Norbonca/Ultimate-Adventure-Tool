@@ -2,12 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   typescript: {
-    // MVP fázisban kikapcsoljuk — később bekapcsoljuk
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   eslint: {
-    // MVP fázisban kikapcsoljuk — később bekapcsoljuk
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   transpilePackages: ["@uat/db", "@uat/core", "@uat/validators", "@uat/config"],
   images: {
@@ -21,4 +19,21 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Sentry wrapping — only active if @sentry/nextjs is installed
+// Install: pnpm add @sentry/nextjs --filter @uat/web
+let exportedConfig = nextConfig;
+try {
+  const { withSentryConfig } = require("@sentry/nextjs");
+  exportedConfig = withSentryConfig(nextConfig, {
+    org: process.env.SENTRY_ORG,
+    project: process.env.SENTRY_PROJECT,
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    widenClientFileUpload: true,
+    silent: !process.env.CI,
+    telemetry: false,
+  });
+} catch {
+  // @sentry/nextjs not installed yet — skip wrapping
+}
+
+export default exportedConfig;

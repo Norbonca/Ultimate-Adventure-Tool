@@ -1,0 +1,56 @@
+name: CI
+
+# ============================================================
+# LOCAL-FIRST WORKFLOW
+# ============================================================
+# 1. Fejlesztés és tesztelés a local dev environment-ben
+#    (pnpm local:start → pnpm dev → manuális teszt)
+# 2. Feature branch-re push → PR nyitás main felé
+# 3. Ez a CI workflow automatikusan fut a PR-en
+# 4. Ha zöld → merge main-be → Vercel automatikusan deployol
+# ============================================================
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]  # Vercel deploy utáni ellenőrzés
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: Lint, Type-check & Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+        continue-on-error: true  # TODO: strict-re váltás ha 0 lint hiba
+
+      - name: Type check
+        run: pnpm type-check
+        continue-on-error: true  # TODO: strict-re váltás ha 0 type hiba
+
+      - name: Build
+        run: pnpm build

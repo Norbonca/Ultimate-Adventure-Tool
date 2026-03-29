@@ -2,6 +2,7 @@
 
 import type { WizardFormData, SubDisciplineRow } from "../../types";
 import { DIFFICULTY_LEVELS } from "@/lib/categories";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 interface Step2Props {
   formData: WizardFormData;
@@ -18,28 +19,32 @@ export function Step2Basics({
   subDisciplines,
   onSubDisciplineChange,
 }: Step2Props) {
+  const { t, locale } = useTranslation();
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-navy-900 mb-2">Alapadatok</h2>
-        <p className="text-navy-500">A túra legfontosabb információi</p>
+        <h2 className="text-2xl font-bold text-navy-900 mb-2">{t('trips.wizard.step2Title')}</h2>
+        <p className="text-navy-500">{t('trips.wizard.step2Description')}</p>
       </div>
 
       {/* Sub-discipline selector (if available) */}
       {subDisciplines.length > 0 && (
         <div>
           <label className="block text-sm font-medium text-navy-700 mb-1.5">
-            Alkategória
+            {t('trips.fields.subcategory')}
           </label>
           <select
             value={formData.sub_discipline_id}
             onChange={(e) => onSubDisciplineChange(e.target.value)}
             className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 bg-white focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
           >
-            <option value="">— Válassz alkategóriát —</option>
+            <option value="">{t('trips.wizard.selectSubcategory')}</option>
             {subDisciplines.map((sub) => (
               <option key={sub.id} value={sub.id}>
-                {(sub.name_localized as Record<string, string>)?.hu || sub.name}
+                {locale === 'en'
+                  ? (sub.name_localized as Record<string, string>)?.en || sub.name
+                  : (sub.name_localized as Record<string, string>)?.hu || sub.name}
               </option>
             ))}
           </select>
@@ -49,31 +54,31 @@ export function Step2Basics({
       {/* Title */}
       <div>
         <label className="block text-sm font-medium text-navy-700 mb-1.5">
-          Túra neve <span className="text-red-500">*</span>
+          {t('trips.fields.title')} <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
           value={formData.title}
           onChange={(e) => onChange({ title: e.target.value })}
-          placeholder="pl. Tátra csúcstúra, Adriai vitorlázás..."
+          placeholder={t('trips.wizard.titlePlaceholder')}
           maxLength={200}
           className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 placeholder:text-navy-300 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
         />
         <p className="text-xs text-navy-400 mt-1">
-          {formData.title.length}/200 karakter
+          {t('trips.wizard.charCount').replace('{count}', String(formData.title.length))}
         </p>
       </div>
 
       {/* Short description */}
       <div>
         <label className="block text-sm font-medium text-navy-700 mb-1.5">
-          Rövid leírás
+          {t('trips.fields.shortDescription')}
         </label>
         <input
           type="text"
           value={formData.short_description}
           onChange={(e) => onChange({ short_description: e.target.value })}
-          placeholder="Egy mondat a túráról (kártyákon jelenik meg)"
+          placeholder={t('trips.wizard.shortDescPlaceholder')}
           maxLength={280}
           className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 placeholder:text-navy-300 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
         />
@@ -82,12 +87,12 @@ export function Step2Basics({
       {/* Description */}
       <div>
         <label className="block text-sm font-medium text-navy-700 mb-1.5">
-          Részletes leírás <span className="text-red-500">*</span>
+          {t('trips.fields.detailedDescription')} <span className="text-red-500">*</span>
         </label>
         <textarea
           value={formData.description}
           onChange={(e) => onChange({ description: e.target.value })}
-          placeholder="Írd le a túra programját, mit várhatnak a résztvevők, milyen élmény lesz..."
+          placeholder={t('trips.wizard.descPlaceholder')}
           rows={5}
           className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 placeholder:text-navy-300 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors resize-none"
         />
@@ -97,7 +102,7 @@ export function Step2Basics({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-navy-700 mb-1.5">
-            Kezdés dátuma <span className="text-red-500">*</span>
+            {t('trips.fields.startDate')} <span className="text-red-500">*</span>
           </label>
           <input
             type="date"
@@ -109,7 +114,7 @@ export function Step2Basics({
         </div>
         <div>
           <label className="block text-sm font-medium text-navy-700 mb-1.5">
-            Befejezés dátuma <span className="text-red-500">*</span>
+            {t('trips.fields.endDate')} <span className="text-red-500">*</span>
           </label>
           <input
             type="date"
@@ -125,7 +130,7 @@ export function Step2Basics({
       <div className="grid grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium text-navy-700 mb-1.5">
-            Ország
+            {t('trips.fields.country')}
           </label>
           <select
             value={formData.location_country}
@@ -134,32 +139,32 @@ export function Step2Basics({
           >
             {countries.map((c) => (
               <option key={c.code} value={c.code}>
-                {c.flag_emoji} {c.name_hu}
+                {c.flag_emoji} {locale === 'en' ? c.name_en : c.name_hu}
               </option>
             ))}
           </select>
         </div>
         <div>
           <label className="block text-sm font-medium text-navy-700 mb-1.5">
-            Régió / Megye
+            {t('trips.wizard.regionLabel')}
           </label>
           <input
             type="text"
             value={formData.location_region}
             onChange={(e) => onChange({ location_region: e.target.value })}
-            placeholder="pl. Magas-Tátra"
+            placeholder={t('trips.wizard.regionPlaceholder')}
             className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 placeholder:text-navy-300 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
           />
         </div>
         <div>
           <label className="block text-sm font-medium text-navy-700 mb-1.5">
-            Város
+            {t('trips.fields.city')}
           </label>
           <input
             type="text"
             value={formData.location_city}
             onChange={(e) => onChange({ location_city: e.target.value })}
-            placeholder="pl. Poprad"
+            placeholder={t('trips.wizard.cityPlaceholder')}
             className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 placeholder:text-navy-300 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
           />
         </div>
@@ -169,7 +174,7 @@ export function Step2Basics({
       <div className="grid grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium text-navy-700 mb-1.5">
-            Max résztvevők
+            {t('trips.fields.maxParticipants')}
           </label>
           <input
             type="number"
@@ -184,7 +189,7 @@ export function Step2Basics({
         </div>
         <div>
           <label className="block text-sm font-medium text-navy-700 mb-1.5">
-            Min résztvevők
+            {t('trips.fields.minParticipants')}
           </label>
           <input
             type="number"
@@ -199,7 +204,7 @@ export function Step2Basics({
         </div>
         <div>
           <label className="block text-sm font-medium text-navy-700 mb-1.5">
-            Nehézségi szint
+            {t('trips.fields.difficulty')}
           </label>
           <div className="flex gap-1">
             {DIFFICULTY_LEVELS.map((level) => (
@@ -216,14 +221,16 @@ export function Step2Basics({
                     ? { backgroundColor: level.color }
                     : undefined
                 }
-                title={level.labelEn}
+                title={locale === 'en' ? level.labelEn : level.label}
               >
                 {level.value}
               </button>
             ))}
           </div>
           <p className="text-xs text-navy-500 mt-1 text-center">
-            {DIFFICULTY_LEVELS.find((l) => l.value === formData.difficulty)?.label}
+            {locale === 'en'
+              ? DIFFICULTY_LEVELS.find((l) => l.value === formData.difficulty)?.labelEn
+              : DIFFICULTY_LEVELS.find((l) => l.value === formData.difficulty)?.label}
           </p>
         </div>
       </div>

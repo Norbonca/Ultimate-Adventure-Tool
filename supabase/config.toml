@@ -1,20 +1,85 @@
-[project]
-id = "rpwajsbxrvypeqaalhvd"
-name = "ultimate-adventure-tool"
+# ============================================
+# Ultimate Adventure Tool — Local Dev Config
+# ============================================
+# Port sorozat: 55xxx (más projektek: 54xxx/56xxx/57xxx)
+# Production project: supabase link --project-ref rpwajsbxrvypeqaalhvd
 
 [api]
 enabled = true
-port = 54321
-schemas = ["public"]
+port = 55321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[api.tls]
+enabled = false
 
 [db]
-port = 54322
+port = 55322
+major_version = 15
 
+[db.pooler]
+enabled = false
+port = 55329
+pool_mode = "transaction"
+default_pool_size = 20
+max_client_conn = 100
+
+# ============================================
+# STUDIO (DB böngésző - http://localhost:55323)
+# ============================================
+[studio]
+enabled = true
+port = 55323
+api_url = "http://localhost"
+
+# ============================================
+# INBUCKET (Fake email szerver - http://localhost:55324)
+# ============================================
+[inbucket]
+enabled = true
+port = 55324
+smtp_port = 55325
+pop3_port = 55326
+
+# ============================================
+# AUTH
+# ============================================
 [auth]
-site_url = "https://ttvk.hu"
-additional_redirect_urls = ["http://localhost:3000/auth/callback"]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/auth/callback", "https://ttvk.hu/auth/callback"]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+refresh_token_reuse_interval = 10
+enable_signup = true
+enable_anonymous_sign_ins = false
 
 [auth.email]
 enable_signup = true
 double_confirm_changes = true
-enable_confirmations = true
+enable_confirmations = false
+secure_password_change = false
+max_frequency = "1s"
+
+[auth.external.google]
+enabled = false
+
+# ============================================
+# STORAGE
+# ============================================
+[storage]
+enabled = true
+file_size_limit = "50MiB"
+
+# ============================================
+# REALTIME
+# ============================================
+[realtime]
+enabled = true
+
+# ============================================
+# ANALYTICS (local-only, logflare kikapcsolva)
+# ============================================
+[analytics]
+enabled = false

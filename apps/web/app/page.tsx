@@ -2,8 +2,6 @@
 
 import Link from 'next/link';
 import {
-  Menu,
-  X,
   MapPin,
   Zap,
   Wallet,
@@ -28,118 +26,119 @@ import {
   Youtube,
   ChevronDown,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useTranslation } from '@/lib/i18n/useTranslation';
+import { AppHeader } from '@/components/AppHeader';
 
 export default function HomePage() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useTranslation();
 
   const categories = [
     {
-      name: 'Hiking',
+      name: t('categories.hiking'),
       icon: Mountain,
       color: '#22C55E',
-      label: 'Distance, elevation, terrain difficulty',
+      label: t('landing.categoryHikingLabel'),
     },
     {
-      name: 'Mountain',
+      name: t('categories.mountaineering'),
       icon: Triangle,
       color: '#F97316',
-      label: 'Technical grades, via ferrata, gear lists',
+      label: t('landing.categoryMountainLabel'),
     },
     {
-      name: 'Water Sports',
+      name: t('categories.waterSports'),
       icon: Waves,
       color: '#3B82F6',
-      label: 'Sailing, kayaking, surfing, kite',
+      label: t('landing.categoryWaterLabel'),
     },
     {
-      name: 'Cycling',
+      name: t('categories.cycling'),
       icon: Bike,
       color: '#EAB308',
-      label: 'Road, MTB, gravel touring, eBike',
+      label: t('landing.categoryCyclingLabel'),
     },
     {
-      name: 'Motorsport',
+      name: t('categories.motorsport'),
       icon: Gauge,
       color: '#B91C1C',
-      label: 'Motorcycle touring, 4x4 off-road',
+      label: t('landing.categoryMotorsportLabel'),
     },
     {
-      name: 'Running',
+      name: t('categories.running'),
       icon: Timer,
       color: '#EF4444',
-      label: 'Road, trail, ultra, race planning',
+      label: t('landing.categoryRunningLabel'),
     },
     {
-      name: 'Winter Sports',
+      name: t('categories.winterSports'),
       icon: Snowflake,
       color: '#06B6D4',
-      label: 'Skiing, snowboard, avalanche risk alerts',
+      label: t('landing.categoryWinterLabel'),
     },
     {
-      name: 'Expedition',
+      name: t('categories.expedition'),
       icon: Compass,
       color: '#8B5CF6',
-      label: 'Multi-sport combined adventures',
+      label: t('landing.categoryExpeditionLabel'),
     },
   ];
 
   const secondaryFeatures = [
     {
-      name: 'Community & Social',
+      name: t('landing.secondaryCommunity'),
       icon: Users,
       color: '#0D9488',
-      desc: 'Follow adventurers, share trip reports, and discover hidden gems from the community.',
+      desc: t('landing.secondaryCommunityDesc'),
     },
     {
-      name: 'Safety & Emergency',
+      name: t('landing.secondarySafety'),
       icon: Shield,
       color: '#FB7185',
-      desc: 'SOS button, safety check-ins, and emergency contacts. Because adventure should be bold, not reckless.',
+      desc: t('landing.secondarySafetyDesc'),
     },
     {
-      name: 'Smart Packing Lists',
+      name: t('landing.secondaryPacking'),
       icon: Package,
       color: '#FBBF24',
-      desc: 'Auto-generated packing lists based on your activity, weather forecast, and trip duration.',
+      desc: t('landing.secondaryPackingDesc'),
     },
     {
-      name: 'Weather Intelligence',
+      name: t('landing.secondaryWeather'),
       icon: CloudSun,
       color: '#06B6D4',
-      desc: 'Real-time forecasts, historical weather data, and alerts tailored to your specific adventure location.',
+      desc: t('landing.secondaryWeatherDesc'),
     },
     {
-      name: 'Booking Integration',
+      name: t('landing.secondaryBooking'),
       icon: Plane,
       color: '#A78BFA',
-      desc: 'Search flights, find accommodation, and book activities — all without leaving your trip plan.',
+      desc: t('landing.secondaryBookingDesc'),
     },
     {
-      name: '7 Languages',
+      name: t('landing.secondaryLanguages'),
       icon: Languages,
       color: '#22C55E',
-      desc: 'Available in Hungarian, English, German, Slovak, Croatian, Slovenian, Romanian, and Czech.',
+      desc: t('landing.secondaryLanguagesDesc'),
     },
   ];
 
   const testimonials = [
     {
-      text: 'Finally, one app that understands hiking isn\'t the same as cycling. The category-specific planning is a game changer for our mountain club.',
-      author: 'Márta K.',
-      role: 'Mountain Club Organizer, Budapest',
+      text: t('landing.testimonial1Text'),
+      author: t('landing.testimonial1Author'),
+      role: t('landing.testimonial1Role'),
       avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=96&q=80&fit=crop&auto=format',
     },
     {
-      text: 'We used to lose hours reconciling expenses after every group trip. With trevu, costs are split in real-time and everyone stays in the loop.',
-      author: 'Tomáš R.',
-      role: 'Trail Running Group Leader, Bratislava',
+      text: t('landing.testimonial2Text'),
+      author: t('landing.testimonial2Author'),
+      role: t('landing.testimonial2Role'),
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=96&q=80&fit=crop&auto=format',
     },
     {
-      text: 'Offline maps that actually work at 2,500m elevation? That alone sold me. But the packing lists and weather alerts make it indispensable.',
-      author: 'Lukas H.',
-      role: 'Alpine Guide, Innsbruck',
+      text: t('landing.testimonial3Text'),
+      author: t('landing.testimonial3Author'),
+      role: t('landing.testimonial3Role'),
       avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=96&q=80&fit=crop&auto=format',
     },
   ];
@@ -360,11 +359,13 @@ export default function HomePage() {
         }
 
         .hero-image {
+          display: block;
           max-width: 900px;
           width: 100%;
-          height: auto;
+          height: 500px;
+          object-fit: cover;
           border-radius: 1rem;
-          margin-bottom: 3rem;
+          margin: 0 auto 3rem;
           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
         }
 
@@ -926,77 +927,29 @@ export default function HomePage() {
         }
       `}</style>
 
-      {/* Header */}
-      <header className="header">
-        <div className="header-content">
-          <div className="logo">
-            <span className="logo-tre">tre</span>
-            <span className="logo-vu">vu</span>
-          </div>
-
-          {/* Desktop Navigation */}
-          <nav className="nav-desktop">
-            <a href="#features">Features</a>
-            <a href="#categories">Categories</a>
-            <Link href="/discover">Discover Trips</Link>
-            <Link href="/pricing">Pricing</Link>
-          </nav>
-
-          {/* Right side - Auth buttons */}
-          <div className="nav-right">
-            <Link href="/login" className="btn-login">Log in</Link>
-            <Link href="/register" className="btn-primary">Get Started</Link>
-          </div>
-
-          {/* Mobile Menu */}
-          <button
-            className="hamburger"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-
-        {/* Mobile Menu Dropdown */}
-        {mobileMenuOpen && (
-          <nav
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1rem',
-              padding: '1rem 2rem',
-              borderTop: '1px solid #E2E8F0',
-            }}
-          >
-            <a href="#features" onClick={() => setMobileMenuOpen(false)}>Features</a>
-            <a href="#categories" onClick={() => setMobileMenuOpen(false)}>Categories</a>
-            <Link href="/discover" onClick={() => setMobileMenuOpen(false)}>Discover Trips</Link>
-            <Link href="/pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</Link>
-            <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Log in</Link>
-            <Link href="/register" className="btn-primary" style={{textAlign:'center'}} onClick={() => setMobileMenuOpen(false)}>Get Started</Link>
-          </nav>
-        )}
-      </header>
+      <AppHeader anchors={[
+        { label: t('nav.features'), href: '#features' },
+        { label: t('nav.categories'), href: '#categories' },
+        { label: t('nav.about'), href: '#about' },
+      ]} />
 
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-content">
           <div className="hero-badge">
             <span className="badge-dot"></span>
-            Now in Early Access — Central Europe
+            {t('landing.heroBadge')}
           </div>
 
-          <h1 className="hero-headline">Trek beyond ordinary</h1>
+          <h1 className="hero-headline">{t('landing.heroHeadline')}</h1>
 
           <p className="hero-subheadline">
-            The all-in-one adventure platform that replaces your trip planner,
-            expense splitter, offline maps, and five other apps — so you can
-            focus on the trail ahead.
+            {t('landing.heroSubheadline')}
           </p>
 
           <div className="hero-ctas">
-            <Link href="/register" className="btn-cta-primary">Start Planning Free →</Link>
-            <Link href="/discover" className="btn-cta-secondary">Explore Trips</Link>
+            <Link href="/register" className="btn-cta-primary">{t('landing.heroCta')}</Link>
+            <Link href="/discover" className="btn-cta-secondary">{t('landing.heroCtaSecondary')}</Link>
           </div>
 
           <img
@@ -1007,23 +960,23 @@ export default function HomePage() {
           />
 
           <div className="hero-trust">
-            <span className="trust-text">Trusted by adventurers across</span>
+            <span className="trust-text">{t('landing.heroTrust')}</span>
             <div className="trust-countries">
               <span className="trust-country">
                 <MapPin size={16} />
-                Hungary
+                {t('landing.heroCountryHungary')}
               </span>
               <span className="trust-country">
                 <MapPin size={16} />
-                Slovakia
+                {t('landing.heroCountrySlovakia')}
               </span>
               <span className="trust-country">
                 <MapPin size={16} />
-                Croatia
+                {t('landing.heroCountryCroatia')}
               </span>
               <span className="trust-country">
                 <MapPin size={16} />
-                Germany
+                {t('landing.heroCountryGermany')}
               </span>
             </div>
           </div>
@@ -1033,38 +986,24 @@ export default function HomePage() {
       {/* Problem Section */}
       <section className="problem">
         <div className="section-container">
-          <span className="section-tag tag-coral">THE PROBLEM</span>
-          <h2 className="section-headline">One adventure. Seven apps. Zero fun.</h2>
+          <span className="section-tag tag-coral">{t('landing.problemTag')}</span>
+          <h2 className="section-headline">{t('landing.problemHeadline')}</h2>
           <p className="section-description">
-            Trip planner here, expense tracker there, offline maps somewhere
-            else. By the time you've organized your tools, you've lost the
-            spark that made you want to go in the first place.
+            {t('landing.problemDescription')}
           </p>
 
           <div className="cards-grid">
             <div className="card">
-              <div className="card-headline">Plan your adventure</div>
-              <p className="card-text">
-                Choose from 8 adventure categories. Add waypoints, set
-                difficulty, pack the right gear — all in one place.
-              </p>
+              <div className="card-headline">{t('landing.problemCard1Title')}</div>
+              <p className="card-text">{t('landing.problemCard1Text')}</p>
             </div>
             <div className="card">
-              <div className="card-headline">Go together, split fairly</div>
-              <p className="card-text">
-                Invite your crew, split costs in any currency, and settle
-                debts with one tap. No more awkward spreadsheets after the
-                trip.
-              </p>
+              <div className="card-headline">{t('landing.problemCard2Title')}</div>
+              <p className="card-text">{t('landing.problemCard2Text')}</p>
             </div>
             <div className="card">
-              <div className="card-headline">
-                Stay connected, even offline
-              </div>
-              <p className="card-text">
-                Full offline support means your plans, maps, and packing lists
-                work at the summit, on the water, or deep in the forest.
-              </p>
+              <div className="card-headline">{t('landing.problemCard3Title')}</div>
+              <p className="card-text">{t('landing.problemCard3Text')}</p>
             </div>
           </div>
         </div>
@@ -1073,11 +1012,10 @@ export default function HomePage() {
       {/* Features Section */}
       <section className="features" id="features">
         <div className="section-container">
-          <span className="section-tag tag-teal">CORE FEATURES</span>
-          <h2 className="section-headline">Your adventure multitool</h2>
+          <span className="section-tag tag-teal">{t('landing.featuresTag')}</span>
+          <h2 className="section-headline">{t('landing.featuresHeadline')}</h2>
           <p className="section-description">
-            Everything you need, nothing you don't. Each feature is
-            purpose-built for outdoor adventures.
+            {t('landing.featuresDescription')}
           </p>
 
           {/* Feature 1 */}
@@ -1089,11 +1027,9 @@ export default function HomePage() {
               >
                 <Zap size={32} color="#0D9488" />
               </div>
-              <h3 className="feature-headline">Smart Trip Planning</h3>
+              <h3 className="feature-headline">{t('landing.feature1Title')}</h3>
               <p className="feature-description">
-                Build trips across 8 adventure categories with category-specific
-                planning tools. From elevation profiles for hikers to avalanche
-                risk for skiers — every sport gets the intelligence it deserves.
+                {t('landing.feature1Description')}
               </p>
             </div>
             <img
@@ -1113,11 +1049,9 @@ export default function HomePage() {
               >
                 <Wallet size={32} color="#FB7185" />
               </div>
-              <h3 className="feature-headline">Effortless Expense Splitting</h3>
+              <h3 className="feature-headline">{t('landing.feature2Title')}</h3>
               <p className="feature-description">
-                Multi-currency cost splitting that actually understands group
-                trips. Add expenses on the go, see who owes what instantly, and
-                export clean reports when you're home.
+                {t('landing.feature2Description')}
               </p>
             </div>
             <img
@@ -1137,11 +1071,9 @@ export default function HomePage() {
               >
                 <WifiOff size={32} color="#A78BFA" />
               </div>
-              <h3 className="feature-headline">Offline-First, Always Ready</h3>
+              <h3 className="feature-headline">{t('landing.feature3Title')}</h3>
               <p className="feature-description">
-                Your plans, maps, and packing lists work without internet.
-                Because summits, rivers, and forests don't come with Wi-Fi.
-                Everything syncs automatically when you're back online.
+                {t('landing.feature3Description')}
               </p>
             </div>
             <img
@@ -1157,11 +1089,10 @@ export default function HomePage() {
       {/* Categories Section */}
       <section className="categories" id="categories">
         <div className="section-container">
-          <span className="section-tag tag-light">8 ADVENTURE CATEGORIES</span>
-          <h2 className="section-headline">One platform. Every adventure.</h2>
+          <span className="section-tag tag-light">{t('landing.categoriesTag')}</span>
+          <h2 className="section-headline">{t('landing.categoriesHeadline')}</h2>
           <p className="section-description">
-            Whether you're summiting peaks, catching waves, or pedaling through
-            valleys — trevu speaks your sport's language.
+            {t('landing.categoriesDescription')}
           </p>
 
           <div className="categories-grid">
@@ -1187,9 +1118,9 @@ export default function HomePage() {
       {/* Secondary Features */}
       <section className="secondary-features">
         <div className="section-container">
-          <span className="section-tag tag-teal">MORE TO EXPLORE</span>
+          <span className="section-tag tag-teal">{t('landing.moreTag')}</span>
           <h2 className="section-headline">
-            Built for the way adventurers actually travel
+            {t('landing.moreHeadline')}
           </h2>
 
           <div className="secondary-grid">
@@ -1218,19 +1149,19 @@ export default function HomePage() {
           <div className="stats-row">
             <div className="stat-item">
               <div className="stat-number">8</div>
-              <div className="stat-label">Adventure Categories</div>
+              <div className="stat-label">{t('landing.statCategories')}</div>
             </div>
             <div className="stat-item">
               <div className="stat-number">100%</div>
-              <div className="stat-label">Offline Capable</div>
+              <div className="stat-label">{t('landing.statOffline')}</div>
             </div>
             <div className="stat-item">
               <div className="stat-number">16+</div>
-              <div className="stat-label">Integrated Services</div>
+              <div className="stat-label">{t('landing.statServices')}</div>
             </div>
             <div className="stat-item">
               <div className="stat-number">7</div>
-              <div className="stat-label">Languages Supported</div>
+              <div className="stat-label">{t('landing.statLanguages')}</div>
             </div>
           </div>
 
@@ -1259,14 +1190,13 @@ export default function HomePage() {
       {/* Final CTA */}
       <section className="final-cta">
         <div className="section-container">
-          <h2 className="final-headline">Your next adventure starts here</h2>
+          <h2 className="final-headline">{t('landing.finalHeadline')}</h2>
           <p className="final-subline">
-            Join thousands of adventurers across Central Europe who plan, share,
-            and explore with trevu.
+            {t('landing.finalSubline')}
           </p>
-          <Link href="/register" className="btn-final-cta">Start Planning Free →</Link>
+          <Link href="/register" className="btn-final-cta">{t('landing.finalCta')}</Link>
           <div className="final-trust">
-            Free forever for personal use. No credit card required.
+            {t('landing.finalTrust')}
           </div>
         </div>
       </section>
@@ -1278,58 +1208,57 @@ export default function HomePage() {
             <div className="footer-brand">
               <div className="footer-logo">trevu</div>
               <p className="footer-tagline">
-                Trek beyond ordinary. The all-in-one adventure platform for
-                Central Europe and beyond.
+                {t('landing.footerTagline')}
               </p>
             </div>
 
             <div className="footer-column">
-              <h3>Product</h3>
+              <h3>{t('landing.footerProduct')}</h3>
               <ul>
                 <li>
-                  <a href="#features">Features</a>
+                  <a href="#features">{t('landing.footerFeatures')}</a>
                 </li>
                 <li>
-                  <a href="#categories">Categories</a>
+                  <a href="#categories">{t('landing.footerCategories')}</a>
                 </li>
                 <li>
-                  <Link href="/pricing">Pricing</Link>
+                  <a href="#" title="Coming soon" className="opacity-50 cursor-default">{t('landing.footerPricing')}</a>
                 </li>
                 <li>
-                  <a href="#">Roadmap</a>
+                  <a href="#">{t('landing.footerRoadmap')}</a>
                 </li>
               </ul>
             </div>
 
             <div className="footer-column">
-              <h3>Company</h3>
+              <h3>{t('landing.footerCompany')}</h3>
               <ul>
                 <li>
-                  <a href="#">About</a>
+                  <a href="#">{t('landing.footerAbout')}</a>
                 </li>
                 <li>
-                  <a href="#">Blog</a>
+                  <a href="#">{t('landing.footerBlog')}</a>
                 </li>
                 <li>
-                  <a href="#">Careers</a>
+                  <a href="#">{t('landing.footerCareers')}</a>
                 </li>
                 <li>
-                  <a href="#">Contact</a>
+                  <a href="#">{t('landing.footerContact')}</a>
                 </li>
               </ul>
             </div>
 
             <div className="footer-column">
-              <h3>Legal</h3>
+              <h3>{t('landing.footerLegal')}</h3>
               <ul>
                 <li>
-                  <a href="#">Privacy Policy</a>
+                  <a href="#">{t('landing.footerPrivacy')}</a>
                 </li>
                 <li>
-                  <a href="#">Terms of Service</a>
+                  <a href="#">{t('landing.footerTerms')}</a>
                 </li>
                 <li>
-                  <a href="#">Cookie Policy</a>
+                  <a href="#">{t('landing.footerCookies')}</a>
                 </li>
               </ul>
             </div>
@@ -1338,7 +1267,7 @@ export default function HomePage() {
           <div className="footer-divider"></div>
 
           <div className="footer-bottom">
-            <div>© 2026 Trevu. All rights reserved.</div>
+            <div>{t('landing.footerCopyright')}</div>
             <div className="social-icons">
               <Instagram className="social-icon" />
               <Twitter className="social-icon" />

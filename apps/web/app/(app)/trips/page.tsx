@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { fetchMyTrips } from "./actions";
 import { CATEGORY_DISPLAY, DIFFICULTY_LEVELS } from "@/lib/categories";
+import { getServerT, getServerLocale } from "@/lib/i18n/server";
+import { AppHeader } from "@/components/AppHeader";
 
 export default async function MyTripsPage() {
   const supabase = await createClient();
@@ -15,38 +17,20 @@ export default async function MyTripsPage() {
   }
 
   const trips = await fetchMyTrips();
+  const { t } = await getServerT();
+  const locale = await getServerLocale();
 
   return (
     <main className="min-h-screen bg-[#F8FAFC]">
-      {/* Header */}
-      <header className="bg-white/95 border-b border-navy-200 sticky top-0 z-50 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <div className="h-9 w-9 rounded-lg bg-trevu-600 text-white flex items-center justify-center font-bold text-sm shadow-trevu-sm">
-                T
-              </div>
-              <span className="text-xl font-extrabold tracking-tight">
-                <span className="text-trevu-600">Tre</span>
-                <span className="text-navy-900">vu</span>
-              </span>
-            </Link>
-            <span className="text-navy-300 mx-1">/</span>
-            <span className="text-sm font-medium text-navy-700">Túráim</span>
-          </div>
-          <Link
-            href="/trips/new"
-            className="px-4 py-2 text-sm font-bold text-white bg-trevu-600 rounded-xl hover:bg-trevu-700 transition-colors shadow-sm"
-          >
-            + Új túra
-          </Link>
-        </div>
-      </header>
+      <AppHeader
+       
+        user={{ email: user.email ?? "", displayName: user.user_metadata?.full_name }}
+      />
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-6 py-8">
         <h2 className="text-2xl font-bold text-navy-900 mb-6">
-          Túráim
+          {t('trips.myTripsTitle')}
           <span className="text-navy-300 font-normal text-lg ml-2">
             ({trips.length})
           </span>
@@ -57,17 +41,16 @@ export default async function MyTripsPage() {
           <div className="text-center py-16">
             <div className="text-6xl mb-4">🏔️</div>
             <h3 className="text-xl font-bold text-navy-900 mb-2">
-              Még nincs túrád
+              {t('trips.emptyTitle')}
             </h3>
             <p className="text-navy-500 mb-6 max-w-md mx-auto">
-              Hozd létre az első kalandodat — válaszd ki a kategóriát, töltsd ki
-              a részleteket, és oszd meg a közösséggel!
+              {t('trips.emptyDescription')}
             </p>
             <Link
               href="/trips/new"
               className="inline-flex px-6 py-3 text-sm font-bold text-white bg-trevu-600 rounded-xl hover:bg-trevu-700 transition-colors shadow-lg shadow-trevu-600/20"
             >
-              + Első túra létrehozása
+              {t('trips.createFirst')}
             </Link>
           </div>
         ) : (
@@ -82,9 +65,12 @@ export default async function MyTripsPage() {
                 color_hex: string;
               } | null;
               const catDisplay = cat ? CATEGORY_DISPLAY[cat.name] : null;
-              const diffLabel = DIFFICULTY_LEVELS.find(
+              const diffLevel = DIFFICULTY_LEVELS.find(
                 (l) => l.value === trip.difficulty
               );
+              const diffLabel = diffLevel
+                ? (locale === 'en' ? diffLevel.labelEn : diffLevel.label)
+                : null;
               const spotsLeft =
                 trip.max_participants - (trip.current_participants || 0);
 
@@ -98,20 +84,26 @@ export default async function MyTripsPage() {
                   <div
                     className="h-36 relative"
                     style={{
-                      background: trip.cover_image_url
-                        ? `url(${trip.cover_image_url}) center/cover`
+                      background: (trip.card_image_url || trip.cover_image_url)
+                        ? `url(${trip.card_image_url || trip.cover_image_url}) center/cover`
                         : `linear-gradient(135deg, ${catDisplay?.colorHex || "#0D9488"}20, ${catDisplay?.colorHex || "#0D9488"}40)`,
                     }}
                   >
                     {/* Status Badge */}
                     <div className="absolute top-3 left-3">
-                      <StatusBadge status={trip.status} />
+                      <StatusBadge status={trip.status} t={t} />
                     </div>
                     {/* Category Emoji */}
                     {catDisplay && (
                       <div className="absolute top-3 right-3 w-9 h-9 rounded-lg bg-white/90 backdrop-blur-sm flex items-center justify-center text-lg shadow-sm">
                         {catDisplay.emoji}
                       </div>
+                    )}
+                    {/* Own Photo Badge */}
+                    {(trip.card_image_url ? trip.card_image_source : trip.cover_image_source) === "user_upload" && (
+                      <span className="absolute bottom-2 right-2 text-[10px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-tl-lg">
+                        ✨ {t("imagePicker.ownPhoto")}
+                      </span>
                     )}
                   </div>
 
@@ -133,7 +125,7 @@ export default async function MyTripsPage() {
                         <span className="text-xs text-navy-500 flex items-center gap-1">
                           📅{" "}
                           {new Date(trip.start_date).toLocaleDateString(
-                            "hu-HU",
+                            locale === 'en' ? 'en-US' : 'hu-HU',
                             { month: "short", day: "numeric" }
                           )}
                         </span>
@@ -148,15 +140,15 @@ export default async function MyTripsPage() {
                         </span>
                       )}
                       {/* Difficulty */}
-                      {diffLabel && (
+                      {diffLabel && diffLevel && (
                         <span
                           className="text-xs font-bold px-1.5 py-0.5 rounded"
                           style={{
-                            color: diffLabel.color,
-                            backgroundColor: `${diffLabel.color}15`,
+                            color: diffLevel.color,
+                            backgroundColor: `${diffLevel.color}15`,
                           }}
                         >
-                          {diffLabel.label}
+                          {diffLabel}
                         </span>
                       )}
                     </div>
@@ -175,8 +167,8 @@ export default async function MyTripsPage() {
                         }`}
                       >
                         {spotsLeft > 0
-                          ? `${spotsLeft} hely`
-                          : "Betelt"}
+                          ? t('common.spotsLeft', { count: spotsLeft })
+                          : t('common.full')}
                       </span>
                     </div>
                   </div>
@@ -190,7 +182,7 @@ export default async function MyTripsPage() {
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status, t }: { status: string; t: (key: any, params?: Record<string, string | number>) => string }) {
   const styles: Record<string, string> = {
     draft: "bg-navy-800/70 text-white",
     published: "bg-trevu-600/90 text-white",
@@ -200,20 +192,22 @@ function StatusBadge({ status }: { status: string }) {
     cancelled: "bg-red-600/90 text-white",
     archived: "bg-navy-400/70 text-white",
   };
-  const labels: Record<string, string> = {
-    draft: "Piszkozat",
-    published: "Publikált",
-    registration_open: "Nyitva",
-    active: "Aktív",
-    completed: "Befejezett",
-    cancelled: "Lemondva",
-    archived: "Archivált",
+
+  const statusKeyMap: Record<string, string> = {
+    draft: 'trips.status.draft',
+    published: 'trips.status.published',
+    registration_open: 'trips.status.registrationOpen',
+    active: 'trips.status.active',
+    completed: 'trips.status.completed',
+    cancelled: 'trips.status.cancelled',
+    archived: 'trips.status.archived',
   };
+
   return (
     <span
       className={`text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm ${styles[status] || styles.draft}`}
     >
-      {labels[status] || status}
+      {statusKeyMap[status] ? t(statusKeyMap[status]) : status}
     </span>
   );
 }
