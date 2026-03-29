@@ -4,9 +4,12 @@
 // Maps Supabase categories.name to UI display data.
 // Icons use lucide-react icon names.
 
+import type { Locale } from '@uat/i18n';
+
 export interface CategoryDisplay {
   name: string;
   nameHu: string;
+  nameEn: string;
   icon: string;       // lucide-react icon name
   emoji: string;      // fallback emoji
   colorHex: string;
@@ -23,6 +26,7 @@ export const CATEGORY_DISPLAY: Record<string, CategoryDisplay> = {
   Hiking: {
     name: "Hiking",
     nameHu: "Túrázás",
+    nameEn: "Hiking",
     icon: "footprints",
     emoji: "🥾",
     colorHex: "#22C55E",
@@ -32,6 +36,17 @@ export const CATEGORY_DISPLAY: Record<string, CategoryDisplay> = {
   Mountaineering: {
     name: "Mountaineering",
     nameHu: "Hegymászás",
+    nameEn: "Mountaineering",
+    icon: "mountain",
+    emoji: "🧗",
+    colorHex: "#F97316",
+    colorBg: "bg-orange-50",
+    colorText: "text-orange-700",
+  },
+  Mountain: {
+    name: "Mountain",
+    nameHu: "Hegymászás",
+    nameEn: "Mountain",
     icon: "mountain",
     emoji: "🧗",
     colorHex: "#F97316",
@@ -41,6 +56,7 @@ export const CATEGORY_DISPLAY: Record<string, CategoryDisplay> = {
   "Water Sports": {
     name: "Water Sports",
     nameHu: "Vízi sportok",
+    nameEn: "Water Sports",
     icon: "waves",
     emoji: "⛵",
     colorHex: "#3B82F6",
@@ -50,6 +66,7 @@ export const CATEGORY_DISPLAY: Record<string, CategoryDisplay> = {
   Motorsport: {
     name: "Motorsport",
     nameHu: "Motorsport",
+    nameEn: "Motorsport",
     icon: "gauge",
     emoji: "🏍️",
     colorHex: "#B91C1C",
@@ -59,6 +76,7 @@ export const CATEGORY_DISPLAY: Record<string, CategoryDisplay> = {
   Cycling: {
     name: "Cycling",
     nameHu: "Kerékpározás",
+    nameEn: "Cycling",
     icon: "bike",
     emoji: "🚴",
     colorHex: "#EAB308",
@@ -68,6 +86,7 @@ export const CATEGORY_DISPLAY: Record<string, CategoryDisplay> = {
   Running: {
     name: "Running",
     nameHu: "Futás",
+    nameEn: "Running",
     icon: "person-standing",
     emoji: "🏃",
     colorHex: "#EF4444",
@@ -77,6 +96,7 @@ export const CATEGORY_DISPLAY: Record<string, CategoryDisplay> = {
   "Winter Sports": {
     name: "Winter Sports",
     nameHu: "Téli sportok",
+    nameEn: "Winter Sports",
     icon: "snowflake",
     emoji: "⛷️",
     colorHex: "#6366F1",
@@ -86,6 +106,7 @@ export const CATEGORY_DISPLAY: Record<string, CategoryDisplay> = {
   Expedition: {
     name: "Expedition",
     nameHu: "Expedíció",
+    nameEn: "Expedition",
     icon: "compass",
     emoji: "🎒",
     colorHex: "#8B5CF6",
@@ -93,6 +114,13 @@ export const CATEGORY_DISPLAY: Record<string, CategoryDisplay> = {
     colorText: "text-violet-700",
   },
 };
+
+/**
+ * Get the localized name for a category.
+ */
+export function getCategoryName(cat: CategoryDisplay, locale: Locale = 'hu'): string {
+  return locale === 'en' ? cat.nameEn : cat.nameHu;
+}
 
 /** Difficulty level labels */
 export const DIFFICULTY_LEVELS = [
@@ -102,3 +130,10 @@ export const DIFFICULTY_LEVELS = [
   { value: 4, label: "Nehéz", labelEn: "Hard", color: "#8B5CF6" },
   { value: 5, label: "Extrém", labelEn: "Extreme", color: "#0F172A" },
 ];
+
+/**
+ * Get the localized label for a difficulty level.
+ */
+export function getDifficultyLabel(level: typeof DIFFICULTY_LEVELS[number], locale: Locale = 'hu'): string {
+  return locale === 'en' ? level.labelEn : level.label;
+}

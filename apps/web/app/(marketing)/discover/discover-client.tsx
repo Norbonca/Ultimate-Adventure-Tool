@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useTranslation } from '@/lib/i18n/useTranslation';
+import { AppHeader } from '@/components/AppHeader';
 import {
   Search,
   MapPin,
@@ -36,6 +38,9 @@ interface Trip {
   location_region: string | null;
   location_city: string | null;
   cover_image_url: string | null;
+  cover_image_source: string | null;
+  card_image_url: string | null;
+  card_image_source: string | null;
   start_date: string | null;
   end_date: string | null;
   price_amount: number | null;
@@ -48,7 +53,7 @@ interface Trip {
   status: string;
   visibility: string;
   categories: { id: string; name: string; name_localized: Record<string, string>; icon_name: string; color_hex: string } | { id: string; name: string; name_localized: Record<string, string>; icon_name: string; color_hex: string }[] | null;
-  sub_disciplines: { id: string; name: string; name_localized: Record<string, string> } | null;
+  sub_disciplines: { id: string; name: string; name_localized: Record<string, string> } | { id: string; name: string; name_localized: Record<string, string> }[] | null;
   profiles: { id: string; display_name: string; avatar_url: string | null; slug: string; subscription_tier: string } | { id: string; display_name: string; avatar_url: string | null; slug: string; subscription_tier: string }[] | null;
 }
 
@@ -113,8 +118,9 @@ const getCategoryIcon = (categoryName: string) => {
   return categoryIconMap[categoryName] || Mountain;
 };
 
-const formatDateRange = (startDate: string, endDate: string): string => {
-  const formatter = new Intl.DateTimeFormat('en-US', {
+const formatDateRange = (startDate: string, endDate: string, locale: string): string => {
+  const intlLocale = locale === 'en' ? 'en-US' : 'hu-HU';
+  const formatter = new Intl.DateTimeFormat(intlLocale, {
     month: 'short',
     day: 'numeric',
   });
@@ -122,17 +128,7 @@ const formatDateRange = (startDate: string, endDate: string): string => {
   const start = new Date(startDate);
   const end = new Date(endDate);
 
-  const startFormatted = formatter.format(start);
-  const endFormatted = formatter.format(end);
-
-  return `${startFormatted}–${endFormatted}`;
-};
-
-const formatPrice = (priceAmount: number | null): string => {
-  if (!priceAmount || priceAmount === 0) {
-    return 'Free';
-  }
-  return `€${priceAmount} /person`;
+  return `${formatter.format(start)}–${formatter.format(end)}`;
 };
 
 export default function DiscoverClient({
@@ -142,6 +138,7 @@ export default function DiscoverClient({
   difficultyLevels,
   currentUser,
 }: DiscoverClientProps) {
+  const { t, locale } = useTranslation();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -1082,63 +1079,18 @@ export default function DiscoverClient({
         }
       `}</style>
 
-      {/* HEADER */}
-      <header className="header">
-        <div className="header-content">
-          <Link href="/" className="header-logo-link">
-            <span className="header-logo">
-              tre<span>vu</span>
-            </span>
-          </Link>
-
-          <nav className="header-nav">
-            <a href="/discover" className="active">
-              Discover
-            </a>
-            <a href="/trips">My Trips</a>
-            <a href="/planner">Travel Planner</a>
-            <a href="/community">Community</a>
-          </nav>
-
-          <div className="header-search">
-            <input
-              type="text"
-              placeholder="Search trips..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-
-          <div className="header-right">
-            {currentUser ? (
-              <>
-                <button className="bell-btn">
-                  <Bell size={20} />
-                </button>
-                <Link href="/profile" className="user-avatar">
-                  {currentUser.initials}
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link href="/login" style={{fontSize:14, fontWeight:500, color:'var(--text-secondary, #475569)'}}>Log in</Link>
-                <Link href="/register" style={{display:'inline-flex', alignItems:'center', padding:'8px 20px', background:'var(--trevu-teal, #0D9488)', color:'#fff', fontSize:14, fontWeight:600, borderRadius:10, transition:'background 0.2s'}}>Get Started</Link>
-              </>
-            )}
-          </div>
-
-          <button className="mobile-menu-btn">
-            <Menu size={24} />
-          </button>
-        </div>
-      </header>
+      <AppHeader anchors={[
+        { label: t('nav.filters'), href: '#filters' },
+        { label: t('nav.categories'), href: '#categories' },
+        { label: t('nav.map'), href: '#map' },
+      ]} />
 
       {/* HERO */}
       <section className="hero">
         <div className="hero-content">
-          <h1 className="hero-title">Find your next adventure</h1>
+          <h1 className="hero-title">{t('discover.heroTitle')}</h1>
           <p className="hero-subtitle">
-            Browse trips organized by experienced adventurers across Central Europe
+            {t('discover.heroSubtitle')}
           </p>
 
           <div className="search-bar">
@@ -1146,23 +1098,23 @@ export default function DiscoverClient({
                 <MapPin size={18} />
                 <input
                   type="text"
-                  placeholder="Where to?"
+                  placeholder={t('discover.whereTo')}
                 />
               </div>
               <div className="search-field">
                 <Calendar size={18} />
                 <input
                   type="text"
-                  placeholder="When?"
+                  placeholder={t('discover.when')}
                 />
               </div>
               <div className="search-field">
                 <Compass size={18} />
                 <select>
-                  <option value="">Activity type</option>
+                  <option value="">{t('discover.activityType')}</option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
-                      {cat.name}
+                      {locale === 'en' ? cat.name : (categoryDisplay[cat.name]?.nameHu || cat.name)}
                     </option>
                   ))}
                 </select>
@@ -1177,7 +1129,7 @@ export default function DiscoverClient({
               className={`pill ${activeCategory === 'all' ? 'pill-active' : 'pill-default'}`}
               onClick={() => setActiveCategory('all')}
             >
-              All Trips
+              {t('discover.allTrips')}
             </button>
             {categories.map((category) => {
               const Icon = getCategoryIcon(category.name);
@@ -1188,7 +1140,7 @@ export default function DiscoverClient({
                   onClick={() => setActiveCategory(category.id)}
                 >
                   <Icon size={14} />
-                  {category.name}
+                  {locale === 'en' ? category.name : (categoryDisplay[category.name]?.nameHu || category.name)}
                 </button>
               );
             })}
@@ -1200,39 +1152,39 @@ export default function DiscoverClient({
       <div className="filter-bar">
         <div className="filter-group">
           <select className="filter-select" value={selectedDifficulty} onChange={(e) => setSelectedDifficulty(e.target.value)}>
-            <option value="all">Difficulty</option>
+            <option value="all">{t('discover.difficulty')}</option>
             {difficultyLevels.map((level) => (
-              <option key={level.value} value={String(level.value)}>{level.labelEn}</option>
+              <option key={level.value} value={String(level.value)}>{locale === 'en' ? level.labelEn : level.label}</option>
             ))}
           </select>
           <select className="filter-select" value={selectedPrice} onChange={(e) => setSelectedPrice(e.target.value)}>
-            <option value="all">Price Range</option>
-            <option value="free">Free</option>
-            <option value="under50">Under €50</option>
+            <option value="all">{t('discover.priceRange')}</option>
+            <option value="free">{t('discover.free')}</option>
+            <option value="under50">{t('discover.underPrice')}</option>
             <option value="50-200">€50 – €200</option>
             <option value="200-500">€200 – €500</option>
             <option value="500+">€500+</option>
           </select>
           <select className="filter-select" value={selectedDuration} onChange={(e) => setSelectedDuration(e.target.value)}>
-            <option value="all">Duration</option>
-            <option value="1">1 day</option>
-            <option value="2-3">2–3 days</option>
-            <option value="4-7">4–7 days</option>
-            <option value="1-2w">1–2 weeks</option>
-            <option value="2w+">2+ weeks</option>
+            <option value="all">{t('discover.duration')}</option>
+            <option value="1">{t('discover.oneDay')}</option>
+            <option value="2-3">{t('discover.twoDays')}</option>
+            <option value="4-7">{t('discover.fourDays')}</option>
+            <option value="1-2w">{t('discover.oneWeek')}</option>
+            <option value="2w+">{t('discover.twoWeeks')}</option>
           </select>
           <select className="filter-select" value={selectedSpots} onChange={(e) => setSelectedSpots(e.target.value)}>
-            <option value="all">Available Spots</option>
-            <option value="1-3">1–3 spots</option>
-            <option value="4-8">4–8 spots</option>
-            <option value="9+">9+ spots</option>
+            <option value="all">{t('discover.availableSpots')}</option>
+            <option value="1-3">{t('discover.spots13')}</option>
+            <option value="4-8">{t('discover.spots48')}</option>
+            <option value="9+">{t('discover.spots9')}</option>
           </select>
         </div>
         <select className="filter-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)} style={{marginLeft:'auto'}}>
-          <option value="recent">Most Recent</option>
-          <option value="price-low">Price: Low → High</option>
-          <option value="price-high">Price: High → Low</option>
-          <option value="date">Soonest First</option>
+          <option value="recent">{t('discover.sortRecent')}</option>
+          <option value="price-low">{t('discover.priceLowHigh')}</option>
+          <option value="price-high">{t('discover.priceHighLow')}</option>
+          <option value="date">{t('discover.sortSoonest')}</option>
         </select>
       </div>
 
@@ -1241,21 +1193,21 @@ export default function DiscoverClient({
         <div className="results-header">
           <div className="results-count">
             {filteredTrips.length === 0
-              ? 'No trips yet'
-              : `${filteredTrips.length} trip${filteredTrips.length !== 1 ? 's' : ''} available`}
+              ? t('discover.noTripsYet')
+              : t('discover.tripsAvailable').replace('{count}', String(filteredTrips.length))}
           </div>
           <div className="view-toggle">
             <button
               className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
               onClick={() => setViewMode('grid')}
-              title="Grid view"
+              title={t('discover.gridView')}
             >
               <LayoutGrid size={16} />
             </button>
             <button
               className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
               onClick={() => setViewMode('list')}
-              title="List view"
+              title={t('discover.listView')}
             >
               <List size={16} />
             </button>
@@ -1264,8 +1216,8 @@ export default function DiscoverClient({
 
         {filteredTrips.length === 0 ? (
           <div className="empty-state">
-            <h2>No trips found</h2>
-            <p>Try adjusting your filters or search criteria</p>
+            <h2>{t('discover.noTrips')}</h2>
+            <p>{t('discover.noTripsHint')}</p>
           </div>
         ) : (
           <>
@@ -1285,26 +1237,37 @@ export default function DiscoverClient({
                     href={`/trips/${trip.slug}`}
                     className="trip-card"
                   >
-                    {/* Image */}
+                    {/* Image — card_image_url ha van, különben cover_image_url fallback */}
+                    {(() => {
+                      const cardImg = trip.card_image_url || trip.cover_image_url;
+                      const cardSrc = trip.card_image_url ? trip.card_image_source : trip.cover_image_source;
+                      return (
                     <div className="trip-card-image" style={
-                      !trip.cover_image_url ? {
+                      !cardImg ? {
                         background: `linear-gradient(135deg, ${catInfo?.colorHex || '#0D9488'}30, ${catInfo?.colorHex || '#0D9488'}60)`
                       } : undefined
                     }>
-                      {trip.cover_image_url && (
-                        <img src={trip.cover_image_url} alt={trip.title} loading="lazy" />
+                      {cardImg && (
+                        <img src={cardImg} alt={trip.title} loading="lazy" />
+                      )}
+                      {cardSrc === "user_upload" && (
+                        <span style={{ position: 'absolute', bottom: 8, right: 8, fontSize: 10, fontWeight: 600, color: '#fff', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: '2px 8px', borderTopLeftRadius: 8 }}>
+                          ✨ {t('imagePicker.ownPhoto')}
+                        </span>
                       )}
                       <div className="trip-card-badges">
                         {catInfo && (
                           <span className="badge-category" style={{ background: catInfo.colorHex }}>
-                            <CatIcon size={12} /> {catInfo.dbCat?.name || ''}
+                            <CatIcon size={12} /> {locale === 'en' ? (catInfo.dbCat?.name || '') : (catInfo.nameHu || catInfo.dbCat?.name || '')}
                           </span>
                         )}
                         <span className="badge-spots">
-                          <Users size={12} /> {spotsLeft} spots left
+                          <Users size={12} /> {t('discover.spotsLeft').replace('{count}', String(spotsLeft))}
                         </span>
                       </div>
                     </div>
+                      );
+                    })()}
 
                     {/* Body */}
                     <div className="trip-card-body">
@@ -1312,7 +1275,7 @@ export default function DiscoverClient({
                       <div className="trip-card-meta">
                         <span><MapPin size={14} /> {location}</span>
                         {trip.start_date && (
-                          <span><Calendar size={14} /> {trip.end_date ? formatDateRange(trip.start_date, trip.end_date) : new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(new Date(trip.start_date))}</span>
+                          <span><Calendar size={14} /> {trip.end_date ? formatDateRange(trip.start_date, trip.end_date, locale) : new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'hu-HU', { month: 'short', day: 'numeric' }).format(new Date(trip.start_date))}</span>
                         )}
                       </div>
                       <div className="trip-card-details">
@@ -1320,12 +1283,12 @@ export default function DiscoverClient({
                           background: diffLevel.color + '20',
                           color: diffLevel.color
                         }}>
-                          {diffLevel.labelEn}
+                          {locale === 'en' ? diffLevel.labelEn : diffLevel.label}
                         </span>
                         {trip.price_amount && trip.price_amount > 0 ? (
-                          <span className="trip-card-price">€{trip.price_amount} <span>/person</span></span>
+                          <span className="trip-card-price">€{trip.price_amount} <span>{t('discover.perPerson')}</span></span>
                         ) : (
-                          <span className="trip-card-price" style={{ color: '#22C55E' }}>Free</span>
+                          <span className="trip-card-price" style={{ color: '#22C55E' }}>{t('discover.free')}</span>
                         )}
                       </div>
                     </div>
@@ -1341,12 +1304,12 @@ export default function DiscoverClient({
                             <span className="corp-name">{organizer?.display_name}</span>
                             <span className="corp-spacer"></span>
                             <span className="verified-badge">
-                              <span className="verified-badge-logo">T</span> Verified Org
+                              <span className="verified-badge-logo">T</span> {t('discover.verifiedOrg')}
                             </span>
                           </div>
                           <div className="guide-row">
                             <div className="organizer-avatar" style={{ background: catInfo?.colorHex || '#0D9488', width: 20, height: 20 }}></div>
-                            <span className="organizer-name">Guide: {organizer?.display_name}</span>
+                            <span className="organizer-name">{t('discover.guide').replace('{name}', organizer?.display_name || '')}</span>
                             <span className="corp-spacer"></span>
                             <div className="organizer-rating"><Star size={12} /> 4.8</div>
                           </div>
@@ -1355,7 +1318,7 @@ export default function DiscoverClient({
                         <>
                           <div className="organizer">
                             <div className="organizer-avatar" style={{ background: catInfo?.colorHex || '#0D9488' }}></div>
-                            <span className="organizer-name">{organizer?.display_name || 'Organizer'}</span>
+                            <span className="organizer-name">{organizer?.display_name || t('discover.organizer')}</span>
                           </div>
                           <div className="organizer-rating">
                             <Star size={14} /> 4.8
@@ -1370,7 +1333,7 @@ export default function DiscoverClient({
 
             {filteredTrips.length > 6 && (
               <div className="load-more">
-                <button className="btn-load-more">Load More Trips</button>
+                <button className="btn-load-more">{t('discover.loadMore')}</button>
               </div>
             )}
           </>
@@ -1380,12 +1343,12 @@ export default function DiscoverClient({
       {/* CTA BANNER */}
       <section className="cta-banner">
         <div className="cta-content">
-          <h2 className="cta-title">Ready to organize your own adventure?</h2>
+          <h2 className="cta-title">{t('discover.ctaTitle')}</h2>
           <p className="cta-subtitle">
-            Create a trip, set crew positions, and let adventurers find you.
+            {t('discover.ctaSubtitle')}
           </p>
           <Link href="/trips/new" className="cta-btn">
-            Create a Trip
+            {t('discover.createTrip')}
           </Link>
         </div>
       </section>
