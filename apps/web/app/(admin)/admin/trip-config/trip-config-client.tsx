@@ -8,9 +8,13 @@ import {
   deleteSubDiscipline,
   upsertParameter,
   deleteParameter,
+  getParameterOptions,
+  upsertParameterOption,
+  deleteParameterOption,
   type AdminCategory,
   type AdminSubDiscipline,
   type AdminParameter,
+  type AdminParameterOption,
 } from "./actions";
 
 // ─── Props ───────────────────────────────────────────────────────────────────
@@ -80,6 +84,23 @@ interface TripConfigClientProps {
   t_p_noParameters: string;
   t_p_isRequired: string;
   t_p_isFilterable: string;
+  // Parameter options
+  t_p_optionsTitle: string;
+  t_p_optionsAddOption: string;
+  t_p_optionsValue: string;
+  t_p_optionsLabelHu: string;
+  t_p_optionsLabelEn: string;
+  t_p_optionsOrder: string;
+  t_p_optionsIsDefault: string;
+  t_p_optionsSave: string;
+  t_p_optionsDelete: string;
+  t_p_optionsDeleteConfirm: string;
+  t_p_optionsNoOptions: string;
+  t_p_optionsSaveFirstHint: string;
+  t_p_optionsValuePlaceholder: string;
+  t_p_optionsLabelPlaceholder: string;
+  t_p_optionsLabelEnPlaceholder: string;
+  t_p_optionsCount: string;
   // Common
   t_saveSuccess: string;
   t_deleteSuccess: string;
@@ -129,6 +150,15 @@ export function TripConfigClient({
   }>({
     parameter_key: "", label_hu: "", label_en: "", field_type: "text",
     is_required: false, is_filterable: false, display_order: 0, group_key: "", status: "active",
+  });
+
+  // ─── Parameter Options state ────────────────────────────────────────────
+  const [options, setOptions] = useState<AdminParameterOption[]>([]);
+  const [optionsLoading, setOptionsLoading] = useState(false);
+  const [showOptForm, setShowOptForm] = useState(false);
+  const [editingOptId, setEditingOptId] = useState<string | null>(null);
+  const [optForm, setOptForm] = useState({
+    value: "", label_hu: "", label_en: "", sort_order: 0, is_default: false, status: "active",
   });
 
   const showToast = useCallback((msg: string, ok = true) => {
@@ -224,6 +254,8 @@ export function TripConfigClient({
       is_required: false, is_filterable: false, display_order: 0, group_key: "", status: "active",
     });
     setShowPForm(true);
+    setShowOptForm(false);
+    setOptions([]);
   };
 
   const openEditP = (p: AdminParameter) => {
@@ -240,6 +272,11 @@ export function TripConfigClient({
       status: p.status,
     });
     setShowPForm(true);
+    setShowOptForm(false);
+    setOptions([]);
+    if (p.field_type === "select" || p.field_type === "multiselect") {
+      loadOptions(p.id);
+    }
   };
 
   const saveP = async () => {
@@ -268,6 +305,68 @@ export function TripConfigClient({
     setLoading(null);
     if (res.success) {
       showToast(t.t_deleteSuccess);
+      refresh();
+    } else {
+      showToast(res.error ?? t.t_errorDelete, false);
+    }
+  };
+
+  // ─── Parameter Options actions ──────────────────────────────────────────
+
+  const loadOptions = async (parameterId: string) => {
+    setOptionsLoading(true);
+    const opts = await getParameterOptions(parameterId);
+    setOptions(opts);
+    setOptionsLoading(false);
+  };
+
+  const openAddOpt = () => {
+    setEditingOptId(null);
+    setOptForm({ value: "", label_hu: "", label_en: "", sort_order: options.length + 1, is_default: false, status: "active" });
+    setShowOptForm(true);
+  };
+
+  const openEditOpt = (opt: AdminParameterOption) => {
+    setEditingOptId(opt.id);
+    setOptForm({
+      value: opt.value,
+      label_hu: opt.label_localized?.hu ?? opt.label,
+      label_en: opt.label_localized?.en ?? opt.label,
+      sort_order: opt.sort_order,
+      is_default: opt.is_default,
+      status: opt.status,
+    });
+    setShowOptForm(true);
+  };
+
+  const saveOpt = async () => {
+    if (!editingPId) return;
+    setLoading("opt-save");
+    const res = await upsertParameterOption({
+      id: editingOptId ?? undefined,
+      parameter_id: editingPId,
+      ...optForm,
+    });
+    setLoading(null);
+    if (res.success) {
+      setShowOptForm(false);
+      showToast(t.t_saveSuccess);
+      await loadOptions(editingPId);
+      refresh();
+    } else {
+      showToast(res.error ?? t.t_errorSave, false);
+    }
+  };
+
+  const deleteOpt = async (id: string) => {
+    if (!confirm(t.t_p_optionsDeleteConfirm)) return;
+    if (!editingPId) return;
+    setLoading(id);
+    const res = await deleteParameterOption(id);
+    setLoading(null);
+    if (res.success) {
+      showToast(t.t_deleteSuccess);
+      await loadOptions(editingPId);
       refresh();
     } else {
       showToast(res.error ?? t.t_errorDelete, false);
@@ -855,6 +954,185 @@ export function TripConfigClient({
                   {t.t_p_saveParameter}
                 </button>
               </div>
+
+              {/* ── OPTIONS SECTION (select/multiselect only) ───────────── */}
+              {(pForm.field_type === "select" || pForm.field_type === "multiselect") && (
+                <div className="mt-4 pt-4 border-t border-emerald-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-sm font-semibold text-slate-700">
+                      {t.t_p_optionsTitle}
+                    </h4>
+                    {editingPId && (
+                      <button
+                        onClick={openAddOpt}
+                        className="px-2.5 py-1 text-xs bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+                      >
+                        + {t.t_p_optionsAddOption}
+                      </button>
+                    )}
+                  </div>
+
+                  {!editingPId ? (
+                    <p className="text-xs text-slate-500 italic">
+                      {t.t_p_optionsSaveFirstHint}
+                    </p>
+                  ) : optionsLoading ? (
+                    <p className="text-xs text-slate-400 animate-pulse">...</p>
+                  ) : (
+                    <>
+                      {/* Add/Edit option form */}
+                      {showOptForm && (
+                        <div className="bg-white border border-slate-200 rounded-lg p-3 mb-3">
+                          <div className="grid grid-cols-2 gap-2 mb-2">
+                            <div>
+                              <label className="text-xs font-medium text-slate-600 block mb-1">
+                                {t.t_p_optionsValue}
+                              </label>
+                              <input
+                                type="text"
+                                value={optForm.value}
+                                onChange={(e) => setOptForm((f) => ({ ...f, value: e.target.value }))}
+                                placeholder={t.t_p_optionsValuePlaceholder}
+                                className={inputCls}
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-slate-600 block mb-1">
+                                {t.t_p_optionsOrder}
+                              </label>
+                              <input
+                                type="number"
+                                value={optForm.sort_order}
+                                onChange={(e) => setOptForm((f) => ({ ...f, sort_order: Number(e.target.value) }))}
+                                className={inputCls}
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-slate-600 block mb-1">
+                                {t.t_p_optionsLabelHu}
+                              </label>
+                              <input
+                                type="text"
+                                value={optForm.label_hu}
+                                onChange={(e) => setOptForm((f) => ({ ...f, label_hu: e.target.value }))}
+                                placeholder={t.t_p_optionsLabelPlaceholder}
+                                className={inputCls}
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-slate-600 block mb-1">
+                                {t.t_p_optionsLabelEn}
+                              </label>
+                              <input
+                                type="text"
+                                value={optForm.label_en}
+                                onChange={(e) => setOptForm((f) => ({ ...f, label_en: e.target.value }))}
+                                placeholder={t.t_p_optionsLabelEnPlaceholder}
+                                className={inputCls}
+                              />
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <label className="flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={optForm.is_default}
+                                onChange={(e) => setOptForm((f) => ({ ...f, is_default: e.target.checked }))}
+                                className="w-3.5 h-3.5 rounded accent-emerald-500"
+                              />
+                              {t.t_p_optionsIsDefault}
+                            </label>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => setShowOptForm(false)}
+                                className="px-2.5 py-1 text-xs border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-100"
+                              >
+                                {t.t_cat_cancelEdit}
+                              </button>
+                              <button
+                                onClick={saveOpt}
+                                disabled={loading === "opt-save"}
+                                className="px-2.5 py-1 text-xs bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 disabled:opacity-50"
+                              >
+                                {t.t_p_optionsSave}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Options list */}
+                      {options.length === 0 ? (
+                        <p className="text-xs text-slate-400 italic">
+                          {t.t_p_optionsNoOptions}
+                        </p>
+                      ) : (
+                        <div className="border border-slate-200 rounded-lg overflow-hidden">
+                          <table className="w-full text-xs">
+                            <thead>
+                              <tr className="bg-slate-50 border-b border-slate-100">
+                                <th className="text-left px-2.5 py-1.5 font-medium text-slate-500 uppercase tracking-wider">
+                                  {t.t_p_optionsValue}
+                                </th>
+                                <th className="text-left px-2.5 py-1.5 font-medium text-slate-500 uppercase tracking-wider">
+                                  {t.t_p_optionsLabelHu}
+                                </th>
+                                <th className="text-left px-2.5 py-1.5 font-medium text-slate-500 uppercase tracking-wider">
+                                  {t.t_p_optionsLabelEn}
+                                </th>
+                                <th className="text-left px-2.5 py-1.5 font-medium text-slate-500 uppercase tracking-wider w-12">
+                                  #
+                                </th>
+                                <th className="px-2.5 py-1.5 w-20" />
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                              {options.map((opt) => (
+                                <tr key={opt.id} className="hover:bg-slate-50/50">
+                                  <td className="px-2.5 py-1.5">
+                                    <span className="font-mono bg-slate-100 px-1 py-0.5 rounded text-slate-700">
+                                      {opt.value}
+                                    </span>
+                                  </td>
+                                  <td className="px-2.5 py-1.5 text-slate-700">
+                                    {opt.label_localized?.hu ?? opt.label}
+                                  </td>
+                                  <td className="px-2.5 py-1.5 text-slate-500">
+                                    {opt.label_localized?.en ?? opt.label}
+                                  </td>
+                                  <td className="px-2.5 py-1.5 text-slate-400">
+                                    {opt.sort_order}
+                                    {opt.is_default && (
+                                      <span className="ml-1 text-emerald-500" title={t.t_p_optionsIsDefault}>★</span>
+                                    )}
+                                  </td>
+                                  <td className="px-2.5 py-1.5">
+                                    <div className="flex gap-1 justify-end">
+                                      <button
+                                        onClick={() => openEditOpt(opt)}
+                                        className="px-1.5 py-0.5 text-[10px] border border-slate-200 text-slate-600 rounded hover:border-emerald-400 hover:text-emerald-600 transition-colors"
+                                      >
+                                        {t.t_p_editParameter}
+                                      </button>
+                                      <button
+                                        onClick={() => deleteOpt(opt.id)}
+                                        disabled={loading === opt.id}
+                                        className="px-1.5 py-0.5 text-[10px] border border-red-200 text-red-600 rounded hover:bg-red-50 disabled:opacity-50 transition-colors"
+                                      >
+                                        {t.t_p_optionsDelete}
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
@@ -903,6 +1181,11 @@ export function TripConfigClient({
                         </td>
                         <td className="px-4 py-2.5 text-slate-500 text-xs">
                           {fieldTypeLabel(p.field_type)}
+                          {(p.field_type === "select" || p.field_type === "multiselect") && (
+                            <span className="ml-1 text-emerald-600 font-medium">
+                              ({t.t_p_optionsCount.replace("{count}", String(p.options_count ?? 0))})
+                            </span>
+                          )}
                         </td>
                         <td className="px-4 py-2.5 text-xs">
                           {p.is_required ? (

@@ -83,6 +83,23 @@ export default async function TripConfigPage() {
         t_p_noParameters={t("admin.tripConfig.parameters.noParameters")}
         t_p_isRequired={t("admin.tripConfig.parameters.isRequired")}
         t_p_isFilterable={t("admin.tripConfig.parameters.isFilterable")}
+        // Parameter options
+        t_p_optionsTitle={t("admin.tripConfig.parameters.optionsTitle")}
+        t_p_optionsAddOption={t("admin.tripConfig.parameters.optionsAddOption")}
+        t_p_optionsValue={t("admin.tripConfig.parameters.optionsValue")}
+        t_p_optionsLabelHu={t("admin.tripConfig.parameters.optionsLabelHu")}
+        t_p_optionsLabelEn={t("admin.tripConfig.parameters.optionsLabelEn")}
+        t_p_optionsOrder={t("admin.tripConfig.parameters.optionsOrder")}
+        t_p_optionsIsDefault={t("admin.tripConfig.parameters.optionsIsDefault")}
+        t_p_optionsSave={t("admin.tripConfig.parameters.optionsSave")}
+        t_p_optionsDelete={t("admin.tripConfig.parameters.optionsDelete")}
+        t_p_optionsDeleteConfirm={t("admin.tripConfig.parameters.optionsDeleteConfirm")}
+        t_p_optionsNoOptions={t("admin.tripConfig.parameters.optionsNoOptions")}
+        t_p_optionsSaveFirstHint={t("admin.tripConfig.parameters.optionsSaveFirstHint")}
+        t_p_optionsValuePlaceholder={t("admin.tripConfig.parameters.optionsValuePlaceholder")}
+        t_p_optionsLabelPlaceholder={t("admin.tripConfig.parameters.optionsLabelPlaceholder")}
+        t_p_optionsLabelEnPlaceholder={t("admin.tripConfig.parameters.optionsLabelEnPlaceholder")}
+        t_p_optionsCount={t("admin.tripConfig.parameters.optionsCount")}
         // Common
         t_saveSuccess={t("admin.tripConfig.saveSuccess")}
         t_deleteSuccess={t("admin.tripConfig.deleteSuccess")}

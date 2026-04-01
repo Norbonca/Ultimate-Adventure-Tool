@@ -66,6 +66,19 @@ export interface AdminParameter {
   display_order: number;
   group_key: string | null;
   status: string;
+  options_count?: number;
+}
+
+export interface AdminParameterOption {
+  id: string;
+  parameter_id: string;
+  value: string;
+  label: string;
+  label_localized: { hu?: string; en?: string };
+  icon_name: string | null;
+  is_default: boolean;
+  sort_order: number;
+  status: string;
 }
 
 // ─── Read ─────────────────────────────────────────────────────────────────────
@@ -95,10 +108,30 @@ export async function getTripConfigData(): Promise<{
       .order("display_order"),
   ]);
 
+  // Fetch options counts per parameter
+  const paramIds = (paramRes.data ?? []).map((p: { id: string }) => p.id);
+  let optionsCounts: Record<string, number> = {};
+  if (paramIds.length > 0) {
+    const { data: optRows } = await admin
+      .from("ref_parameter_options")
+      .select("parameter_id")
+      .in("parameter_id", paramIds);
+    if (optRows) {
+      for (const row of optRows) {
+        optionsCounts[row.parameter_id] = (optionsCounts[row.parameter_id] ?? 0) + 1;
+      }
+    }
+  }
+
+  const parameters = (paramRes.data ?? []).map((p: AdminParameter) => ({
+    ...p,
+    options_count: optionsCounts[p.id] ?? 0,
+  }));
+
   return {
     categories: (catRes.data ?? []) as AdminCategory[],
     subDisciplines: (sdRes.data ?? []) as AdminSubDiscipline[],
-    parameters: (paramRes.data ?? []) as AdminParameter[],
+    parameters: parameters as AdminParameter[],
   };
 }
 
@@ -223,6 +256,66 @@ export async function deleteParameter(
   await requireAdmin();
   const admin = createAdminClient();
   const { error } = await admin.from("ref_category_parameters").delete().eq("id", id);
+  if (error) return { success: false, error: error.message };
+  return { success: true };
+}
+
+// ─── Parameter Options ──────────────────────────────────────────────────────
+
+export async function getParameterOptions(
+  parameterId: string
+): Promise<AdminParameterOption[]> {
+  await requireAdmin();
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from("ref_parameter_options")
+    .select(
+      "id, parameter_id, value, label, label_localized, icon_name, is_default, sort_order, status"
+    )
+    .eq("parameter_id", parameterId)
+    .order("sort_order");
+  return (data ?? []) as AdminParameterOption[];
+}
+
+export async function upsertParameterOption(data: {
+  id?: string;
+  parameter_id: string;
+  value: string;
+  label_hu: string;
+  label_en: string;
+  icon_name?: string | null;
+  is_default: boolean;
+  sort_order: number;
+  status: string;
+}): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
+  const admin = createAdminClient();
+
+  const payload = {
+    parameter_id: data.parameter_id,
+    value: data.value,
+    label: data.label_en || data.label_hu,
+    label_localized: { hu: data.label_hu, en: data.label_en },
+    icon_name: data.icon_name || null,
+    is_default: data.is_default,
+    sort_order: data.sort_order,
+    status: data.status,
+  };
+
+  const { error } = data.id
+    ? await admin.from("ref_parameter_options").update(payload).eq("id", data.id)
+    : await admin.from("ref_parameter_options").insert(payload);
+
+  if (error) return { success: false, error: error.message };
+  return { success: true };
+}
+
+export async function deleteParameterOption(
+  id: string
+): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
+  const admin = createAdminClient();
+  const { error } = await admin.from("ref_parameter_options").delete().eq("id", id);
   if (error) return { success: false, error: error.message };
   return { success: true };
 }
