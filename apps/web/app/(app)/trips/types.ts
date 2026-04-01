@@ -53,7 +53,7 @@ export interface ParameterOptionRow {
   value: string;
   label: string;
   label_localized: Record<string, string>;
-  display_order: number;
+  sort_order: number;
 }
 
 export interface CoverImageRow {

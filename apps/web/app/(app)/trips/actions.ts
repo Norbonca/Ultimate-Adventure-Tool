@@ -279,9 +279,9 @@ export async function fetchParameterOptions(parameterIds: string[]) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("ref_parameter_options")
-    .select("id, parameter_id, value, label, label_localized, display_order")
+    .select("id, parameter_id, value, label, label_localized, sort_order")
     .in("parameter_id", parameterIds)
-    .order("display_order");
+    .order("sort_order");
 
   if (error) {
     console.error("Parameter options fetch error:", error);
