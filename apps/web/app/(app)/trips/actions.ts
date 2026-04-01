@@ -423,7 +423,7 @@ export async function fetchTripForEdit(tripId: string): Promise<{
     category_details: (trip.category_details as Record<string, unknown>) || {},
     visibility: trip.visibility || "public",
     require_approval: trip.require_approval ?? true,
-    registration_deadline: trip.registration_deadline || "",
+    registration_deadline: trip.registration_deadline ? String(trip.registration_deadline).slice(0, 10) : "",
     price_amount: trip.price_amount ? Number(trip.price_amount) : null,
     price_currency: trip.price_currency || "EUR",
     is_cost_sharing: trip.is_cost_sharing ?? true,

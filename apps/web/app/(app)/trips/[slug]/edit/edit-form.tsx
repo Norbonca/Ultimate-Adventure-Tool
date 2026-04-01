@@ -87,7 +87,9 @@ export function EditTripForm({
   );
   const [visibility, setVisibility] = useState(trip.visibility || "public");
   const [requireApproval, setRequireApproval] = useState(trip.require_approval);
-  const [registrationDeadline, setRegistrationDeadline] = useState(trip.registration_deadline || "");
+  const [registrationDeadline, setRegistrationDeadline] = useState(
+    trip.registration_deadline ? String(trip.registration_deadline).slice(0, 10) : ""
+  );
   const [priceAmount, setPriceAmount] = useState<number | null>(
     trip.price_amount ? Number(trip.price_amount) : null
   );
