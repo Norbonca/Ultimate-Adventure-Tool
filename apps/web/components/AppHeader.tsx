@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { ChevronDown, Home, Compass, Sparkles, Users, CreditCard } from "lucide-react";
+import { ChevronDown, Home, Sparkles, Users, CreditCard } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────────────
 interface AnchorLink {
@@ -27,8 +27,7 @@ interface AppHeaderProps {
 // ── Navigation menu items (static) ────────────────────────────────
 const NAV_ITEMS = [
   { key: "nav.home", href: "/", icon: Home },
-  { key: "nav.discover", href: "/discover", icon: Compass },
-  { key: "nav.features", href: "/#features", icon: Sparkles },
+  { key: "nav.getStarted", href: "/get-started", icon: Sparkles },
   { key: "nav.community", href: "/community", icon: Users },
   { key: "nav.pricing", href: "/pricing", icon: CreditCard },
 ] as const;

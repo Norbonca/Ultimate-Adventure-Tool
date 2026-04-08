@@ -7,6 +7,15 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
+  async redirects() {
+    return [
+      {
+        source: "/discover",
+        destination: "/",
+        permanent: true,
+      },
+    ];
+  },
   transpilePackages: ["@uat/db", "@uat/core", "@uat/validators", "@uat/config"],
   images: {
     remotePatterns: [

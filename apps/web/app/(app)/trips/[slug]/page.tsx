@@ -111,7 +111,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
         user={user ? { email: user.email ?? "", displayName: user.user_metadata?.full_name } : null}
       />
 
-      <BackButton fallback="/discover" label={t('common.back')} />
+      <BackButton fallback="/" label={t('common.back')} />
 
       {/* Hero Section */}
       <div
