@@ -200,7 +200,13 @@ export async function initTimelineFromTemplate(
   const { template, error: tplError } = await fetchTimelineTemplateDetail(templateId);
   if (!template || tplError) return { success: false, error: tplError ?? "Template not found" };
 
+  const phaseCount = template.phases?.length ?? 0;
+  if (phaseCount === 0) {
+    return { success: false, error: `Template has no phases (templateId: ${templateId})` };
+  }
+
   const tripStartDate = trip.start_date ? new Date(trip.start_date) : new Date();
+  const errors: string[] = [];
 
   // Fázisok létrehozása
   for (const phase of template.phases) {
@@ -216,7 +222,10 @@ export async function initTimelineFromTemplate(
       .select("id")
       .single();
 
-    if (phaseError || !newPhase) continue;
+    if (phaseError || !newPhase) {
+      errors.push(`Phase "${phase.name}": ${phaseError?.message ?? "no data returned"}`);
+      continue;
+    }
 
     // Mérföldkövek
     for (const milestone of phase.milestones) {
@@ -240,7 +249,10 @@ export async function initTimelineFromTemplate(
         .select("id")
         .single();
 
-      if (msError || !newMs) continue;
+      if (msError || !newMs) {
+        errors.push(`Milestone "${milestone.name}": ${msError?.message ?? "no data returned"}`);
+        continue;
+      }
 
       // Feladatok
       if (milestone.tasks && milestone.tasks.length > 0) {
@@ -256,9 +268,16 @@ export async function initTimelineFromTemplate(
           sort_order: task.sort_order,
         }));
 
-        await supabase.from("trip_tasks").insert(taskInserts);
+        const { error: taskError } = await supabase.from("trip_tasks").insert(taskInserts);
+        if (taskError) {
+          errors.push(`Tasks for "${milestone.name}": ${taskError.message}`);
+        }
       }
     }
+  }
+
+  if (errors.length > 0) {
+    return { success: false, error: errors.join(" | ") };
   }
 
   return { success: true };

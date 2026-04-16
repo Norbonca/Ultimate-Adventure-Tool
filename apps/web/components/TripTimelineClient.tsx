@@ -179,6 +179,7 @@ function TemplateSelector({ tripId, onInit }: { tripId: string; onInit: () => vo
   const [templates, setTemplates] = useState<TimelineTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [initializing, setInitializing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchTimelineTemplates().then((result) => {
@@ -189,9 +190,12 @@ function TemplateSelector({ tripId, onInit }: { tripId: string; onInit: () => vo
 
   const handleInit = async (templateId: string) => {
     setInitializing(true);
+    setError(null);
     const result = await initTimelineFromTemplate(tripId, templateId);
     if (result.success) {
       onInit();
+    } else {
+      setError(result.error ?? "Unknown error");
     }
     setInitializing(false);
   };
@@ -243,6 +247,12 @@ function TemplateSelector({ tripId, onInit }: { tripId: string; onInit: () => vo
           <span className="text-sm font-medium text-slate-600">{t("timeline.emptyTemplate")}</span>
         </button>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700 break-all">
+          <strong>{t("timeline.initError")}:</strong> {error}
+        </div>
+      )}
 
       {initializing && (
         <div className="flex items-center justify-center gap-2 text-teal-600 text-sm">
