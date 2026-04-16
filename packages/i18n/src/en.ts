@@ -1368,6 +1368,92 @@ const en: TranslationKeys = {
   },
 
   // ============================================================================
+  // M021 — Trip Timeline
+  // ============================================================================
+  timeline: {
+    title: "Trip Timeline",
+    overallProgress: "Overall: {completed}/{total} tasks",
+    progressPercent: "{percent}%",
+    addPhase: "Add Phase",
+    addMilestone: "Add milestone",
+    addTask: "Add task",
+    noTimeline: "No timeline yet for this trip.",
+    initFromTemplate: "Start from template",
+    chooseTemplate: "Choose a template",
+    templateMinimal: "Minimal Planning",
+    templateStandard: "Standard Planning",
+    templateFull: "Full Planning",
+    emptyTemplate: "Empty (build manually)",
+    initSuccess: "Timeline created successfully!",
+    initError: "Error creating timeline",
+    // Phase names
+    phaseAnnouncement: "Announcement",
+    phaseRegistration: "Registration",
+    phasePreparation: "Preparation",
+    phaseTravelThere: "Travel There",
+    phaseAdventure: "Adventure",
+    phaseExtraPrograms: "Extra Programs",
+    phaseTravelBack: "Travel Back",
+    phaseWrapup: "Wrap-up",
+    // Milestone
+    milestoneStatus: "Status",
+    milestoneDueDate: "Due date",
+    milestoneAssignees: "Assignees",
+    milestoneTasks: "Tasks",
+    milestoneNotes: "Notes",
+    milestoneDelete: "Delete milestone",
+    milestoneDeleteConfirm: "Are you sure you want to delete this milestone? Its tasks will also be deleted.",
+    milestoneSave: "Save",
+    // Statuses
+    statusNotStarted: "Not Started",
+    statusInProgress: "In Progress",
+    statusDone: "Done",
+    // Task
+    taskPending: "Pending",
+    taskInProgress: "In Progress",
+    taskPendingVerification: "Pending Verification",
+    taskCompleted: "Completed",
+    taskRejected: "Rejected",
+    taskSkipped: "Skipped",
+    taskBlocked: "Blocked",
+    taskRequired: "Required",
+    taskOptional: "Optional",
+    taskBlocking: "Blocking",
+    taskVerificationNeeded: "Organizer verification needed",
+    // Task types
+    typeChecklist: "Checklist",
+    typeUpload: "Upload",
+    typeConfirm: "Confirmation",
+    typePayment: "Payment",
+    typeForm: "Data collection",
+    typeLink: "Link sharing",
+    typeNotification: "Notification",
+    typeReview: "Review",
+    // Task assignee
+    assigneeOrganizer: "Organizer",
+    assigneeParticipant: "Participant",
+    assigneeEveryone: "Everyone",
+    assigneeRole: "Crew position",
+    assigneeExternal: "External",
+    // Actions
+    submitTask: "Mark as done",
+    verifyTask: "Approve",
+    rejectTask: "Reject",
+    rejectionNote: "Rejection reason",
+    // Participant
+    myTasks: "My Tasks",
+    noTasksAssigned: "No tasks assigned to you.",
+    overdueWarning: "Overdue",
+    // Phase delete
+    phaseDelete: "Delete phase",
+    phaseDeleteConfirm: "Are you sure you want to delete this phase? Its milestones and tasks will also be deleted.",
+    // Names
+    phaseName: "Phase name",
+    milestoneName: "Milestone name",
+    taskName: "Task name",
+  },
+
+  // ============================================================================
   validation: {
     required: "This field is required",
     emailInvalid: "A valid email is required",

@@ -8,10 +8,11 @@ import {
   fetchTripItinerary,
 } from "../../actions";
 import { CATEGORY_DISPLAY } from "@/lib/categories";
-import type { TranslationKey } from "@uat/i18n";
+// TranslationKey removed — timeline is now dynamic
 import { getServerT, getServerLocale } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
 import { BackButton } from "@/components/BackButton";
+import { TripTimelineClient } from "@/components/TripTimelineClient";
 
 interface ManagePageProps {
   params: Promise<{ slug: string }>;
@@ -62,10 +63,6 @@ export default async function TripManagePage({ params }: ManagePageProps) {
   // TODO: M03 Expense integration — for now expenses are 0
   const expenses = 0;
   const netProfit = revenue - expenses;
-
-  // Determine phase statuses based on trip state
-  const isRegistrationDone = trip.status === "active" || trip.status === "completed";
-  const isPreparationDone = trip.status === "completed";
 
   return (
     <main className="min-h-screen bg-[#F8FAFC]">
@@ -181,77 +178,8 @@ export default async function TripManagePage({ params }: ManagePageProps) {
 
         {/* ── Main Content ── */}
         <div className="flex-1 p-8 space-y-8">
-          {/* Timeline Header */}
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-navy-900">{t("trips.manage.timeline")}</h1>
-            <button className="text-sm font-medium text-trevu-600 hover:text-trevu-700 transition-colors">
-              {t("trips.manage.addPhase")}
-            </button>
-          </div>
-
-          {/* Phase Timeline */}
-          <div className="space-y-6">
-            {/* Phase 1: Registration */}
-            <div className="bg-white rounded-2xl border border-navy-200 p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
-                  isRegistrationDone ? "bg-green-50 text-green-700" : "bg-trevu-50 text-trevu-700"
-                }`}>
-                  {t("trips.manage.phaseRegistration")}
-                </span>
-              </div>
-              <div className="space-y-3 ml-1">
-                {[
-                  { key: "openApplications", done: trip.status !== "draft" },
-                  { key: "collectPayment", done: isRegistrationDone },
-                  { key: "lockCrew", done: isRegistrationDone },
-                ].map((item) => (
-                  <div key={item.key} className="flex items-center gap-3">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center text-xs ${
-                      item.done
-                        ? "border-green-500 bg-green-50 text-green-600"
-                        : "border-navy-300 text-transparent"
-                    }`}>
-                      {item.done && "✓"}
-                    </div>
-                    <span className={`text-sm ${item.done ? "text-navy-500 line-through" : "text-navy-800"}`}>
-                      {t(`trips.manage.${item.key}` as TranslationKey)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Phase 2: Preparation */}
-            <div className="bg-white rounded-2xl border border-navy-200 p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
-                  isPreparationDone ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-700"
-                }`}>
-                  {t("trips.manage.phasePreparation")}
-                </span>
-              </div>
-              <div className="space-y-3 ml-1">
-                {[
-                  { key: "bookAccommodation", done: isPreparationDone },
-                  { key: "equipmentChecklist", done: isPreparationDone },
-                ].map((item) => (
-                  <div key={item.key} className="flex items-center gap-3">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center text-xs ${
-                      item.done
-                        ? "border-green-500 bg-green-50 text-green-600"
-                        : "border-navy-300 text-transparent"
-                    }`}>
-                      {item.done && "✓"}
-                    </div>
-                    <span className={`text-sm ${item.done ? "text-navy-500 line-through" : "text-navy-800"}`}>
-                      {t(`trips.manage.${item.key}` as TranslationKey)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          {/* ── M021 Trip Timeline ── */}
+          <TripTimelineClient tripId={trip.id} isOrganizer={true} />
 
           {/* Crew Positions */}
           {crewPositions.length > 0 && (

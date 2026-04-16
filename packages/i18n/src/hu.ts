@@ -1394,6 +1394,92 @@ const hu = {
   },
 
   // ============================================================================
+  // M021 — Trip Timeline
+  // ============================================================================
+  timeline: {
+    title: "Trip Timeline",
+    overallProgress: "Összesen: {completed}/{total} feladat",
+    progressPercent: "{percent}%",
+    addPhase: "Fázis hozzáadása",
+    addMilestone: "Mérföldkő hozzáadása",
+    addTask: "Feladat hozzáadása",
+    noTimeline: "Még nincs timeline ehhez a túrához.",
+    initFromTemplate: "Sablon alapján indítás",
+    chooseTemplate: "Válassz sablont",
+    templateMinimal: "Minimál szervezés",
+    templateStandard: "Standard szervezés",
+    templateFull: "Teljes szervezés",
+    emptyTemplate: "Üres (kézi felépítés)",
+    initSuccess: "Timeline sikeresen létrehozva!",
+    initError: "Hiba a timeline létrehozásakor",
+    // Fázis nevek
+    phaseAnnouncement: "Meghirdetés",
+    phaseRegistration: "Regisztráció",
+    phasePreparation: "Előkészület",
+    phaseTravelThere: "Odautazás",
+    phaseAdventure: "Túra",
+    phaseExtraPrograms: "Kiegészítő programok",
+    phaseTravelBack: "Visszautazás",
+    phaseWrapup: "Lezárás",
+    // Mérföldkő
+    milestoneStatus: "Státusz",
+    milestoneDueDate: "Határidő",
+    milestoneAssignees: "Felelősök",
+    milestoneTasks: "Feladatok",
+    milestoneNotes: "Megjegyzés",
+    milestoneDelete: "Mérföldkő törlése",
+    milestoneDeleteConfirm: "Biztosan törlöd ezt a mérföldkövet? A feladatai is törlődnek.",
+    milestoneSave: "Mentés",
+    // Státuszok
+    statusNotStarted: "Nem indult",
+    statusInProgress: "Folyamatban",
+    statusDone: "Kész",
+    // Feladat
+    taskPending: "Függőben",
+    taskInProgress: "Folyamatban",
+    taskPendingVerification: "Ellenőrzésre vár",
+    taskCompleted: "Kész",
+    taskRejected: "Elutasítva",
+    taskSkipped: "Kihagyva",
+    taskBlocked: "Blokkolt",
+    taskRequired: "Kötelező",
+    taskOptional: "Opcionális",
+    taskBlocking: "Blokkoló",
+    taskVerificationNeeded: "Szervező ellenőrzés szükséges",
+    // Feladat típusok
+    typeChecklist: "Ellenőrző lista",
+    typeUpload: "Feltöltés",
+    typeConfirm: "Visszaigazolás",
+    typePayment: "Fizetés",
+    typeForm: "Adatgyűjtés",
+    typeLink: "Link megosztás",
+    typeNotification: "Értesítés",
+    typeReview: "Áttekintés",
+    // Feladat felelős
+    assigneeOrganizer: "Szervező",
+    assigneeParticipant: "Résztvevő",
+    assigneeEveryone: "Mindenki",
+    assigneeRole: "Crew pozíció",
+    assigneeExternal: "Külső fél",
+    // Műveletek
+    submitTask: "Kész jelölés",
+    verifyTask: "Jóváhagyás",
+    rejectTask: "Elutasítás",
+    rejectionNote: "Elutasítás indoklása",
+    // Participant
+    myTasks: "Feladataim",
+    noTasksAssigned: "Nincsenek hozzád rendelt feladatok.",
+    overdueWarning: "Lejárt határidő",
+    // Fázis törlés
+    phaseDelete: "Fázis törlése",
+    phaseDeleteConfirm: "Biztosan törlöd ezt a fázist? A mérföldkövei és feladatai is törlődnek.",
+    // Sablon név
+    phaseName: "Fázis neve",
+    milestoneName: "Mérföldkő neve",
+    taskName: "Feladat neve",
+  },
+
+  // ============================================================================
   // Validációs üzenetek
   // ============================================================================
   validation: {
