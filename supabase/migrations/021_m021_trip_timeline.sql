@@ -403,18 +403,17 @@ DECLARE
   ms_id UUID;
 BEGIN
   -- ── Timeline Templates ────────────────────────────────
-  INSERT INTO ref_timeline_templates (id, key, name, name_localized, description, description_localized, icon, sort_order)
+  INSERT INTO ref_timeline_templates (key, name, name_localized, description, description_localized, icon, sort_order)
   VALUES
-    (gen_random_uuid(), 'minimal', 'Minimal', '{"hu":"Minimál szervezés","en":"Minimal Planning"}',
+    ('minimal', 'Minimal', '{"hu":"Minimál szervezés","en":"Minimal Planning"}',
      'Basic timeline for simple trips', '{"hu":"Alap timeline egyszerű túrákhoz — regisztráció, túra, lezárás","en":"Basic timeline for simple trips — registration, adventure, wrap-up"}',
      'clipboard-list', 1),
-    (gen_random_uuid(), 'standard', 'Standard', '{"hu":"Standard szervezés","en":"Standard Planning"}',
+    ('standard', 'Standard', '{"hu":"Standard szervezés","en":"Standard Planning"}',
      'Recommended for most trips', '{"hu":"Ajánlott a legtöbb túrához — meghirdetés, regisztráció, előkészület, túra, lezárás","en":"Recommended for most trips — announcement, registration, preparation, adventure, wrap-up"}',
      'clipboard-check', 2),
-    (gen_random_uuid(), 'full', 'Full', '{"hu":"Teljes szervezés","en":"Full Planning"}',
+    ('full', 'Full', '{"hu":"Teljes szervezés","en":"Full Planning"}',
      'Complete pipeline for professional organizers', '{"hu":"Teljes szervezési pipeline profi szervezőknek — mind a 8 fázis","en":"Complete pipeline for professional organizers — all 8 phases"}',
-     'list-checks', 3)
-  RETURNING id INTO t_full; -- last inserted
+     'list-checks', 3);
 
   SELECT id INTO t_minimal FROM ref_timeline_templates WHERE key = 'minimal';
   SELECT id INTO t_standard FROM ref_timeline_templates WHERE key = 'standard';
