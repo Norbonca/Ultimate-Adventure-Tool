@@ -31,16 +31,21 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Védett oldalak — bejelentkezés nélkül átirányítás
-  const protectedPaths = [
-    "/dashboard", "/trips", "/profile", "/settings", "/admin",
-  ];
+  // /trips/[slug] (detail) NYILVÁNOS — Discover-ről kattintható, nem kell auth.
+  // /trips (lista), /trips/new és /trips/[slug]/{edit|manage|participant} védett.
+  const pathname = request.nextUrl.pathname;
+  const protectedPaths = ["/dashboard", "/profile", "/settings", "/admin"];
   const publicAdminPaths = ["/admin/login"];
-  const isPublicAdmin = publicAdminPaths.some((p) =>
-    request.nextUrl.pathname.startsWith(p)
-  );
+  const isPublicAdmin = publicAdminPaths.some((p) => pathname.startsWith(p));
+
+  const isTripsList = pathname === "/trips" || pathname === "/trips/";
+  const isTripsCreate = pathname.startsWith("/trips/new");
+  const isTripsSubAction = /^\/trips\/[^/]+\/(edit|manage|participant)(\/|$)/.test(pathname);
+  const isTripsProtected = isTripsList || isTripsCreate || isTripsSubAction;
+
   const isProtected =
     !isPublicAdmin &&
-    protectedPaths.some((p) => request.nextUrl.pathname.startsWith(p));
+    (isTripsProtected || protectedPaths.some((p) => pathname.startsWith(p)));
 
   if (!user && isProtected) {
     const url = request.nextUrl.clone();

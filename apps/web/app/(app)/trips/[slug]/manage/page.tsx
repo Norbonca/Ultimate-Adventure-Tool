@@ -272,20 +272,33 @@ export default async function TripManagePage({ params }: ManagePageProps) {
                     const profile = (Array.isArray(p.profiles) ? p.profiles[0] : p.profiles) as {
                       display_name: string | null;
                     } | null;
+                    const hasMessage = !!p.application_text;
                     return (
-                      <div key={p.id} className="flex items-center justify-between bg-amber-50 rounded-xl p-4">
-                        <div>
-                          <span className="text-sm font-semibold text-navy-800">
-                            {profile?.display_name || "—"}
-                          </span>
-                          {p.application_text && (
-                            <p className="text-xs text-navy-500 mt-1 line-clamp-1">{p.application_text}</p>
+                      <div key={p.id} className="flex items-start justify-between bg-amber-50 rounded-xl p-4 gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-sm font-semibold text-navy-800">
+                              {profile?.display_name || "—"}
+                            </span>
+                            {hasMessage && (
+                              <span
+                                className="inline-flex items-center gap-1 text-[10px] font-semibold text-trevu-700 bg-trevu-100 px-1.5 py-0.5 rounded-full"
+                                title={t("trips.manage.hasApplicationMessage")}
+                              >
+                                💬 {t("trips.manage.hasMessageBadge")}
+                              </span>
+                            )}
+                          </div>
+                          {hasMessage && (
+                            <p className="text-xs text-navy-600 mt-2 bg-white/60 rounded-lg px-2.5 py-2 whitespace-pre-wrap leading-relaxed">
+                              {p.application_text}
+                            </p>
                           )}
-                          <span className="text-xs text-navy-400">
+                          <span className="text-xs text-navy-400 block mt-1">
                             {p.applied_at && new Date(p.applied_at).toLocaleDateString(dateLocale)}
                           </span>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 shrink-0">
                           <button className="px-3 py-1.5 text-xs font-semibold text-white bg-trevu-600 rounded-lg hover:bg-trevu-700">
                             {t("trips.manage.approve")}
                           </button>

@@ -2,7 +2,9 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { getServerT } from "@/lib/i18n/server";
+import { computeDefaultRequireApproval, getAutoApprovalThreshold } from "@/lib/system-settings";
 import type { WizardFormData } from "./types";
 
 // ============================================
@@ -92,6 +94,15 @@ export async function saveDraft(
     profile = newProfile;
   }
 
+  // Business rule: ha a szervező explicit nem állítja a require_approval-t,
+  // a system_settings küszöb (default: 15) alapján számoljuk.
+  //   max_participants <= threshold → true (kézi jóváhagyás, kisebb csapat)
+  //   max_participants >  threshold → false (auto-approval, nagyobb túra)
+  const maxParticipants = formData.max_participants || 10;
+  const threshold = await getAutoApprovalThreshold();
+  const requireApproval =
+    formData.require_approval ?? computeDefaultRequireApproval(maxParticipants, threshold);
+
   const tripPayload = {
     organizer_id: profile.id,
     category_id: formData.category_id || null,
@@ -105,12 +116,12 @@ export async function saveDraft(
     location_country: formData.location_country || "HU",
     location_region: formData.location_region || null,
     location_city: formData.location_city || null,
-    max_participants: formData.max_participants || 10,
+    max_participants: maxParticipants,
     min_participants: formData.min_participants || 2,
     difficulty: formData.difficulty || 1,
     category_details: formData.category_details || {},
     visibility: formData.visibility || "public",
-    require_approval: formData.require_approval ?? true,
+    require_approval: requireApproval,
     registration_deadline: formData.registration_deadline || null,
     price_amount: formData.price_amount || null,
     price_currency: formData.price_currency || "EUR",
@@ -630,4 +641,166 @@ export async function fetchTripItinerary(tripId: string) {
     return [];
   }
   return data || [];
+}
+
+// ============================================
+// fetchMyParticipation — A bejelentkezett user résztvevő rekordja adott túrához
+// ============================================
+export async function fetchMyParticipation(tripId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data, error } = await supabase
+    .from("trip_participants")
+    .select("id, status, application_text, applied_at, approved_at, rejection_reason")
+    .eq("trip_id", tripId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error("fetchMyParticipation error:", error);
+    return null;
+  }
+  return data;
+}
+
+// ============================================
+// applyToTrip — Jelentkezés túrára
+// ============================================
+// Business logic:
+//   - A user be kell jelentkezve legyen
+//   - Nem jelentkezhet saját túrára (organizer check)
+//   - Nem lehet már meglévő rekord (unique uq_trip_participant)
+//   - Státusz: require_approval=true → 'pending', egyébként 'approved'
+//   - A current_participants számolót a trg_participant_count trigger frissíti.
+//   - applicationText MINDIG menthető (user írhat megjegyzést)
+// ============================================
+export async function applyToTrip(
+  tripId: string,
+  applicationText?: string
+): Promise<{ ok: boolean; status?: string; error?: string }> {
+  const { t } = await getServerT();
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { ok: false, error: t("errors.notAuthenticated") };
+  }
+
+  // Trip betöltés — validáció
+  const { data: trip, error: tripErr } = await supabase
+    .from("trips")
+    .select("id, organizer_id, status, require_approval, max_participants, current_participants")
+    .eq("id", tripId)
+    .maybeSingle();
+
+  if (tripErr || !trip) {
+    return { ok: false, error: t("trips.errors.tripNotFound") };
+  }
+
+  if (trip.organizer_id === user.id) {
+    return { ok: false, error: t("trips.errors.cannotApplyOwnTrip") };
+  }
+
+  if (!["published", "registration_open"].includes(trip.status)) {
+    return { ok: false, error: t("trips.errors.tripNotAcceptingApplications") };
+  }
+
+  const spotsLeft = trip.max_participants - (trip.current_participants || 0);
+  // require_approval=false → azonnal approved, helyet foglal → ellenőrizzük a spot-ot
+  // require_approval=true → pending, nem foglal helyet → nem kell spot ellenőrzés
+  if (!trip.require_approval && spotsLeft <= 0) {
+    return { ok: false, error: t("trips.errors.tripFull") };
+  }
+
+  // Meglévő rekord ellenőrzés
+  const { data: existing } = await supabase
+    .from("trip_participants")
+    .select("id, status")
+    .eq("trip_id", tripId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (existing && existing.status !== "cancelled") {
+    return { ok: false, error: t("trips.errors.alreadyApplied") };
+  }
+
+  const nextStatus = trip.require_approval ? "pending" : "approved";
+  const payload = {
+    trip_id: tripId,
+    user_id: user.id,
+    status: nextStatus as "pending" | "approved",
+    application_text: applicationText?.trim() || null,
+    applied_at: new Date().toISOString(),
+    approved_at: trip.require_approval ? null : new Date().toISOString(),
+  };
+
+  // Ha volt cancelled rekord → update; egyébként insert
+  if (existing) {
+    const { error } = await supabase
+      .from("trip_participants")
+      .update(payload)
+      .eq("id", existing.id);
+    if (error) {
+      console.error("applyToTrip update error:", error);
+      return { ok: false, error: error.message };
+    }
+  } else {
+    const { error } = await supabase.from("trip_participants").insert(payload);
+    if (error) {
+      console.error("applyToTrip insert error:", error);
+      return { ok: false, error: error.message };
+    }
+  }
+
+  revalidatePath(`/trips`);
+  return { ok: true, status: nextStatus };
+}
+
+// ============================================
+// cancelApplication — Jelentkezés visszavonása
+// ============================================
+// Csak pending/approved/approved_pending_payment állapotból.
+// Status → 'cancelled' (a trigger a current_participants-et frissíti).
+// ============================================
+export async function cancelApplication(
+  tripId: string
+): Promise<{ ok: boolean; error?: string }> {
+  const { t } = await getServerT();
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { ok: false, error: t("errors.notAuthenticated") };
+  }
+
+  const { data: existing } = await supabase
+    .from("trip_participants")
+    .select("id, status")
+    .eq("trip_id", tripId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (!existing) {
+    return { ok: false, error: t("trips.errors.applicationNotFound") };
+  }
+
+  const cancellable = ["pending", "approved", "approved_pending_payment", "waitlisted"];
+  if (!cancellable.includes(existing.status)) {
+    return { ok: false, error: t("trips.errors.cannotCancelNow") };
+  }
+
+  const { error } = await supabase
+    .from("trip_participants")
+    .update({ status: "cancelled" })
+    .eq("id", existing.id);
+
+  if (error) {
+    console.error("cancelApplication error:", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalidatePath(`/trips`);
+  return { ok: true };
 }

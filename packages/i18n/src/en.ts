@@ -576,6 +576,16 @@ const en: TranslationKeys = {
       automatic: "Automatic",
       backToDiscover: "Back to Discover",
       backToTrip: "Back to trip",
+      // Apply flow
+      loginToApply: "Sign in to apply",
+      applicationMessage: "Message to the organizer",
+      applicationMessagePlaceholder: "Briefly share why you'd like to join, your experience, special needs (e.g. diet)…",
+      approvalRequiredNote: "The organizer will manually review your application. You'll be notified of the decision.",
+      submitApplication: "Submit application",
+      joinTrip: "Join trip",
+      confirmCancel: "Are you sure you want to cancel your application?",
+      cancelApplication: "Cancel application",
+      yourMessage: "Your message",
     },
 
     // Empty state
@@ -751,6 +761,8 @@ const en: TranslationKeys = {
       pendingApplications: "Pending Applications",
       approve: "Approve",
       reject: "Reject",
+      hasApplicationMessage: "This application has a message",
+      hasMessageBadge: "message",
       phaseRegistration: "Registration",
       phasePreparation: "Preparation",
       openApplications: "Open applications",
@@ -796,6 +808,17 @@ const en: TranslationKeys = {
       paidOn: "Paid on",
       you: "You",
       noItinerary: "Itinerary is not available yet.",
+    },
+
+    // Apply flow & organizer action errors
+    errors: {
+      tripNotFound: "Trip not found.",
+      tripNotAcceptingApplications: "This trip is not accepting applications right now.",
+      tripFull: "Sorry, this trip is full.",
+      alreadyApplied: "You have already applied to this trip.",
+      cannotApplyOwnTrip: "You cannot apply to your own trip.",
+      applicationNotFound: "No application found for you on this trip.",
+      cannotCancelNow: "The application can no longer be cancelled in its current state.",
     },
   },
 

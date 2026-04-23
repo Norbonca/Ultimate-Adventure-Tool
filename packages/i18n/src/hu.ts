@@ -585,6 +585,16 @@ const hu = {
       automatic: "Automatikus",
       backToDiscover: "Vissza a felfedezéshez",
       backToTrip: "Vissza a túrához",
+      // Apply flow
+      loginToApply: "Jelentkezéshez bejelentkezés",
+      applicationMessage: "Megjegyzés a szervezőnek",
+      applicationMessagePlaceholder: "Írd le röviden, miért szeretnél jönni, milyen tapasztalatod van, speciális igények (pl. étrend)…",
+      approvalRequiredNote: "A szervező manuálisan bírálja el a jelentkezésedet. Értesítést kapsz a döntésről.",
+      submitApplication: "Jelentkezés beküldése",
+      joinTrip: "Csatlakozom",
+      confirmCancel: "Biztos visszavonod a jelentkezésed?",
+      cancelApplication: "Jelentkezés visszavonása",
+      yourMessage: "A te megjegyzésed",
     },
 
     // Empty state
@@ -774,6 +784,8 @@ const hu = {
       pendingApplications: "Függő jelentkezések",
       approve: "Elfogad",
       reject: "Elutasít",
+      hasApplicationMessage: "A jelentkezéshez megjegyzés tartozik",
+      hasMessageBadge: "megjegyzés",
       // Timeline phases
       phaseRegistration: "Regisztráció",
       phasePreparation: "Felkészülés",
@@ -822,6 +834,17 @@ const hu = {
       paidOn: "Fizetve",
       you: "Te",
       noItinerary: "Az útiterv még nem érhető el.",
+    },
+
+    // Apply flow & organizer action errors
+    errors: {
+      tripNotFound: "A túra nem található.",
+      tripNotAcceptingApplications: "Ez a túra jelenleg nem fogad jelentkezéseket.",
+      tripFull: "Sajnos a túra betelt.",
+      alreadyApplied: "Már jelentkeztél erre a túrára.",
+      cannotApplyOwnTrip: "Saját túrádra nem jelentkezhetsz.",
+      applicationNotFound: "Nem találtunk hozzád jelentkezést ezen a túrán.",
+      cannotCancelNow: "A jelentkezés már nem vonható vissza ebben az állapotban.",
     },
   },
 

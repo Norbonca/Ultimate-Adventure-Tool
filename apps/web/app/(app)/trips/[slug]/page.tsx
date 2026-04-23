@@ -1,11 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { fetchTripBySlug, fetchCategoryParametersForDisplay } from "../actions";
+import { fetchTripBySlug, fetchCategoryParametersForDisplay, fetchMyParticipation } from "../actions";
 import { CATEGORY_DISPLAY, DIFFICULTY_LEVELS } from "@/lib/categories";
 import { getServerT, getServerLocale } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
 import { BackButton } from "@/components/BackButton";
+import { ApplyButton } from "@/components/ApplyButton";
 
 interface TripDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -29,10 +30,10 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
   } = await supabase.auth.getUser();
   const isOrganizer = user?.id === trip.organizer_id;
 
-  const paramDefs = await fetchCategoryParametersForDisplay(
-    trip.category_id,
-    trip.sub_discipline_id
-  );
+  const [paramDefs, myParticipation] = await Promise.all([
+    fetchCategoryParametersForDisplay(trip.category_id, trip.sub_discipline_id),
+    fetchMyParticipation(trip.id),
+  ]);
 
   const catRaw = trip.categories;
   const category = (Array.isArray(catRaw) ? catRaw[0] : catRaw) as {
@@ -314,10 +315,14 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                 <span className="text-navy-300"> / {trip.max_participants}</span>
               </div>
 
-              {!isOrganizer && spotsLeft > 0 && (
-                <button className="w-full py-3 bg-trevu-600 text-white font-bold rounded-xl hover:bg-trevu-700 transition-colors shadow-lg shadow-trevu-600/20">
-                  {t("trips.detail.apply")}
-                </button>
+              {!isOrganizer && (
+                <ApplyButton
+                  tripId={trip.id}
+                  requireApproval={trip.require_approval}
+                  spotsLeft={spotsLeft}
+                  isAuthenticated={!!user}
+                  participation={myParticipation as never}
+                />
               )}
 
               {isOrganizer && (
