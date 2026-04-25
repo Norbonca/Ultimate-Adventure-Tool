@@ -230,6 +230,7 @@ export const trips = pgTable(
     maxParticipants: integer('max_participants').notNull(),
     minParticipants: integer('min_participants').notNull().default(1),
     currentParticipants: integer('current_participants').notNull().default(0),
+    staffSeats: integer('staff_seats').notNull().default(0),
 
     // Pricing
     priceAmount: decimal('price_amount', { precision: 10, scale: 2 }),
@@ -271,6 +272,7 @@ export const trips = pgTable(
     index('idx_trips_country').on(table.locationCountry),
     check('chk_trips_difficulty', sql`${table.difficulty} >= 1 AND ${table.difficulty} <= 5`),
     check('chk_trips_participants', sql`${table.maxParticipants} >= ${table.minParticipants} AND ${table.maxParticipants} >= 2`),
+    check('chk_trips_staff_seats', sql`${table.staffSeats} >= 0 AND ${table.staffSeats} <= 50`),
   ]
 );
 
@@ -323,6 +325,8 @@ export const tripParticipants = pgTable(
     applicationText: text('application_text'),
     skillMatch: skillMatchEnum('skill_match'),
     rejectionReason: text('rejection_reason'),
+    isStaffSeat: boolean('is_staff_seat').notNull().default(false),
+    staffRoleLabel: varchar('staff_role_label', { length: 100 }),
 
     // Timestamps
     appliedAt: timestamp('applied_at', { withTimezone: true }).notNull().defaultNow(),

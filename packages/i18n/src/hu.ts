@@ -817,6 +817,49 @@ const hu = {
       coverImage: "Borítókép",
       coverImageChange: "Borítókép módosítása",
       noChanges: "Nincs módosítás",
+      backToTrip: "Vissza a túrához",
+      statusPublished: "Közzétéve",
+      statusDraft: "Piszkozat",
+      draftSaved: "Piszkozat mentve",
+      tabs: {
+        basicInfo: "Alapadatok",
+        categoryDetails: "Kategória részletek",
+        images: "Képek",
+        settings: "Beállítások",
+        timeline: "Menetrend",
+        crew: "Csapat",
+      },
+    },
+
+    // Settings tab — extra labels
+    settings: {
+      pricingHeader: "ÁRAZÁS",
+      teamSizeHeader: "CSAPAT FELÉPÍTÉS",
+      teamSizeHelp: "Add meg, hány vendég jelentkezhet a túrára, és hány helyet jelölsz ki Te (pl. guide, skipper). Magadat is hozzárendelheted egy szervezői helyhez.",
+      guestSeatsLabel: "Vendégek (jelentkezhetnek)",
+      staffSeatsLabel: "Szervezői helyek (Te jelölöd ki)",
+      teamTotal: "Teljes csapat: {count} fő",
+    },
+
+    // Crew tab — section labels
+    crew: {
+      positionsHeader: "POZÍCIÓK",
+      applicationsHeader: "FÜGGŐBEN LEVŐ JELENTKEZÉSEK",
+      membersHeader: "CSAPATTAGOK",
+      removePosition: "Pozíció eltávolítása",
+      noPositions: "Még nincsenek pozíciók — add hozzá az elsőt lent.",
+      staffSeatsHeader: "SZERVEZŐI HELYEK ({total})",
+      staffSeatsHelp: "Ezeket a helyeket Te töltöd be (jelentkezés nélkül). Magadat is hozzárendelheted.",
+      staffSeatsEmpty: "Ennek a túrának nincsenek szervezői helyei. Növeld a számukat a Beállítások tabon.",
+      staffSeatEmpty: "Üres szervezői hely",
+      staffSeatEmptyDesc: "Még nincs hozzárendelve",
+      assignSelf: "Felveszem magam",
+      removeStaffSeat: "Eltávolítás",
+      youBadge: "Te",
+      staffRolePlaceholder: "Pozíció (pl. Kapitány, Skipper, Túravezető)",
+      confirmAssign: "Megerősítés",
+      staffSummaryGuests: "{current}/{max} vendég",
+      staffSummaryStaff: "{filled}/{total} szervező",
     },
 
     // Participant dashboard (/trips/[slug]/participant)
@@ -845,6 +888,9 @@ const hu = {
       cannotApplyOwnTrip: "Saját túrádra nem jelentkezhetsz.",
       applicationNotFound: "Nem találtunk hozzád jelentkezést ezen a túrán.",
       cannotCancelNow: "A jelentkezés már nem vonható vissza ebben az állapotban.",
+      organizerOnly: "Ez a művelet csak a túra szervezőjének engedélyezett.",
+      staffSeatsFull: "Minden szervezői hely betöltve. Növeld a számukat a Beállítások tabon.",
+      alreadyOnTrip: "Ez a felhasználó már része a csapatnak.",
     },
   },
 

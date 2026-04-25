@@ -96,6 +96,7 @@ export interface WizardFormData {
   location_city: string;
   max_participants: number;
   min_participants: number;
+  staff_seats: number;
   difficulty: number;
   sub_discipline_id: string;
 
@@ -132,6 +133,7 @@ export const INITIAL_FORM_DATA: WizardFormData = {
   location_city: "",
   max_participants: 10,
   min_participants: 2,
+  staff_seats: 0,
   difficulty: 1,
   sub_discipline_id: "",
   category_details: {},

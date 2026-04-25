@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin-client";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getServerT } from "@/lib/i18n/server";
@@ -118,6 +119,7 @@ export async function saveDraft(
     location_city: formData.location_city || null,
     max_participants: maxParticipants,
     min_participants: formData.min_participants || 2,
+    staff_seats: Math.max(0, Math.min(50, formData.staff_seats ?? 0)),
     difficulty: formData.difficulty || 1,
     category_details: formData.category_details || {},
     visibility: formData.visibility || "public",
@@ -429,6 +431,7 @@ export async function fetchTripForEdit(tripId: string): Promise<{
     location_city: trip.location_city || "",
     max_participants: trip.max_participants || 10,
     min_participants: trip.min_participants || 2,
+    staff_seats: trip.staff_seats ?? 0,
     difficulty: trip.difficulty || 1,
     sub_discipline_id: trip.sub_discipline_id || "",
     category_details: (trip.category_details as Record<string, unknown>) || {},
@@ -803,4 +806,219 @@ export async function cancelApplication(
 
   revalidatePath(`/trips`);
   return { ok: true };
+}
+
+// ============================================
+// assignStaffSeat — Szervezői hely betöltése (S27)
+// ============================================
+// A túra szervezője közvetlenül kijelöli, ki tölti be a szervezői helyet
+// (önmagát is felveheti). Bypass-olja a jelentkezési flow-t: a rekord
+// azonnal `participant` státusszal jön létre és `is_staff_seat = true`.
+// ============================================
+export async function assignStaffSeat(
+  tripId: string,
+  userIdOrSelf: string | "self",
+  crewPositionId?: string | null,
+  roleLabel?: string | null
+): Promise<{ ok: boolean; error?: string }> {
+  const { t } = await getServerT();
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { ok: false, error: t("errors.notAuthenticated") };
+  }
+
+  const { data: trip, error: tripErr } = await supabase
+    .from("trips")
+    .select("id, organizer_id, staff_seats")
+    .eq("id", tripId)
+    .maybeSingle();
+
+  if (tripErr || !trip) {
+    return { ok: false, error: t("trips.errors.tripNotFound") };
+  }
+
+  if (trip.organizer_id !== user.id) {
+    return { ok: false, error: t("trips.errors.organizerOnly") };
+  }
+
+  const targetUserId = userIdOrSelf === "self" ? user.id : userIdOrSelf;
+
+  const { data: filledRows } = await supabase
+    .from("trip_participants")
+    .select("id")
+    .eq("trip_id", tripId)
+    .eq("is_staff_seat", true);
+
+  const filledCount = filledRows?.length ?? 0;
+
+  if (filledCount >= (trip.staff_seats ?? 0)) {
+    return { ok: false, error: t("trips.errors.staffSeatsFull") };
+  }
+
+  const { data: existing } = await supabase
+    .from("trip_participants")
+    .select("id, status, is_staff_seat")
+    .eq("trip_id", tripId)
+    .eq("user_id", targetUserId)
+    .maybeSingle();
+
+  if (existing && existing.status !== "cancelled") {
+    return { ok: false, error: t("trips.errors.alreadyOnTrip") };
+  }
+
+  const payload = {
+    trip_id: tripId,
+    user_id: targetUserId,
+    status: "participant" as const,
+    is_staff_seat: true,
+    crew_position_id: crewPositionId || null,
+    staff_role_label: roleLabel?.trim().slice(0, 100) || null,
+    applied_at: new Date().toISOString(),
+    approved_at: new Date().toISOString(),
+  };
+
+  // Az írást a service role kliens végzi (bypass RLS) — az organizer ellenőrzést
+  // fent már elvégeztük (auth.getUser + trip.organizer_id === user.id).
+  const admin = createAdminClient();
+
+  if (existing) {
+    const { data, error } = await admin
+      .from("trip_participants")
+      .update(payload)
+      .eq("id", existing.id)
+      .select("id");
+    if (error) {
+      console.error("assignStaffSeat update error:", error);
+      return { ok: false, error: error.message };
+    }
+    if (!data || data.length === 0) {
+      return { ok: false, error: "A frissítés nem érintett rekordot." };
+    }
+  } else {
+    const { data, error } = await admin
+      .from("trip_participants")
+      .insert(payload)
+      .select("id");
+    if (error) {
+      console.error("assignStaffSeat insert error:", error);
+      return { ok: false, error: error.message };
+    }
+    if (!data || data.length === 0) {
+      return { ok: false, error: "A beszúrás nem hozott létre rekordot." };
+    }
+  }
+
+  revalidatePath(`/trips`);
+  return { ok: true };
+}
+
+// ============================================
+// removeStaffSeat — Szervezői hely felszabadítása (S27)
+// ============================================
+export async function removeStaffSeat(
+  tripId: string,
+  participantId: string
+): Promise<{ ok: boolean; error?: string }> {
+  const { t } = await getServerT();
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { ok: false, error: t("errors.notAuthenticated") };
+  }
+
+  const { data: trip } = await supabase
+    .from("trips")
+    .select("organizer_id")
+    .eq("id", tripId)
+    .maybeSingle();
+
+  if (!trip || trip.organizer_id !== user.id) {
+    return { ok: false, error: t("trips.errors.organizerOnly") };
+  }
+
+  // Admin kliensen futtatjuk a delete-et (RLS bypass; organizer-jogot fent ellenőriztük)
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from("trip_participants")
+    .delete()
+    .eq("id", participantId)
+    .eq("trip_id", tripId)
+    .eq("is_staff_seat", true);
+
+  if (error) {
+    console.error("removeStaffSeat error:", error);
+    return { ok: false, error: error.message };
+  }
+
+  revalidatePath(`/trips`);
+  return { ok: true };
+}
+
+// ============================================
+// fetchStaffSeats — Szervezői helyek listája (S27)
+// ============================================
+export async function fetchStaffSeats(tripId: string): Promise<{
+  assigned: Array<{
+    participantId: string;
+    userId: string;
+    displayName: string;
+    avatarUrl: string | null;
+    isSelf: boolean;
+    crewPositionId: string | null;
+    crewRoleName: string | null;
+    staffRoleLabel: string | null;
+  }>;
+  totalSeats: number;
+  freeSeats: number;
+  guestSeats: { max: number; current: number };
+}> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { data: trip } = await supabase
+    .from("trips")
+    .select("staff_seats, max_participants, current_participants")
+    .eq("id", tripId)
+    .maybeSingle();
+
+  const totalSeats = trip?.staff_seats ?? 0;
+
+  const { data: rows } = await supabase
+    .from("trip_participants")
+    .select(`
+      id, user_id, crew_position_id, staff_role_label,
+      profiles!inner (display_name, avatar_url),
+      trip_crew_positions (role_name)
+    `)
+    .eq("trip_id", tripId)
+    .eq("is_staff_seat", true)
+    .order("applied_at", { ascending: true });
+
+  const assigned = (rows ?? []).map((r) => {
+    const profile = Array.isArray(r.profiles) ? r.profiles[0] : r.profiles;
+    const pos = Array.isArray(r.trip_crew_positions) ? r.trip_crew_positions[0] : r.trip_crew_positions;
+    return {
+      participantId: r.id,
+      userId: r.user_id,
+      displayName: (profile as { display_name?: string } | null)?.display_name || "—",
+      avatarUrl: (profile as { avatar_url?: string | null } | null)?.avatar_url ?? null,
+      isSelf: !!user && r.user_id === user.id,
+      crewPositionId: r.crew_position_id ?? null,
+      crewRoleName: (pos as { role_name?: string } | null)?.role_name ?? null,
+      staffRoleLabel: (r as { staff_role_label?: string | null }).staff_role_label ?? null,
+    };
+  });
+
+  return {
+    assigned,
+    totalSeats,
+    freeSeats: Math.max(0, totalSeats - assigned.length),
+    guestSeats: {
+      max: trip?.max_participants ?? 0,
+      current: trip?.current_participants ?? 0,
+    },
+  };
 }
