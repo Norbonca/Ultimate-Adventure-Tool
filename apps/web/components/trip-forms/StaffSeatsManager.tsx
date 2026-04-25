@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
-import { assignStaffSeat, removeStaffSeat, fetchStaffSeats } from "@/app/(app)/trips/actions";
+import {
+  assignStaffSeat,
+  removeStaffSeat,
+  fetchStaffSeats,
+  fetchCrewPositions,
+} from "@/app/(app)/trips/actions";
+import { AddStaffMemberModal } from "./AddStaffMemberModal";
 
 interface StaffSeat {
   participantId: string;
@@ -13,6 +19,11 @@ interface StaffSeat {
   crewPositionId: string | null;
   crewRoleName: string | null;
   staffRoleLabel: string | null;
+}
+
+interface CrewPositionLite {
+  id: string;
+  role_name: string;
 }
 
 interface StaffSeatsManagerProps {
@@ -27,12 +38,20 @@ export function StaffSeatsManager({ tripId, totalSeats }: StaffSeatsManagerProps
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pickerOpenIdx, setPickerOpenIdx] = useState<number | null>(null);
-  const [roleInput, setRoleInput] = useState("");
+  const [pickerPositionId, setPickerPositionId] = useState<string | null>(null);
+  const [pickerCustomLabel, setPickerCustomLabel] = useState("");
+  const [addModalOpenIdx, setAddModalOpenIdx] = useState<number | null>(null);
+  const [crewPositions, setCrewPositions] = useState<CrewPositionLite[]>([]);
 
   useEffect(() => {
     fetchStaffSeats(tripId).then((res) => {
       setSeats(res.assigned);
       setGuest(res.guestSeats);
+    });
+    fetchCrewPositions(tripId).then((rows) => {
+      setCrewPositions(
+        (rows ?? []).map((p) => ({ id: p.id, role_name: p.role_name }))
+      );
     });
   }, [tripId]);
 
@@ -42,18 +61,27 @@ export function StaffSeatsManager({ tripId, totalSeats }: StaffSeatsManagerProps
     setGuest(res.guestSeats);
   };
 
-  const handleSelfAssign = async (label: string) => {
+  const handleSelfAssign = async () => {
     setError(null);
     setPending(true);
-    const trimmed = label.trim().slice(0, 100);
+    const positionLabel =
+      crewPositions.find((p) => p.id === pickerPositionId)?.role_name ||
+      pickerCustomLabel.trim().slice(0, 100) ||
+      null;
     try {
-      const result = await assignStaffSeat(tripId, "self", null, trimmed || null);
+      const result = await assignStaffSeat(
+        tripId,
+        "self",
+        pickerPositionId,
+        positionLabel
+      );
       if (!result || result.error) {
-        setError(result?.error ?? "Ismeretlen hiba a felvételnél");
+        setError(result?.error ?? t("trips.crew.addStaffError"));
         return;
       }
-      setRoleInput("");
       setPickerOpenIdx(null);
+      setPickerPositionId(null);
+      setPickerCustomLabel("");
       await reload();
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
@@ -181,60 +209,111 @@ export function StaffSeatsManager({ tripId, totalSeats }: StaffSeatsManagerProps
                   </div>
                 </div>
               </div>
-              {!selfAlreadyAssigned && idx === 0 && !isPickerOpen && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPickerOpenIdx(idx);
-                    setRoleInput("");
-                  }}
-                  disabled={pending}
-                  className="px-3 py-1.5 rounded-lg bg-trevu-500 hover:bg-trevu-600 text-white text-sm font-semibold transition-colors disabled:opacity-40"
-                >
-                  {t("trips.crew.assignSelf")}
-                </button>
+              {!isPickerOpen && (
+                <div className="flex flex-col sm:flex-row gap-2 shrink-0">
+                  {!selfAlreadyAssigned && idx === 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPickerOpenIdx(idx);
+                        setPickerPositionId(crewPositions[0]?.id ?? null);
+                        setPickerCustomLabel("");
+                      }}
+                      disabled={pending}
+                      className="px-3 py-1.5 rounded-lg bg-trevu-500 hover:bg-trevu-600 text-white text-sm font-semibold transition-colors disabled:opacity-40"
+                    >
+                      {t("trips.crew.assignSelf")}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setAddModalOpenIdx(idx)}
+                    disabled={pending}
+                    className="px-3 py-1.5 rounded-lg border border-trevu-500 text-trevu-700 hover:bg-trevu-50 text-sm font-semibold transition-colors disabled:opacity-40"
+                  >
+                    {t("trips.crew.addStaffOther")}
+                  </button>
+                </div>
               )}
             </div>
 
             {isPickerOpen && (
-              <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t border-navy-100">
-                <input
-                  type="text"
-                  value={roleInput}
-                  onChange={(e) => setRoleInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      handleSelfAssign(roleInput);
-                    }
-                    if (e.key === "Escape") {
-                      setPickerOpenIdx(null);
-                      setRoleInput("");
-                    }
-                  }}
-                  placeholder={t("trips.crew.staffRolePlaceholder")}
-                  maxLength={100}
-                  className="flex-1 px-3 py-2 rounded-lg border border-navy-200 text-sm text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
-                  autoFocus
-                />
-                <div className="flex gap-2">
+              <div className="pt-2 border-t border-navy-100 space-y-3">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-navy-500">
+                  {t("trips.crew.positionSection")}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {crewPositions.map((p) => {
+                    const active = pickerPositionId === p.id;
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => {
+                          setPickerPositionId(p.id);
+                          setPickerCustomLabel("");
+                        }}
+                        className={`px-3 py-1.5 rounded-full text-sm font-semibold transition-colors ${
+                          active
+                            ? "bg-trevu-500 text-white"
+                            : "bg-navy-50 text-navy-700 hover:bg-navy-100"
+                        }`}
+                      >
+                        {p.role_name}
+                      </button>
+                    );
+                  })}
                   <button
                     type="button"
-                    onClick={() => handleSelfAssign(roleInput)}
-                    disabled={pending}
-                    className="px-3 py-2 rounded-lg bg-trevu-500 hover:bg-trevu-600 text-white text-sm font-semibold transition-colors disabled:opacity-40"
+                    onClick={() => setPickerPositionId(null)}
+                    className={`px-3 py-1.5 rounded-full text-sm font-semibold transition-colors ${
+                      pickerPositionId === null
+                        ? "bg-trevu-500 text-white"
+                        : "bg-navy-50 text-navy-700 hover:bg-navy-100"
+                    }`}
                   >
-                    {t("trips.crew.confirmAssign")}
+                    {t("trips.crew.positionNone")}
                   </button>
+                </div>
+                {pickerPositionId === null && (
+                  <input
+                    type="text"
+                    value={pickerCustomLabel}
+                    onChange={(e) => setPickerCustomLabel(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleSelfAssign();
+                      }
+                      if (e.key === "Escape") {
+                        setPickerOpenIdx(null);
+                      }
+                    }}
+                    placeholder={t("trips.crew.staffRolePlaceholder")}
+                    maxLength={100}
+                    className="w-full px-3 py-2 rounded-lg border border-navy-200 text-sm text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
+                    autoFocus
+                  />
+                )}
+                <div className="flex justify-end gap-2">
                   <button
                     type="button"
                     onClick={() => {
                       setPickerOpenIdx(null);
-                      setRoleInput("");
+                      setPickerPositionId(null);
+                      setPickerCustomLabel("");
                     }}
                     className="px-3 py-2 rounded-lg text-navy-500 text-sm font-medium hover:bg-navy-50 transition-colors"
                   >
                     {t("common.cancel")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSelfAssign}
+                    disabled={pending}
+                    className="px-3 py-2 rounded-lg bg-trevu-500 hover:bg-trevu-600 text-white text-sm font-semibold transition-colors disabled:opacity-40"
+                  >
+                    {t("trips.crew.confirmAssign")}
                   </button>
                 </div>
               </div>
@@ -244,6 +323,18 @@ export function StaffSeatsManager({ tripId, totalSeats }: StaffSeatsManagerProps
       })}
 
       {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
+
+      {addModalOpenIdx !== null && (
+        <AddStaffMemberModal
+          tripId={tripId}
+          crewPositions={crewPositions}
+          onClose={() => setAddModalOpenIdx(null)}
+          onAssigned={async () => {
+            setAddModalOpenIdx(null);
+            await reload();
+          }}
+        />
+      )}
     </div>
   );
 }

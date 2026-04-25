@@ -30,10 +30,17 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
   } = await supabase.auth.getUser();
   const isOrganizer = user?.id === trip.organizer_id;
 
-  const [paramDefs, myParticipation] = await Promise.all([
+  const [paramDefs, myParticipation, staffCountResult] = await Promise.all([
     fetchCategoryParametersForDisplay(trip.category_id, trip.sub_discipline_id),
     fetchMyParticipation(trip.id),
+    supabase
+      .from("trip_participants")
+      .select("id", { count: "exact", head: true })
+      .eq("trip_id", trip.id)
+      .eq("is_staff_seat", true),
   ]);
+  const filledStaff = staffCountResult.count ?? 0;
+  const totalStaff = trip.staff_seats ?? 0;
 
   const catRaw = trip.categories;
   const category = (Array.isArray(catRaw) ? catRaw[0] : catRaw) as {
@@ -205,8 +212,16 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
               <span className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-navy-200">
                 <span className="text-navy-400">👥</span>
                 <span className="font-medium text-navy-700">
-                  {trip.current_participants || 0}/{trip.max_participants} {t("trips.detail.people")}
+                  {trip.current_participants || 0}/{trip.max_participants} {t("trips.detail.guestsLabel")}
                 </span>
+                {totalStaff > 0 && (
+                  <>
+                    <span className="text-navy-300 mx-1">·</span>
+                    <span className="font-medium text-emerald-700">
+                      {filledStaff}/{totalStaff} {t("trips.detail.staffLabel")}
+                    </span>
+                  </>
+                )}
               </span>
             </div>
 

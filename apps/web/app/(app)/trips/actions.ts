@@ -1022,3 +1022,125 @@ export async function fetchStaffSeats(tripId: string): Promise<{
     },
   };
 }
+
+// ============================================
+// searchUsersForStaffSeat — User keresés szervezői hely betöltéshez (S28)
+// ============================================
+// A szervező név/email alapján keres regisztrált felhasználókat, hogy egy
+// szervezői helyre rendelhesse őket (Add Staff Member modal). A találatokban
+// jelzi, ha a user már a túrán van (ekkor a Választ gomb tiltott).
+// ============================================
+export async function searchUsersForStaffSeat(
+  tripId: string,
+  query: string
+): Promise<{
+  results: Array<{
+    userId: string;
+    displayName: string;
+    email: string | null;
+    avatarUrl: string | null;
+    alreadyOnTrip: boolean;
+  }>;
+  error?: string;
+}> {
+  const { t } = await getServerT();
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { results: [], error: t("errors.notAuthenticated") };
+  }
+
+  const { data: trip } = await supabase
+    .from("trips")
+    .select("organizer_id")
+    .eq("id", tripId)
+    .maybeSingle();
+
+  if (!trip || trip.organizer_id !== user.id) {
+    return { results: [], error: t("trips.errors.organizerOnly") };
+  }
+
+  const trimmed = query.trim();
+  if (trimmed.length < 2) {
+    return { results: [] };
+  }
+
+  // Az auth.users tábla email-jéhez admin kliens kell — a szervezőt fent ellenőriztük.
+  const admin = createAdminClient();
+  const escaped = trimmed.replace(/[%_]/g, (c) => `\\${c}`);
+  const pattern = `%${escaped}%`;
+
+  const { data: profiles, error: profErr } = await admin
+    .from("profiles")
+    .select("id, display_name, avatar_url")
+    .ilike("display_name", pattern)
+    .limit(10);
+
+  if (profErr) {
+    console.error("searchUsersForStaffSeat profiles error:", profErr);
+    return { results: [], error: profErr.message };
+  }
+
+  const profileById = new Map((profiles ?? []).map((p) => [p.id, p]));
+
+  // Email keresés az auth.users-ben
+  const { data: authPage, error: authErr } = await admin.auth.admin.listUsers({
+    page: 1,
+    perPage: 200,
+  });
+
+  if (authErr) {
+    console.error("searchUsersForStaffSeat auth list error:", authErr);
+  }
+
+  const lower = trimmed.toLowerCase();
+  const emailMatches = (authPage?.users ?? []).filter(
+    (u) => u.email && u.email.toLowerCase().includes(lower)
+  );
+
+  for (const u of emailMatches) {
+    if (!profileById.has(u.id)) {
+      const { data: p } = await admin
+        .from("profiles")
+        .select("id, display_name, avatar_url")
+        .eq("id", u.id)
+        .maybeSingle();
+      if (p) profileById.set(p.id, p);
+    }
+  }
+
+  const candidateIds = Array.from(profileById.keys());
+  if (candidateIds.length === 0) {
+    return { results: [] };
+  }
+
+  const emailById = new Map(
+    (authPage?.users ?? []).map((u) => [u.id, u.email ?? null])
+  );
+
+  const { data: existingPart } = await supabase
+    .from("trip_participants")
+    .select("user_id, status")
+    .eq("trip_id", tripId)
+    .in("user_id", candidateIds);
+
+  const onTrip = new Set(
+    (existingPart ?? [])
+      .filter((p) => p.status !== "cancelled")
+      .map((p) => p.user_id)
+  );
+
+  const results = candidateIds.map((id) => {
+    const p = profileById.get(id)!;
+    return {
+      userId: id,
+      displayName: p.display_name || "—",
+      email: emailById.get(id) ?? null,
+      avatarUrl: p.avatar_url ?? null,
+      alreadyOnTrip: onTrip.has(id),
+    };
+  });
+
+  return { results: results.slice(0, 10) };
+}
