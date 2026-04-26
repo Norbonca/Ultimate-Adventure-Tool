@@ -129,7 +129,7 @@ export function SkillsForm({ categories, subDisciplines, userInterests, initialS
       </p>
 
       {/* Level legend */}
-      <div className="flex gap-3 rounded-xl bg-[#F8FAFC] p-4 mb-8">
+      <div className="flex gap-3 rounded-xl bg-slate-50 p-4 mb-8">
         {SKILL_LEVELS.map((level) => (
           <div key={level.key} className="flex-1 text-center">
             <span

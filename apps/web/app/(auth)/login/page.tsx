@@ -81,7 +81,7 @@ export default function LoginPage() {
     <>
     <main className="flex min-h-[calc(100vh-56px)]">
       {/* Left: Brand Panel */}
-      <div className="hidden lg:flex flex-col justify-between w-[560px] shrink-0 bg-gradient-to-b from-[#0F172A] to-[#134E4A] p-12 text-white">
+      <div className="hidden lg:flex flex-col justify-between w-[560px] shrink-0 bg-gradient-to-b from-slate-900 to-[#134E4A] p-12 text-white">
         <div>
           <Link href="/" className="text-2xl font-extrabold tracking-tight text-trevu-400 hover:text-trevu-300 transition-colors">trevu</Link>
         </div>

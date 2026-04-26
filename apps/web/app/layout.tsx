@@ -41,7 +41,7 @@ export default async function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen bg-[#F8FAFC] text-navy-900 antialiased">
+      <body className="min-h-screen bg-slate-50 text-navy-900 antialiased">
         {children}
       </body>
     </html>

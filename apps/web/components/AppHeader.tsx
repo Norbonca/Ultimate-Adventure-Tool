@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { ChevronDown, Home, Sparkles, Users, CreditCard } from "lucide-react";
+import { ChevronDown, Home, Sparkles, Users, CreditCard } from "@/lib/icons";
 
 // ── Types ──────────────────────────────────────────────────────────
 interface AnchorLink {
@@ -113,7 +113,7 @@ export function AppHeader({ anchors, user }: AppHeaderProps) {
           <button
             onClick={() => setMenuOpen((v) => !v)}
             className="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center hover:bg-teal-700 transition-colors"
-            aria-label="Navigation menu"
+            aria-label={t('nav.menuLabel')}
             aria-expanded={menuOpen}
           >
             <span className="text-white font-bold text-sm">T</span>

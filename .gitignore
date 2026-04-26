@@ -42,3 +42,7 @@ supabase/.temp/
 
 # Temp files
 _tmp_*
+
+# Playwright test outputs (S29)
+apps/web/playwright-report/
+apps/web/test-results/

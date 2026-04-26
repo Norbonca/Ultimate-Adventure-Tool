@@ -33,7 +33,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col bg-[#F8FAFC]">
+    <main className="flex min-h-screen flex-col bg-slate-50">
 
       {/* Body */}
       <div className="flex flex-1 items-center justify-center px-4 py-12">

@@ -17,7 +17,20 @@
     "local:reset": "supabase db reset",
     "local:status": "supabase status",
     "test": "turbo test",
-    "test:watch": "pnpm --filter @uat/web test:watch"
+    "test:watch": "pnpm --filter @uat/web test:watch",
+    "qa": "bash scripts/run-all-tests.sh",
+    "qa:quick": "bash scripts/run-all-tests.sh --quick",
+    "qa:consistency": "bash scripts/run-all-tests.sh --consistency-only",
+    "qa:report": "node scripts/qa-report.mjs --write",
+    "qa:report:docx": "node scripts/qa-report-docx.mjs",
+    "qa:report:nodocx": "node scripts/qa-report.mjs --write --no-docx",
+    "qa:doc": "cd .. && node .skills/trevu-doc-consistency/scripts/run-all.mjs",
+    "qa:plan": "cd .. && node .skills/trevu-plan-consistency/scripts/run-all.mjs",
+    "qa:code": "cd .. && node .skills/trevu-code-consistency/scripts/run-all.mjs",
+    "qa:quality": "cd .. && node .skills/trevu-code-quality/scripts/run-all.mjs",
+    "qa:dev": "cd .. && node .skills/trevu-dev-functional/scripts/run-all.mjs",
+    "qa:flow": "cd .. && node .skills/trevu-user-flow/scripts/run-all.mjs",
+    "qa:usability": "cd .. && node .skills/trevu-usability/scripts/run-all.mjs"
   },
   "devDependencies": {
     "turbo": "^2.3.0",

@@ -25,7 +25,7 @@ import {
   LayoutGrid,
   List,
   ChevronDown,
-} from 'lucide-react';
+} from '@/lib/icons';
 
 // Types matching Supabase query results exactly
 interface Trip {

@@ -74,7 +74,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
     : user?.displayName || user?.email || "";
 
   return (
-    <aside className="w-60 min-h-screen bg-[#0F172A] flex flex-col flex-shrink-0">
+    <aside className="w-60 min-h-screen bg-slate-900 flex flex-col flex-shrink-0">
       {/* Logo */}
       <div className="px-4 py-5 border-b border-white/10">
         <div className="flex items-center gap-2">

@@ -175,6 +175,7 @@ const en: TranslationKeys = {
   // Navigation
   // ============================================================================
   nav: {
+    menuLabel: "Navigation menu",
     features: "Features",
     categories: "Categories",
     discover: "Discover",
@@ -722,11 +723,11 @@ const en: TranslationKeys = {
     },
 
     difficulty: {
-      1: "Easy",
-      2: "Moderately difficult",
-      3: "Moderate",
-      4: "Hard",
-      5: "Very hard",
+      level1: "Easy",
+      level2: "Moderately difficult",
+      level3: "Moderate",
+      level4: "Hard",
+      level5: "Very hard",
     },
 
     participantStatus: {
@@ -848,8 +849,16 @@ const en: TranslationKeys = {
       resultSelected: "Selected",
       resultSelect: "Select",
       alreadyOnTrip: "already on the trip",
-      inviteTitle: "Not yet registered?",
-      inviteDesc: "Email invite is coming soon.",
+      inviteTitle: "INVITE BY EMAIL",
+      inviteDesc: "Enter an email address to send an invite. If the user is already registered, they'll be added to the crew automatically.",
+      inviteEmailPlaceholder: "co-organizer@example.com",
+      inviteSubmit: "Invite",
+      inviteSending: "Sending…",
+      inviteSentNewTitle: "Invite email sent",
+      inviteSentNewDesc: "{email} — once they sign up, they'll automatically join the trip as crew.",
+      inviteAddedExistingTitle: "User added to the crew",
+      inviteAddedExistingDesc: "{name} is already on Trevu. They've been added to the crew with the chosen position.",
+      inviteAnother: "Invite another",
       assignWillAppear: "The person will appear as a participant immediately.",
     },
 
@@ -881,6 +890,8 @@ const en: TranslationKeys = {
       organizerOnly: "Only the trip organizer is allowed to do this.",
       staffSeatsFull: "All staff seats are filled. Increase the count in the Settings tab.",
       alreadyOnTrip: "This user is already on the trip.",
+      inviteInvalidEmail: "Invalid email address.",
+      inviteFailed: "The invite could not be sent. Please try again.",
     },
   },
 
@@ -1304,7 +1315,7 @@ const en: TranslationKeys = {
       addNote: "Add Note",
       actions: "Actions",
       suspend: "Suspend",
-      email_btn: "Send Email",
+      emailBtn: "Send Email",
     },
     // Audit log
     audit: {

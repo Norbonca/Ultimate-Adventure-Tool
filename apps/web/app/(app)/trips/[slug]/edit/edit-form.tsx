@@ -200,7 +200,7 @@ export function EditTripForm({
   }, [activeTab, formData, updateForm, countries, categoryParameters, parameterOptions, trip.id]);
 
   return (
-    <div className="bg-[#F8FAFC]">
+    <div className="bg-slate-50">
       {/* ── Title Section ── */}
       <section className="px-6 sm:px-12 lg:px-[120px] pt-8">
         <Link

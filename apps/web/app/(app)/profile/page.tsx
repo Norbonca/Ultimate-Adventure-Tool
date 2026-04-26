@@ -255,7 +255,7 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#F8FAFC]">
+      <main className="min-h-screen bg-slate-50">
         <AppHeader anchors={headerAnchors} />
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center text-slate-500">
@@ -268,7 +268,7 @@ export default function ProfilePage() {
 
   if (!profile || !user) {
     return (
-      <main className="min-h-screen bg-[#F8FAFC]">
+      <main className="min-h-screen bg-slate-50">
         <AppHeader anchors={headerAnchors} />
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center text-red-600">
@@ -309,7 +309,7 @@ export default function ProfilePage() {
   });
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC]">
+    <main className="min-h-screen bg-slate-50">
       <AppHeader
         anchors={headerAnchors}
         user={{
@@ -610,19 +610,19 @@ export default function ProfilePage() {
 
               {/* Activity Stats (3 cards) */}
               <div className="grid grid-cols-3 gap-4">
-                <div className="bg-[#F8FAFC] rounded-xl p-4 text-center">
+                <div className="bg-slate-50 rounded-xl p-4 text-center">
                   <p className="text-xl font-bold text-slate-900">0 km</p>
                   <p className="text-xs text-slate-500 mt-1">
                     {t("profile.overview.distanceCovered")}
                   </p>
                 </div>
-                <div className="bg-[#F8FAFC] rounded-xl p-4 text-center">
+                <div className="bg-slate-50 rounded-xl p-4 text-center">
                   <p className="text-xl font-bold text-slate-900">0 m</p>
                   <p className="text-xs text-slate-500 mt-1">
                     {t("profile.overview.elevationGain")}
                   </p>
                 </div>
-                <div className="bg-[#F8FAFC] rounded-xl p-4 text-center">
+                <div className="bg-slate-50 rounded-xl p-4 text-center">
                   <p className="text-xl font-bold text-slate-900">0 h</p>
                   <p className="text-xs text-slate-500 mt-1">
                     {t("profile.overview.activeTime")}

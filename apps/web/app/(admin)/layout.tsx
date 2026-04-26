@@ -59,9 +59,9 @@ export default async function AdminLayout({
   };
 
   return (
-    <div className="flex min-h-screen bg-[#0F172A]">
+    <div className="flex min-h-screen bg-slate-900">
       <AdminSidebar user={sidebarUser} />
-      <main className="flex-1 bg-[#F8FAFC] overflow-auto">
+      <main className="flex-1 bg-slate-50 overflow-auto">
         {children}
       </main>
     </div>

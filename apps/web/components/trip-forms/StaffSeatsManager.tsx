@@ -333,6 +333,9 @@ export function StaffSeatsManager({ tripId, totalSeats }: StaffSeatsManagerProps
             setAddModalOpenIdx(null);
             await reload();
           }}
+          onInvited={() => {
+            void reload();
+          }}
         />
       )}
     </div>

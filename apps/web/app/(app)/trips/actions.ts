@@ -137,7 +137,11 @@ export async function saveDraft(
   };
 
   if (existingTripId) {
-    // UPDATE existing trip — preserve current status (don't reset to draft!)
+    // upsert-skip: manual if/else create-or-update needed for status preservation —
+    // an UPSERT here would either reset status to "draft" on subsequent saves
+    // (overwriting "published") or require a DB-side trigger; the explicit
+    // .update() with payloadWithoutStatus keeps the published flag intact.
+    // See CLAUDE.md §3.5 + .skills/trevu-code-consistency/references/upsert-tables.md.
     const { status: _ignoreStatus, ...payloadWithoutStatus } = tripPayload;
     const { error } = await supabase
       .from("trips")
@@ -1143,4 +1147,145 @@ export async function searchUsersForStaffSeat(
   });
 
   return { results: results.slice(0, 10) };
+}
+
+// ============================================
+// inviteStaffByEmail — Email-alapú szervezői meghívás (S29)
+// ============================================
+// A szervező megad egy email címet a szervezői hely betöltésére.
+// - Ha az email-hez tartozik regisztrált user (auth.users) → in-app csatolás,
+//   `is_staff_seat=true, status='participant'`. (M07 in-app értesítés DEFERRED.)
+// - Ha nem létezik user → Supabase `auth.admin.inviteUserByEmail` kiküldi a
+//   meghívó emailt, a `handle_new_user` trigger létrehozza a profile-t,
+//   és azonnal hozzákapcsoljuk a túrához ugyanazzal a payload-dal.
+// ============================================
+export async function inviteStaffByEmail(
+  tripId: string,
+  email: string,
+  crewPositionId?: string | null,
+  roleLabel?: string | null
+): Promise<
+  | { ok: true; mode: "existing"; displayName: string }
+  | { ok: true; mode: "invited"; email: string }
+  | { ok: false; error: string }
+> {
+  const { t } = await getServerT();
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { ok: false, error: t("errors.notAuthenticated") };
+  }
+
+  const trimmedEmail = email.trim().toLowerCase();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(trimmedEmail)) {
+    return { ok: false, error: t("trips.errors.inviteInvalidEmail") };
+  }
+
+  const { data: trip, error: tripErr } = await supabase
+    .from("trips")
+    .select("id, organizer_id, slug, staff_seats")
+    .eq("id", tripId)
+    .maybeSingle();
+
+  if (tripErr || !trip) {
+    return { ok: false, error: t("trips.errors.tripNotFound") };
+  }
+
+  if (trip.organizer_id !== user.id) {
+    return { ok: false, error: t("trips.errors.organizerOnly") };
+  }
+
+  // Szabad seat ellenőrzés — ugyanaz a logika mint az assignStaffSeat-ben
+  const { data: filledRows } = await supabase
+    .from("trip_participants")
+    .select("id")
+    .eq("trip_id", tripId)
+    .eq("is_staff_seat", true);
+
+  if ((filledRows?.length ?? 0) >= (trip.staff_seats ?? 0)) {
+    return { ok: false, error: t("trips.errors.staffSeatsFull") };
+  }
+
+  const admin = createAdminClient();
+
+  // 1) Létező user lookup a profiles tábla email mezején (idx_profiles_email)
+  const { data: existingProfile } = await admin
+    .from("profiles")
+    .select("id, display_name")
+    .eq("email", trimmedEmail)
+    .maybeSingle();
+
+  const upsertParticipant = async (targetUserId: string) => {
+    const { data: existing } = await admin
+      .from("trip_participants")
+      .select("id, status")
+      .eq("trip_id", tripId)
+      .eq("user_id", targetUserId)
+      .maybeSingle();
+
+    if (existing && existing.status !== "cancelled") {
+      return { ok: false as const, error: t("trips.errors.alreadyOnTrip") };
+    }
+
+    const payload = {
+      trip_id: tripId,
+      user_id: targetUserId,
+      status: "participant" as const,
+      is_staff_seat: true,
+      crew_position_id: crewPositionId || null,
+      staff_role_label: roleLabel?.trim().slice(0, 100) || null,
+      applied_at: new Date().toISOString(),
+      approved_at: new Date().toISOString(),
+    };
+
+    if (existing) {
+      const { error } = await admin
+        .from("trip_participants")
+        .update(payload)
+        .eq("id", existing.id);
+      if (error) return { ok: false as const, error: error.message };
+    } else {
+      const { error } = await admin
+        .from("trip_participants")
+        .insert(payload);
+      if (error) return { ok: false as const, error: error.message };
+    }
+    return { ok: true as const };
+  };
+
+  if (existingProfile) {
+    const res = await upsertParticipant(existingProfile.id);
+    if (!res.ok) return { ok: false, error: res.error };
+
+    revalidatePath(`/trips`);
+    return {
+      ok: true,
+      mode: "existing",
+      displayName: existingProfile.display_name || trimmedEmail,
+    };
+  }
+
+  // 2) Nem létező user → Supabase invite (létrehozza az auth.users rekordot
+  //    és kiküldi a magic link emailt; a handle_new_user trigger profile-t is hoz létre).
+  const { data: invited, error: inviteErr } =
+    await admin.auth.admin.inviteUserByEmail(trimmedEmail, {
+      data: {
+        invited_to_trip_id: tripId,
+        invited_to_trip_slug: trip.slug,
+        staff_role_label: roleLabel?.trim().slice(0, 100) || null,
+      },
+    });
+
+  if (inviteErr || !invited?.user) {
+    console.error("inviteStaffByEmail invite error:", inviteErr);
+    return { ok: false, error: inviteErr?.message ?? t("trips.errors.inviteFailed") };
+  }
+
+  const res = await upsertParticipant(invited.user.id);
+  if (!res.ok) return { ok: false, error: res.error };
+
+  revalidatePath(`/trips`);
+  return { ok: true, mode: "invited", email: trimmedEmail };
 }

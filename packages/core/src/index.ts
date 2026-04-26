@@ -3,6 +3,7 @@
 // ============================================================================
 // MVP modulok üzleti logikája
 
+export * from "./shared";
 export * from "./user";
 export * from "./trip";
 export * from "./expense";

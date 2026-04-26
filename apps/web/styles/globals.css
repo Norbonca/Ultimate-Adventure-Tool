@@ -37,6 +37,42 @@
     --trail-sage: #6EE7B7;
     --golden-hour: #FBBF24;
     --dusk-violet: #8B5CF6;
+
+    /* ----------------------------------------------------------
+       CLAUDE.md §3.8 canonical token aliases
+       Use these names from new code; legacy names above are kept
+       for back-compat. Single source of truth per CLAUDE.md.
+       ---------------------------------------------------------- */
+
+    /* Colors (alias to actual Trevu palette) */
+    --color-primary: var(--trevu-teal);
+    --color-bg: var(--arctic-white);
+    --color-surface: #FFFFFF;
+    --color-border: var(--border-subtle);
+    --color-text: var(--text-primary);
+    --color-text-muted: var(--text-slate);
+
+    /* Radius */
+    --radius-s: 6px;
+    --radius-m: 10px;
+    --radius-l: 16px;
+
+    /* Spacing */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-7: 32px;
+    --space-8: 48px;
+
+    /* Typography */
+    --font-s: 13px;
+    --font-m: 14px;
+    --font-l: 18px;
+    --font-xl: 24px;
+    --font-xxl: 28px;
   }
 
   html {

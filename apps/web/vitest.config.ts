@@ -9,7 +9,15 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
     include: ["**/*.{test,spec}.{ts,tsx}"],
-    exclude: ["node_modules", ".next", "e2e"],
+    exclude: [
+      "node_modules",
+      ".next",
+      // Playwright-only directories — futtatás `pnpm test:e2e` / `test:a11y`
+      // parancsokkal, nem Vitest-tel. Az import-jaik (@playwright/test,
+      // @axe-core/playwright) csak Playwright runtime-ban resolve-ódnak.
+      "tests/e2e/**",
+      "tests/usability/**",
+    ],
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "lcov"],

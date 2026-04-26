@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
-import { assignStaffSeat, searchUsersForStaffSeat } from "@/app/(app)/trips/actions";
+import {
+  assignStaffSeat,
+  inviteStaffByEmail,
+  searchUsersForStaffSeat,
+} from "@/app/(app)/trips/actions";
 
 interface CrewPosition {
   id: string;
@@ -22,6 +26,7 @@ interface AddStaffMemberModalProps {
   crewPositions: CrewPosition[];
   onClose: () => void;
   onAssigned: () => void;
+  onInvited?: () => void;
 }
 
 export function AddStaffMemberModal({
@@ -29,6 +34,7 @@ export function AddStaffMemberModal({
   crewPositions,
   onClose,
   onAssigned,
+  onInvited,
 }: AddStaffMemberModalProps) {
   const { t } = useTranslation();
 
@@ -42,6 +48,15 @@ export function AddStaffMemberModal({
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteSending, setInviteSending] = useState(false);
+  const [inviteError, setInviteError] = useState<string | null>(null);
+  const [inviteSuccess, setInviteSuccess] = useState<
+    | { mode: "existing"; displayName: string }
+    | { mode: "invited"; email: string }
+    | null
+  >(null);
 
   useEffect(() => {
     const trimmed = query.trim();
@@ -70,6 +85,42 @@ export function AddStaffMemberModal({
     null;
 
   const canSubmit = !!selectedUserId && !pending;
+
+  const handleInvite = async () => {
+    const email = inviteEmail.trim();
+    if (!email) return;
+    setInviteError(null);
+    setInviteSuccess(null);
+    setInviteSending(true);
+    try {
+      const res = await inviteStaffByEmail(
+        tripId,
+        email,
+        selectedPositionId,
+        positionLabel
+      );
+      if (!res.ok) {
+        setInviteError(res.error);
+        return;
+      }
+      if (res.mode === "existing") {
+        setInviteSuccess({ mode: "existing", displayName: res.displayName });
+      } else {
+        setInviteSuccess({ mode: "invited", email: res.email });
+      }
+      onInvited?.();
+    } catch (e) {
+      setInviteError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setInviteSending(false);
+    }
+  };
+
+  const resetInvite = () => {
+    setInviteEmail("");
+    setInviteError(null);
+    setInviteSuccess(null);
+  };
 
   const handleSubmit = async () => {
     if (!selectedUserId) return;
@@ -269,19 +320,80 @@ export function AddStaffMemberModal({
             </div>
           )}
 
-          {/* Invite banner — informatív, későbbi feature */}
-          <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 border border-amber-200">
-            <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 shrink-0">
-              ✉
+          {/* Email-alapú meghívás — állandó szekció (S29) */}
+          <div className="space-y-2">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-navy-500">
+              {t("trips.crew.inviteTitle")}
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold text-amber-900">
-                {t("trips.crew.inviteTitle")}
+
+            {!inviteSuccess && (
+              <>
+                <div className="text-xs text-navy-500 leading-relaxed">
+                  {t("trips.crew.inviteDesc")}
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-lg border border-navy-300 bg-white focus-within:ring-2 focus-within:ring-trevu-500 focus-within:border-trevu-500 transition-colors">
+                    <span className="text-navy-400 text-sm">✉</span>
+                    <input
+                      type="email"
+                      value={inviteEmail}
+                      onChange={(e) => {
+                        setInviteEmail(e.target.value);
+                        setInviteError(null);
+                      }}
+                      placeholder={t("trips.crew.inviteEmailPlaceholder")}
+                      className="flex-1 outline-none text-sm text-navy-900 placeholder-navy-400"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleInvite}
+                    disabled={inviteSending || !inviteEmail.trim()}
+                    className="px-4 py-2.5 rounded-lg bg-trevu-500 hover:bg-trevu-600 text-white text-sm font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {inviteSending
+                      ? t("trips.crew.inviteSending")
+                      : t("trips.crew.inviteSubmit")}
+                  </button>
+                </div>
+                {inviteError && (
+                  <div className="text-xs text-red-600 px-1">{inviteError}</div>
+                )}
+              </>
+            )}
+
+            {inviteSuccess && (
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-trevu-50 border border-trevu-300">
+                <div className="w-8 h-8 rounded-full bg-trevu-500 flex items-center justify-center text-white shrink-0 text-sm">
+                  ✓
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold text-trevu-700">
+                    {inviteSuccess.mode === "invited"
+                      ? t("trips.crew.inviteSentNewTitle")
+                      : t("trips.crew.inviteAddedExistingTitle")}
+                  </div>
+                  <div className="text-xs text-trevu-700 mt-0.5 leading-relaxed">
+                    {inviteSuccess.mode === "invited"
+                      ? t("trips.crew.inviteSentNewDesc").replace(
+                          "{email}",
+                          inviteSuccess.email
+                        )
+                      : t("trips.crew.inviteAddedExistingDesc").replace(
+                          "{name}",
+                          inviteSuccess.displayName
+                        )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={resetInvite}
+                    className="text-xs font-semibold text-trevu-700 hover:text-trevu-800 mt-2 underline"
+                  >
+                    {t("trips.crew.inviteAnother")}
+                  </button>
+                </div>
               </div>
-              <div className="text-xs text-amber-700 mt-0.5">
-                {t("trips.crew.inviteDesc")}
-              </div>
-            </div>
+            )}
           </div>
         </div>
 

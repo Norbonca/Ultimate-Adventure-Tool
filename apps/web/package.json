@@ -10,7 +10,12 @@
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:install": "playwright install --with-deps",
+    "test:a11y": "playwright test tests/usability/a11y.spec.ts",
+    "test:lighthouse": "playwright test tests/usability/lighthouse.spec.ts"
   },
   "dependencies": {
     "@sentry/nextjs": "^9.47.1",
@@ -39,6 +44,10 @@
     "postcss": "^8.4.0",
     "tailwindcss": "^3.4.0",
     "typescript": "^5.7.0",
-    "vitest": "^2.1.9"
+    "vitest": "^2.1.9",
+    "@playwright/test": "^1.49.0",
+    "@axe-core/playwright": "^4.10.0",
+    "lighthouse": "^12.4.0",
+    "chrome-launcher": "^1.1.2"
   }
 }

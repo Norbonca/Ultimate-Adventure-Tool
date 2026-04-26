@@ -174,6 +174,7 @@ const hu = {
   // Navigation
   // ============================================================================
   nav: {
+    menuLabel: "Navigációs menü",
     features: "Funkciók",
     categories: "Kategóriák",
     discover: "Felfedezés",
@@ -743,11 +744,11 @@ const hu = {
 
     // Difficulty levels
     difficulty: {
-      1: "Könnyű",
-      2: "Mérsékelten nehéz",
-      3: "Közepes",
-      4: "Nehéz",
-      5: "Nagyon nehéz",
+      level1: "Könnyű",
+      level2: "Mérsékelten nehéz",
+      level3: "Közepes",
+      level4: "Nehéz",
+      level5: "Nagyon nehéz",
     },
 
     // Participant status
@@ -875,8 +876,16 @@ const hu = {
       resultSelected: "Kiválasztva",
       resultSelect: "Választ",
       alreadyOnTrip: "már a túrán",
-      inviteTitle: "Még nincs regisztrálva?",
-      inviteDesc: "A meghívó email funkció hamarosan elérhető.",
+      inviteTitle: "MEGHÍVÁS EMAILEN",
+      inviteDesc: "Email cím megadásával meghívót küldünk. Ha a felhasználó már regisztrált, automatikusan a túra szervezői csapatába kerül.",
+      inviteEmailPlaceholder: "szervezotag@example.com",
+      inviteSubmit: "Meghívás",
+      inviteSending: "Küldés…",
+      inviteSentNewTitle: "Meghívó email elküldve",
+      inviteSentNewDesc: "{email} — a felhasználó a regisztráció után automatikusan szervezőként csatlakozik a túrához.",
+      inviteAddedExistingTitle: "Felhasználó hozzáadva a csapathoz",
+      inviteAddedExistingDesc: "{name} már regisztrált a Trevu-n. A megadott pozícióval rögtön bekerült a szervezői csapatba.",
+      inviteAnother: "Új meghívás",
       assignWillAppear: "A személy azonnal résztvevőként megjelenik.",
     },
 
@@ -909,6 +918,8 @@ const hu = {
       organizerOnly: "Ez a művelet csak a túra szervezőjének engedélyezett.",
       staffSeatsFull: "Minden szervezői hely betöltve. Növeld a számukat a Beállítások tabon.",
       alreadyOnTrip: "Ez a felhasználó már része a csapatnak.",
+      inviteInvalidEmail: "Érvénytelen email cím.",
+      inviteFailed: "A meghívás nem sikerült. Próbáld újra.",
     },
   },
 
@@ -1332,7 +1343,7 @@ const hu = {
       addNote: "Megjegyzés hozzáadása",
       actions: "Akciók",
       suspend: "Felfüggesztés",
-      email_btn: "Email küldése",
+      emailBtn: "Email küldése",
     },
     // Audit log
     audit: {

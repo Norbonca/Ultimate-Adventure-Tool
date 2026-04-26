@@ -14,7 +14,7 @@ export default async function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC]">
+    <main className="min-h-screen bg-slate-50">
       <AppHeader
         anchors={[
           { label: t('nav.myTrips'), href: '/trips' },

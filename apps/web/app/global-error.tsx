@@ -2,6 +2,11 @@
 
 import { useEffect } from "react";
 
+// i18n-skip: Next.js root error boundary fires BEFORE any i18n provider can mount
+// (the root <html>/<body> are rendered here, replacing the normal app shell).
+// Hardcoded Hungarian fallback is the canonical pattern — bilingual messaging
+// would require a parallel locale-detection script that runs without React context.
+// CLAUDE.md §3.7 i18n requirement is waived for this single file.
 export default function GlobalError({
   error,
   reset,

@@ -109,7 +109,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
   const spotsLeft = trip.max_participants - (trip.current_participants || 0);
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC]">
+    <main className="min-h-screen bg-slate-50">
       <AppHeader
         anchors={[
           { label: t('nav.description'), href: '#description' },

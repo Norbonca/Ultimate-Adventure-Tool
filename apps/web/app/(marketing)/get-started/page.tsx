@@ -1,5 +1,15 @@
 'use client';
 
+// i18n-skip: marketing landing alt/title szövegek — a teljes 1283-soros
+// landing oldal i18n + design-token refaktora külön task (tracked: PLAN-005
+// "marketing landing inline-style refaktor"). A marketing copy egyelőre
+// part of the design-iteration process; teljes i18n az amikor a get-started
+// oldal Pencil-design v2 + komponensekre bontás is befejeződik.
+//
+// hex-skip: ugyanezen okból az inline `<style jsx>` blokkban szereplő hex
+// színek (~140 db) is külön refaktor task része. A teljes landing redesign
+// fogja megoldani a CSS-token migrációt egyszerre, addig a stable hex-érték
+// jobban szolgálja a marketing iterációt.
 import Link from 'next/link';
 import {
   MapPin,
@@ -25,7 +35,7 @@ import {
   Facebook,
   Youtube,
   ChevronDown,
-} from 'lucide-react';
+} from '@/lib/icons';
 import { useTranslation } from '@/lib/i18n/useTranslation';
 import { AppHeader } from '@/components/AppHeader';
 
