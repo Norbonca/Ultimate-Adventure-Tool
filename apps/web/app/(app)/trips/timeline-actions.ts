@@ -345,8 +345,8 @@ export async function fetchTripTimeline(
           .filter((a) => a.milestone_id === ms.id)
           .map((a) => ({
             user_id: a.user_id,
-            display_name: (a.profiles as Record<string, unknown>)?.display_name as string | null,
-            avatar_url: (a.profiles as Record<string, unknown>)?.avatar_url as string | null,
+            display_name: (a.profiles as unknown as Record<string, unknown> | null)?.display_name as string | null,
+            avatar_url: (a.profiles as unknown as Record<string, unknown> | null)?.avatar_url as string | null,
           }));
 
         return {
@@ -793,8 +793,8 @@ export async function fetchMyTasks(
 
     return {
       tasks: (directTasks ?? []).map((t) => {
-        const ms = t.trip_tasks_milestone as Record<string, unknown> | null;
-        const phase = ms?.trip_milestones_phase as Record<string, unknown> | null;
+        const ms = t.trip_tasks_milestone as unknown as Record<string, unknown> | null;
+        const phase = ms?.trip_milestones_phase as unknown as Record<string, unknown> | null;
         return {
           task_id: t.id,
           task_name: t.name,
