@@ -1390,6 +1390,15 @@ const hu = {
       saveRole: "Mentés",
       editRole: "Szerkesztés",
       lastAdminError: "Nem lehet visszavonni az utolsó aktív admin hozzáférését.",
+      createNewUserToggle: "Új felhasználó létrehozása (még nincs regisztrálva)",
+      displayNameLabel: "Megjelenítendő név",
+      displayNamePlaceholder: "pl. Kovács János",
+      passwordLabel: "Ideiglenes jelszó",
+      passwordPlaceholder: "Min. 8 karakter",
+      passwordHint: "A felhasználó első belépés után érdemes módosítani.",
+      userAlreadyExists: "Ez az email már regisztrálva van — kapcsold ki az 'Új felhasználó' kapcsolót.",
+      passwordTooShort: "A jelszó legalább 8 karakter legyen.",
+      createUserFailed: "A felhasználó létrehozása nem sikerült.",
     },
     // Trip Config (M02 referencia adat kezelés)
     tripConfig: {

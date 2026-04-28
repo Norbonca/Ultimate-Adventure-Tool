@@ -42,6 +42,15 @@ interface AdminUsersClientProps {
   t_editRole: string;
   t_lastAdminError: string;
   t_cancel: string;
+  t_createNewUserToggle: string;
+  t_displayNameLabel: string;
+  t_displayNamePlaceholder: string;
+  t_passwordLabel: string;
+  t_passwordPlaceholder: string;
+  t_passwordHint: string;
+  t_userAlreadyExists: string;
+  t_passwordTooShort: string;
+  t_createUserFailed: string;
 }
 
 export function AdminUsersClient({
@@ -53,7 +62,14 @@ export function AdminUsersClient({
 
   // Add form state
   const [showAddForm, setShowAddForm] = useState(false);
-  const [addForm, setAddForm] = useState({ email: "", role: "operations_admin", notes: "" });
+  const [addForm, setAddForm] = useState({
+    email: "",
+    role: "operations_admin",
+    notes: "",
+    createNewUser: false,
+    displayName: "",
+    password: "",
+  });
   const [addError, setAddError] = useState<string | null>(null);
 
   // Edit role state — key: adminRoleId
@@ -102,7 +118,14 @@ export function AdminUsersClient({
     setLoading(null);
     if (res.success) {
       setShowAddForm(false);
-      setAddForm({ email: "", role: "operations_admin", notes: "" });
+      setAddForm({
+        email: "",
+        role: "operations_admin",
+        notes: "",
+        createNewUser: false,
+        displayName: "",
+        password: "",
+      });
       showToast(t.t_addSuccess);
       refresh();
     } else {
@@ -110,6 +133,9 @@ export function AdminUsersClient({
       setAddError(
         key === "userNotFound" ? t.t_userNotFound
         : key === "alreadyAdmin" ? t.t_alreadyAdmin
+        : key === "userAlreadyExists" ? t.t_userAlreadyExists
+        : key === "passwordTooShort" ? t.t_passwordTooShort
+        : key === "createUserFailed" ? t.t_createUserFailed
         : key
       );
     }
@@ -207,6 +233,50 @@ export function AdminUsersClient({
                 </select>
               </div>
             </div>
+            <label className="flex items-start gap-2 text-sm text-slate-700 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={addForm.createNewUser}
+                onChange={(e) =>
+                  setAddForm((f) => ({ ...f, createNewUser: e.target.checked }))
+                }
+                className="mt-0.5 w-4 h-4 accent-emerald-500"
+              />
+              <span>{t.t_createNewUserToggle}</span>
+            </label>
+
+            {addForm.createNewUser && (
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-medium text-slate-600 block mb-1">
+                    {t.t_displayNameLabel}
+                  </label>
+                  <input
+                    type="text"
+                    value={addForm.displayName}
+                    onChange={(e) => setAddForm((f) => ({ ...f, displayName: e.target.value }))}
+                    placeholder={t.t_displayNamePlaceholder}
+                    className={inputCls}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-slate-600 block mb-1">
+                    {t.t_passwordLabel}
+                  </label>
+                  <input
+                    type="text"
+                    required={addForm.createNewUser}
+                    minLength={8}
+                    value={addForm.password}
+                    onChange={(e) => setAddForm((f) => ({ ...f, password: e.target.value }))}
+                    placeholder={t.t_passwordPlaceholder}
+                    className={inputCls}
+                  />
+                  <p className="text-[11px] text-slate-500 mt-1">{t.t_passwordHint}</p>
+                </div>
+              </div>
+            )}
+
             <div>
               <label className="text-xs font-medium text-slate-600 block mb-1">
                 {t.t_notesLabel}

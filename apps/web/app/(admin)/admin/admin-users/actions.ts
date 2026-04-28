@@ -133,25 +133,74 @@ export async function grantAdmin(formData: {
   email: string;
   role: string;
   notes?: string;
+  createNewUser?: boolean;
+  displayName?: string;
+  password?: string;
 }): Promise<{ success: boolean; error?: string }> {
   const currentUser = await requireAdmin();
   const adminClient = createAdminClient();
+  const email = formData.email.toLowerCase().trim();
 
-  const { data: profile, error: profileError } = await adminClient
+  const { data: existingProfile } = await adminClient
     .from("profiles")
     .select("id, email")
-    .eq("email", formData.email.toLowerCase().trim())
-    .single();
+    .eq("email", email)
+    .maybeSingle();
 
-  if (profileError || !profile) {
+  // ── Új felhasználó létrehozása ──
+  if (formData.createNewUser) {
+    if (existingProfile) {
+      return { success: false, error: "userAlreadyExists" };
+    }
+    if (!formData.password || formData.password.length < 8) {
+      return { success: false, error: "passwordTooShort" };
+    }
+
+    const displayName = (formData.displayName ?? "").trim();
+    const { data: created, error: createErr } = await adminClient.auth.admin.createUser({
+      email,
+      password: formData.password,
+      email_confirm: true,
+      user_metadata: {
+        full_name: displayName || email,
+        display_name: displayName || email,
+      },
+    });
+
+    if (createErr || !created.user) {
+      return { success: false, error: createErr?.message ?? "createUserFailed" };
+    }
+
+    // handle_new_user trigger létrehoz profile-t; biztos ami biztos: display_name update
+    if (displayName) {
+      await adminClient
+        .from("profiles")
+        .update({ display_name: displayName })
+        .eq("id", created.user.id);
+    }
+
+    const { error: roleErr } = await adminClient.from("admin_roles").insert({
+      user_id: created.user.id,
+      role: formData.role,
+      is_active: true,
+      granted_by: currentUser.id,
+      notes: formData.notes ?? null,
+    });
+
+    if (roleErr) return { success: false, error: roleErr.message };
+    return { success: true };
+  }
+
+  // ── Meglévő felhasználó admin-ná tétele ──
+  if (!existingProfile) {
     return { success: false, error: "userNotFound" };
   }
 
   const { data: existing } = await adminClient
     .from("admin_roles")
     .select("id, is_active")
-    .eq("user_id", profile.id)
-    .single();
+    .eq("user_id", existingProfile.id)
+    .maybeSingle();
 
   if (existing) {
     if (existing.is_active) {
@@ -173,7 +222,7 @@ export async function grantAdmin(formData: {
   }
 
   const { error } = await adminClient.from("admin_roles").insert({
-    user_id: profile.id,
+    user_id: existingProfile.id,
     role: formData.role,
     is_active: true,
     granted_by: currentUser.id,

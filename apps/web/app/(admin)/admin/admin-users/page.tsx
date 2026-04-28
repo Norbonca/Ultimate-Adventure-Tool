@@ -51,6 +51,15 @@ export default async function AdminUsersPage() {
           t_editRole={t("admin.adminUsers.editRole")}
           t_lastAdminError={t("admin.adminUsers.lastAdminError")}
           t_cancel={t("common.cancel")}
+          t_createNewUserToggle={t("admin.adminUsers.createNewUserToggle")}
+          t_displayNameLabel={t("admin.adminUsers.displayNameLabel")}
+          t_displayNamePlaceholder={t("admin.adminUsers.displayNamePlaceholder")}
+          t_passwordLabel={t("admin.adminUsers.passwordLabel")}
+          t_passwordPlaceholder={t("admin.adminUsers.passwordPlaceholder")}
+          t_passwordHint={t("admin.adminUsers.passwordHint")}
+          t_userAlreadyExists={t("admin.adminUsers.userAlreadyExists")}
+          t_passwordTooShort={t("admin.adminUsers.passwordTooShort")}
+          t_createUserFailed={t("admin.adminUsers.createUserFailed")}
         />
       </div>
     </div>

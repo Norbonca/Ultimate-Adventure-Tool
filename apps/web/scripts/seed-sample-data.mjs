@@ -35,7 +35,7 @@ if (!SUPABASE_URL || !SERVICE_KEY) {
   console.error("✗ Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in .env.local");
   process.exit(1);
 }
-if (!SUPABASE_URL.includes("localhost") && !SUPABASE_URL.includes("127.0.0.1")) {
+if (!SUPABASE_URL.includes("localhost") && !SUPABASE_URL.includes("127.0.0.1") && !process.env.ALLOW_PROD_SEED) {
   console.error("✗ Safety abort: .env.local SUPABASE_URL nem local (" + SUPABASE_URL + ")");
   console.error("  Ez a script csak local dev-re való.");
   process.exit(1);

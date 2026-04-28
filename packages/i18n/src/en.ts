@@ -1362,6 +1362,15 @@ const en: TranslationKeys = {
       saveRole: "Save",
       editRole: "Edit",
       lastAdminError: "Cannot revoke the last active admin access.",
+      createNewUserToggle: "Create new user (not yet registered)",
+      displayNameLabel: "Display name",
+      displayNamePlaceholder: "e.g. John Smith",
+      passwordLabel: "Temporary password",
+      passwordPlaceholder: "Min. 8 characters",
+      passwordHint: "User should change this on first login.",
+      userAlreadyExists: "This email is already registered — turn off 'Create new user'.",
+      passwordTooShort: "Password must be at least 8 characters.",
+      createUserFailed: "Failed to create user.",
     },
     // Trip Config (M02 reference data management)
     tripConfig: {
