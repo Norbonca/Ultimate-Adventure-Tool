@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -10,6 +11,36 @@ import { ApplyButton } from "@/components/ApplyButton";
 
 interface TripDetailPageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: TripDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const trip = await fetchTripBySlug(slug);
+  if (!trip) return {};
+
+  const description =
+    (trip.short_description as string | null) ||
+    (typeof trip.description === "string" ? trip.description.slice(0, 200) : null) ||
+    "Fedezd fel ezt a kalandot a Trevu-n.";
+
+  const cover = (trip.cover_image_url as string | null) || null;
+
+  return {
+    title: trip.title as string,
+    description,
+    openGraph: {
+      title: trip.title as string,
+      description,
+      type: "article",
+      ...(cover ? { images: [{ url: cover, width: 1200, height: 630, alt: trip.title as string }] } : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: trip.title as string,
+      description,
+      ...(cover ? { images: [cover] } : {}),
+    },
+  };
 }
 
 export default async function TripDetailPage({ params }: TripDetailPageProps) {
