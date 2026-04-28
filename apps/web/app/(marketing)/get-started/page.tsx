@@ -1232,7 +1232,7 @@ export default function HomePage() {
                   <a href="#categories">{t('landing.footerCategories')}</a>
                 </li>
                 <li>
-                  <a href="#" title="Coming soon" className="opacity-50 cursor-default">{t('landing.footerPricing')}</a>
+                  <a href="/pricing">{t('landing.footerPricing')}</a>
                 </li>
                 <li>
                   <a href="#">{t('landing.footerRoadmap')}</a>

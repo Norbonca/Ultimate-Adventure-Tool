@@ -1079,11 +1079,7 @@ export default function DiscoverClient({
         }
       `}</style>
 
-      <AppHeader anchors={[
-        { label: t('nav.filters'), href: '#filters' },
-        { label: t('nav.categories'), href: '#categories' },
-        { label: t('nav.map'), href: '#map' },
-      ]} />
+      <AppHeader />
 
       {/* HERO */}
       <section className="hero">
