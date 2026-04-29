@@ -235,8 +235,8 @@ const hu = {
     heroCountryGermany: "Németország",
 
     // Problem section
-    problemTag: "A PROBLÉMA",
-    problemHeadline: "Egy kaland. Hét app. Nulla élvezet.",
+    problemTag: "A KIHÍVÁS",
+    problemHeadline: "A túra legyen a kihívás. Ne a tervezése.",
     problemDescription: "Útvonaltervező itt, költségkövető ott, offline térkép valahol máshol. Mire összerendezted az eszközeidet, már elvesztetted azt a szikrát, ami miatt el akartál indulni.",
     problemCard1Title: "Tervezd meg a kalandod",
     problemCard1Text: "Válassz 8 kalandkategóriából. Adj hozzá útvonalpontokat, állítsd be a nehézséget, csomagold be a megfelelő felszerelést — minden egy helyen.",

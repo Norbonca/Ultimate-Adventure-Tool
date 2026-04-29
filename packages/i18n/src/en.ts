@@ -236,8 +236,8 @@ const en: TranslationKeys = {
     heroCountryGermany: "Germany",
 
     // Problem section
-    problemTag: "THE PROBLEM",
-    problemHeadline: "One adventure. Seven apps. Zero fun.",
+    problemTag: "THE CHALLENGE",
+    problemHeadline: "Let the trip be the challenge. Not the planning.",
     problemDescription: "Trip planner here, expense tracker there, offline maps somewhere else. By the time you've organized your tools, you've lost the spark that made you want to go in the first place.",
     problemCard1Title: "Plan your adventure",
     problemCard1Text: "Choose from 8 adventure categories. Add waypoints, set difficulty, pack the right gear — all in one place.",
