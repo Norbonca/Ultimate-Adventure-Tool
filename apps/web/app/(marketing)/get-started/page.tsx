@@ -414,6 +414,19 @@ export default function HomePage() {
           padding: 6rem 2rem;
         }
 
+        .problem .section-container {
+          text-align: center;
+        }
+
+        .problem .section-description {
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .problem .cards-grid {
+          text-align: left;
+        }
+
         .section-container {
           max-width: 1280px;
           margin: 0 auto;
