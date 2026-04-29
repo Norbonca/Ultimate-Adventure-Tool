@@ -4,12 +4,12 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
-            "env": [
-                      "ADMIN_EMAIL",
-                      "ENABLE_EXPERIMENTAL_COREPACK",
-                      "SUPABASE_SERVICE_ROLE_KEY"
-            ]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "env": [
+        "ADMIN_EMAIL",
+        "ENABLE_EXPERIMENTAL_COREPACK",
+        "SUPABASE_SERVICE_ROLE_KEY"
+      ]
     },
     "dev": {
       "cache": false,
