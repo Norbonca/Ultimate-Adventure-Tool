@@ -33,7 +33,7 @@
     "qa:usability": "cd .. && node .skills/trevu-usability/scripts/run-all.mjs"
   },
   "devDependencies": {
-    "turbo": "^2.3.0",
+    "turbo": "^2.10.9",
     "typescript": "^5.7.0"
   },
   "packageManager": "pnpm@9.15.0",
