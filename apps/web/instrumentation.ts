@@ -11,3 +11,15 @@ export async function register() {
     // @sentry/nextjs not installed — skip initialization
   }
 }
+
+// Sentry v10: captures errors thrown inside nested React Server Components.
+export async function onRequestError(
+  ...args: Parameters<typeof import("@sentry/nextjs").captureRequestError>
+) {
+  try {
+    const Sentry = await import("@sentry/nextjs");
+    Sentry.captureRequestError(...args);
+  } catch {
+    // @sentry/nextjs not installed — skip
+  }
+}

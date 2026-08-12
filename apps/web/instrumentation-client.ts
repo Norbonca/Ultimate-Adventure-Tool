@@ -24,3 +24,6 @@ Sentry.init({
   // Set environment
   environment: process.env.NODE_ENV,
 });
+
+// Navigation instrumentation for the App Router (Sentry v10 requirement).
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
