@@ -13,12 +13,12 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",
-    "drizzle-orm": "^0.38.0",
+    "drizzle-orm": "^0.45.2",
     "postgres": "^3.4.9"
   },
   "devDependencies": {
     "@types/node": "^26.2.0",
-    "drizzle-kit": "^0.30.0",
+    "drizzle-kit": "^0.31.10",
     "typescript": "^5.7.0"
   }
 }
