@@ -18,7 +18,7 @@
     "test:lighthouse": "playwright test tests/usability/lighthouse.spec.ts"
   },
   "dependencies": {
-    "@sentry/nextjs": "^9.47.1",
+    "@sentry/nextjs": "^10.70.0",
     "@supabase/ssr": "^0.5.0",
     "@supabase/supabase-js": "^2.112.3",
     "@uat/config": "workspace:*",
