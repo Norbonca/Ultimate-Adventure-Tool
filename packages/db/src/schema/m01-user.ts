@@ -95,6 +95,14 @@ export const deviceTypeEnum = pgEnum('device_type_t', [
   'tablet',
 ]);
 
+// Kozos sync_status_t — tobb modul hasznalja (M03 Expense, offline sync)
+export const syncStatusEnum = pgEnum('sync_status_t', [
+  'synced',
+  'pending_upload',
+  'pending_download',
+  'conflict',
+]);
+
 // ============================================================================
 // TÁBLÁK
 // ============================================================================

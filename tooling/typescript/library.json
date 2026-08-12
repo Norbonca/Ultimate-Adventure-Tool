@@ -1,8 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "./base.json",
-  "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./src"
-  }
+  "extends": "./base.json"
+
+  // NOTE: rootDir / outDir intentionally do NOT live here.
+  // Relative paths in an extended config resolve against the file that declares
+  // them (tooling/typescript/), not against the consuming package, so "./src"
+  // would point at tooling/typescript/src and break tsc with TS6059.
+  // A package that actually emits must declare them in its own tsconfig.json
+  // (see packages/db). Today no package emits: every package's "main"/"types"
+  // point straight at ./src/index.ts and Next.js transpiles them.
 }

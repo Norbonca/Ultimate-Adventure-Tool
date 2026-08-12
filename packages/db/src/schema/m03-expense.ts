@@ -25,9 +25,9 @@ import {
   check,
 } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
-import { profiles } from './user'; // M01
-import { trips, tripParticipants } from './trip'; // M02
-import { syncStatusEnum } from './user'; // Közös sync_status_t
+import { profiles } from './m01-user'; // M01
+import { trips, tripParticipants } from './m02-trip'; // M02
+import { syncStatusEnum } from './m01-user'; // Közös sync_status_t
 
 // ============================================
 // ENUM DEFINÍCIÓK

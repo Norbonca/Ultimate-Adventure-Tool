@@ -31,7 +31,7 @@ import {
   check,
 } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
-import { profiles } from './user'; // M01
+import { profiles } from './m01-user'; // M01
 
 // ============================================
 // ENUM DEFINICIOK
