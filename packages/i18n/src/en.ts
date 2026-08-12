@@ -589,6 +589,11 @@ const en: TranslationKeys = {
       confirmCancel: "Are you sure you want to cancel your application?",
       cancelApplication: "Cancel application",
       yourMessage: "Your message",
+      // Public Crew Card
+      crewCardTitle: "Crew positions",
+      teamSetup: "Team setup: {guests} guests · {staff} staff · {total} total",
+      applyForPosition: "Apply for a position →",
+      allPositionsFilled: "All positions filled",
     },
 
     // Empty state

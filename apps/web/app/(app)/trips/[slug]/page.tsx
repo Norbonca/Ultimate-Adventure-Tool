@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { fetchTripBySlug, fetchCategoryParametersForDisplay, fetchMyParticipation } from "../actions";
+import { fetchTripBySlug, fetchCategoryParametersForDisplay, fetchMyParticipation, fetchCrewPositions } from "../actions";
 import { CATEGORY_DISPLAY, DIFFICULTY_LEVELS } from "@/lib/categories";
 import { getServerT, getServerLocale } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
@@ -61,7 +61,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
   } = await supabase.auth.getUser();
   const isOrganizer = user?.id === trip.organizer_id;
 
-  const [paramDefs, myParticipation, staffCountResult] = await Promise.all([
+  const [paramDefs, myParticipation, staffCountResult, crewPositions] = await Promise.all([
     fetchCategoryParametersForDisplay(trip.category_id, trip.sub_discipline_id),
     fetchMyParticipation(trip.id),
     supabase
@@ -69,9 +69,12 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
       .select("id", { count: "exact", head: true })
       .eq("trip_id", trip.id)
       .eq("is_staff_seat", true),
+    fetchCrewPositions(trip.id),
   ]);
   const filledStaff = staffCountResult.count ?? 0;
   const totalStaff = trip.staff_seats ?? 0;
+  const totalGuests = trip.max_participants ?? 0;
+  const teamTotal = totalGuests + totalStaff;
 
   const catRaw = trip.categories;
   const category = (Array.isArray(catRaw) ? catRaw[0] : catRaw) as {
@@ -408,6 +411,63 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                     )}
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Public Crew Card — only when there are crew positions */}
+            {crewPositions.length > 0 && (
+              <div className="bg-white rounded-2xl border border-navy-200 p-5 space-y-3">
+                <h3 className="text-base font-bold text-navy-900">
+                  {t("trips.detail.crewCardTitle")}
+                </h3>
+
+                {teamTotal > 0 && (
+                  <div className="flex items-center gap-2 rounded-md bg-emerald-50 text-emerald-700 px-3 py-2 text-xs font-semibold">
+                    <span aria-hidden>👥</span>
+                    <span>
+                      {t("trips.detail.teamSetup")
+                        .replace("{guests}", String(totalGuests))
+                        .replace("{staff}", String(totalStaff))
+                        .replace("{total}", String(teamTotal))}
+                    </span>
+                  </div>
+                )}
+
+                <ul className="space-y-3">
+                  {crewPositions.map((pos: { id: string; role_name: string; spots: number; filled_spots: number }) => {
+                    const filled = pos.filled_spots ?? 0;
+                    const total = pos.spots ?? 0;
+                    const ratio = total > 0 ? filled / total : 0;
+                    const pct = Math.min(100, Math.round(ratio * 100));
+                    const barColor =
+                      ratio >= 1 ? "#10B981" : ratio > 0 ? "#EAB308" : "#CBD5E1";
+                    return (
+                      <li key={pos.id} className="space-y-1.5">
+                        <div className="flex justify-between text-sm">
+                          <span className="font-semibold text-navy-900">{pos.role_name}</span>
+                          <span className="text-navy-400 text-xs tabular-nums">{filled}/{total}</span>
+                        </div>
+                        <div className="h-2 rounded-full bg-navy-100 overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all"
+                            style={{ width: `${pct}%`, backgroundColor: barColor }}
+                          />
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+
+                {!isOrganizer && crewPositions.some((p: { spots: number; filled_spots: number }) => (p.filled_spots ?? 0) < (p.spots ?? 0)) && (
+                  <div className="pt-1 text-sm font-semibold text-emerald-600">
+                    {t("trips.detail.applyForPosition")}
+                  </div>
+                )}
+                {crewPositions.every((p: { spots: number; filled_spots: number }) => (p.filled_spots ?? 0) >= (p.spots ?? 0)) && (
+                  <div className="pt-1 text-xs text-navy-400">
+                    {t("trips.detail.allPositionsFilled")}
+                  </div>
+                )}
               </div>
             )}
 

@@ -598,6 +598,11 @@ const hu = {
       confirmCancel: "Biztos visszavonod a jelentkezésed?",
       cancelApplication: "Jelentkezés visszavonása",
       yourMessage: "A te megjegyzésed",
+      // Public Crew Card
+      crewCardTitle: "Szervezői pozíciók",
+      teamSetup: "Csapat: {guests} vendég · {staff} szervező · {total} fő",
+      applyForPosition: "Jelentkezem egy pozícióra →",
+      allPositionsFilled: "Minden pozíció betelt",
     },
 
     // Empty state
