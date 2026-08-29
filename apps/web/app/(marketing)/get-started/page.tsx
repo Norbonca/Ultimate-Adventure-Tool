@@ -34,7 +34,6 @@ import {
   Twitter,
   Facebook,
   Youtube,
-  ChevronDown,
 } from '@/lib/icons';
 import { useTranslation } from '@/lib/i18n/useTranslation';
 import { AppHeader } from '@/components/AppHeader';
@@ -1191,7 +1190,7 @@ export default function HomePage() {
           <div className="testimonials-grid">
             {testimonials.map((testimonial, idx) => (
               <div key={idx} className="testimonial">
-                <p className="testimonial-text">"{testimonial.text}"</p>
+                <p className="testimonial-text">{'"'}{testimonial.text}{'"'}</p>
                 <div className="testimonial-author">
                   <img
                     src={testimonial.avatar}

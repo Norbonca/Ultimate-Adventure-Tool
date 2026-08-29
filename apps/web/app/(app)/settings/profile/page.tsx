@@ -25,6 +25,33 @@ interface EmergencyContact {
   relationship: string;
 }
 
+// Reference tables (ref_countries, ref_languages, ref_currencies, ref_timezones) —
+// only the columns this screen actually renders are declared.
+interface RefCountry {
+  code: string;
+  flag_emoji?: string | null;
+  name_en?: string | null;
+  name_hu?: string | null;
+}
+
+interface RefLanguage {
+  code: string;
+  name_native?: string | null;
+}
+
+interface RefCurrency {
+  code: string;
+  symbol?: string | null;
+  name_en?: string | null;
+  name_hu?: string | null;
+}
+
+interface RefTimezone {
+  tz_id: string;
+  display_name?: string | null;
+  utc_offset_text?: string | null;
+}
+
 const RELATIONSHIP_OPTIONS = ["spouse", "parent", "sibling", "friend", "other"];
 
 export default function ProfileSettingsPage() {
@@ -40,10 +67,10 @@ export default function ProfileSettingsPage() {
     avatar_url: "", avatar_source: "system",
   });
   const [emergency, setEmergency] = useState<EmergencyContact>({ name: "", phone: "", relationship: "" });
-  const [refCountries, setRefCountries] = useState<any[]>([]);
-  const [refLanguages, setRefLanguages] = useState<any[]>([]);
-  const [refCurrencies, setRefCurrencies] = useState<any[]>([]);
-  const [refTimezones, setRefTimezones] = useState<any[]>([]);
+  const [refCountries, setRefCountries] = useState<RefCountry[]>([]);
+  const [refLanguages, setRefLanguages] = useState<RefLanguage[]>([]);
+  const [refCurrencies, setRefCurrencies] = useState<RefCurrency[]>([]);
+  const [refTimezones, setRefTimezones] = useState<RefTimezone[]>([]);
 
   useEffect(() => {
     async function load() {

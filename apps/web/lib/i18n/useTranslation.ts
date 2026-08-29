@@ -54,6 +54,7 @@ export function useTranslation() {
 
     if (stored && SUPPORTED_LOCALES.includes(stored)) {
       setLocale(stored);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only bootstrap/sync on mount; a proper rewrite (derive-during-render / useSyncExternalStore) is tracked as an open question (2026-08-29)
       setLocaleState(stored);
       document.documentElement.lang = stored;
       setCookie("trevu-locale", stored);

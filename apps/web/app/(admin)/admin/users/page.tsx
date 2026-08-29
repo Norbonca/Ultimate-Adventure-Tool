@@ -1,5 +1,5 @@
 import { getServerT } from "@/lib/i18n/server";
-import { getAdminUsers, banUser, unbanUser } from "../actions";
+import { getAdminUsers } from "../actions";
 import { AdminUsersClient } from "./users-client";
 
 interface PageProps {

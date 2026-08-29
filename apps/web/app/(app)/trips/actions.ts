@@ -2,7 +2,6 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin-client";
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getServerT } from "@/lib/i18n/server";
 import { computeDefaultRequireApproval, getAutoApprovalThreshold } from "@/lib/system-settings";

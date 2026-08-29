@@ -110,7 +110,7 @@ export async function getTripConfigData(): Promise<{
 
   // Fetch options counts per parameter
   const paramIds = (paramRes.data ?? []).map((p: { id: string }) => p.id);
-  let optionsCounts: Record<string, number> = {};
+  const optionsCounts: Record<string, number> = {};
   if (paramIds.length > 0) {
     const { data: optRows } = await admin
       .from("ref_parameter_options")

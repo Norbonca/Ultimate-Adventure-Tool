@@ -144,7 +144,9 @@ export async function banUser(
 ): Promise<{ success: boolean; error?: string }> {
   const { supabase, user: adminUser } = await requireAdmin();
 
-  const banUntil =
+  // TODO: banUntil is computed but never passed to the ban call — the chosen
+  // duration is currently ignored. See hubnote open questions (2026-08-29).
+  const _banUntil =
     duration === "permanent"
       ? null
       : new Date(

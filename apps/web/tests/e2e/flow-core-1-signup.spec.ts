@@ -1,6 +1,4 @@
-import { test, expect } from '@playwright/test';
-import { AppHeaderPage } from './pom/AppHeaderPage';
-import { createTestUser, deleteTestUser } from './_setup/seed';
+import { test } from '@playwright/test';
 
 /**
  * FLOW-CORE-1 — Signup → email confirm → profile completion
@@ -33,11 +31,11 @@ test.describe('FLOW-CORE-1 — Signup', () => {
     // TODO: assert avatar + URL = /dashboard
   });
 
-  test('rejects duplicate email', async ({ page }) => {
+  test('rejects duplicate email', async () => {
     test.fixme(true, 'Existing user fixture + duplicate-email error path');
   });
 
-  test('rejects weak password', async ({ page }) => {
+  test('rejects weak password', async () => {
     test.fixme(true, 'Password < 8 char → t("auth.passwordTooShort")');
   });
 });

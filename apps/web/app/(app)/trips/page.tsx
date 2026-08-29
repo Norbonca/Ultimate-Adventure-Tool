@@ -4,6 +4,7 @@ import Link from "next/link";
 import { fetchMyTrips } from "./actions";
 import { CATEGORY_DISPLAY, DIFFICULTY_LEVELS } from "@/lib/categories";
 import { getServerT, getServerLocale } from "@/lib/i18n/server";
+import type { TranslationKey } from "@uat/i18n";
 import { AppHeader } from "@/components/AppHeader";
 
 export default async function MyTripsPage() {
@@ -182,7 +183,13 @@ export default async function MyTripsPage() {
   );
 }
 
-function StatusBadge({ status, t }: { status: string; t: (key: any, params?: Record<string, string | number>) => string }) {
+function StatusBadge({
+  status,
+  t,
+}: {
+  status: string;
+  t: (key: TranslationKey, params?: Record<string, string | number>) => string;
+}) {
   const styles: Record<string, string> = {
     draft: "bg-navy-800/70 text-white",
     published: "bg-trevu-600/90 text-white",
@@ -193,7 +200,7 @@ function StatusBadge({ status, t }: { status: string; t: (key: any, params?: Rec
     archived: "bg-navy-400/70 text-white",
   };
 
-  const statusKeyMap: Record<string, string> = {
+  const statusKeyMap: Record<string, TranslationKey> = {
     draft: 'trips.status.draft',
     published: 'trips.status.published',
     registration_open: 'trips.status.registrationOpen',

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import { createTestUser, deleteTestUser } from './_setup/seed';
 
 /**
@@ -31,7 +31,7 @@ test.describe('FLOW-CORE-3 — Trip wizard publish', () => {
     userId = null;
   });
 
-  test('happy path — 5-step wizard publishes a draft', async ({ page }) => {
+  test('happy path — 5-step wizard publishes a draft', async () => {
     test.fixme(true, 'Authed page fixture (storage state) + 5-step navigation — needs auth helper');
     // TODO: login programmatically (set storage state)
     // TODO: /dashboard → "Új túra" click
@@ -44,11 +44,11 @@ test.describe('FLOW-CORE-3 — Trip wizard publish', () => {
     // TODO: expect anonymous tab can see the trip
   });
 
-  test('autosave preserves data when navigating between steps', async ({ page }) => {
+  test('autosave preserves data when navigating between steps', async () => {
     test.fixme(true, 'Autosave 2s debounce + step back/forward');
   });
 
-  test('cannot publish without required fields', async ({ page }) => {
+  test('cannot publish without required fields', async () => {
     test.fixme(true, 'Validation errors on Step 5 if title/cat missing');
   });
 });

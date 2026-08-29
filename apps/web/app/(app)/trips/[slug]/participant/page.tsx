@@ -28,7 +28,7 @@ export default async function ParticipantDashboardPage({ params }: ParticipantPa
   const locale = await getServerLocale();
   const dateLocale = locale === "en" ? "en-US" : "hu-HU";
 
-  const [participants, crewPositions, itinerary] = await Promise.all([
+  const [participants, _crewPositions, itinerary] = await Promise.all([
     fetchTripParticipants(trip.id),
     fetchCrewPositions(trip.id),
     fetchTripItinerary(trip.id),
@@ -73,7 +73,7 @@ export default async function ParticipantDashboardPage({ params }: ParticipantPa
     organizer: { label: t("trips.detail.organizer"), bg: "bg-trevu-50", text: "text-trevu-700" },
     none: { label: "—", bg: "bg-navy-50", text: "text-navy-400" },
   };
-  const mySc = statusLabels[myStatus] || statusLabels.none;
+  const _mySc = statusLabels[myStatus] || statusLabels.none;
 
   return (
     <main className="min-h-screen bg-slate-50">
