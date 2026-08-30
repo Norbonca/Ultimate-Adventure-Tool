@@ -100,6 +100,21 @@
     --color-success: var(--trail-sage);
     --color-rating: var(--golden-hour);
     --color-special: var(--dusk-violet);
+    /* Semantic subtle/text variants — S34, a Pencil-fájlok tokenjeivel azonos */
+    --color-success-subtle: #ECFDF5;
+    --color-success-text: #047857;
+    --color-danger-subtle: #FEF0EE;
+    --color-warning-subtle: #FEF3C7;
+    --color-info-subtle: #DBEAFE;
+    --color-special-subtle: #EDE9FE;
+    --color-navy-800: #1E293B;
+    --color-text-secondary: #475569;
+    --color-primary-subtle: #F0FDFA;
+    --color-text-body: #334155;
+    --color-text-subtle: #94A3B8;
+    --color-border-strong: #CBD5E1;
+    --color-info: #3B82F6;
+    --color-warning: #F59E0B;
 
     /* Gradients — §3 */
     --gradient-trevu: linear-gradient(135deg, #0D9488 0%, #06B6D4 100%);
