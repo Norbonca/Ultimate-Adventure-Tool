@@ -114,6 +114,16 @@
     --motion-duration: 300ms;
     --motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
 
+    /* Category colors — §8 (+ Motorsport, Icon Bank §12) */
+    --cat-hiking: #059669;
+    --cat-climbing: #92400E;
+    --cat-water: #0D9488;
+    --cat-cycling: #D97706;
+    --cat-running: #DC2626;
+    --cat-winter: #3B82F6;
+    --cat-expedition: #8B5CF6;
+    --cat-motorsport: #B91C1C;
+
     /* Dark mode ("éjszakai túra") — §7 */
     --dark-bg: #0F172A;
     --dark-surface: #1E293B;

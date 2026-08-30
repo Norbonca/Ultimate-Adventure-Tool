@@ -16,11 +16,13 @@ import { SettingsSection } from "@/components/trip-forms/SettingsSection";
 import { CrewSection } from "@/components/trip-forms/CrewSection";
 import { StaffSeatsManager } from "@/components/trip-forms/StaffSeatsManager";
 import { TripTimelineClient } from "@/components/TripTimelineClient";
+import { Icon } from "@/components/Icon";
 
 type TabKey = "basic" | "category" | "images" | "settings" | "timeline" | "crew";
 
 interface CategoryDisplayInfo {
   emoji: string;
+  icon?: string;
   nameHu: string;
   nameEn: string;
   colorHex?: string;
@@ -72,12 +74,12 @@ interface EditTripFormProps {
 }
 
 const TAB_DEFS: { key: TabKey; icon: string; labelKey: string }[] = [
-  { key: "basic", icon: "📝", labelKey: "trips.edit.tabs.basicInfo" },
-  { key: "category", icon: "⚙️", labelKey: "trips.edit.tabs.categoryDetails" },
-  { key: "images", icon: "🖼️", labelKey: "trips.edit.tabs.images" },
-  { key: "settings", icon: "🔒", labelKey: "trips.edit.tabs.settings" },
-  { key: "timeline", icon: "📅", labelKey: "trips.edit.tabs.timeline" },
-  { key: "crew", icon: "👥", labelKey: "trips.edit.tabs.crew" },
+  { key: "basic", icon: "file-text", labelKey: "trips.edit.tabs.basicInfo" },
+  { key: "category", icon: "settings-2", labelKey: "trips.edit.tabs.categoryDetails" },
+  { key: "images", icon: "image", labelKey: "trips.edit.tabs.images" },
+  { key: "settings", icon: "lock", labelKey: "trips.edit.tabs.settings" },
+  { key: "timeline", icon: "calendar", labelKey: "trips.edit.tabs.timeline" },
+  { key: "crew", icon: "users", labelKey: "trips.edit.tabs.crew" },
 ];
 
 export function EditTripForm({
@@ -214,7 +216,7 @@ export function EditTripForm({
         <div className="flex items-center gap-3 mb-3">
           {categoryDisplay && (
             <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
-              <span>{categoryDisplay.emoji}</span>
+              <Icon name={categoryDisplay.icon ?? "compass"} size={13} />
               <span>{categoryName}</span>
             </span>
           )}
@@ -256,7 +258,7 @@ export function EditTripForm({
                     : "text-navy-500 hover:text-navy-700 font-medium"
                 }`}
               >
-                <span>{tab.icon}</span>
+                <Icon name={tab.icon} size={15} />
                 <span>{t(tab.labelKey as Parameters<typeof t>[0])}</span>
                 {isActive && (
                   <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-t bg-trevu-500" />
@@ -280,7 +282,7 @@ export function EditTripForm({
           <div className="flex items-center gap-2 min-h-[20px]">
             {saveStatus === "saved" && (
               <>
-                <span className="text-trevu-600 font-bold">✓</span>
+                <Icon name="check" size={14} strokeWidth={2.5} className="text-trevu-600" />
                 <span className="text-sm text-navy-500">
                   {t("trips.edit.draftSaved")}
                 </span>
@@ -305,7 +307,7 @@ export function EditTripForm({
               disabled={saveStatus === "saving"}
               className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-trevu-600 rounded-xl hover:bg-trevu-700 transition-colors disabled:opacity-50"
             >
-              <span>💾</span>
+              <Icon name="save" size={15} />
               <span>
                 {saveStatus === "saving"
                   ? t("trips.edit.saving")

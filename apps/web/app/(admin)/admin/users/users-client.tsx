@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { banUser, unbanUser, type AdminUser } from "../actions";
+import { Icon } from "@/components/Icon";
 
 interface AdminUsersClientProps {
   users: AdminUser[];
@@ -162,8 +163,9 @@ export function AdminUsersClient({
           <button
             type="submit"
             className="px-3 py-1.5 bg-emerald-500 text-white text-sm rounded-lg hover:bg-emerald-600 transition-colors"
+            aria-label="Search"
           >
-            🔍
+            <Icon name="search" size={16} />
           </button>
         </form>
 

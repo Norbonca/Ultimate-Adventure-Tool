@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { CATEGORY_DISPLAY, getCategoryName } from "@/lib/categories";
 import { saveUserInterests, saveUserSkills } from "../actions";
+import { Icon } from "@/components/Icon";
 
 type LocalizedName = Record<string, string> | null;
 
@@ -151,7 +152,7 @@ export function InterestsForm({ categories, subDisciplines, initialInterests, in
           const isExpanded = expandedCategories.has(cat.id);
           const subs = subsByCategory[cat.id] ?? [];
           const catName = display ? getCategoryName(display, locale) : getLocalized(cat.name_localized, locale, cat.name);
-          const emoji = display?.emoji ?? "🏔️";
+          const iconName = display?.icon ?? cat.icon_name ?? "compass";
           const colorHex = display?.colorHex ?? cat.color_hex ?? "#0D9488";
 
           return (
@@ -175,7 +176,7 @@ export function InterestsForm({ categories, subDisciplines, initialInterests, in
                   className="flex h-10 w-10 items-center justify-center rounded-lg text-xl"
                   style={{ backgroundColor: colorHex }}
                 >
-                  {emoji}
+                  <Icon name={iconName} size={20} />
                 </span>
                 <div className="flex-1 min-w-0">
                   <div className="text-[15px] font-bold text-navy-900">{catName}</div>

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getServerT } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
+import { Icon } from "@/components/Icon";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -36,7 +37,7 @@ export default async function DashboardPage() {
             className="p-6 bg-white rounded-2xl border border-navy-200 hover:border-trevu-400 hover:shadow-trevu-lg transition-all group"
           >
             <div className="w-12 h-12 rounded-xl bg-trevu-50 flex items-center justify-center mb-4">
-              <span className="text-2xl">🏔️</span>
+              <Icon name="backpack" size={24} className="text-trevu-600" />
             </div>
             <h3 className="font-semibold text-navy-900 group-hover:text-trevu-600 transition-colors">
               {t('dashboard.myTrips')}
@@ -51,7 +52,7 @@ export default async function DashboardPage() {
             className="p-6 bg-white rounded-2xl border border-navy-200 hover:border-trevu-400 hover:shadow-trevu-lg transition-all group"
           >
             <div className="w-12 h-12 rounded-xl bg-trevu-50 flex items-center justify-center mb-4">
-              <span className="text-2xl">➕</span>
+              <Icon name="plus" size={24} className="text-trevu-600" />
             </div>
             <h3 className="font-semibold text-navy-900 group-hover:text-trevu-600 transition-colors">
               {t('dashboard.newTrip')}
@@ -63,7 +64,7 @@ export default async function DashboardPage() {
 
           <div className="p-6 bg-white rounded-2xl border border-navy-200 opacity-60">
             <div className="w-12 h-12 rounded-xl bg-navy-100 flex items-center justify-center mb-4">
-              <span className="text-2xl">💰</span>
+              <Icon name="wallet" size={24} className="text-navy-500" />
             </div>
             <h3 className="font-semibold text-navy-900">{t('dashboard.expenses')}</h3>
             <p className="text-sm text-navy-500 mt-1">
@@ -73,7 +74,7 @@ export default async function DashboardPage() {
 
           <div className="p-6 bg-white rounded-2xl border border-navy-200 opacity-60">
             <div className="w-12 h-12 rounded-xl bg-navy-100 flex items-center justify-center mb-4">
-              <span className="text-2xl">🧭</span>
+              <Icon name="compass" size={24} className="text-navy-500" />
             </div>
             <h3 className="font-semibold text-navy-900">{t('dashboard.guides')}</h3>
             <p className="text-sm text-navy-500 mt-1">

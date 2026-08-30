@@ -1,5 +1,6 @@
 import { getServerT } from "@/lib/i18n/server";
 import { getAdminStats } from "./actions";
+import { Icon } from "@/components/Icon";
 
 export default async function AdminDashboardPage() {
   const { t } = await getServerT();
@@ -11,7 +12,7 @@ export default async function AdminDashboardPage() {
       value: stats.totalUsers.toLocaleString(),
       trend: "+2.5%",
       trendUp: true,
-      icon: "👥",
+      icon: "users",
       color: "bg-blue-50 border-blue-200",
       iconBg: "bg-blue-100",
     },
@@ -20,7 +21,7 @@ export default async function AdminDashboardPage() {
       value: stats.newSignups.toLocaleString(),
       trend: "+4.2%",
       trendUp: true,
-      icon: "✨",
+      icon: "sparkles",
       color: "bg-emerald-50 border-emerald-200",
       iconBg: "bg-emerald-100",
     },
@@ -29,7 +30,7 @@ export default async function AdminDashboardPage() {
       value: stats.activeTrips.toLocaleString(),
       trend: "+1.8%",
       trendUp: true,
-      icon: "🏔️",
+      icon: "backpack",
       color: "bg-violet-50 border-violet-200",
       iconBg: "bg-violet-100",
     },
@@ -38,7 +39,7 @@ export default async function AdminDashboardPage() {
       value: "—",
       trend: "",
       trendUp: true,
-      icon: "💰",
+      icon: "wallet",
       color: "bg-amber-50 border-amber-200",
       iconBg: "bg-amber-100",
       note: t("admin.comingSoon"),
@@ -48,7 +49,7 @@ export default async function AdminDashboardPage() {
       value: "—",
       trend: "",
       trendUp: false,
-      icon: "📈",
+      icon: "trending-up",
       color: "bg-rose-50 border-rose-200",
       iconBg: "bg-rose-100",
       note: t("admin.comingSoon"),
@@ -58,7 +59,7 @@ export default async function AdminDashboardPage() {
       value: "—",
       trend: "",
       trendUp: false,
-      icon: "🎫",
+      icon: "ticket",
       color: "bg-orange-50 border-orange-200",
       iconBg: "bg-orange-100",
       note: t("admin.comingSoon"),
@@ -85,8 +86,8 @@ export default async function AdminDashboardPage() {
             className={`p-4 rounded-xl border ${card.color} flex flex-col gap-2`}
           >
             <div className="flex items-center justify-between">
-              <div className={`w-8 h-8 rounded-lg ${card.iconBg} flex items-center justify-center text-base`}>
-                {card.icon}
+              <div className={`w-8 h-8 rounded-lg ${card.iconBg} flex items-center justify-center text-slate-700`}>
+                <Icon name={card.icon} size={16} />
               </div>
               {card.trend && (
                 <span
@@ -147,12 +148,12 @@ export default async function AdminDashboardPage() {
           </div>
           <div className="space-y-3">
             {[
-              { text: "Új felhasználó regisztrált", time: "5 perce", icon: "👤" },
-              { text: "Túra publikálva", time: "12 perce", icon: "🏔️" },
-              { text: "Regisztráció megerősítve", time: "28 perce", icon: "✅" },
+              { text: "Új felhasználó regisztrált", time: "5 perce", icon: "user-circle" },
+              { text: "Túra publikálva", time: "12 perce", icon: "backpack" },
+              { text: "Regisztráció megerősítve", time: "28 perce", icon: "check-circle-2" },
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-2.5">
-                <span className="text-base mt-0.5">{item.icon}</span>
+                <Icon name={item.icon} size={16} className="mt-0.5 text-slate-500" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-slate-700 truncate">{item.text}</p>
                   <p className="text-xs text-slate-400">{item.time}</p>
@@ -167,7 +168,7 @@ export default async function AdminDashboardPage() {
               href="/admin/users"
               className="flex items-center gap-2 text-sm text-slate-600 hover:text-emerald-600 transition-colors"
             >
-              <span>👥</span>
+              <Icon name="users" size={15} />
               <span>
                 {stats.totalUsers} {t("admin.nav.users")}
               </span>
@@ -176,7 +177,7 @@ export default async function AdminDashboardPage() {
               href="/admin/trips"
               className="flex items-center gap-2 text-sm text-slate-600 hover:text-emerald-600 transition-colors"
             >
-              <span>🏔️</span>
+              <Icon name="backpack" size={15} />
               <span>
                 {stats.activeTrips} {t("admin.nav.trips")}
               </span>

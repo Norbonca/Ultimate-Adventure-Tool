@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import type { WizardFormData } from "@/app/(app)/trips/types";
 import { useTranslation } from "@/lib/i18n/useTranslation";
+import { Icon } from "@/components/Icon";
 
 interface CrewSectionProps {
   data: WizardFormData;
@@ -69,7 +70,7 @@ export function CrewSection({ data, onChange, membersSlot, applicationsSlot, sta
                 className="text-xs text-navy-400 hover:text-red-500 transition-colors"
                 aria-label={t("trips.crew.removePosition")}
               >
-                ✕
+                <Icon name="x" size={12} />
               </button>
             </div>
           ))}

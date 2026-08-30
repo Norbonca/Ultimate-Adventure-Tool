@@ -23,6 +23,7 @@ import { Step3Details } from "./steps/step3-details";
 import { Step4Publish } from "./steps/step4-publish";
 import { CATEGORY_DISPLAY } from "@/lib/categories";
 import { useTranslation } from "@/lib/i18n/useTranslation";
+import { Icon } from "@/components/Icon";
 
 interface WizardFormProps {
   categories: CategoryRow[];
@@ -230,7 +231,7 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
                         : "bg-navy-100 text-navy-400"
                   }`}
                 >
-                  {isCompleted ? "✓" : step.num}
+                  {isCompleted ? <Icon name="check" size={16} strokeWidth={2.5} /> : step.num}
                 </div>
                 <span
                   className={`text-xs mt-1.5 font-medium ${
@@ -325,7 +326,7 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
             <span className="text-xs text-navy-400 animate-pulse">{t("common.saving")}</span>
           )}
           {saveStatus === "saved" && (
-            <span className="text-xs text-green-600">✓ {t("trips.wizard.saved")}</span>
+            <span className="text-xs text-green-600 flex items-center gap-1"><Icon name="check" size={12} strokeWidth={2.5} /> {t("trips.wizard.saved")}</span>
           )}
           {saveStatus === "error" && (
             <span className="text-xs text-red-500">{errorMsg}</span>
@@ -357,7 +358,7 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
               disabled={saveStatus === "saving"}
               className="px-6 py-2.5 text-sm font-bold text-white bg-trevu-600 rounded-xl hover:bg-trevu-700 transition-colors disabled:opacity-50 shadow-lg shadow-trevu-600/30"
             >
-              🚀 {t("trips.wizard.publish")}
+              <span className="inline-flex items-center gap-2"><Icon name="rocket" size={16} /> {t("trips.wizard.publish")}</span>
             </button>
           )}
         </div>

@@ -7,6 +7,7 @@ import {
   inviteStaffByEmail,
   searchUsersForStaffSeat,
 } from "@/app/(app)/trips/actions";
+import { Icon } from "@/components/Icon";
 
 interface CrewPosition {
   id: string;
@@ -233,7 +234,7 @@ export function AddStaffMemberModal({
               {t("trips.crew.searchSection")}
             </div>
             <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg border border-navy-300 bg-white focus-within:ring-2 focus-within:ring-trevu-500 focus-within:border-trevu-500 transition-colors">
-              <span className="text-navy-400">🔍</span>
+              <Icon name="search" size={16} className="text-navy-400" />
               <input
                 type="text"
                 value={query}
@@ -334,7 +335,7 @@ export function AddStaffMemberModal({
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-lg border border-navy-300 bg-white focus-within:ring-2 focus-within:ring-trevu-500 focus-within:border-trevu-500 transition-colors">
-                    <span className="text-navy-400 text-sm">✉</span>
+                    <Icon name="mail" size={15} className="text-navy-400" />
                     <input
                       type="email"
                       value={inviteEmail}
@@ -365,8 +366,8 @@ export function AddStaffMemberModal({
 
             {inviteSuccess && (
               <div className="flex items-start gap-3 p-3 rounded-lg bg-trevu-50 border border-trevu-300">
-                <div className="w-8 h-8 rounded-full bg-trevu-500 flex items-center justify-center text-white shrink-0 text-sm">
-                  ✓
+                <div className="w-8 h-8 rounded-full bg-trevu-500 flex items-center justify-center text-white shrink-0">
+                  <Icon name="check" size={14} strokeWidth={3} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-semibold text-trevu-700">

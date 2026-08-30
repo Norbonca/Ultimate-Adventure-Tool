@@ -3,6 +3,7 @@
 import type { CategoryRow, WizardFormData } from "../../types";
 import { CATEGORY_DISPLAY } from "@/lib/categories";
 import { useTranslation } from "@/lib/i18n/useTranslation";
+import { Icon } from "@/components/Icon";
 
 interface Step1Props {
   categories: CategoryRow[];
@@ -52,10 +53,10 @@ export function Step1Category({
               }`}
             >
               <div
-                className="w-14 h-14 rounded-xl flex items-center justify-center mb-3 text-3xl"
-                style={{ backgroundColor: `${cat.color_hex}15` }}
+                className="w-14 h-14 rounded-xl flex items-center justify-center mb-3"
+                style={{ backgroundColor: `${cat.color_hex}15`, color: cat.color_hex }}
               >
-                {display?.emoji || "🏔️"}
+                <Icon name={display?.icon || cat.icon_name || "compass"} size={28} strokeWidth={1.5} />
               </div>
               <span className="text-sm font-semibold text-navy-900">
                 {localName}
@@ -102,7 +103,7 @@ export function Step1Category({
             }`}
           >
             <div className="flex items-center gap-3 mb-2">
-              <span className="text-lg">🔒</span>
+              <Icon name="lock" size={18} className="text-navy-500" />
               <h4 className="font-semibold text-navy-900">
                 {t("trips.wizard.tripTypePrivate")}
               </h4>
@@ -122,7 +123,7 @@ export function Step1Category({
             }`}
           >
             <div className="flex items-center gap-3 mb-2">
-              <span className="text-lg">🌍</span>
+              <Icon name="globe" size={18} className="text-navy-500" />
               <h4 className="font-semibold text-navy-900">
                 {t("trips.wizard.tripTypePublic")}
               </h4>

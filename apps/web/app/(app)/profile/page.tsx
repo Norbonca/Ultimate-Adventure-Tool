@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { AppHeader } from "@/components/AppHeader";
+import { Icon } from "@/components/Icon";
 
 // ─── Types ───────────────────────────────────────────────────────────
 interface Profile {
@@ -67,14 +68,14 @@ interface FollowCounts {
 
 // ─── Constants ───────────────────────────────────────────────────────
 const CATEGORY_ICONS: Record<string, string> = {
-  hiking: "🥾",
-  mountain: "🏔️",
-  water_sports: "🌊",
-  cycling: "🚴",
-  running: "🏃",
-  winter_sports: "❄️",
-  expedition: "🧭",
-  motorsport: "🏍️",
+  hiking: "footprints",
+  mountain: "mountain",
+  water_sports: "waves",
+  cycling: "bike",
+  running: "person-standing",
+  winter_sports: "snowflake",
+  expedition: "compass",
+  motorsport: "gauge",
 };
 
 const SKILL_LEVEL_KEYS: Record<string, string> = {
@@ -545,7 +546,7 @@ export default function ProfilePage() {
                         }}
                       >
                         <span className="text-2xl">
-                          {CATEGORY_ICONS[iconKey] || "⭐"}
+                          <Icon name={CATEGORY_ICONS[iconKey] || "star"} size={18} />
                         </span>
                         <span className="text-xs font-medium text-slate-700">
                           {getLocalizedName(
@@ -663,7 +664,7 @@ export default function ProfilePage() {
                               className="flex items-center gap-3 rounded-xl border border-slate-100 px-4 py-3"
                             >
                               <span className="text-lg">
-                                {CATEGORY_ICONS[iconKey] || "⭐"}
+                                <Icon name={CATEGORY_ICONS[iconKey] || "star"} size={18} />
                               </span>
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-slate-900 truncate">

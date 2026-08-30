@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/useTranslation";
+import { Icon } from "@/components/Icon";
 
 interface AdminSidebarProps {
   user: {
@@ -35,28 +36,28 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
     {
       label: t("admin.nav.operations"),
       items: [
-        { key: "alerts", label: t("admin.nav.alerts"), href: "/admin/alerts", icon: "🔔", badge: 3, comingSoon: true },
-        { key: "users", label: t("admin.nav.users"), href: "/admin/users", icon: "👥" },
-        { key: "trips", label: t("admin.nav.trips"), href: "/admin/trips", icon: "🏔️" },
-        { key: "routes", label: t("admin.nav.routes"), href: "/admin/routes", icon: "🗺️", comingSoon: true },
-        { key: "support", label: t("admin.nav.support"), href: "/admin/support", icon: "🎫", comingSoon: true },
+        { key: "alerts", label: t("admin.nav.alerts"), href: "/admin/alerts", icon: "bell", badge: 3, comingSoon: true },
+        { key: "users", label: t("admin.nav.users"), href: "/admin/users", icon: "users" },
+        { key: "trips", label: t("admin.nav.trips"), href: "/admin/trips", icon: "backpack" },
+        { key: "routes", label: t("admin.nav.routes"), href: "/admin/routes", icon: "map", comingSoon: true },
+        { key: "support", label: t("admin.nav.support"), href: "/admin/support", icon: "ticket", comingSoon: true },
       ],
     },
     {
       label: t("admin.nav.dashboards"),
       items: [
-        { key: "overview", label: t("admin.nav.overview"), href: "/admin", icon: "📊" },
-        { key: "traffic", label: t("admin.nav.traffic"), href: "/admin/traffic", icon: "📈", comingSoon: true },
-        { key: "finance", label: t("admin.nav.finance"), href: "/admin/finance", icon: "💰", comingSoon: true },
-        { key: "performance", label: t("admin.nav.performance"), href: "/admin/performance", icon: "⚡", comingSoon: true },
+        { key: "overview", label: t("admin.nav.overview"), href: "/admin", icon: "layout-dashboard" },
+        { key: "traffic", label: t("admin.nav.traffic"), href: "/admin/traffic", icon: "trending-up", comingSoon: true },
+        { key: "finance", label: t("admin.nav.finance"), href: "/admin/finance", icon: "wallet", comingSoon: true },
+        { key: "performance", label: t("admin.nav.performance"), href: "/admin/performance", icon: "zap", comingSoon: true },
       ],
     },
     {
       label: t("admin.nav.configuration"),
       items: [
-        { key: "tripConfig", label: t("admin.nav.tripConfig"), href: "/admin/trip-config", icon: "⚙️" },
-        { key: "adminUsers", label: t("admin.nav.adminUsers"), href: "/admin/admin-users", icon: "🛡️" },
-        { key: "settings", label: t("admin.nav.settings"), href: "/admin/settings", icon: "🔧", comingSoon: true },
+        { key: "tripConfig", label: t("admin.nav.tripConfig"), href: "/admin/trip-config", icon: "settings-2" },
+        { key: "adminUsers", label: t("admin.nav.adminUsers"), href: "/admin/admin-users", icon: "shield" },
+        { key: "settings", label: t("admin.nav.settings"), href: "/admin/settings", icon: "wrench", comingSoon: true },
       ],
     },
   ];
@@ -105,7 +106,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
                   <li key={item.key}>
                     {item.comingSoon ? (
                       <span className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-slate-500 cursor-not-allowed text-sm">
-                        <span className="text-base leading-none w-4 text-center">{item.icon}</span>
+                        <Icon name={item.icon} size={16} className="w-4 shrink-0" />
                         <span className="flex-1">{item.label}</span>
                         <span className="text-[10px] bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded">
                           {t("admin.comingSoon")}
@@ -120,7 +121,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
                             : "text-slate-400 hover:text-white hover:bg-white/5"
                         }`}
                       >
-                        <span className="text-base leading-none w-4 text-center">{item.icon}</span>
+                        <Icon name={item.icon} size={16} className="w-4 shrink-0" />
                         <span className="flex-1">{item.label}</span>
                         {item.badge !== undefined && item.badge > 0 && (
                           <span className="bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">

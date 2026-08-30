@@ -3,6 +3,7 @@
 import type { WizardFormData } from "@/app/(app)/trips/types";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import type { TranslationKey } from "@uat/i18n";
+import { Icon } from "@/components/Icon";
 
 interface SettingsSectionProps {
   data: WizardFormData;
@@ -10,9 +11,9 @@ interface SettingsSectionProps {
 }
 
 const VISIBILITY_OPTIONS = [
-  { value: "public" as const, icon: "🌍", labelKey: "trips.wizard.visPublic", descKey: "trips.wizard.visPublicDesc" },
-  { value: "followers_only" as const, icon: "👥", labelKey: "trips.wizard.visFollowers", descKey: "trips.wizard.visFollowersDesc" },
-  { value: "private" as const, icon: "🔒", labelKey: "trips.wizard.visPrivate", descKey: "trips.wizard.visPrivateDesc" },
+  { value: "public" as const, icon: "globe", labelKey: "trips.wizard.visPublic", descKey: "trips.wizard.visPublicDesc" },
+  { value: "followers_only" as const, icon: "users", labelKey: "trips.wizard.visFollowers", descKey: "trips.wizard.visFollowersDesc" },
+  { value: "private" as const, icon: "lock", labelKey: "trips.wizard.visPrivate", descKey: "trips.wizard.visPrivateDesc" },
 ];
 
 export function SettingsSection({ data, onChange }: SettingsSectionProps) {
@@ -37,7 +38,7 @@ export function SettingsSection({ data, onChange }: SettingsSectionProps) {
                   : "border-navy-200 hover:border-navy-300"
               }`}
             >
-              <span className="text-xl">{opt.icon}</span>
+              <Icon name={opt.icon} size={20} className="text-navy-600" />
               <span className="block text-sm font-semibold text-navy-800 mt-2">
                 {t(opt.labelKey as TranslationKey)}
               </span>
@@ -94,7 +95,7 @@ export function SettingsSection({ data, onChange }: SettingsSectionProps) {
           </div>
         </div>
         <div className="mt-3 flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-emerald-50 text-emerald-700 text-sm font-semibold">
-          <span>👥</span>
+          <Icon name="users" size={15} />
           <span>
             {t("trips.settings.teamTotal").replace(
               "{count}",
