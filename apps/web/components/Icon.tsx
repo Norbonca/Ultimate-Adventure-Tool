@@ -68,6 +68,7 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   inbox: L.Inbox,
   info: L.Info,
   "loader-2": L.Loader2,
+  "folder-open": L.FolderOpen,
   lock: L.Lock,
   unlock: L.Unlock,
   "x-circle": L.XCircle,

@@ -75,6 +75,7 @@ export {
   Inbox,
   Info,
   Loader2,
+  FolderOpen,
   Lock,
   Unlock,
   XCircle,
