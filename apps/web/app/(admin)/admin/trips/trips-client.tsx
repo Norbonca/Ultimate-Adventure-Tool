@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { updateTripStatus, type AdminTrip } from "../actions";
+import { Icon } from "@/components/Icon";
 
 interface TabLabel {
   key: string;
@@ -159,8 +160,9 @@ export function AdminTripsClient({
           <button
             type="submit"
             className="px-3 py-1.5 bg-emerald-500 text-white text-sm rounded-lg hover:bg-emerald-600 transition-colors"
+            aria-label="Search"
           >
-            🔍
+            <Icon name="search" size={16} />
           </button>
         </form>
       </div>
@@ -208,8 +210,8 @@ export function AdminTripsClient({
                         {trip.title}
                       </p>
                       {trip.location_city && (
-                        <p className="text-xs text-slate-400 truncate">
-                          📍 {trip.location_city}
+                        <p className="text-xs text-slate-400 truncate inline-flex items-center gap-1">
+                          <Icon name="map-pin" size={11} /> {trip.location_city}
                         </p>
                       )}
                     </div>

@@ -73,6 +73,80 @@
     --font-l: 18px;
     --font-xl: 24px;
     --font-xxl: 28px;
+
+    /* ----------------------------------------------------------
+       Trevu_Brand_Guide.docx (Proposal B) — S33 additions
+       Source: .skills/trevu-brand/references/brand-kivonat.md
+       ---------------------------------------------------------- */
+
+    /* Brand type scale (DM Sans) — §4 */
+    --font-h1: 36px;   /* 700 */
+    --font-h2: 28px;   /* 600 */
+    --font-h3: 22px;   /* 600 */
+    --font-h4: 18px;   /* 500 */
+    --font-body-lg: 18px;
+    --font-body: 16px;
+    --font-body-sm: 14px;
+    --font-caption: 12px; /* 500 */
+    --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+    /* Semantic colors — §3 */
+    --color-primary-hover: var(--trevu-teal-dark);
+    --color-primary-light: var(--trevu-teal-light);
+    --color-navy: var(--deep-navy);
+    --color-frost: var(--card-bg);
+    --color-border-input: var(--border-medium);
+    --color-danger: var(--sunrise-coral);
+    --color-success: var(--trail-sage);
+    --color-rating: var(--golden-hour);
+    --color-special: var(--dusk-violet);
+    /* Semantic subtle/text variants — S34, a Pencil-fájlok tokenjeivel azonos */
+    --color-success-subtle: #ECFDF5;
+    --color-success-text: #047857;
+    --color-danger-subtle: #FEF0EE;
+    --color-warning-subtle: #FEF3C7;
+    --color-info-subtle: #DBEAFE;
+    --color-special-subtle: #EDE9FE;
+    --color-navy-800: #1E293B;
+    --color-text-secondary: #475569;
+    --color-primary-subtle: #F0FDFA;
+    --color-text-body: #334155;
+    --color-text-subtle: #94A3B8;
+    --color-border-strong: #CBD5E1;
+    --color-info: #3B82F6;
+    --color-warning: #F59E0B;
+
+    /* Gradients — §3 */
+    --gradient-trevu: linear-gradient(135deg, #0D9488 0%, #06B6D4 100%);
+    --gradient-dawn: linear-gradient(135deg, #F97066 0%, #FBBF24 100%);
+
+    /* Shadows & motion — §5, §6, §9 */
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.08);
+    --shadow-primary: 0 2px 8px rgba(13, 148, 136, 0.25);
+    --focus-ring: 0 0 0 3px rgba(13, 148, 136, 0.12);
+    --radius-chip: 6px;
+    --motion-duration: 300ms;
+    --motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Category colors — §8 (+ Motorsport, Icon Bank §12) */
+    --cat-hiking: #059669;
+    --cat-climbing: #92400E;
+    --cat-water: #0D9488;
+    --cat-cycling: #D97706;
+    --cat-running: #DC2626;
+    --cat-winter: #3B82F6;
+    --cat-expedition: #8B5CF6;
+    --cat-motorsport: #B91C1C;
+
+    /* Dark mode ("éjszakai túra") — §7 */
+    --dark-bg: #0F172A;
+    --dark-surface: #1E293B;
+    --dark-border: #334155;
+    --dark-text: #F1F5F9;
+    --dark-text-muted: #94A3B8;
+    --dark-primary: #2DD4BF;
+    --dark-danger: #FCA5A1;
   }
 
   html {

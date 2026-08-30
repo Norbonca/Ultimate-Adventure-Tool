@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/useTranslation";
+import { Icon } from "@/components/Icon";
 
 
 const NAV_ITEMS = [
-  { href: "/settings/profile", icon: "👤", key: "settings.nav.editProfile" },
-  { href: "/settings/interests", icon: "🧭", key: "settings.nav.adventureInterests" },
-  { href: "/settings/social", icon: "👥", key: "settings.nav.socialNetworks" },
-  { href: "/settings/privacy", icon: "🛡️", key: "settings.nav.privacy" },
+  { href: "/settings/profile", icon: "user-circle", key: "settings.nav.editProfile" },
+  { href: "/settings/interests", icon: "compass", key: "settings.nav.adventureInterests" },
+  { href: "/settings/social", icon: "users", key: "settings.nav.socialNetworks" },
+  { href: "/settings/privacy", icon: "shield", key: "settings.nav.privacy" },
 ] as const;
 
 export function SettingsSidebar() {
@@ -31,7 +32,7 @@ export function SettingsSidebar() {
                   : "text-navy-500 hover:bg-navy-50 hover:text-navy-700"
               }`}
             >
-              <span className="text-base">{item.icon}</span>
+              <Icon name={item.icon} size={18} />
               {t(item.key as Parameters<typeof t>[0])}
             </Link>
           );

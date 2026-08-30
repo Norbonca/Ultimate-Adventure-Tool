@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { applyToTrip, cancelApplication } from "@/app/(app)/trips/actions";
+import { Icon } from "@/components/Icon";
 
 type Participation = {
   id: string;
@@ -134,7 +135,7 @@ export function ApplyButton({
         {participation.application_text && (
           <div className="text-xs text-navy-500 bg-navy-50 rounded-lg p-3">
             <span className="font-semibold block mb-1">
-              💬 {t("trips.detail.yourMessage")}
+              <Icon name="message-circle" size={12} className="inline -mt-0.5 mr-1" />{t("trips.detail.yourMessage")}
             </span>
             <span className="whitespace-pre-wrap">{participation.application_text}</span>
           </div>

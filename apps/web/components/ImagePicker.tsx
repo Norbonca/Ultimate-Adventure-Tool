@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { uploadCoverImage, fetchCoverImages } from "@/app/(app)/trips/actions";
 import { uploadAvatar, fetchSystemAvatars } from "@/app/(app)/settings/actions";
+import { Icon } from "@/components/Icon";
 
 // ============================================
 // ImagePicker — Közös képválasztó component
@@ -152,7 +153,7 @@ export function ImagePicker({
           {/* Own photo badge on cover preview */}
           {isImageType && currentSource === "user_upload" && (
             <span className="absolute bottom-3 right-3 text-[11px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-tl-lg">
-              ✨ {t("imagePicker.ownPhoto")}
+              <Icon name="camera" size={12} className="inline -mt-0.5 mr-1" />{t("imagePicker.ownPhoto")}
             </span>
           )}
 
@@ -168,7 +169,7 @@ export function ImagePicker({
                 : "mt-2 text-sm font-medium text-teal-600 hover:text-teal-700 transition-colors"
             }
           >
-            {isImageType ? "✕" : t("imagePicker.avatar.change")}
+            {isImageType ? <Icon name="x" size={14} label={t("imagePicker.avatar.change")} /> : t("imagePicker.avatar.change")}
           </button>
         </div>
       ) : (
@@ -235,9 +236,9 @@ export function ImagePicker({
             <div className="flex gap-1 border-b border-slate-200">
               {(
                 [
-                  { key: "icon" as const, label: t("imagePicker.avatar.tabIcons"), icon: "🏔️" },
-                  { key: "nature" as const, label: t("imagePicker.avatar.tabNature"), icon: "🌄" },
-                  { key: "abstract" as const, label: t("imagePicker.avatar.tabAbstract"), icon: "🎨" },
+                  { key: "icon" as const, label: t("imagePicker.avatar.tabIcons"), icon: "mountain" },
+                  { key: "nature" as const, label: t("imagePicker.avatar.tabNature"), icon: "sun" },
+                  { key: "abstract" as const, label: t("imagePicker.avatar.tabAbstract"), icon: "palette" },
                 ] as const
               ).map((tab) => (
                 <button
@@ -249,7 +250,7 @@ export function ImagePicker({
                       : "border-transparent text-slate-400 hover:text-slate-600"
                   }`}
                 >
-                  <span>{tab.icon}</span>
+                  <Icon name={tab.icon} size={14} />
                   {tab.label}
                 </button>
               ))}
@@ -289,7 +290,7 @@ export function ImagePicker({
                   {/* Photographer credit (cover only) */}
                   {isImageType && img.photographer && (
                     <span className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] px-1.5 py-0.5 opacity-0 group-hover:opacity-100 transition-opacity truncate">
-                      📷 {img.photographer}
+                      <Icon name="camera" size={10} className="inline -mt-0.5 mr-1" />{img.photographer}
                     </span>
                   )}
                   {/* Featured badge (cover only) */}

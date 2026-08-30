@@ -7,6 +7,7 @@ import { DIFFICULTY_LEVELS } from "@/lib/categories";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import type { TranslationKey } from "@uat/i18n";
 import { ImagePicker } from "@/components/ImagePicker";
+import { Icon } from "@/components/Icon";
 
 interface Step4Props {
   formData: WizardFormData;
@@ -44,7 +45,7 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
               className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
               style={{ backgroundColor: `${categoryDisplay.colorHex}15` }}
             >
-              {categoryDisplay.emoji}
+              <Icon name={categoryDisplay.icon} size={24} className="text-navy-700" />
             </div>
           )}
           <div className="flex-1 min-w-0">
@@ -144,9 +145,9 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
         </label>
         <div className="grid grid-cols-3 gap-3">
           {([
-            { value: "public" as const, icon: "🌍", labelKey: "trips.wizard.visPublic", descKey: "trips.wizard.visPublicDesc" },
-            { value: "followers_only" as const, icon: "👥", labelKey: "trips.wizard.visFollowers", descKey: "trips.wizard.visFollowersDesc" },
-            { value: "private" as const, icon: "🔒", labelKey: "trips.wizard.visPrivate", descKey: "trips.wizard.visPrivateDesc" },
+            { value: "public" as const, icon: "globe", labelKey: "trips.wizard.visPublic", descKey: "trips.wizard.visPublicDesc" },
+            { value: "followers_only" as const, icon: "users", labelKey: "trips.wizard.visFollowers", descKey: "trips.wizard.visFollowersDesc" },
+            { value: "private" as const, icon: "lock", labelKey: "trips.wizard.visPrivate", descKey: "trips.wizard.visPrivateDesc" },
           ]).map((opt) => (
             <button
               key={opt.value}
@@ -157,7 +158,7 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
                   : "border-navy-200 hover:border-navy-300"
               }`}
             >
-              <span className="text-xl">{opt.icon}</span>
+              <Icon name={opt.icon} size={20} className="text-navy-600" />
               <span className="block text-sm font-semibold text-navy-800 mt-2">
                 {t(opt.labelKey as TranslationKey)}
               </span>
@@ -188,8 +189,9 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
                   })
                 }
                 className="text-trevu-400 hover:text-trevu-600 text-xs ml-0.5"
+                aria-label={t("common.cancel")}
               >
-                ✕
+                <Icon name="x" size={12} />
               </button>
             </span>
           ))}

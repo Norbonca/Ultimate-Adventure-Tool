@@ -22,6 +22,7 @@ import {
   List,
 } from '@/lib/icons';
 import type { LucideIcon } from '@/lib/icons';
+import { Icon } from "@/components/Icon";
 
 // Types matching Supabase query results exactly
 interface Trip {
@@ -1245,7 +1246,7 @@ export default function DiscoverClient({
                       )}
                       {cardSrc === "user_upload" && (
                         <span style={{ position: 'absolute', bottom: 8, right: 8, fontSize: 10, fontWeight: 600, color: '#fff', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: '2px 8px', borderTopLeftRadius: 8 }}>
-                          ✨ {t('imagePicker.ownPhoto')}
+                          <Icon name="camera" size={11} className="inline -mt-0.5 mr-1" />{t('imagePicker.ownPhoto')}
                         </span>
                       )}
                       <div className="trip-card-badges">

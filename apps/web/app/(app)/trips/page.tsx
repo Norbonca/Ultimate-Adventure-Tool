@@ -6,6 +6,7 @@ import { CATEGORY_DISPLAY, DIFFICULTY_LEVELS } from "@/lib/categories";
 import { getServerT, getServerLocale } from "@/lib/i18n/server";
 import type { TranslationKey } from "@uat/i18n";
 import { AppHeader } from "@/components/AppHeader";
+import { Icon } from "@/components/Icon";
 
 export default async function MyTripsPage() {
   const supabase = await createClient();
@@ -40,7 +41,7 @@ export default async function MyTripsPage() {
         {trips.length === 0 ? (
           /* Empty State */
           <div className="text-center py-16">
-            <div className="text-6xl mb-4">🏔️</div>
+            <div className="flex justify-center mb-4 text-navy-300"><Icon name="inbox" size={56} strokeWidth={1.25} /></div>
             <h3 className="text-xl font-bold text-navy-900 mb-2">
               {t('trips.emptyTitle')}
             </h3>
@@ -97,13 +98,13 @@ export default async function MyTripsPage() {
                     {/* Category Emoji */}
                     {catDisplay && (
                       <div className="absolute top-3 right-3 w-9 h-9 rounded-lg bg-white/90 backdrop-blur-sm flex items-center justify-center text-lg shadow-sm">
-                        {catDisplay.emoji}
+                        <Icon name={catDisplay.icon} size={18} className="text-navy-700" />
                       </div>
                     )}
                     {/* Own Photo Badge */}
                     {(trip.card_image_url ? trip.card_image_source : trip.cover_image_source) === "user_upload" && (
                       <span className="absolute bottom-2 right-2 text-[10px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-tl-lg">
-                        ✨ {t("imagePicker.ownPhoto")}
+                        <Icon name="camera" size={11} className="inline -mt-0.5 mr-1" />{t("imagePicker.ownPhoto")}
                       </span>
                     )}
                   </div>
@@ -124,7 +125,7 @@ export default async function MyTripsPage() {
                       {/* Date */}
                       {trip.start_date && (
                         <span className="text-xs text-navy-500 flex items-center gap-1">
-                          📅{" "}
+                          <Icon name="calendar" size={13} />{" "}
                           {new Date(trip.start_date).toLocaleDateString(
                             locale === 'en' ? 'en-US' : 'hu-HU',
                             { month: "short", day: "numeric" }
@@ -134,7 +135,7 @@ export default async function MyTripsPage() {
                       {/* Location */}
                       {(trip.location_city || trip.location_region) && (
                         <span className="text-xs text-navy-500 flex items-center gap-1">
-                          📍{" "}
+                          <Icon name="map-pin" size={13} />{" "}
                           {trip.location_city ||
                             trip.location_region ||
                             trip.location_country}
@@ -156,8 +157,8 @@ export default async function MyTripsPage() {
 
                     {/* Footer */}
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-navy-100">
-                      <span className="text-xs text-navy-400">
-                        👥 {trip.current_participants || 0}/
+                      <span className="text-xs text-navy-400 flex items-center gap-1">
+                        <Icon name="users" size={13} /> {trip.current_participants || 0}/
                         {trip.max_participants}
                       </span>
                       <span

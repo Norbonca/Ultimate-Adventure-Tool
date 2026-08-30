@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import type { TranslationKey } from "@uat/i18n";
+import { Icon } from "@/components/Icon";
 
 export type PlanningMode = "template" | "ai" | "scratch";
 
@@ -12,7 +13,7 @@ interface TemplateData {
   descriptionHu: string;
   descriptionEn: string;
   image: string;
-  categoryEmoji: string;
+  categoryIcon: string;
   categoryKey: string;
   organizerName: string;
   spots: number;
@@ -26,7 +27,7 @@ const SAMPLE_TEMPLATES: TemplateData[] = [
     descriptionHu: "Egy hétvégi túra az erdélyi hegyekbe, 3 napos túra szállással és közös étkezéssel.",
     descriptionEn: "A weekend hike in the Carpathian mountains with accommodation and group meals.",
     image: "",
-    categoryEmoji: "🥾",
+    categoryIcon: "footprints",
     categoryKey: "hiking",
     organizerName: "Fanni",
     spots: 3,
@@ -38,7 +39,7 @@ const SAMPLE_TEMPLATES: TemplateData[] = [
     descriptionHu: "Vitorlás kaland a dalmát partok mentén, a legszebb öblökkel és kikötőkkel.",
     descriptionEn: "Sailing adventure along the Dalmatian coast with stunning bays and harbors.",
     image: "",
-    categoryEmoji: "⛵",
+    categoryIcon: "waves",
     categoryKey: "waterSports",
     organizerName: "Marko",
     spots: 6,
@@ -50,7 +51,7 @@ const SAMPLE_TEMPLATES: TemplateData[] = [
     descriptionHu: "Síelős hétvége az osztrák Alpokban, szállással és síbérlettel.",
     descriptionEn: "Ski trip weekend in the Austrian Alps with accommodation and ski passes.",
     image: "",
-    categoryEmoji: "⛷️",
+    categoryIcon: "snowflake",
     categoryKey: "winterSports",
     organizerName: "Stefan",
     spots: 8,
@@ -106,8 +107,8 @@ export function Step0Template({
               : "border-navy-200 bg-white hover:border-navy-300"
           }`}
         >
-          <div className="w-10 h-10 rounded-lg bg-navy-100 flex items-center justify-center text-lg mb-4">
-            📋
+          <div className="w-10 h-10 rounded-lg bg-navy-100 flex items-center justify-center text-navy-600 mb-4">
+            <Icon name="clipboard-list" size={20} />
           </div>
           <h3 className="font-semibold text-navy-900 mb-2">
             {t("trips.wizard.useTemplate")}
@@ -129,8 +130,8 @@ export function Step0Template({
               : "border-navy-200 bg-white hover:border-navy-300"
           }`}
         >
-          <div className="w-10 h-10 rounded-lg bg-trevu-100 flex items-center justify-center text-lg mb-4">
-            ✨
+          <div className="w-10 h-10 rounded-lg bg-trevu-100 flex items-center justify-center text-trevu-600 mb-4">
+            <Icon name="sparkles" size={20} />
           </div>
           <h3 className="font-semibold text-navy-900 mb-2">
             {t("trips.wizard.aiAssistant")}
@@ -152,8 +153,8 @@ export function Step0Template({
               : "border-navy-200 bg-white hover:border-navy-300"
           }`}
         >
-          <div className="w-10 h-10 rounded-lg bg-navy-100 flex items-center justify-center text-lg mb-4">
-            ✏️
+          <div className="w-10 h-10 rounded-lg bg-navy-100 flex items-center justify-center text-navy-600 mb-4">
+            <Icon name="pencil" size={20} />
           </div>
           <h3 className="font-semibold text-navy-900 mb-2">
             {t("trips.wizard.startFromScratch")}
@@ -191,7 +192,7 @@ export function Step0Template({
                   className={`h-40 bg-gradient-to-br ${TEMPLATE_GRADIENTS[idx]} relative`}
                 >
                   <div className="absolute top-3 left-3 px-2 py-0.5 bg-white/90 backdrop-blur-sm rounded-md text-xs font-medium text-navy-700">
-                    {tmpl.categoryEmoji} {t(`categories.${tmpl.categoryKey}` as TranslationKey)}
+                    <Icon name={tmpl.categoryIcon} size={13} /> {t(`categories.${tmpl.categoryKey}` as TranslationKey)}
                   </div>
                 </div>
 
@@ -205,7 +206,7 @@ export function Step0Template({
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-xs text-navy-400">
-                      <span>👤 {tmpl.organizerName}</span>
+                      <span className="inline-flex items-center gap-1"><Icon name="user-check" size={12} /> {tmpl.organizerName}</span>
                       <span>·</span>
                       <span>
                         {tmpl.duration} {t("trips.detail.days")}

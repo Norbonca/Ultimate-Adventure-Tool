@@ -13,6 +13,7 @@ import { getServerT, getServerLocale } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
 import { BackButton } from "@/components/BackButton";
 import { TripTimelineClient } from "@/components/TripTimelineClient";
+import { Icon } from "@/components/Icon";
 
 interface ManagePageProps {
   params: Promise<{ slug: string }>;
@@ -159,19 +160,19 @@ export default async function TripManagePage({ params }: ManagePageProps) {
               href={`/trips/${slug}/edit`}
               className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm font-semibold text-white bg-trevu-600 rounded-xl hover:bg-trevu-700 transition-colors"
             >
-              ✏️ {t("trips.manage.editTrip")}
+              <Icon name="pencil" size={15} /> {t("trips.manage.editTrip")}
             </Link>
             <button
               onClick={undefined}
               className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm font-medium text-navy-600 bg-white border border-navy-200 rounded-xl hover:bg-navy-50 transition-colors"
             >
-              🔗 {t("trips.manage.shareLink")}
+              <Icon name="share-2" size={15} /> {t("trips.manage.shareLink")}
             </button>
             <Link
               href={`/trips/${slug}`}
               className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm font-medium text-navy-600 bg-white border border-navy-200 rounded-xl hover:bg-navy-50 transition-colors"
             >
-              👁️ {t("trips.manage.viewPublic")}
+              <Icon name="eye" size={15} /> {t("trips.manage.viewPublic")}
             </Link>
           </div>
         </aside>
@@ -221,14 +222,14 @@ export default async function TripManagePage({ params }: ManagePageProps) {
                 href={`/trips/${slug}/edit`}
                 className="flex items-center gap-3 p-4 rounded-xl border border-navy-200 hover:border-trevu-300 hover:bg-trevu-50/50 transition-all"
               >
-                <span className="text-lg">✏️</span>
+                <Icon name="pencil" size={18} className="text-navy-500" />
                 <span className="text-sm font-medium text-navy-700">{t("trips.manage.editTrip")}</span>
               </Link>
               <Link
                 href={`/trips/${slug}`}
                 className="flex items-center gap-3 p-4 rounded-xl border border-navy-200 hover:border-trevu-300 hover:bg-trevu-50/50 transition-all"
               >
-                <span className="text-lg">👁️</span>
+                <Icon name="eye" size={18} className="text-navy-500" />
                 <span className="text-sm font-medium text-navy-700">{t("trips.manage.viewPublic")}</span>
               </Link>
             </div>
@@ -285,7 +286,7 @@ export default async function TripManagePage({ params }: ManagePageProps) {
                                 className="inline-flex items-center gap-1 text-[10px] font-semibold text-trevu-700 bg-trevu-100 px-1.5 py-0.5 rounded-full"
                                 title={t("trips.manage.hasApplicationMessage")}
                               >
-                                💬 {t("trips.manage.hasMessageBadge")}
+                                <Icon name="message-circle" size={10} /> {t("trips.manage.hasMessageBadge")}
                               </span>
                             )}
                           </div>

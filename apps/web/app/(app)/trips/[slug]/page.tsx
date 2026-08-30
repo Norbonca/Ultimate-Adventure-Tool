@@ -8,6 +8,7 @@ import { getServerT, getServerLocale } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
 import { BackButton } from "@/components/BackButton";
 import { ApplyButton } from "@/components/ApplyButton";
+import { Icon } from "@/components/Icon";
 
 interface TripDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -167,14 +168,14 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
         {trip.cover_image_source === "user_upload" && (
           <span className="absolute top-4 right-4 text-[11px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-tl-lg">
-            ✨ {t("imagePicker.ownPhoto")}
+            <Icon name="camera" size={12} className="inline -mt-0.5 mr-1" />{t("imagePicker.ownPhoto")}
           </span>
         )}
         <div className="absolute bottom-6 left-6 right-6 max-w-6xl mx-auto">
           <div className="flex items-end gap-4">
             {catDisplay && (
-              <div className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl bg-white/90 backdrop-blur-sm shadow-lg">
-                {catDisplay.emoji}
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-white/90 backdrop-blur-sm shadow-lg" style={{ color: catDisplay.colorHex }}>
+                <Icon name={catDisplay.icon} size={28} strokeWidth={1.5} />
               </div>
             )}
             <div className="flex-1">
@@ -210,7 +211,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
             <div className="flex flex-wrap gap-3 text-sm">
               {startDate && (
                 <span className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-navy-200">
-                  <span className="text-navy-400">📅</span>
+                  <Icon name="calendar" size={15} className="text-navy-400" />
                   <span className="font-medium text-navy-700">
                     {startDate}
                     {endDate && startDate !== endDate ? ` → ${endDate}` : ""}
@@ -223,7 +224,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                 </span>
               )}
               <span className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-navy-200">
-                <span className="text-navy-400">📍</span>
+                <Icon name="map-pin" size={15} className="text-navy-400" />
                 <span className="font-medium text-navy-700">
                   {[trip.location_city, trip.location_region, trip.location_country]
                     .filter(Boolean)
@@ -244,7 +245,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                 </span>
               )}
               <span className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-navy-200">
-                <span className="text-navy-400">👥</span>
+                <Icon name="users" size={15} className="text-navy-400" />
                 <span className="font-medium text-navy-700">
                   {trip.current_participants || 0}/{trip.max_participants} {t("trips.detail.guestsLabel")}
                 </span>
@@ -423,7 +424,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
 
                 {teamTotal > 0 && (
                   <div className="flex items-center gap-2 rounded-md bg-emerald-50 text-emerald-700 px-3 py-2 text-xs font-semibold">
-                    <span aria-hidden>👥</span>
+                    <Icon name="users" size={14} />
                     <span>
                       {t("trips.detail.teamSetup")
                         .replace("{guests}", String(totalGuests))
@@ -479,11 +480,14 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
               <div className="flex justify-between">
                 <span className="text-navy-500">{t("trips.wizard.visibility")}</span>
                 <span className="font-medium text-navy-700">
-                  {trip.visibility === "public"
-                    ? `🌍 ${t("trips.wizard.visPublic")}`
-                    : trip.visibility === "followers_only"
-                      ? `👥 ${t("trips.wizard.visFollowers")}`
-                      : `🔒 ${t("trips.wizard.visPrivate")}`}
+                  <span className="inline-flex items-center gap-1.5">
+                    <Icon name={trip.visibility === "public" ? "globe" : trip.visibility === "followers_only" ? "users" : "lock"} size={14} />
+                    {trip.visibility === "public"
+                      ? t("trips.wizard.visPublic")
+                      : trip.visibility === "followers_only"
+                        ? t("trips.wizard.visFollowers")
+                        : t("trips.wizard.visPrivate")}
+                  </span>
                 </span>
               </div>
               <div className="flex justify-between">
@@ -543,7 +547,7 @@ function DetailValue({
   locale: string;
 }) {
   if (typeof value === "boolean") {
-    return <>{value ? "✅" : "❌"}</>;
+    return value ? <Icon name="check-circle-2" size={16} className="text-emerald-600" label={locale === "en" ? "Yes" : "Igen"} /> : <Icon name="x-circle" size={16} className="text-red-500" label={locale === "en" ? "No" : "Nem"} />;
   }
   if (Array.isArray(value)) {
     return <>{value.join(", ")}</>;

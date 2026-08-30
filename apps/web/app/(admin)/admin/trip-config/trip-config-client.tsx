@@ -16,6 +16,7 @@ import {
   type AdminParameter,
   type AdminParameterOption,
 } from "./actions";
+import { Icon } from "@/components/Icon";
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -1103,7 +1104,7 @@ export function TripConfigClient({
                                   <td className="px-2.5 py-1.5 text-slate-400">
                                     {opt.sort_order}
                                     {opt.is_default && (
-                                      <span className="ml-1 text-emerald-500" title={t.t_p_optionsIsDefault}>★</span>
+                                      <span className="ml-1 inline-flex text-emerald-500" title={t.t_p_optionsIsDefault}><Icon name="star" size={11} /></span>
                                     )}
                                   </td>
                                   <td className="px-2.5 py-1.5">
@@ -1189,7 +1190,7 @@ export function TripConfigClient({
                         </td>
                         <td className="px-4 py-2.5 text-xs">
                           {p.is_required ? (
-                            <span className="text-emerald-600 font-medium">✓</span>
+                            <Icon name="check" size={14} strokeWidth={2.5} className="text-emerald-600" />
                           ) : (
                             <span className="text-slate-300">—</span>
                           )}

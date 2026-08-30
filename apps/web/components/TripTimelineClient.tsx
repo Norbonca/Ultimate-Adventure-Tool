@@ -22,6 +22,7 @@ import {
   type MilestoneWithTasks,
   type TimelineTask,
 } from "@/app/(app)/trips/timeline-actions";
+import { Icon } from "@/components/Icon";
 
 // ── Status colors ───────────────────────────
 
@@ -43,17 +44,8 @@ const TASK_STATUS_COLORS: Record<string, { bg: string; text: string }> = {
 
 // ── Phase icons ─────────────────────────────
 
-const PHASE_ICONS: Record<string, string> = {
-  megaphone: "📢",
-  "clipboard-list": "📋",
-  package: "📦",
-  plane: "✈️",
-  compass: "🧭",
-  sparkles: "✨",
-  home: "���",
-  flag: "🏁",
-  circle: "⚪",
-};
+// Phase icons are Icon Bank keys (03_Icon_Bank.md §6.2) stored in trip_phases.icon.
+const PHASE_ICON_FALLBACK = "circle";
 
 // ══════════════════════════════════════════════
 // MAIN COMPONENT
@@ -227,7 +219,7 @@ function TemplateSelector({ tripId, onInit }: { tripId: string; onInit: () => vo
               disabled={initializing}
               className="w-full flex items-center gap-4 px-5 py-4 rounded-xl border border-slate-200 hover:border-teal-300 hover:bg-teal-50/50 transition-all text-left disabled:opacity-50"
             >
-              <span className="text-2xl">{PHASE_ICONS[tpl.icon] || "📋"}</span>
+              <span className="text-teal-600"><Icon name={tpl.icon || "clipboard-list"} size={24} /></span>
               <div>
                 <span className="block text-sm font-semibold text-slate-800">
                   {(tpl.name_localized as Record<string, string>)?.hu || tpl.name}
@@ -244,7 +236,7 @@ function TemplateSelector({ tripId, onInit }: { tripId: string; onInit: () => vo
           disabled={initializing}
           className="w-full flex items-center gap-4 px-5 py-4 rounded-xl border border-dashed border-slate-300 hover:border-teal-300 hover:bg-teal-50/30 transition-all text-left disabled:opacity-50"
         >
-          <span className="text-2xl">➕</span>
+          <span className="text-slate-500"><Icon name="plus" size={24} /></span>
           <span className="text-sm font-medium text-slate-600">{t("timeline.emptyTemplate")}</span>
         </button>
       </div>
@@ -295,7 +287,7 @@ function PhaseColumn({
   };
 
   const milestoneCount = phase.milestones.length;
-  const icon = PHASE_ICONS[phase.icon] || "⚪";
+  const icon = phase.icon || PHASE_ICON_FALLBACK;
 
   return (
     <div
@@ -305,7 +297,7 @@ function PhaseColumn({
       {/* Phase Header */}
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
-          <span className="text-base">{icon}</span>
+          <Icon name={icon} size={16} className="text-slate-600" />
           <span className="text-sm font-bold text-slate-900">{phase.name}</span>
         </div>
         <span className="flex items-center justify-center w-6 h-6 text-xs font-semibold text-white bg-teal-500 rounded-full">
@@ -555,8 +547,8 @@ function MilestoneModal({
                           : "border-slate-300 hover:border-teal-400"
                       }`}
                     >
-                      {isCompleted && "✓"}
-                      {isPendingVerification && "⏳"}
+                      {isCompleted && <Icon name="check" size={12} strokeWidth={3} />}
+                      {isPendingVerification && <Icon name="hourglass" size={12} />}
                     </button>
 
                     {/* Task name */}
@@ -567,11 +559,11 @@ function MilestoneModal({
                     {/* Status badge for non-standard */}
                     {isPendingVerification && isOrganizer && (
                       <div className="flex gap-1">
-                        <button onClick={() => handleVerify(task)} className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded font-medium hover:bg-green-200">
-                          ���
+                        <button onClick={() => handleVerify(task)} className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded font-medium hover:bg-green-200" aria-label={t("common.confirm")}>
+                          <Icon name="check" size={12} strokeWidth={3} />
                         </button>
-                        <button onClick={() => handleReject(task)} className="text-xs px-2 py-0.5 bg-red-100 text-red-600 rounded font-medium hover:bg-red-200">
-                          ✗
+                        <button onClick={() => handleReject(task)} className="text-xs px-2 py-0.5 bg-red-100 text-red-600 rounded font-medium hover:bg-red-200" aria-label={t("common.cancel")}>
+                          <Icon name="x" size={12} strokeWidth={3} />
                         </button>
                       </div>
                     )}
@@ -587,8 +579,9 @@ function MilestoneModal({
                       <button
                         onClick={() => handleDeleteTask(task.id)}
                         className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-400 transition-all text-sm"
+                        aria-label={t("common.delete")}
                       >
-                        ✕
+                        <Icon name="x" size={14} />
                       </button>
                     )}
                   </div>
@@ -701,8 +694,8 @@ function AddPhaseButton({ tripId, onCreated }: { tripId: string; onCreated: () =
       <button onClick={handleAdd} className="px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600">
         {t("common.save")}
       </button>
-      <button onClick={() => setAdding(false)} className="text-xs text-slate-400 hover:text-slate-600">
-        ✕
+      <button onClick={() => setAdding(false)} className="text-xs text-slate-400 hover:text-slate-600" aria-label={t("common.cancel")}>
+        <Icon name="x" size={14} />
       </button>
     </div>
   );

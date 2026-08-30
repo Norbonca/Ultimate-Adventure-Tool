@@ -10,6 +10,7 @@ import {
 import { CATEGORY_DISPLAY } from "@/lib/categories";
 import { getServerT, getServerLocale } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
+import { Icon } from "@/components/Icon";
 
 interface ParticipantPageProps {
   params: Promise<{ slug: string }>;
@@ -94,7 +95,7 @@ export default async function ParticipantDashboardPage({ params }: ParticipantPa
               <div className="flex items-center gap-4 mt-2 text-sm text-navy-500">
                 {catDisplay && (
                   <span className="flex items-center gap-1 bg-navy-50 px-2 py-0.5 rounded-lg text-xs font-medium">
-                    {catDisplay.emoji} {categoryName}
+                    <Icon name={catDisplay.icon} size={13} /> {categoryName}
                   </span>
                 )}
                 {trip.start_date && (
@@ -183,9 +184,9 @@ export default async function ParticipantDashboardPage({ params }: ParticipantPa
                           <p className="text-sm text-navy-500 mt-1">{day.description}</p>
                         )}
                         <div className="flex gap-4 mt-2 text-xs text-navy-400">
-                          {day.distance_km && <span>📏 {day.distance_km} km</span>}
-                          {day.elevation_gain_m && <span>⛰️ +{day.elevation_gain_m} m</span>}
-                          {day.estimated_hours && <span>⏱️ {day.estimated_hours}h</span>}
+                          {day.distance_km && <span className="inline-flex items-center gap-1"><Icon name="ruler" size={12} /> {day.distance_km} km</span>}
+                          {day.elevation_gain_m && <span className="inline-flex items-center gap-1"><Icon name="mountain-snow" size={12} /> +{day.elevation_gain_m} m</span>}
+                          {day.estimated_hours && <span className="inline-flex items-center gap-1"><Icon name="clock" size={12} /> {day.estimated_hours}h</span>}
                         </div>
                       </div>
                     </div>

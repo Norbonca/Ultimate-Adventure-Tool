@@ -9,6 +9,7 @@ import {
   fetchCrewPositions,
 } from "@/app/(app)/trips/actions";
 import { AddStaffMemberModal } from "./AddStaffMemberModal";
+import { Icon } from "@/components/Icon";
 
 interface StaffSeat {
   participantId: string;
@@ -180,7 +181,7 @@ export function StaffSeatsManager({ tripId, totalSeats }: StaffSeatsManagerProps
               disabled={pending}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-600 border border-red-200 hover:bg-red-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <span>🗑️</span>
+              <Icon name="trash-2" size={13} />
               <span>{t("trips.crew.removeStaffSeat")}</span>
             </button>
           </div>
