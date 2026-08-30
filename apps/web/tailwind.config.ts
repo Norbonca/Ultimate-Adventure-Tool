@@ -78,6 +78,7 @@ const config: Config = {
         "trevu-xl": "14px",
         "trevu-2xl": "16px",
         "trevu-3xl": "20px",
+        "chip": "6px",       /* brand §3 — kategória/státusz chip */
       },
       boxShadow: {
         "trevu":    "0 2px 8px rgba(13, 148, 136, 0.25)",
