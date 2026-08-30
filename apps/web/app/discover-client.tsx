@@ -23,6 +23,7 @@ import {
 } from '@/lib/icons';
 import type { LucideIcon } from '@/lib/icons';
 import { Icon } from "@/components/Icon";
+import { Card, CardImage, CardBody, Chip, StateTemplate } from "@/components/ui";
 
 // Types matching Supabase query results exactly
 interface Trip {
@@ -759,7 +760,7 @@ export default function DiscoverClient({
         .trip-card-image {
           position: relative;
           width: 100%;
-          height: 240px;
+          aspect-ratio: 3 / 2;
           background-color: #e5e7eb;
           overflow: hidden;
         }
@@ -1220,10 +1221,7 @@ export default function DiscoverClient({
         </div>
 
         {filteredTrips.length === 0 ? (
-          <div className="empty-state">
-            <h2>{t('discover.noTrips')}</h2>
-            <p>{t('discover.noTripsHint')}</p>
-          </div>
+          <StateTemplate variant="empty" title={t('discover.noTrips')} description={t('discover.noTripsHint')} className="my-8" />
         ) : (
           <>
             <div className={`trips-grid${viewMode === 'list' ? ' list-view' : ''}`}>
@@ -1237,7 +1235,7 @@ export default function DiscoverClient({
                 const CatIcon = catInfo?.dbCat ? getCategoryIcon(catInfo.dbCat.name) : Mountain;
 
                 return (
-                  <Link
+                  <Card
                     key={trip.id}
                     href={`/trips/${trip.slug}`}
                     className="trip-card"
@@ -1247,14 +1245,7 @@ export default function DiscoverClient({
                       const cardImg = trip.card_image_url || trip.cover_image_url;
                       const cardSrc = trip.card_image_url ? trip.card_image_source : trip.cover_image_source;
                       return (
-                    <div className="trip-card-image" style={
-                      !cardImg ? {
-                        background: `linear-gradient(135deg, ${catInfo?.colorHex || '#0D9488'}30, ${catInfo?.colorHex || '#0D9488'}60)`
-                      } : undefined
-                    }>
-                      {cardImg && (
-                        <img src={cardImg} alt={trip.title} loading="lazy" />
-                      )}
+                    <CardImage src={cardImg} alt={trip.title} className="trip-card-image">
                       {cardSrc === "user_upload" && (
                         <span style={{ position: 'absolute', bottom: 8, right: 8, fontSize: 10, fontWeight: 600, color: '#fff', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: '2px 8px', borderTopLeftRadius: 8 }}>
                           <Icon name="camera" size={11} className="inline -mt-0.5 mr-1" />{t('imagePicker.ownPhoto')}
@@ -1262,20 +1253,20 @@ export default function DiscoverClient({
                       )}
                       <div className="trip-card-badges">
                         {catInfo && (
-                          <span className="badge-category" style={{ background: catInfo.colorHex }}>
+                          <Chip solid category="hiking" className="badge-category" style={{ background: catInfo.colorHex }}>
                             <CatIcon size={12} /> {locale === 'en' ? (catInfo.dbCat?.name || '') : (catInfo.nameHu || catInfo.dbCat?.name || '')}
-                          </span>
+                          </Chip>
                         )}
                         <span className="badge-spots">
                           <Users size={12} /> {t('discover.spotsLeft').replace('{count}', String(spotsLeft))}
                         </span>
                       </div>
-                    </div>
+                    </CardImage>
                       );
                     })()}
 
                     {/* Body */}
-                    <div className="trip-card-body">
+                    <CardBody className="trip-card-body">
                       <h3 className="trip-card-title">{trip.title}</h3>
                       <div className="trip-card-meta">
                         <span><MapPin size={14} /> {location}</span>
@@ -1293,10 +1284,10 @@ export default function DiscoverClient({
                         {trip.price_amount && trip.price_amount > 0 ? (
                           <span className="trip-card-price">€{trip.price_amount} <span>{t('discover.perPerson')}</span></span>
                         ) : (
-                          <span className="trip-card-price" style={{ color: '#22C55E' }}>{t('discover.free')}</span>
+                          <span className="trip-card-price" style={{ color: 'var(--color-success-text, #047857)' }}>{t('discover.free')}</span>
                         )}
                       </div>
-                    </div>
+                    </CardBody>
 
                     {/* Footer */}
                     <div className={`trip-card-footer${isCorporate ? ' corporate' : ''}`}>
@@ -1331,7 +1322,7 @@ export default function DiscoverClient({
                         </>
                       )}
                     </div>
-                  </Link>
+                  </Card>
                 );
               })}
             </div>

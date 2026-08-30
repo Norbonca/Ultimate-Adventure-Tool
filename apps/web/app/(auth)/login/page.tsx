@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { Button, Input, Checkbox } from "@/components/ui";
 
 // Brand marks for the OAuth buttons. Declared at module scope so React does not
 // re-create the component type on every render (react-hooks/static-components).
@@ -132,21 +133,12 @@ export default function LoginPage() {
 
           {/* Social login buttons */}
           <div className="flex gap-4">
-            <button
-              onClick={handleGoogleSignIn}
-              disabled={googleLoading}
-              className="flex-1 flex items-center justify-center gap-2 rounded-trevu bg-white border border-navy-200 py-3 text-sm font-medium text-navy-700 hover:bg-navy-50 transition-colors disabled:opacity-50"
-            >
-              <GoogleIcon />
-              Google
-            </button>
-            <button
-              disabled
-              className="flex-1 flex items-center justify-center gap-2 rounded-trevu bg-white border border-navy-200 py-3 text-sm font-medium text-navy-700 hover:bg-navy-50 transition-colors opacity-50 cursor-not-allowed"
-            >
-              <FacebookIcon />
-              Facebook
-            </button>
+            <Button variant="social" className="flex-1" onClick={handleGoogleSignIn} loading={googleLoading}>
+              <span className="inline-flex items-center gap-2"><GoogleIcon />Google</span>
+            </Button>
+            <Button variant="social" className="flex-1" disabled>
+              <span className="inline-flex items-center gap-2"><FacebookIcon />Facebook</span>
+            </Button>
           </div>
 
           {/* Divider */}
@@ -183,77 +175,56 @@ export default function LoginPage() {
           {/* Form */}
           {activeTab === "email" ? (
             <form onSubmit={handleLogin} className="space-y-5">
-              <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-navy-700 mb-1.5">
-                  {t('auth.email')}
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="input-trevu"
-                  placeholder={t('auth.emailPlaceholder')}
-                />
-              </div>
+              <Input
+                id="email"
+                label={t('auth.email')}
+                type="email"
+                autoComplete="email"
+                icon="mail"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder={t('auth.emailPlaceholder')}
+              />
 
-              <div>
-                <label htmlFor="password" className="block text-sm font-semibold text-navy-700 mb-1.5">
-                  {t('auth.password')}
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="input-trevu"
-                  placeholder={t('auth.passwordPlaceholder')}
-                />
-              </div>
+              <Input
+                id="password"
+                label={t('auth.password')}
+                type="password"
+                autoComplete="current-password"
+                icon="lock"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder={t('auth.passwordPlaceholder')}
+              />
 
               <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 text-sm text-navy-500 cursor-pointer">
-                  <input type="checkbox" className="h-4 w-4 rounded border-navy-300 text-trevu-600 focus:ring-trevu-600/20" />
-                  {t('auth.rememberMe')}
-                </label>
+                <Checkbox id="remember" label={t('auth.rememberMe')} />
                 <Link href="/forgot-password" className="text-sm font-medium text-trevu-600 hover:text-trevu-700">
                   {t('auth.forgotPassword')}
                 </Link>
               </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full rounded-trevu bg-trevu-600 py-3 text-white font-semibold hover:bg-trevu-700 transition-colors disabled:opacity-50 shadow-trevu"
-              >
+              <Button type="submit" fullWidth loading={loading}>
                 {loading ? t('auth.loginLoading') : t('auth.login')}
-              </button>
+              </Button>
             </form>
           ) : (
             <div className="space-y-5">
-              <div>
-                <label htmlFor="phone" className="block text-sm font-semibold text-navy-700 mb-1.5">
-                  {t('auth.phoneNumber')}
-                </label>
-                <input
-                  id="phone"
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="input-trevu"
-                  placeholder={t('auth.phonePlaceholder')}
-                />
-              </div>
-              <button
-                disabled
-                className="w-full rounded-trevu bg-trevu-600 py-3 text-white font-semibold opacity-50 cursor-not-allowed"
-              >
+              <Input
+                id="phone"
+                label={t('auth.phoneNumber')}
+                type="tel"
+                autoComplete="tel"
+                icon="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder={t('auth.phonePlaceholder')}
+              />
+              <Button fullWidth disabled>
                 {t('auth.sendOTP')}
-              </button>
+              </Button>
               <p className="text-xs text-navy-400 text-center">{t('auth.phoneComingSoon')}</p>
             </div>
           )}

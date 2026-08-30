@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/useTranslation";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { Button, Input, Checkbox } from "@/components/ui";
 
 // Brand marks for the OAuth buttons. Declared at module scope so React does not
 // re-create the component type on every render (react-hooks/static-components).
@@ -135,7 +137,10 @@ export default function RegisterPage() {
       {/* Right: Form Panel */}
       <div className="flex-1 flex items-center justify-center p-8 lg:p-16 bg-white">
         <div className="w-full max-w-[420px] space-y-7">
-          <h2 className="text-2xl font-bold text-navy-900">{t('auth.registerTitle')}</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-navy-900">{t('auth.registerTitle')}</h2>
+            <LanguageSwitcher />
+          </div>
 
           {error && (
             <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
@@ -145,21 +150,12 @@ export default function RegisterPage() {
 
           {/* Social login buttons */}
           <div className="flex gap-4">
-            <button
-              onClick={handleGoogleSignUp}
-              disabled={googleLoading}
-              className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-white border border-navy-200 py-3 text-sm font-medium text-navy-700 hover:bg-navy-50 transition-colors disabled:opacity-50"
-            >
-              <GoogleIcon />
-              Google
-            </button>
-            <button
-              disabled
-              className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-white border border-navy-200 py-3 text-sm font-medium text-navy-700 hover:bg-navy-50 transition-colors opacity-50 cursor-not-allowed"
-            >
-              <FacebookIcon />
-              Facebook
-            </button>
+            <Button variant="social" className="flex-1" onClick={handleGoogleSignUp} loading={googleLoading}>
+              <span className="inline-flex items-center gap-2"><GoogleIcon />Google</span>
+            </Button>
+            <Button variant="social" className="flex-1" disabled>
+              <span className="inline-flex items-center gap-2"><FacebookIcon />Facebook</span>
+            </Button>
           </div>
 
           {/* Divider */}
@@ -172,91 +168,73 @@ export default function RegisterPage() {
           {/* Form */}
           <form onSubmit={handleRegister} className="space-y-5">
             <div className="flex gap-4">
-              <div className="flex-1">
-                <label htmlFor="firstName" className="block text-sm font-semibold text-navy-700 mb-1.5">
-                  {t('auth.firstName')}
-                </label>
-                <input
-                  id="firstName"
-                  type="text"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  required
-                  className="input-trevu"
-                  placeholder={t('auth.firstNamePlaceholder')}
-                />
-              </div>
-              <div className="flex-1">
-                <label htmlFor="lastName" className="block text-sm font-semibold text-navy-700 mb-1.5">
-                  {t('auth.lastName')}
-                </label>
-                <input
-                  id="lastName"
-                  type="text"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  required
-                  className="input-trevu"
-                  placeholder={t('auth.lastNamePlaceholder')}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-navy-700 mb-1.5">
-                {t('auth.email')}
-              </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+              <Input
+                id="firstName"
+                label={t('auth.firstName')}
+                type="text"
+                autoComplete="given-name"
+                wrapperClassName="flex-1"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
                 required
-                className="input-trevu"
-                placeholder={t('auth.emailPlaceholder')}
+                placeholder={t('auth.firstNamePlaceholder')}
               />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-navy-700 mb-1.5">
-                {t('auth.password')}
-              </label>
-              <input
-                id="password"
-                type="password"
-                autoComplete="new-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+              <Input
+                id="lastName"
+                label={t('auth.lastName')}
+                type="text"
+                autoComplete="family-name"
+                wrapperClassName="flex-1"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
                 required
-                minLength={8}
-                className="input-trevu"
-                placeholder={t('auth.passwordMin')}
+                placeholder={t('auth.lastNamePlaceholder')}
               />
             </div>
 
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={termsAccepted}
-                onChange={(e) => setTermsAccepted(e.target.checked)}
-                className="mt-0.5 rounded border-navy-300 text-trevu-600 focus:ring-trevu-600/20"
-              />
-              <span className="text-sm text-navy-500">
-                {t('auth.termsAgreement')}{" "}
-                <a href="#" className="text-trevu-600 font-medium hover:underline">{t('auth.termsOfService')}</a>
-                {" "}{t('common.and')}{" "}
-                <a href="#" className="text-trevu-600 font-medium hover:underline">{t('auth.privacyPolicy')}</a>
-              </span>
-            </label>
+            <Input
+              id="email"
+              label={t('auth.email')}
+              type="email"
+              autoComplete="email"
+              icon="mail"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder={t('auth.emailPlaceholder')}
+            />
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-xl bg-trevu-600 py-3 text-white font-semibold hover:bg-trevu-700 transition-colors disabled:opacity-50 shadow-trevu"
-            >
+            <Input
+              id="password"
+              label={t('auth.password')}
+              type="password"
+              autoComplete="new-password"
+              icon="lock"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={8}
+              placeholder={t('auth.passwordMin')}
+            />
+
+            <Checkbox
+              id="terms"
+              checked={termsAccepted}
+              onChange={(e) => setTermsAccepted(e.target.checked)}
+              className="items-start"
+              label={
+                <span className="text-sm text-navy-500">
+                  {t('auth.termsAgreement')}{" "}
+                  <a href="#" className="text-trevu-600 font-medium hover:underline">{t('auth.termsOfService')}</a>
+                  {" "}{t('common.and')}{" "}
+                  <a href="#" className="text-trevu-600 font-medium hover:underline">{t('auth.privacyPolicy')}</a>
+                </span>
+              }
+            />
+
+            <Button type="submit" fullWidth loading={loading}>
               {loading ? t('auth.registerLoading') : t('auth.registerBtn')}
-            </button>
+            </Button>
           </form>
 
           <p className="text-center text-sm text-navy-500">
