@@ -1,9 +1,15 @@
 "use client";
 
+/**
+ * Forgot Password — design/D01_User_Auth_Profile.pen#0lajY
+ */
+
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n/useTranslation";
+import { Icon } from "@/components/Icon";
+import { Button, Input } from "@/components/ui";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -38,10 +44,8 @@ export default function ForgotPasswordPage() {
       <div className="flex flex-1 items-center justify-center px-4 py-12">
         <div className="w-full max-w-[440px] rounded-2xl border border-navy-200 bg-white p-10 shadow-sm">
           {/* Icon */}
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-trevu-50">
-            <svg className="h-7 w-7 text-trevu-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
-            </svg>
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-trevu-50 text-trevu-600">
+            <Icon name="key-round" size={28} />
           </div>
 
           {/* Title */}
@@ -66,9 +70,7 @@ export default function ForgotPasswordPage() {
                 href="/login"
                 className="flex items-center justify-center gap-2 text-sm font-medium text-navy-500 hover:text-navy-700"
               >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                </svg>
+                <Icon name="arrow-left" size={16} />
                 {t('auth.backToLogin')}
               </Link>
             </div>
@@ -80,37 +82,27 @@ export default function ForgotPasswordPage() {
                 </div>
               )}
 
-              <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-navy-700 mb-1.5">
-                  {t('auth.email')}
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="input-trevu"
-                  placeholder={t('auth.emailPlaceholder')}
-                />
-              </div>
+              <Input
+                id="email"
+                label={t('auth.email')}
+                type="email"
+                autoComplete="email"
+                icon="mail"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder={t('auth.emailPlaceholder')}
+              />
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full rounded-xl bg-trevu-600 py-3 text-white font-semibold hover:bg-trevu-700 transition-colors disabled:opacity-50 shadow-trevu"
-              >
+              <Button type="submit" fullWidth loading={loading}>
                 {loading ? t('common.loading') : t('auth.sendResetLink')}
-              </button>
+              </Button>
 
               <Link
                 href="/login"
                 className="flex items-center justify-center gap-2 text-sm font-medium text-navy-500 hover:text-navy-700"
               >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                </svg>
+                <Icon name="arrow-left" size={16} />
                 {t('auth.backToLogin')}
               </Link>
             </form>
