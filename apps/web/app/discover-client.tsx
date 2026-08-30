@@ -251,7 +251,7 @@ export default function DiscoverClient({
         }
 
         body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+          font-family: 'DM Sans', system-ui, sans-serif;
           background-color: #f9fafb;
           color: #1f2937;
         }
@@ -613,6 +613,13 @@ export default function DiscoverClient({
         }
 
         @media (max-width: 640px) {
+          .pill,
+          .filter-select {
+            min-height: 44px;
+          }
+        }
+
+        @media (max-width: 640px) {
           .filter-bar {
             padding: 1rem;
           }
@@ -733,7 +740,7 @@ export default function DiscoverClient({
 
         .trip-card {
           background-color: white;
-          border-radius: 12px;
+          border-radius: var(--radius-l, 16px);
           overflow: hidden;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
           transition: all 0.3s;
@@ -1077,7 +1084,11 @@ export default function DiscoverClient({
         }
       `}</style>
 
-      <AppHeader />
+      <AppHeader anchors={[
+        { label: t('nav.filters'), href: '#filters' },
+        { label: t('nav.categories'), href: '#categories' },
+        { label: t('nav.map'), href: '#map' },
+      ]} />
 
       {/* HERO */}
       <section className="hero">
@@ -1118,7 +1129,7 @@ export default function DiscoverClient({
               </button>
           </div>
 
-          <div className="category-pills">
+          <div id="categories" className="category-pills">
             <button
               className={`pill ${activeCategory === 'all' ? 'pill-active' : 'pill-default'}`}
               onClick={() => setActiveCategory('all')}
@@ -1143,7 +1154,7 @@ export default function DiscoverClient({
       </section>
 
       {/* FILTER BAR */}
-      <div className="filter-bar">
+      <div id="filters" className="filter-bar">
         <div className="filter-group">
           <select className="filter-select" value={selectedDifficulty} onChange={(e) => setSelectedDifficulty(e.target.value)}>
             <option value="all">{t('discover.difficulty')}</option>
@@ -1190,7 +1201,7 @@ export default function DiscoverClient({
               ? t('discover.noTripsYet')
               : t('discover.tripsAvailable').replace('{count}', String(filteredTrips.length))}
           </div>
-          <div className="view-toggle">
+          <div id="map" className="view-toggle">
             <button
               className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
               onClick={() => setViewMode('grid')}
