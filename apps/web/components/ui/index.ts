@@ -8,6 +8,8 @@ export { Input } from "./Input";
 export type { InputProps } from "./Input";
 export { Checkbox } from "./Checkbox";
 export type { CheckboxProps } from "./Checkbox";
+export { Toggle } from "./Toggle";
+export type { ToggleProps } from "./Toggle";
 export { Chip } from "./Chip";
 export type { ChipProps, CategoryKey, StatusKey } from "./Chip";
 export { Card, CardImage, CardBody } from "./Card";

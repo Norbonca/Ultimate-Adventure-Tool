@@ -31,6 +31,7 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   users: L.Users,
   wallet: L.Wallet,
   // actions
+  "arrow-left": L.ArrowLeft,
   "arrow-right": L.ArrowRight,
   "arrow-up-down": L.ArrowUpDown,
   check: L.Check,
@@ -67,6 +68,7 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   hourglass: L.Hourglass,
   inbox: L.Inbox,
   info: L.Info,
+  "key-round": L.KeyRound,
   "loader-2": L.Loader2,
   "folder-open": L.FolderOpen,
   lock: L.Lock,
