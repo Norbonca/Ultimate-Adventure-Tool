@@ -15,14 +15,14 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Report to Sentry if available
-    try {
-      const Sentry = require("@sentry/nextjs");
-      Sentry.captureException(error);
-    } catch {
-      // Sentry not installed — log to console
-      console.error("Unhandled error:", error);
-    }
+    // Report to Sentry if available (dynamic import keeps the optional-dependency
+    // semantics of the previous require() without violating no-require-imports)
+    import("@sentry/nextjs")
+      .then((Sentry) => Sentry.captureException(error))
+      .catch(() => {
+        // Sentry not installed — log to console
+        console.error("Unhandled error:", error);
+      });
   }, [error]);
 
   return (

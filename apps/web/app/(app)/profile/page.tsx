@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { User } from "@supabase/supabase-js";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -46,6 +47,16 @@ interface SubDiscipline {
   name: string;
   name_localized?: Record<string, string> | string;
   category_id: string;
+}
+
+interface RecentTrip {
+  id: string;
+  slug: string;
+  title?: string;
+  card_image_url?: string | null;
+  cover_image_url?: string | null;
+  location_city?: string | null;
+  location_country?: string | null;
 }
 
 interface FollowCounts {
@@ -111,7 +122,7 @@ export default function ProfilePage() {
   const { t, locale } = useTranslation();
 
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const [followCounts, setFollowCounts] = useState<FollowCounts>({
@@ -122,7 +133,7 @@ export default function ProfilePage() {
   const [adventureInterests, setAdventureInterests] = useState<AdventureInterest[]>([]);
   const [userSkills, setUserSkills] = useState<UserSkill[]>([]);
   const [subDisciplines, setSubDisciplines] = useState<SubDiscipline[]>([]);
-  const [recentTrips, setRecentTrips] = useState<any[]>([]);
+  const [recentTrips, setRecentTrips] = useState<RecentTrip[]>([]);
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -233,8 +244,12 @@ export default function ProfilePage() {
 
         const cats = categoriesRes.data || [];
         if (interestsRes.data && cats.length > 0) {
-          const interestCategoryIds = interestsRes.data.map((i: any) => i.category_id);
-          setAdventureInterests(cats.filter((c: any) => interestCategoryIds.includes(c.id)));
+          const interestCategoryIds = interestsRes.data.map(
+            (i: { category_id: string }) => i.category_id
+          );
+          setAdventureInterests(
+            cats.filter((c: AdventureInterest) => interestCategoryIds.includes(c.id))
+          );
         }
 
         setSubDisciplines(subDiscsRes.data || []);
@@ -700,7 +715,7 @@ export default function ProfilePage() {
 
               {recentTrips.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {recentTrips.map((trip: any) => (
+                  {recentTrips.map((trip) => (
                     <Link
                       key={trip.id}
                       href={`/trips/${trip.slug}`}

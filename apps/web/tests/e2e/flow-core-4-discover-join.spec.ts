@@ -1,5 +1,4 @@
-import { test, expect } from '@playwright/test';
-import { createTestUser, deleteTestUser } from './_setup/seed';
+import { test } from '@playwright/test';
 
 /**
  * FLOW-CORE-4 — Discover → filter → trip detail → join
@@ -28,7 +27,7 @@ test.describe('FLOW-CORE-4 — Discover → join', () => {
     test.fixme(true, 'Need seeded published trips fixture');
   });
 
-  test('authed user can join open trip', async ({ page }) => {
+  test('authed user can join open trip', async () => {
     test.fixme(true, 'Authed fixture + open trip seed');
     // TODO: storage state with logged-in user
     // TODO: navigate / → first trip → "Csatlakozom"
@@ -36,15 +35,15 @@ test.describe('FLOW-CORE-4 — Discover → join', () => {
     // TODO: assert via admin client: participants.status='confirmed'
   });
 
-  test('approval-required trip → pending status', async ({ page }) => {
+  test('approval-required trip → pending status', async () => {
     test.fixme(true, 'Seed trip with require_approval=true');
   });
 
-  test('full trip blocks join', async ({ page }) => {
+  test('full trip blocks join', async () => {
     test.fixme(true, 'Seed trip at max_participants — UI shows "Megtelt" disabled state');
   });
 
-  test('organizer cannot self-join', async ({ page }) => {
+  test('organizer cannot self-join', async () => {
     test.fixme(true, 'Authed as organizer of a trip → join button hidden / disabled');
   });
 });

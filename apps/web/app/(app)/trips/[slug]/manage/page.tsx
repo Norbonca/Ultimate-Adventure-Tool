@@ -31,7 +31,7 @@ export default async function TripManagePage({ params }: ManagePageProps) {
   const locale = await getServerLocale();
   const dateLocale = locale === "en" ? "en-US" : "hu-HU";
 
-  const [participants, crewPositions, itinerary] = await Promise.all([
+  const [participants, crewPositions, _itinerary] = await Promise.all([
     fetchTripParticipants(trip.id),
     fetchCrewPositions(trip.id),
     fetchTripItinerary(trip.id),
@@ -41,7 +41,7 @@ export default async function TripManagePage({ params }: ManagePageProps) {
   const category = (Array.isArray(catRaw) ? catRaw[0] : catRaw) as {
     name: string; name_localized: Record<string, string>; color_hex: string;
   } | null;
-  const catDisplay = category ? CATEGORY_DISPLAY[category.name] : null;
+  const _catDisplay = category ? CATEGORY_DISPLAY[category.name] : null;
 
   const approvedCount = participants.filter(
     (p) => ["approved", "approved_pending_payment", "participant"].includes(p.status)

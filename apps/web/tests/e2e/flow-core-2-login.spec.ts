@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import { AppHeaderPage } from './pom/AppHeaderPage';
 import { createTestUser, deleteTestUser } from './_setup/seed';
 
 /**
@@ -45,7 +44,7 @@ test.describe('FLOW-CORE-2 — Login', () => {
     await expect(page.getByText(/invalid|érvénytelen|hibás/i)).toBeVisible({ timeout: 5000 });
   });
 
-  test('empty form shows validation', async ({ page }) => {
+  test('empty form shows validation', async () => {
     test.fixme(true, 'HTML5 required attribute — needs explicit assertion strategy');
   });
 });

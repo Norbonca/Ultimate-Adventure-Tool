@@ -11,7 +11,6 @@ import {
   createTask,
   updateMilestone,
   updateTask,
-  deletePhase,
   deleteMilestone,
   deleteTask,
   submitTask,
@@ -87,6 +86,7 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
   }, [tripId, isOrganizer]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only bootstrap/sync on mount; a proper rewrite (derive-during-render / useSyncExternalStore) is tracked as an open question (2026-08-29)
     loadTimeline();
   }, [loadTimeline]);
 
@@ -218,7 +218,8 @@ function TemplateSelector({ tripId, onInit }: { tripId: string; onInit: () => vo
       <div className="space-y-3 max-w-md mx-auto">
         <p className="text-sm font-semibold text-slate-700">{t("timeline.chooseTemplate")}</p>
         {templates.map((tpl) => {
-          const nameKey = `template${tpl.key.charAt(0).toUpperCase()}${tpl.key.slice(1)}` as keyof typeof t;
+          // TODO: nameKey is built but not used — template names are not localised yet.
+          const _nameKey = `template${tpl.key.charAt(0).toUpperCase()}${tpl.key.slice(1)}` as keyof typeof t;
           return (
             <button
               key={tpl.id}
@@ -357,7 +358,7 @@ function PhaseColumn({
 // ════════��═════════════════════════════════════
 
 function MilestoneCard({ milestone, onClick }: { milestone: MilestoneWithTasks; onClick: () => void }) {
-  const { t, locale } = useTranslation();
+  const { locale } = useTranslation();
   const progressPct = milestone.task_count > 0
     ? Math.round((milestone.completed_count / milestone.task_count) * 100)
     : 0;

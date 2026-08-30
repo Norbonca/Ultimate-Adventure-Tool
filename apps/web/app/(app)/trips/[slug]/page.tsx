@@ -512,7 +512,8 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
 
 // ── Helper Components ──
 
-function TripStatusBadge({ status, t }: { status: string; t: (key: string) => string }) {
+// Currently unused — kept for the status column planned on this screen.
+function _TripStatusBadge({ status, t }: { status: string; t: (key: string) => string }) {
   const config: Record<string, { bg: string; text: string; key: string }> = {
     draft: { bg: "bg-navy-100", text: "text-navy-600", key: "trips.status.draft" },
     published: { bg: "bg-trevu-50", text: "text-trevu-700", key: "trips.status.published" },
@@ -532,7 +533,7 @@ function TripStatusBadge({ status, t }: { status: string; t: (key: string) => st
 
 function DetailValue({
   value,
-  fieldType,
+  fieldType: _fieldType,
   unit,
   locale,
 }: {

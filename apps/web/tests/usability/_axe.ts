@@ -1,9 +1,11 @@
-import { Page, expect } from '@playwright/test';
+import { Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+
+type ImpactLevel = 'minor' | 'moderate' | 'serious' | 'critical';
 
 export interface AxeOptions {
   /** Limit violation reporting to selected impact levels. */
-  impacts?: Array<'minor' | 'moderate' | 'serious' | 'critical'>;
+  impacts?: ImpactLevel[];
   /** WCAG tags to include, e.g. ['wcag2a', 'wcag2aa']. */
   tags?: string[];
 }
@@ -13,7 +15,7 @@ export async function runAxe(page: Page, opts: AxeOptions = {}) {
   if (opts.tags?.length) builder.withTags(opts.tags);
   const results = await builder.analyze();
   const filtered = opts.impacts
-    ? results.violations.filter((v) => opts.impacts!.includes(v.impact as any))
+    ? results.violations.filter((v) => opts.impacts!.includes(v.impact as ImpactLevel))
     : results.violations;
   return { results, violations: filtered };
 }

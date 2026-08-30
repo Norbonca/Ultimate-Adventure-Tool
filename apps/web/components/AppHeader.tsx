@@ -47,6 +47,7 @@ export function AppHeader({ anchors, user }: AppHeaderProps) {
   // Sync user prop (client components pass it async)
   useEffect(() => {
     if (user !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only bootstrap/sync on mount; a proper rewrite (derive-during-render / useSyncExternalStore) is tracked as an open question (2026-08-29)
       setResolvedUser(user);
       setAuthChecked(true);
     }

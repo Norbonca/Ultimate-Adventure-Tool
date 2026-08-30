@@ -4,7 +4,6 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n/useTranslation";
-import { AppHeader } from "@/components/AppHeader";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");

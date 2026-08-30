@@ -37,7 +37,7 @@ const STEP_KEYS = [
   { num: 4, key: "stepPublish" },
 ];
 
-export function WizardForm({ categories, countries, userId }: WizardFormProps) {
+export function WizardForm({ categories, countries, userId: _userId }: WizardFormProps) {
   const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [planningMode, setPlanningMode] = useState<PlanningMode | null>(null);

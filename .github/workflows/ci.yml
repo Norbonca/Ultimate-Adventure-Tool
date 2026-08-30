@@ -45,21 +45,53 @@ jobs:
 
       - name: Lint
         run: pnpm lint
-        continue-on-error: true  # TODO: strict-re váltás ha 0 lint hiba
 
       - name: Type check
         run: pnpm type-check
-        continue-on-error: true  # TODO: strict-re váltás ha 0 type hiba
 
       - name: Build
         run: pnpm build
+
+  qa-audit:
+    name: QA Audit Gate (trevu-test)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    # A .skills/trevu-test szkriptek csak node builtineket használnak,
+    # ezért nem kell hozzájuk pnpm install.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: i18n sync (HU/EN kulcsparitás)
+        run: node .skills/trevu-test/scripts/check-i18n-sync.mjs
+
+      - name: i18n quality
+        run: node .skills/trevu-test/scripts/check-i18n-quality.mjs
+
+      - name: Internal links
+        run: node .skills/trevu-test/scripts/check-links.mjs
+
+      - name: Category consistency
+        run: node .skills/trevu-test/scripts/check-categories.mjs
+
+      - name: Security scan
+        run: node .skills/trevu-test/scripts/check-security.mjs
+
+      - name: Architectural invariants
+        run: node .skills/trevu-test/scripts/check-architecture.mjs
 
   db-push:
     name: Supabase DB Push
     runs-on: ubuntu-latest
     # Csak main-re push esetén fut (ne fusson PR-en)
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    needs: ci  # Csak ha a build sikeres
+    needs: [ci, qa-audit]  # Csak ha a build és az auditkapu is sikeres
 
     steps:
       - name: Checkout

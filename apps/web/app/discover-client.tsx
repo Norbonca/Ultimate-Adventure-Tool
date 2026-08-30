@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useTranslation } from '@/lib/i18n/useTranslation';
 import { AppHeader } from '@/components/AppHeader';
 import {
@@ -19,13 +18,10 @@ import {
   Snowflake,
   Users,
   Star,
-  Bell,
-  Menu,
-  ArrowUpDown,
   LayoutGrid,
   List,
-  ChevronDown,
 } from '@/lib/icons';
+import type { LucideIcon } from '@/lib/icons';
 
 // Types matching Supabase query results exactly
 interface Trip {
@@ -103,7 +99,7 @@ interface DiscoverClientProps {
   currentUser: CurrentUser | null;
 }
 
-const categoryIconMap: Record<string, React.ComponentType<any>> = {
+const categoryIconMap: Record<string, LucideIcon> = {
   Hiking: Mountain,
   Mountaineering: Triangle,
   'Water Sports': Waves,
@@ -136,12 +132,13 @@ export default function DiscoverClient({
   categories,
   categoryDisplay,
   difficultyLevels,
-  currentUser,
+  currentUser: _currentUser,
 }: DiscoverClientProps) {
   const { t, locale } = useTranslation();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  // TODO: setSearchQuery is never called — the search box is not wired to this state.
+  const [searchQuery, _setSearchQuery] = useState<string>('');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
   const [selectedPrice, setSelectedPrice] = useState<string>('all');
   const [selectedDuration, setSelectedDuration] = useState<string>('all');
