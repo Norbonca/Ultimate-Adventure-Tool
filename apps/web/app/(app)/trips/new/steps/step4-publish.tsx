@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Wizard Step 4 — Settings and Publish — design/D02_Trip_Management.pen#Gvgnj
+ */
+
 import { useState } from "react";
 import type { WizardFormData } from "../../types";
 import type { CategoryDisplay } from "@/lib/categories";
@@ -8,6 +12,7 @@ import { useTranslation } from "@/lib/i18n/useTranslation";
 import type { TranslationKey } from "@uat/i18n";
 import { ImagePicker } from "@/components/ImagePicker";
 import { Icon } from "@/components/Icon";
+import { Input, Toggle } from "@/components/ui";
 
 interface Step4Props {
   formData: WizardFormData;
@@ -233,79 +238,41 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
 
       {/* ── Settings ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => onChange({ require_approval: !formData.require_approval })}
-            className={`relative w-11 h-6 rounded-full transition-colors ${
-              formData.require_approval ? "bg-trevu-600" : "bg-navy-200"
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${
-                formData.require_approval ? "translate-x-5" : "translate-x-0"
-              }`}
-            />
-          </button>
-          <div>
-            <span className="text-sm font-medium text-navy-700">
-              {t("trips.wizard.requireApproval")}
-            </span>
-            <span className="block text-xs text-navy-400">
-              {t("trips.wizard.requireApprovalDesc")}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => onChange({ is_cost_sharing: !formData.is_cost_sharing })}
-            className={`relative w-11 h-6 rounded-full transition-colors ${
-              formData.is_cost_sharing ? "bg-trevu-600" : "bg-navy-200"
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${
-                formData.is_cost_sharing ? "translate-x-5" : "translate-x-0"
-              }`}
-            />
-          </button>
-          <div>
-            <span className="text-sm font-medium text-navy-700">
-              {t("trips.wizard.costSharing")}
-            </span>
-            <span className="block text-xs text-navy-400">
-              {t("trips.wizard.costSharingDesc")}
-            </span>
-          </div>
-        </div>
+        <Toggle
+          checked={formData.require_approval}
+          onChange={(checked) => onChange({ require_approval: checked })}
+          label={t("trips.wizard.requireApproval")}
+          description={t("trips.wizard.requireApprovalDesc")}
+        />
+        <Toggle
+          checked={formData.is_cost_sharing}
+          onChange={(checked) => onChange({ is_cost_sharing: checked })}
+          label={t("trips.wizard.costSharing")}
+          description={t("trips.wizard.costSharingDesc")}
+        />
       </div>
 
       {/* ── Pricing ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-navy-700 mb-1.5">
-            {t("trips.wizard.pricePerPerson")}
-          </label>
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            value={formData.price_amount ?? ""}
-            onChange={(e) => onChange({ price_amount: e.target.value ? Number(e.target.value) : null })}
-            placeholder="0.00"
-            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-navy-700 mb-1.5">
+        <Input
+          id="trip-price"
+          label={t("trips.wizard.pricePerPerson")}
+          type="number"
+          min="0"
+          step="0.01"
+          value={formData.price_amount ?? ""}
+          onChange={(e) => onChange({ price_amount: e.target.value ? Number(e.target.value) : null })}
+          placeholder="0.00"
+        />
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="trip-currency" className="text-sm font-semibold text-navy-900">
             {t("trips.wizard.currency")}
           </label>
           <select
+            id="trip-currency"
             value={formData.price_currency}
             onChange={(e) => onChange({ price_currency: e.target.value })}
-            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors bg-white"
+            className="w-full min-h-[48px] px-4 py-3 rounded-trevu border-[1.5px] border-navy-300 text-[15px] text-navy-900 bg-white focus:ring-[3px] focus:ring-trevu-600/10 focus:border-trevu-600 outline-none transition-all duration-200"
           >
             <option value="EUR">EUR (€)</option>
             <option value="HUF">HUF (Ft)</option>
@@ -317,41 +284,24 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
 
       {/* ── Registration Deadline ── */}
       <div className="max-w-xs">
-        <label className="block text-sm font-medium text-navy-700 mb-1.5">
-          {t("trips.wizard.registrationDeadline")}
-        </label>
-        <input
+        <Input
+          id="trip-registration-deadline"
+          label={t("trips.wizard.registrationDeadline")}
           type="datetime-local"
           value={formData.registration_deadline}
           onChange={(e) => onChange({ registration_deadline: e.target.value })}
-          className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
         />
       </div>
 
       {/* ── Show on Landing Page ── */}
-      <div className="flex items-center justify-between py-4 border-t border-navy-100">
-        <div>
-          <span className="text-sm font-medium text-navy-700">
-            {t("trips.wizard.showOnLanding")}
-          </span>
-          <span className="block text-xs text-navy-400">
-            {t("trips.wizard.showOnLandingDesc")}
-          </span>
-        </div>
-        <button
-          type="button"
-          onClick={() => onChange({ show_on_landing: !formData.show_on_landing })}
-          className={`relative w-11 h-6 rounded-full transition-colors ${
-            formData.show_on_landing ? "bg-trevu-600" : "bg-navy-200"
-          }`}
-        >
-          <span
-            className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${
-              formData.show_on_landing ? "translate-x-5" : "translate-x-0"
-            }`}
-          />
-        </button>
-      </div>
+      <Toggle
+        checked={formData.show_on_landing}
+        onChange={(checked) => onChange({ show_on_landing: checked })}
+        label={t("trips.wizard.showOnLanding")}
+        description={t("trips.wizard.showOnLandingDesc")}
+        trailing
+        className="justify-between py-4 border-t border-navy-100"
+      />
     </div>
   );
 }

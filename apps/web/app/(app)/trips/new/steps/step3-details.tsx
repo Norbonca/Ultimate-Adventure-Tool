@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Wizard Step 3 — Category Details — design/D02_Trip_Management.pen#fNVuu
+ */
+
 import { useMemo } from "react";
 import type {
   WizardFormData,
@@ -7,6 +11,7 @@ import type {
   ParameterOptionRow,
 } from "../../types";
 import { useTranslation } from "@/lib/i18n/useTranslation";
+import { Input, StateTemplate, Toggle } from "@/components/ui";
 
 interface Step3Props {
   formData: WizardFormData;
@@ -67,20 +72,11 @@ export function Step3Details({
   const { t, locale } = useTranslation();
 
   if (isLoading) {
-    return (
-      <div className="text-center py-12">
-        <div className="inline-block w-8 h-8 border-2 border-trevu-600 border-t-transparent rounded-full animate-spin" />
-        <p className="text-navy-500 mt-3">{t('trips.wizard.loadingParams')}</p>
-      </div>
-    );
+    return <StateTemplate variant="loading" title={t('trips.wizard.loadingParams')} />;
   }
 
   if (parameters.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-navy-500">{t('trips.wizard.noParams')}</p>
-      </div>
-    );
+    return <StateTemplate variant="empty" title={t('trips.wizard.noParams')} />;
   }
 
   return (
@@ -148,59 +144,57 @@ function ParameterField({
       : (param.label_localized as Record<string, string>)?.hu || param.label;
 
   const inputClasses =
-    "w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 placeholder:text-navy-300 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors bg-white";
+    "w-full min-h-[48px] px-4 py-3 rounded-trevu border-[1.5px] border-navy-300 text-[15px] text-navy-900 placeholder:text-navy-500 bg-white focus:ring-[3px] focus:ring-trevu-600/10 focus:border-trevu-600 outline-none transition-all duration-200";
+
+  const fieldId = `param-${param.parameter_key}`;
+  const labelNode = (
+    <>
+      {label}
+      {param.field_type === "number" && param.unit && (
+        <span className="text-navy-400 font-normal"> ({param.unit})</span>
+      )}
+      {param.is_required && <span className="text-coral"> *</span>}
+    </>
+  );
 
   switch (param.field_type) {
     case "number":
       return (
-        <div>
-          <label className="block text-sm font-medium text-navy-700 mb-1.5">
-            {label}
-            {param.unit && (
-              <span className="text-navy-400 font-normal"> ({param.unit})</span>
-            )}
-            {param.is_required && <span className="text-red-500"> *</span>}
-          </label>
-          <input
-            type="number"
-            value={(value as number) ?? ""}
-            onChange={(e) =>
-              onChange(e.target.value ? parseFloat(e.target.value) : null)
-            }
-            min={param.validation?.min}
-            max={param.validation?.max}
-            step={param.validation?.step || 1}
-            placeholder={param.placeholder || undefined}
-            className={inputClasses}
-          />
-        </div>
+        <Input
+          id={fieldId}
+          label={labelNode}
+          type="number"
+          value={(value as number) ?? ""}
+          onChange={(e) =>
+            onChange(e.target.value ? parseFloat(e.target.value) : null)
+          }
+          min={param.validation?.min}
+          max={param.validation?.max}
+          step={param.validation?.step || 1}
+          placeholder={param.placeholder || undefined}
+        />
       );
 
     case "text":
       return (
-        <div>
-          <label className="block text-sm font-medium text-navy-700 mb-1.5">
-            {label}
-            {param.is_required && <span className="text-red-500"> *</span>}
-          </label>
-          <input
-            type="text"
-            value={(value as string) ?? ""}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder={param.placeholder || undefined}
-            className={inputClasses}
-          />
-        </div>
+        <Input
+          id={fieldId}
+          label={labelNode}
+          type="text"
+          value={(value as string) ?? ""}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={param.placeholder || undefined}
+        />
       );
 
     case "textarea":
       return (
         <div className="sm:col-span-2">
-          <label className="block text-sm font-medium text-navy-700 mb-1.5">
-            {label}
-            {param.is_required && <span className="text-red-500"> *</span>}
+          <label htmlFor={fieldId} className="block text-sm font-semibold text-navy-900 mb-1.5">
+            {labelNode}
           </label>
           <textarea
+            id={fieldId}
             value={(value as string) ?? ""}
             onChange={(e) => onChange(e.target.value)}
             rows={3}
@@ -211,34 +205,22 @@ function ParameterField({
 
     case "boolean":
       return (
-        <div className="flex items-center gap-3 py-2">
-          <button
-            type="button"
-            onClick={() => onChange(!(value as boolean))}
-            className={`relative w-11 h-6 rounded-full transition-colors ${
-              value ? "bg-trevu-600" : "bg-navy-200"
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${
-                value ? "translate-x-5" : "translate-x-0"
-              }`}
-            />
-          </button>
-          <label className="text-sm font-medium text-navy-700">
-            {label}
-          </label>
-        </div>
+        <Toggle
+          checked={!!value}
+          onChange={(checked) => onChange(checked)}
+          label={label}
+          className="py-2"
+        />
       );
 
     case "select":
       return (
         <div>
-          <label className="block text-sm font-medium text-navy-700 mb-1.5">
-            {label}
-            {param.is_required && <span className="text-red-500"> *</span>}
+          <label htmlFor={fieldId} className="block text-sm font-semibold text-navy-900 mb-1.5">
+            {labelNode}
           </label>
           <select
+            id={fieldId}
             value={(value as string) ?? ""}
             onChange={(e) => onChange(e.target.value)}
             className={inputClasses}
@@ -259,9 +241,8 @@ function ParameterField({
       const selectedValues = (value as string[]) || [];
       return (
         <div className="sm:col-span-2">
-          <label className="block text-sm font-medium text-navy-700 mb-1.5">
-            {label}
-            {param.is_required && <span className="text-red-500"> *</span>}
+          <label className="block text-sm font-semibold text-navy-900 mb-1.5">
+            {labelNode}
           </label>
           <div className="flex flex-wrap gap-2">
             {options.map((opt) => {
@@ -300,17 +281,13 @@ function ParameterField({
 
     default:
       return (
-        <div>
-          <label className="block text-sm font-medium text-navy-700 mb-1.5">
-            {label}
-          </label>
-          <input
-            type="text"
-            value={(value as string) ?? ""}
-            onChange={(e) => onChange(e.target.value)}
-            className={inputClasses}
-          />
-        </div>
+        <Input
+          id={fieldId}
+          label={label}
+          type="text"
+          value={(value as string) ?? ""}
+          onChange={(e) => onChange(e.target.value)}
+        />
       );
   }
 }
