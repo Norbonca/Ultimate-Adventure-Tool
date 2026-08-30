@@ -267,7 +267,11 @@ export default function ProfilePage() {
   }, []);
 
   // ─── Loading / Error ─────────────────────────────────────
-  const headerAnchors: { label: string; href: string }[] = [];
+  const headerAnchors: { label: string; href: string }[] = [
+    { label: t("nav.overview"), href: "#overview" },
+    { label: t("nav.skills"), href: "#skills" },
+    { label: t("nav.privacy"), href: "/settings/privacy" },
+  ];
 
   if (isLoading) {
     return (
