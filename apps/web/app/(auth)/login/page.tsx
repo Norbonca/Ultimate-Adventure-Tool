@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/useTranslation";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 // Brand marks for the OAuth buttons. Declared at module scope so React does not
 // re-create the component type on every render (react-hooks/static-components).
@@ -118,7 +119,10 @@ export default function LoginPage() {
       {/* Right: Form Panel */}
       <div className="flex-1 flex items-center justify-center p-8 lg:p-16 bg-white">
         <div className="w-full max-w-[420px] space-y-8">
-          <h2 className="text-2xl font-bold text-navy-900">{t('auth.loginTitle')}</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-navy-900">{t('auth.loginTitle')}</h2>
+            <LanguageSwitcher />
+          </div>
 
           {error && (
             <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
@@ -131,14 +135,14 @@ export default function LoginPage() {
             <button
               onClick={handleGoogleSignIn}
               disabled={googleLoading}
-              className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-white border border-navy-200 py-3 text-sm font-medium text-navy-700 hover:bg-navy-50 transition-colors disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-2 rounded-trevu bg-white border border-navy-200 py-3 text-sm font-medium text-navy-700 hover:bg-navy-50 transition-colors disabled:opacity-50"
             >
               <GoogleIcon />
               Google
             </button>
             <button
               disabled
-              className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-white border border-navy-200 py-3 text-sm font-medium text-navy-700 hover:bg-navy-50 transition-colors opacity-50 cursor-not-allowed"
+              className="flex-1 flex items-center justify-center gap-2 rounded-trevu bg-white border border-navy-200 py-3 text-sm font-medium text-navy-700 hover:bg-navy-50 transition-colors opacity-50 cursor-not-allowed"
             >
               <FacebookIcon />
               Facebook
@@ -186,6 +190,7 @@ export default function LoginPage() {
                 <input
                   id="email"
                   type="email"
+                  autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -201,6 +206,7 @@ export default function LoginPage() {
                 <input
                   id="password"
                   type="password"
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -211,7 +217,7 @@ export default function LoginPage() {
 
               <div className="flex items-center justify-between">
                 <label className="flex items-center gap-2 text-sm text-navy-500 cursor-pointer">
-                  <input type="checkbox" className="rounded border-navy-300 text-trevu-600 focus:ring-trevu-600/20" />
+                  <input type="checkbox" className="h-4 w-4 rounded border-navy-300 text-trevu-600 focus:ring-trevu-600/20" />
                   {t('auth.rememberMe')}
                 </label>
                 <Link href="/forgot-password" className="text-sm font-medium text-trevu-600 hover:text-trevu-700">
@@ -222,7 +228,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-xl bg-trevu-600 py-3 text-white font-semibold hover:bg-trevu-700 transition-colors disabled:opacity-50 shadow-trevu"
+                className="w-full rounded-trevu bg-trevu-600 py-3 text-white font-semibold hover:bg-trevu-700 transition-colors disabled:opacity-50 shadow-trevu"
               >
                 {loading ? t('auth.loginLoading') : t('auth.login')}
               </button>
@@ -244,7 +250,7 @@ export default function LoginPage() {
               </div>
               <button
                 disabled
-                className="w-full rounded-xl bg-trevu-600 py-3 text-white font-semibold opacity-50 cursor-not-allowed"
+                className="w-full rounded-trevu bg-trevu-600 py-3 text-white font-semibold opacity-50 cursor-not-allowed"
               >
                 {t('auth.sendOTP')}
               </button>

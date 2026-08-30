@@ -394,6 +394,8 @@ export default function HomePage() {
 
         .trust-countries {
           display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
           gap: 1rem;
           align-items: center;
         }
@@ -907,6 +909,17 @@ export default function HomePage() {
 
           .categories-grid {
             grid-template-columns: repeat(2, 1fr);
+          }
+        }
+
+        @media (max-width: 480px) {
+          .categories-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .hero-trust,
+          .trust-countries {
+            max-width: 100%;
           }
 
           .secondary-grid {
