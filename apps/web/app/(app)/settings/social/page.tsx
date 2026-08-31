@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslation } from "@/lib/i18n/useTranslation";
+import { StateTemplate } from "@/components/ui";
 
 interface FollowUser {
   id: string;
@@ -109,11 +110,11 @@ export default function SocialPage() {
         className="input-trevu mb-6"
       />
 
-      {/* User list */}
+      {/* User list — states: design/D00_Core_Components.pen#v0Gvw, #3VCtO */}
       {loading ? (
-        <p className="text-sm text-navy-500 text-center py-8">{t('common.loading')}</p>
+        <StateTemplate variant="loading" title={t('common.loading')} />
       ) : filtered.length === 0 ? (
-        <p className="text-sm text-navy-500 text-center py-8">{t('settings.social.empty')}</p>
+        <StateTemplate variant="empty" icon="users" title={t('settings.social.empty')} />
       ) : (
         <div className="divide-y divide-navy-200">
           {filtered.map((user) => {

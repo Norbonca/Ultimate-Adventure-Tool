@@ -7,6 +7,7 @@ import { getServerT, getServerLocale } from "@/lib/i18n/server";
 import type { TranslationKey } from "@uat/i18n";
 import { AppHeader } from "@/components/AppHeader";
 import { Icon } from "@/components/Icon";
+import { Button, StateTemplate } from "@/components/ui";
 
 export default async function MyTripsPage() {
   const supabase = await createClient();
@@ -39,22 +40,14 @@ export default async function MyTripsPage() {
         </h2>
 
         {trips.length === 0 ? (
-          /* Empty State */
-          <div className="text-center py-16">
-            <div className="flex justify-center mb-4 text-navy-300"><Icon name="inbox" size={56} strokeWidth={1.25} /></div>
-            <h3 className="text-xl font-bold text-navy-900 mb-2">
-              {t('trips.emptyTitle')}
-            </h3>
-            <p className="text-navy-500 mb-6 max-w-md mx-auto">
-              {t('trips.emptyDescription')}
-            </p>
-            <Link
-              href="/trips/new"
-              className="inline-flex px-6 py-3 text-sm font-bold text-white bg-trevu-600 rounded-xl hover:bg-trevu-700 transition-colors shadow-lg shadow-trevu-600/20"
-            >
-              {t('trips.createFirst')}
-            </Link>
-          </div>
+          /* Empty State — design/D00_Core_Components.pen#3VCtO */
+          <StateTemplate
+            variant="empty"
+            icon="inbox"
+            title={t('trips.emptyTitle')}
+            description={t('trips.emptyDescription')}
+            actions={<Button href="/trips/new">{t('trips.createFirst')}</Button>}
+          />
         ) : (
           /* Trip Cards Grid */
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

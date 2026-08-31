@@ -37,6 +37,7 @@ export {
   Wallet,
 
   // ── Actions (§3) ──────────────────────────────────────────────
+  ArrowLeft,
   ArrowRight,
   ArrowUpDown,
   Check,
@@ -74,6 +75,7 @@ export {
   Hourglass,
   Inbox,
   Info,
+  KeyRound,
   Loader2,
   FolderOpen,
   Lock,

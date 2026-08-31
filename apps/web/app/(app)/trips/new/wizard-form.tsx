@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * Trip Wizard shell — design/D02_Trip_Management.pen#nzzRK (ProgressStepper),
+ * #D7gcf (WizardFooter). Stepper/footer extraction into components/ui: next round.
+ */
+
 import { useState, useCallback, useTransition } from "react";
 import type {
   CategoryRow,
@@ -24,6 +29,7 @@ import { Step4Publish } from "./steps/step4-publish";
 import { CATEGORY_DISPLAY } from "@/lib/categories";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { Icon } from "@/components/Icon";
+import { Button } from "@/components/ui";
 
 interface WizardFormProps {
   categories: CategoryRow[];
@@ -311,12 +317,9 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
       <div className="flex items-center justify-between mt-6">
         <div>
           {currentStep > 0 && (
-            <button
-              onClick={goBack}
-              className="px-5 py-2.5 text-sm font-medium text-navy-600 bg-white border border-navy-200 rounded-xl hover:bg-navy-50 transition-colors"
-            >
-              ← {t("trips.wizard.back")}
-            </button>
+            <Button variant="outline" size="sm" icon="arrow-left" onClick={goBack}>
+              {t("trips.wizard.back")}
+            </Button>
           )}
         </div>
 
@@ -334,32 +337,35 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
 
           {/* Draft save button (visible from step 2) */}
           {currentStep >= 2 && (
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={doSaveDraft}
               disabled={saveStatus === "saving"}
-              className="px-4 py-2.5 text-sm font-medium text-navy-500 bg-navy-50 border border-navy-200 rounded-xl hover:bg-navy-100 transition-colors disabled:opacity-50"
             >
               {t("trips.wizard.saveDraft")}
-            </button>
+            </Button>
           )}
 
           {/* Next / Publish */}
           {currentStep < 4 ? (
-            <button
+            <Button
+              size="sm"
+              iconRight="arrow-right"
               onClick={goNext}
               disabled={!canGoNext || isPending}
-              className="px-6 py-2.5 text-sm font-bold text-white bg-trevu-600 rounded-xl hover:bg-trevu-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
             >
-              {t("trips.wizard.next")} →
-            </button>
+              {t("trips.wizard.next")}
+            </Button>
           ) : (
-            <button
+            <Button
+              size="sm"
+              icon="rocket"
               onClick={doPublish}
               disabled={saveStatus === "saving"}
-              className="px-6 py-2.5 text-sm font-bold text-white bg-trevu-600 rounded-xl hover:bg-trevu-700 transition-colors disabled:opacity-50 shadow-lg shadow-trevu-600/30"
             >
-              <span className="inline-flex items-center gap-2"><Icon name="rocket" size={16} /> {t("trips.wizard.publish")}</span>
-            </button>
+              {t("trips.wizard.publish")}
+            </Button>
           )}
         </div>
       </div>
