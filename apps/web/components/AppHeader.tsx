@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -32,9 +33,18 @@ const NAV_ITEMS = [
   { key: "nav.pricing", href: "/pricing", icon: CreditCard },
 ] as const;
 
+// ── Belső funkciók menüje — a KÖZÉP zóna alapértelmezett tartalma
+// bejelentkezve, minden app-oldalon (spec 1.4; Discover már nem belső funkció)
+const INTERNAL_NAV = [
+  { key: "nav.myTrips", href: "/trips" },
+  { key: "nav.travelPlanner", href: "/planner" },
+  { key: "nav.community", href: "/community" },
+] as const;
+
 // ── Component ─────────────────────────────────────────────────────
 export function AppHeader({ anchors, user }: AppHeaderProps) {
   const { t } = useTranslation();
+  const pathname = usePathname();
 
   // Dropdown state
   const [menuOpen, setMenuOpen] = useState(false);
@@ -150,27 +160,60 @@ export function AppHeader({ anchors, user }: AppHeaderProps) {
           )}
         </div>
 
-        {/* ── KÖZÉP ZÓNA: Kontextuális anchor linkek ── */}
-        {anchors && anchors.length > 0 && (
+        {/* ── KÖZÉP ZÓNA: belső navigáció ──
+            Publikus oldal explicit anchorokat ad át; különben bejelentkezve
+            a belső funkciók menüje (My Trips · Travel Planner · Community). */}
+        {anchors && anchors.length > 0 ? (
           <nav className="hidden md:flex items-center gap-1 mx-auto">
-            {anchors.map((anchor, i) => (
-              <span key={anchor.href} className="flex items-center">
-                {i > 0 && (
-                  <span className="text-slate-300 mx-1.5">·</span>
-                )}
-                <a
-                  href={anchor.href}
-                  className="text-sm font-medium text-slate-500 hover:text-teal-600 transition-colors whitespace-nowrap"
-                >
-                  {anchor.label}
-                </a>
-              </span>
-            ))}
+            {anchors.map((anchor, i) => {
+              const active = anchor.href === "/"
+                ? pathname === "/"
+                : !anchor.href.startsWith("#") && pathname?.startsWith(anchor.href);
+              return (
+                <span key={anchor.href} className="flex items-center">
+                  {i > 0 && (
+                    <span className="text-slate-300 mx-1.5">·</span>
+                  )}
+                  <a
+                    href={anchor.href}
+                    className={`text-sm transition-colors whitespace-nowrap ${
+                      active
+                        ? "font-semibold text-teal-600"
+                        : "font-medium text-slate-500 hover:text-teal-600"
+                    }`}
+                  >
+                    {anchor.label}
+                  </a>
+                </span>
+              );
+            })}
           </nav>
+        ) : authChecked && isLoggedIn ? (
+          <nav className="hidden md:flex items-center gap-1 mx-auto">
+            {INTERNAL_NAV.map((item, i) => {
+              const active = pathname?.startsWith(item.href);
+              return (
+                <span key={item.href} className="flex items-center">
+                  {i > 0 && (
+                    <span className="text-slate-300 mx-1.5">·</span>
+                  )}
+                  <Link
+                    href={item.href}
+                    className={`text-sm transition-colors whitespace-nowrap ${
+                      active
+                        ? "font-semibold text-teal-600"
+                        : "font-medium text-slate-500 hover:text-teal-600"
+                    }`}
+                  >
+                    {t(item.key as Parameters<typeof t>[0])}
+                  </Link>
+                </span>
+              );
+            })}
+          </nav>
+        ) : (
+          <div className="flex-1" />
         )}
-
-        {/* Spacer when no anchors (push right zone to edge) */}
-        {(!anchors || anchors.length === 0) && <div className="flex-1" />}
 
         {/* ── JOBB ZÓNA: Nyelv + User ── */}
         <div className="ml-auto flex items-center gap-3">

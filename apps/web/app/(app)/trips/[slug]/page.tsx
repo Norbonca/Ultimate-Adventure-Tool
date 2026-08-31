@@ -146,11 +146,6 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
   return (
     <main className="min-h-screen bg-slate-50">
       <AppHeader
-        anchors={[
-          { label: t('nav.description'), href: '#description' },
-          { label: t('nav.details'), href: '#details' },
-          { label: t('nav.location'), href: '#location' },
-        ]}
         user={user ? { email: user.email ?? "", displayName: user.user_metadata?.full_name } : null}
       />
 
