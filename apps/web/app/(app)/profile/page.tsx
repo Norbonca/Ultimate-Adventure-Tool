@@ -267,16 +267,10 @@ export default function ProfilePage() {
   }, []);
 
   // ─── Loading / Error ─────────────────────────────────────
-  const headerAnchors: { label: string; href: string }[] = [
-    { label: t("nav.overview"), href: "#overview" },
-    { label: t("nav.skills"), href: "#skills" },
-    { label: t("nav.privacy"), href: "/settings/privacy" },
-  ];
-
   if (isLoading) {
     return (
       <main className="min-h-screen bg-slate-50">
-        <AppHeader anchors={headerAnchors} />
+        <AppHeader />
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center text-slate-500">
             {t("common.loading")}
@@ -289,7 +283,7 @@ export default function ProfilePage() {
   if (!profile || !user) {
     return (
       <main className="min-h-screen bg-slate-50">
-        <AppHeader anchors={headerAnchors} />
+        <AppHeader />
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center text-red-600">
             {t("profile.overview.notFound")}
@@ -331,7 +325,6 @@ export default function ProfilePage() {
   return (
     <main className="min-h-screen bg-slate-50">
       <AppHeader
-        anchors={headerAnchors}
         user={{
           email: user.email ?? "",
           displayName: profile.display_name ?? undefined,

@@ -17,10 +17,6 @@ export default async function DashboardPage() {
   return (
     <main className="min-h-screen bg-slate-50">
       <AppHeader
-        anchors={[
-          { label: t('nav.myTrips'), href: '/trips' },
-          { label: t('nav.newTrip'), href: '/trips/new' },
-        ]}
         user={{ email: user.email ?? "", displayName: user.user_metadata?.full_name }}
       />
 
