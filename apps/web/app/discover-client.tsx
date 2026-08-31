@@ -1086,9 +1086,9 @@ export default function DiscoverClient({
       `}</style>
 
       <AppHeader anchors={[
-        { label: t('nav.filters'), href: '#filters' },
-        { label: t('nav.categories'), href: '#categories' },
-        { label: t('nav.map'), href: '#map' },
+        { label: t('nav.discover'), href: '/' },
+        { label: t('nav.pricing'), href: '/pricing' },
+        { label: t('nav.community'), href: '/community' },
       ]} />
 
       {/* HERO */}

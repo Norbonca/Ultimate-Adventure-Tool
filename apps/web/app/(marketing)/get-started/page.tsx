@@ -963,9 +963,9 @@ export default function HomePage() {
       `}</style>
 
       <AppHeader anchors={[
-        { label: t('nav.features'), href: '#features' },
-        { label: t('nav.categories'), href: '#categories' },
-        { label: t('nav.about'), href: '#about' },
+        { label: t('nav.discover'), href: '/' },
+        { label: t('nav.pricing'), href: '/pricing' },
+        { label: t('nav.community'), href: '/community' },
       ]} />
 
       {/* Hero Section */}

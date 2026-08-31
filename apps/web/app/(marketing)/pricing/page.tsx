@@ -55,7 +55,11 @@ export default async function PricingPage() {
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <AppHeader />
+      <AppHeader anchors={[
+        { label: t('nav.discover'), href: '/' },
+        { label: t('nav.pricing'), href: '/pricing' },
+        { label: t('nav.community'), href: '/community' },
+      ]} />
 
       <section className="max-w-6xl mx-auto px-6 pt-16 pb-10 text-center">
         <h1 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">

@@ -165,19 +165,28 @@ export function AppHeader({ anchors, user }: AppHeaderProps) {
             a belső funkciók menüje (My Trips · Travel Planner · Community). */}
         {anchors && anchors.length > 0 ? (
           <nav className="hidden md:flex items-center gap-1 mx-auto">
-            {anchors.map((anchor, i) => (
-              <span key={anchor.href} className="flex items-center">
-                {i > 0 && (
-                  <span className="text-slate-300 mx-1.5">·</span>
-                )}
-                <a
-                  href={anchor.href}
-                  className="text-sm font-medium text-slate-500 hover:text-teal-600 transition-colors whitespace-nowrap"
-                >
-                  {anchor.label}
-                </a>
-              </span>
-            ))}
+            {anchors.map((anchor, i) => {
+              const active = anchor.href === "/"
+                ? pathname === "/"
+                : !anchor.href.startsWith("#") && pathname?.startsWith(anchor.href);
+              return (
+                <span key={anchor.href} className="flex items-center">
+                  {i > 0 && (
+                    <span className="text-slate-300 mx-1.5">·</span>
+                  )}
+                  <a
+                    href={anchor.href}
+                    className={`text-sm transition-colors whitespace-nowrap ${
+                      active
+                        ? "font-semibold text-teal-600"
+                        : "font-medium text-slate-500 hover:text-teal-600"
+                    }`}
+                  >
+                    {anchor.label}
+                  </a>
+                </span>
+              );
+            })}
           </nav>
         ) : authChecked && isLoggedIn ? (
           <nav className="hidden md:flex items-center gap-1 mx-auto">
