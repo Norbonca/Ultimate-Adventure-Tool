@@ -1639,6 +1639,22 @@ const en: TranslationKeys = {
       },
     },
   },
+
+  // ============================================================================
+  // Travel Planner (M20) — placeholder until the module ships
+  // ============================================================================
+  planner: {
+    comingSoonDesc:
+      "Coming soon — plan routes, transport and budget for your trips in one place.",
+  },
+
+  // ============================================================================
+  // Community (M06) — placeholder until the module ships
+  // ============================================================================
+  community: {
+    comingSoonDesc:
+      "Coming soon — follow adventurers, share stories and find your next crew.",
+  },
 } as const;
 
 export default en;

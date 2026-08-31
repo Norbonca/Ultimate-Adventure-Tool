@@ -1669,6 +1669,22 @@ const hu = {
       },
     },
   },
+
+  // ============================================================================
+  // Travel Planner (M20) — placeholder amíg a modul elkészül
+  // ============================================================================
+  planner: {
+    comingSoonDesc:
+      "Hamarosan — útvonalak, közlekedés és költségkeret tervezése egy helyen.",
+  },
+
+  // ============================================================================
+  // Community (M06) — placeholder amíg a modul elkészül
+  // ============================================================================
+  community: {
+    comingSoonDesc:
+      "Hamarosan — kövess kalandorokat, ossz meg történeteket, és találd meg a következő csapatod.",
+  },
 } as const;
 
 export default hu;
