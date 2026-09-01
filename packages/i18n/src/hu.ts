@@ -565,6 +565,23 @@ const hu = {
     publishTrip: "Túra közzététele",
     myTrips: "Saját túráim",
     myTripsTitle: "Túráim",
+    listTabs: {
+      active: "Aktív",
+      past: "Korábbi",
+      drafts: "Piszkozatok",
+    },
+    searchPlaceholder: "Keresés a túráim között...",
+    recentActivity: "Legutóbbi események",
+    newApplication: "Új jelentkezés: {name}",
+    noActivity: "Még nincs esemény.",
+    listStats: {
+      title: "Statisztikáid",
+      trips: "Túra",
+      days: "Nap",
+      countries: "Ország",
+    },
+    participantsOf: "{current}/{max} résztvevő",
+    noTripsInTab: "Ezen a fülön nincs túra.",
     newTrip: "+ Új túra",
     discover: "Felfedezés",
 

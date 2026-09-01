@@ -556,6 +556,23 @@ const en: TranslationKeys = {
     publishTrip: "Publish trip",
     myTrips: "My trips",
     myTripsTitle: "My Trips",
+    listTabs: {
+      active: "Active",
+      past: "Past",
+      drafts: "Drafts",
+    },
+    searchPlaceholder: "Search trips...",
+    recentActivity: "Recent Activity",
+    newApplication: "New application from {name}",
+    noActivity: "No activity yet.",
+    listStats: {
+      title: "Your Stats",
+      trips: "Trips",
+      days: "Days",
+      countries: "Countries",
+    },
+    participantsOf: "{current}/{max} participants",
+    noTripsInTab: "No trips in this tab.",
     newTrip: "+ New trip",
     discover: "Discover",
 
