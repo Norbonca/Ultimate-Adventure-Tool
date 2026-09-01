@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getServerT } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui";
+import { FindFriends, FollowToggle } from "./find-friends";
 
 // Community Dashboard (M05) — design: design/D06_Community.pen#r6Cv8p
 // Saját közösségi áttekintő: követettek, követők, publikus tartalmaim.
@@ -25,7 +26,15 @@ function initials(name: string | null): string {
     .slice(0, 2);
 }
 
-function PersonRow({ person }: { person: FollowProfile }) {
+function PersonRow({
+  person,
+  isFollowing,
+  followBack,
+}: {
+  person: FollowProfile;
+  isFollowing: boolean;
+  followBack?: boolean;
+}) {
   return (
     <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-3">
       {person.avatar_url ? (
@@ -40,7 +49,7 @@ function PersonRow({ person }: { person: FollowProfile }) {
           {initials(person.display_name)}
         </div>
       )}
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="text-sm font-semibold text-navy-900 truncate">
           {person.display_name ?? "—"}
         </p>
@@ -48,6 +57,11 @@ function PersonRow({ person }: { person: FollowProfile }) {
           <p className="text-xs text-navy-400 truncate">@{person.slug}</p>
         )}
       </div>
+      <FollowToggle
+        targetId={person.id}
+        initialFollowing={isFollowing}
+        followBack={followBack}
+      />
     </div>
   );
 }
@@ -94,6 +108,7 @@ export default async function CommunityPage() {
   const followers = (followerRes.data ?? [])
     .map((r) => r.profiles as unknown as FollowProfile | null)
     .filter((p): p is FollowProfile => p !== null);
+  const followingIds = new Set(following.map((p) => p.id));
   const myTrips = tripsRes.data ?? [];
   const profile = profileRes.data;
 
@@ -112,8 +127,10 @@ export default async function CommunityPage() {
         </h1>
 
         <div className="flex flex-col lg:flex-row gap-6 items-start">
-          {/* ── Bal oszlop: követettek + követők ── */}
+          {/* ── Bal oszlop: keresés + követettek + követők ── */}
           <div className="flex-1 min-w-0 w-full space-y-8">
+            <FindFriends />
+
             <section>
               <h2 className="text-base font-bold text-navy-900 mb-3">
                 {t("community.following")} ({following.length})
@@ -121,7 +138,7 @@ export default async function CommunityPage() {
               {following.length > 0 ? (
                 <div className="space-y-2.5">
                   {following.map((p) => (
-                    <PersonRow key={p.id} person={p} />
+                    <PersonRow key={p.id} person={p} isFollowing={true} />
                   ))}
                 </div>
               ) : (
@@ -138,7 +155,12 @@ export default async function CommunityPage() {
               {followers.length > 0 ? (
                 <div className="space-y-2.5">
                   {followers.map((p) => (
-                    <PersonRow key={p.id} person={p} />
+                    <PersonRow
+                      key={p.id}
+                      person={p}
+                      isFollowing={followingIds.has(p.id)}
+                      followBack
+                    />
                   ))}
                 </div>
               ) : (
