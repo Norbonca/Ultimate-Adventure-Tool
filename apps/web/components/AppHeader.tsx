@@ -34,10 +34,11 @@ const NAV_ITEMS = [
 ] as const;
 
 // ── Belső funkciók menüje — a KÖZÉP zóna alapértelmezett tartalma
-// bejelentkezve, minden app-oldalon (spec 1.4; Discover már nem belső funkció)
+// bejelentkezve, minden app-oldalon (spec 1.4).
+// Túratervező = M02 túraszervezés (a My Trips oldalról indul);
+// nem keverendő az M20 Utazástervezővel (per-túra oda-/hazaút tervezés).
 const INTERNAL_NAV = [
-  { key: "nav.myTrips", href: "/trips" },
-  { key: "nav.travelPlanner", href: "/planner" },
+  { key: "nav.tripPlanner", href: "/trips" },
   { key: "nav.community", href: "/community" },
 ] as const;
 
