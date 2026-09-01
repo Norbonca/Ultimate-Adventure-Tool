@@ -186,6 +186,7 @@ const en: TranslationKeys = {
     signUp: "Sign up",
     dashboard: "Dashboard",
     myTrips: "My Trips",
+    tripPlanner: "Trip Planner",
     travelPlanner: "Travel Planner",
     community: "Community",
     home: "Home",
@@ -1641,19 +1642,19 @@ const en: TranslationKeys = {
   },
 
   // ============================================================================
-  // Travel Planner (M20) — placeholder until the module ships
-  // ============================================================================
-  planner: {
-    comingSoonDesc:
-      "Coming soon — plan routes, transport and budget for your trips in one place.",
-  },
-
-  // ============================================================================
-  // Community (M06) — placeholder until the module ships
+  // Community Dashboard (/community) — M05 personal community overview
   // ============================================================================
   community: {
-    comingSoonDesc:
-      "Coming soon — follow adventurers, share stories and find your next crew.",
+    title: "My Community",
+    following: "Following",
+    followers: "My followers",
+    noFollowing: "You are not following anyone yet.",
+    noFollowers: "You have no followers yet.",
+    whatOthersSee: "What others see",
+    viewPublicProfile: "My public profile",
+    myPublishedTrips: "My published trips",
+    noPublishedTrips: "You have no published trips yet.",
+    blogComingSoon: "Blog & stories — coming with the community feed.",
   },
 } as const;
 

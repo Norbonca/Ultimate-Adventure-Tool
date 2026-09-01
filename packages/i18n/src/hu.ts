@@ -185,6 +185,7 @@ const hu = {
     signUp: "Regisztráció",
     dashboard: "Irányítópult",
     myTrips: "Saját túráim",
+    tripPlanner: "Túratervező",
     travelPlanner: "Utazástervező",
     community: "Közösség",
     home: "Főoldal",
@@ -1671,19 +1672,19 @@ const hu = {
   },
 
   // ============================================================================
-  // Travel Planner (M20) — placeholder amíg a modul elkészül
-  // ============================================================================
-  planner: {
-    comingSoonDesc:
-      "Hamarosan — útvonalak, közlekedés és költségkeret tervezése egy helyen.",
-  },
-
-  // ============================================================================
-  // Community (M06) — placeholder amíg a modul elkészül
+  // Community Dashboard (/community) — M05 saját közösségi áttekintő
   // ============================================================================
   community: {
-    comingSoonDesc:
-      "Hamarosan — kövess kalandorokat, ossz meg történeteket, és találd meg a következő csapatod.",
+    title: "Közösségem",
+    following: "Követettek",
+    followers: "Követőim",
+    noFollowing: "Még senkit sem követsz.",
+    noFollowers: "Még nincs követőd.",
+    whatOthersSee: "Amit mások látnak",
+    viewPublicProfile: "Publikus profilom",
+    myPublishedTrips: "Publikált túráim",
+    noPublishedTrips: "Még nincs publikált túrád.",
+    blogComingSoon: "Blog és történetek — a közösségi feeddel érkezik.",
   },
 } as const;
 
