@@ -23,6 +23,7 @@ import {
   type TimelineTask,
 } from "@/app/(app)/trips/timeline-actions";
 import { Icon } from "@/components/Icon";
+import { getLocalizedName, getLocalizedText } from "@/lib/i18n/localized";
 
 // ── Status colors ───────────────────────────
 
@@ -167,7 +168,7 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
 // ═════════════════���════════════════════════════
 
 function TemplateSelector({ tripId, onInit }: { tripId: string; onInit: () => void }) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [templates, setTemplates] = useState<TimelineTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [initializing, setInitializing] = useState(false);
@@ -210,8 +211,7 @@ function TemplateSelector({ tripId, onInit }: { tripId: string; onInit: () => vo
       <div className="space-y-3 max-w-md mx-auto">
         <p className="text-sm font-semibold text-slate-700">{t("timeline.chooseTemplate")}</p>
         {templates.map((tpl) => {
-          // TODO: nameKey is built but not used — template names are not localised yet.
-          const _nameKey = `template${tpl.key.charAt(0).toUpperCase()}${tpl.key.slice(1)}` as keyof typeof t;
+          const description = getLocalizedText(tpl.description, tpl.description_localized, locale);
           return (
             <button
               key={tpl.id}
@@ -222,10 +222,10 @@ function TemplateSelector({ tripId, onInit }: { tripId: string; onInit: () => vo
               <span className="text-teal-600"><Icon name={tpl.icon || "clipboard-list"} size={24} /></span>
               <div>
                 <span className="block text-sm font-semibold text-slate-800">
-                  {(tpl.name_localized as Record<string, string>)?.hu || tpl.name}
+                  {getLocalizedName(tpl, locale)}
                 </span>
-                {tpl.description && (
-                  <span className="block text-xs text-slate-500 mt-0.5">{tpl.description}</span>
+                {description && (
+                  <span className="block text-xs text-slate-500 mt-0.5">{description}</span>
                 )}
               </div>
             </button>
@@ -274,7 +274,7 @@ function PhaseColumn({
   onMilestoneClick: (ms: MilestoneWithTasks) => void;
   onRefresh: () => void;
 }) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [addingMilestone, setAddingMilestone] = useState(false);
   const [newMilestoneName, setNewMilestoneName] = useState("");
 
@@ -298,7 +298,7 @@ function PhaseColumn({
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
           <Icon name={icon} size={16} className="text-slate-600" />
-          <span className="text-sm font-bold text-slate-900">{phase.name}</span>
+          <span className="text-sm font-bold text-slate-900">{getLocalizedName(phase, locale)}</span>
         </div>
         <span className="flex items-center justify-center w-6 h-6 text-xs font-semibold text-white bg-teal-500 rounded-full">
           {milestoneCount}
@@ -363,7 +363,7 @@ function MilestoneCard({ milestone, onClick }: { milestone: MilestoneWithTasks; 
       {/* Top row: status dot + name */}
       <div className="flex items-start gap-2">
         <div className={`w-2.5 h-2.5 rounded-full mt-1 shrink-0 ${STATUS_DOT[milestone.status] || STATUS_DOT.not_started}`} />
-        <span className="text-sm font-medium text-slate-800 leading-tight">{milestone.name}</span>
+        <span className="text-sm font-medium text-slate-800 leading-tight">{getLocalizedName(milestone, locale)}</span>
       </div>
 
       {/* Bottom row: due date + progress */}
@@ -404,7 +404,8 @@ function MilestoneModal({
   onRefresh: () => void;
 }) {
   const { t, locale } = useTranslation();
-  const [name, setName] = useState(milestone.name);
+  const displayName = getLocalizedName(milestone, locale);
+  const [name, setName] = useState(displayName);
   const [status, setStatus] = useState(milestone.status);
   const [dueDate, setDueDate] = useState(milestone.due_date || "");
   const [notes, setNotes] = useState(milestone.description || "");
@@ -414,8 +415,10 @@ function MilestoneModal({
 
   const handleSave = async () => {
     setSaving(true);
+    const trimmed = name.trim();
     await updateMilestone(milestone.id, {
-      name,
+      // Csak tényleges átnevezéskor küldjük a nevet — így a sablon fordítása megmarad.
+      ...(trimmed && trimmed !== displayName ? { name: trimmed } : {}),
       status,
       due_date: dueDate || null,
       description: notes || undefined,
@@ -553,7 +556,7 @@ function MilestoneModal({
 
                     {/* Task name */}
                     <span className={`flex-1 text-sm ${isCompleted ? "text-slate-400 line-through" : "text-slate-700"}`}>
-                      {task.name}
+                      {getLocalizedName(task, locale)}
                     </span>
 
                     {/* Status badge for non-standard */}

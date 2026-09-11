@@ -145,6 +145,7 @@ export const tripPhases = pgTable(
     templatePhaseId: uuid('template_phase_id')
       .references(() => refPhaseTemplates.id, { onDelete: 'set null' }),
     name: varchar('name', { length: 100 }).notNull(),
+    nameLocalized: jsonb('name_localized').default({}),
     icon: varchar('icon', { length: 50 }).default('circle'),
     sortOrder: integer('sort_order').notNull().default(0),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -168,6 +169,7 @@ export const tripMilestones = pgTable(
     templateMilestoneId: uuid('template_milestone_id')
       .references(() => refMilestoneTemplates.id, { onDelete: 'set null' }),
     name: varchar('name', { length: 200 }).notNull(),
+    nameLocalized: jsonb('name_localized').default({}),
     description: text('description'),
     status: milestoneStatusEnum('status').notNull().default('not_started'),
     dueDate: date('due_date'),
@@ -213,6 +215,7 @@ export const tripTasks = pgTable(
     templateTaskId: uuid('template_task_id')
       .references(() => refTaskTemplates.id, { onDelete: 'set null' }),
     name: varchar('name', { length: 300 }).notNull(),
+    nameLocalized: jsonb('name_localized').default({}),
     description: text('description'),
     startDate: date('start_date'),
     dueDate: date('due_date'),
