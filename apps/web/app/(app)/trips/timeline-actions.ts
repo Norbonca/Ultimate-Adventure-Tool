@@ -18,6 +18,7 @@ export interface TimelineTemplate {
   name: string;
   name_localized: Record<string, string>;
   description: string | null;
+  description_localized: Record<string, string> | null;
   category_id: string | null;
   icon: string;
 }
@@ -26,6 +27,7 @@ export interface TimelinePhase {
   id: string;
   trip_id: string;
   name: string;
+  name_localized: Record<string, string> | null;
   icon: string;
   sort_order: number;
 }
@@ -35,6 +37,7 @@ export interface TimelineMilestone {
   phase_id: string;
   trip_id: string;
   name: string;
+  name_localized: Record<string, string> | null;
   description: string | null;
   status: "not_started" | "in_progress" | "done";
   due_date: string | null;
@@ -46,6 +49,7 @@ export interface TimelineTask {
   milestone_id: string;
   trip_id: string;
   name: string;
+  name_localized: Record<string, string> | null;
   status: string;
   task_type: string;
   assignee_type: string;
@@ -106,7 +110,7 @@ export async function fetchTimelineTemplates(
 
   let query = supabase
     .from("ref_timeline_templates")
-    .select("id, key, name, name_localized, description, category_id, icon")
+    .select("id, key, name, name_localized, description, description_localized, category_id, icon")
     .eq("is_active", true)
     .order("sort_order");
 
@@ -216,6 +220,7 @@ export async function initTimelineFromTemplate(
         trip_id: tripId,
         template_phase_id: phase.id,
         name: phase.name,
+        name_localized: phase.name_localized ?? {},
         icon: phase.icon,
         sort_order: phase.sort_order,
       })
@@ -243,6 +248,7 @@ export async function initTimelineFromTemplate(
           phase_id: newPhase.id,
           template_milestone_id: milestone.id,
           name: milestone.name,
+          name_localized: milestone.name_localized ?? {},
           due_date: dueDate,
           sort_order: milestone.sort_order,
         })
@@ -261,6 +267,7 @@ export async function initTimelineFromTemplate(
           trip_id: tripId,
           template_task_id: task.id,
           name: task.name,
+          name_localized: task.name_localized ?? {},
           task_type: task.task_type || "checklist",
           assignee_type: task.assignee_type || "organizer",
           is_required: task.is_required ?? true,
@@ -296,7 +303,7 @@ export async function fetchTripTimeline(
   // Fázisok
   const { data: phases } = await supabase
     .from("trip_phases")
-    .select("id, trip_id, name, icon, sort_order")
+    .select("id, trip_id, name, name_localized, icon, sort_order")
     .eq("trip_id", tripId)
     .order("sort_order");
 
@@ -309,7 +316,7 @@ export async function fetchTripTimeline(
   // Mérföldkövek
   const { data: milestones } = await supabase
     .from("trip_milestones")
-    .select("id, phase_id, trip_id, name, description, status, due_date, sort_order")
+    .select("id, phase_id, trip_id, name, name_localized, description, status, due_date, sort_order")
     .in("phase_id", phaseIds)
     .order("sort_order");
 
@@ -318,7 +325,7 @@ export async function fetchTripTimeline(
   // Feladatok
   const { data: tasks } = await supabase
     .from("trip_tasks")
-    .select("id, milestone_id, trip_id, name, status, task_type, assignee_type, assignee_id, is_required, is_blocking, requires_verification, due_date, sort_order")
+    .select("id, milestone_id, trip_id, name, name_localized, status, task_type, assignee_type, assignee_id, is_required, is_blocking, requires_verification, due_date, sort_order")
     .eq("trip_id", tripId)
     .order("sort_order");
 
@@ -395,7 +402,7 @@ export async function createPhase(
       icon: icon || "circle",
       sort_order: nextOrder,
     })
-    .select("id, trip_id, name, icon, sort_order")
+    .select("id, trip_id, name, name_localized, icon, sort_order")
     .single();
 
   if (error) return { phase: null, error: error.message };
@@ -411,7 +418,7 @@ export async function updatePhase(
 
   const { error } = await supabase
     .from("trip_phases")
-    .update(data)
+    .update(data.name !== undefined ? { ...data, name_localized: {} } : data)
     .eq("id", phaseId);
 
   if (error) return { error: error.message };
@@ -457,7 +464,7 @@ export async function createMilestone(
       name,
       sort_order: nextOrder,
     })
-    .select("id, phase_id, trip_id, name, description, status, due_date, sort_order")
+    .select("id, phase_id, trip_id, name, name_localized, description, status, due_date, sort_order")
     .single();
 
   if (error) return { milestone: null, error: error.message };
@@ -480,7 +487,7 @@ export async function updateMilestone(
 
   const { error } = await supabase
     .from("trip_milestones")
-    .update(data)
+    .update(data.name !== undefined ? { ...data, name_localized: {} } : data)
     .eq("id", milestoneId);
 
   if (error) return { error: error.message };
@@ -540,7 +547,7 @@ export async function createTask(
       sort_order: nextOrder,
       due_date: data.due_date || null,
     })
-    .select("id, milestone_id, trip_id, name, status, task_type, assignee_type, assignee_id, is_required, is_blocking, requires_verification, due_date, sort_order")
+    .select("id, milestone_id, trip_id, name, name_localized, status, task_type, assignee_type, assignee_id, is_required, is_blocking, requires_verification, due_date, sort_order")
     .single();
 
   if (error) return { task: null, error: error.message };
@@ -567,7 +574,10 @@ export async function updateTask(
   const { supabase, user } = await getAuthUser();
   if (!user) return { error: "Not authenticated" };
 
-  const { error } = await supabase.from("trip_tasks").update(data).eq("id", taskId);
+  const { error } = await supabase
+    .from("trip_tasks")
+    .update(data.name !== undefined ? { ...data, name_localized: {} } : data)
+    .eq("id", taskId);
   if (error) return { error: error.message };
   return {};
 }
