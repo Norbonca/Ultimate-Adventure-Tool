@@ -137,7 +137,7 @@ export const INITIAL_FORM_DATA: WizardFormData = {
   difficulty: 1,
   sub_discipline_id: "",
   category_details: {},
-  visibility: "public",
+  visibility: "private",
   require_approval: true,
   registration_deadline: "",
   price_amount: null,

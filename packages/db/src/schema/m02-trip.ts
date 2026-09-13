@@ -202,7 +202,6 @@ export const trips = pgTable(
       .references(() => profiles.id, { onDelete: 'restrict' }),
     orgId: uuid('org_id'),
     categoryId: uuid('category_id')
-      .notNull()
       .references(() => categories.id, { onDelete: 'restrict' }),
     subDisciplineId: uuid('sub_discipline_id')
       .references(() => subDisciplines.id, { onDelete: 'set null' }),
@@ -219,8 +218,8 @@ export const trips = pgTable(
 
     // Difficulty & Location
     difficulty: integer('difficulty').notNull(),
-    startDate: date('start_date').notNull(),
-    endDate: date('end_date').notNull(),
+    startDate: date('start_date'),
+    endDate: date('end_date'),
     meetingPoint: varchar('meeting_point', { length: 200 }),
     locationCountry: varchar('location_country', { length: 2 }).notNull(),
     locationRegion: varchar('location_region', { length: 100 }),
@@ -247,6 +246,7 @@ export const trips = pgTable(
     // Lifecycle
     status: tripStatusEnum('status').notNull().default('draft'),
     visibility: tripVisibilityEnum('visibility').notNull().default('public'),
+    showOnLanding: boolean('show_on_landing').notNull().default(true),
     requireApproval: boolean('require_approval').notNull().default(true),
     autoAccept: boolean('auto_accept').notNull().default(false),
     registrationDeadline: timestamp('registration_deadline', { withTimezone: true }),

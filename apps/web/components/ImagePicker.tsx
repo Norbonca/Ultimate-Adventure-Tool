@@ -61,8 +61,8 @@ export function ImagePicker({
         setGalleryImages(images as GalleryImage[]);
       }
     }
-    loadImages();
-  }, [showGallery, type, categoryId]);
+    loadImages().catch(() => setUploadError(t("errors.loadFailed")));
+  }, [showGallery, type, categoryId, t]);
 
   // ── File upload handler ──
   const handleFileUpload = useCallback(
@@ -76,10 +76,9 @@ export function ImagePicker({
       const fd = new FormData();
       fd.append("file", file);
 
-      const result =
-        type === "cover" || type === "card"
-          ? await uploadCoverImage(fd)
-          : await uploadAvatar(fd);
+      const result = await (type === "cover" || type === "card"
+        ? uploadCoverImage(fd)
+        : uploadAvatar(fd)).catch(() => ({ url: "", error: t("errors.saveFailed") }));
 
       setIsUploading(false);
 
@@ -93,7 +92,7 @@ export function ImagePicker({
       // Reset input
       e.target.value = "";
     },
-    [type, onSelect]
+    [type, onSelect, t]
   );
 
   // ── Select gallery image ──

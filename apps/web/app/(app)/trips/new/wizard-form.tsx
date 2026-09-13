@@ -21,7 +21,7 @@ import {
   fetchCategoryParameters,
   fetchParameterOptions,
 } from "../actions";
-import { Step0Template, type PlanningMode } from "./steps/step0-template";
+import { Step0Template, SAMPLE_TEMPLATES, type PlanningMode } from "./steps/step0-template";
 import { Step1Category } from "./steps/step1-category";
 import { Step2Basics } from "./steps/step2-basics";
 import { Step3Details } from "./steps/step3-details";
@@ -45,7 +45,7 @@ const STEP_KEYS = [
 ];
 
 export function WizardForm({ categories, countries, userId: _userId }: WizardFormProps) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [planningMode, setPlanningMode] = useState<PlanningMode | null>(null);
   const [formData, setFormData] = useState<WizardFormData>(INITIAL_FORM_DATA);
@@ -124,12 +124,20 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
     [formData.category_id, updateForm]
   );
 
+  const persistDraft = useCallback(async (data: Partial<WizardFormData>, id?: string) => {
+    try {
+      return await saveDraft(data, id);
+    } catch {
+      return { tripId: id || "", error: t("errors.saveFailed") };
+    }
+  }, [t]);
+
   // ── Save draft ──
   const doSaveDraft = useCallback(async () => {
     setSaveStatus("saving");
     setErrorMsg("");
 
-    const result = await saveDraft(formData, tripId || undefined);
+    const result = await persistDraft(formData, tripId || undefined);
     if (result.error) {
       setSaveStatus("error");
       setErrorMsg(result.error);
@@ -138,16 +146,29 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
       if (!tripId) setTripId(result.tripId);
       setTimeout(() => setSaveStatus("idle"), 2000);
     }
-  }, [formData, tripId]);
+  }, [formData, tripId, persistDraft]);
 
   // ── Template selected ──
   const onSelectTemplate = useCallback(
-    (_templateId: string) => {
-      // TODO: pre-fill formData from template data
+    (templateId: string) => {
+      const template = SAMPLE_TEMPLATES.find(item => item.id === templateId);
+      if (!template) return;
+      const category = categories.find(item => item.name === template.categoryName);
+      if (!category) {
+        setSaveStatus("error");
+        setErrorMsg(t("errors.loadFailed"));
+        return;
+      }
+      onCategorySelect(category.id, category.name);
+      updateForm({
+        title: locale === "en" ? template.title : template.titleHu,
+        description: locale === "en" ? template.descriptionEn : template.descriptionHu,
+        max_participants: Math.max(2, template.spots),
+      });
       setPlanningMode("template");
       setCurrentStep(1);
     },
-    []
+    [categories, locale, onCategorySelect, t, updateForm]
   );
 
   // ── Next step ──
@@ -161,7 +182,7 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
     // Save draft on Step 2 → 3 transition (first save)
     if (currentStep === 2 && !tripId) {
       setSaveStatus("saving");
-      const result = await saveDraft(formData);
+      const result = await persistDraft(formData);
       if (result.error) {
         setSaveStatus("error");
         setErrorMsg(result.error);
@@ -174,11 +195,18 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
 
     // Save draft on every step transition after initial save
     if (currentStep >= 2 && tripId) {
-      await saveDraft(formData, tripId);
+      setSaveStatus("saving");
+      const result = await persistDraft(formData, tripId);
+      if (result.error) {
+        setSaveStatus("error");
+        setErrorMsg(result.error);
+        return;
+      }
+      setSaveStatus("saved");
     }
 
     setCurrentStep((prev) => Math.min(prev + 1, 4));
-  }, [currentStep, formData, tripId]);
+  }, [currentStep, formData, tripId, persistDraft]);
 
   const goBack = useCallback(() => {
     setCurrentStep((prev) => Math.max(prev - 1, 0));
@@ -192,7 +220,7 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
     }
 
     setSaveStatus("saving");
-    const result = await publishTrip(tripId, formData);
+    const result = await publishTrip(tripId, formData).catch(() => ({ slug: "", error: t("errors.saveFailed") }));
     if (result.error) {
       setSaveStatus("error");
       setErrorMsg(result.error);
@@ -279,7 +307,7 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
             selectedCategoryId={formData.category_id}
             tripType={formData.trip_type}
             onSelect={onCategorySelect}
-            onTripTypeChange={(type) => updateForm({ trip_type: type })}
+            onTripTypeChange={(type) => updateForm({ trip_type: type, visibility: type })}
             isLoading={isPending}
           />
         )}
@@ -332,7 +360,7 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
             <span className="text-xs text-green-600 flex items-center gap-1"><Icon name="check" size={12} strokeWidth={2.5} /> {t("trips.wizard.saved")}</span>
           )}
           {saveStatus === "error" && (
-            <span className="text-xs text-red-500">{errorMsg}</span>
+            <span role="alert" className="text-xs text-red-500">{errorMsg}</span>
           )}
 
           {/* Draft save button (visible from step 2) */}
@@ -353,7 +381,7 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
               size="sm"
               iconRight="arrow-right"
               onClick={goNext}
-              disabled={!canGoNext || isPending}
+              disabled={!canGoNext || isPending || saveStatus === "saving"}
             >
               {t("trips.wizard.next")}
             </Button>

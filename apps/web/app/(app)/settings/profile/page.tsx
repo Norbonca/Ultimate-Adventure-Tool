@@ -78,7 +78,7 @@ export default function ProfileSettingsPage() {
       if (!user) return;
 
       const [profileRes, emergencyRes, countriesRes, languagesRes, currenciesRes, timezonesRes] = await Promise.all([
-        supabase.from("profiles").select("*").eq("id", user.id).single(),
+        supabase.rpc("get_my_profile"),
         supabase.from("emergency_contacts").select("*").eq("user_id", user.id).limit(1).single(),
         supabase.from("ref_countries").select("*").eq("is_active", true).order("sort_order"),
         supabase.from("ref_languages").select("*").eq("is_active", true).eq("is_app_supported", true).order("sort_order"),

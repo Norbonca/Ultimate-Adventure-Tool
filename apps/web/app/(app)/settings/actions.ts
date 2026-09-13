@@ -1,5 +1,8 @@
 "use server";
 
+import { getServerT } from "@/lib/i18n/server";
+import { z } from "zod";
+
 import { createClient } from "@/lib/supabase/server";
 
 // ============================================
@@ -47,25 +50,17 @@ export async function fetchUserInterests() {
 }
 
 export async function saveUserInterests(categoryIds: string[]) {
+  const { t } = await getServerT();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
-  // Delete existing interests
-  const { error: delError } = await supabase
-    .from("user_adventure_interests")
-    .delete()
-    .eq("user_id", user.id);
-
-  if (delError) return { error: delError.message };
-
-  // Insert new ones
-  if (categoryIds.length > 0) {
-    const { error: insError } = await supabase
-      .from("user_adventure_interests")
-      .insert(categoryIds.map((cid) => ({ user_id: user.id, category_id: cid })));
-
-    if (insError) return { error: insError.message };
+  const input = z.array(z.string().uuid()).max(100).safeParse(categoryIds);
+  if (!input.success) return { error: t("errors.validationFailed") };
+  const { error } = await supabase.rpc("replace_my_interests", { category_ids: input.data });
+  if (error) {
+    console.error("Interests save failed", error);
+    return { error: t("errors.saveFailed") };
   }
 
   return { error: null };
@@ -136,13 +131,23 @@ export async function fetchPrivacySettings() {
 }
 
 export async function savePrivacySettings(settings: Record<string, unknown>) {
+  const { t } = await getServerT();
+  const parsed = z.object({
+    profile_visibility: z.enum(["public", "registered", "private"]),
+    email_visibility: z.enum(["public", "hidden"]),
+    phone_visibility: z.enum(["trip_companions_only", "hidden"]),
+    location_precision: z.enum(["city_country", "country_only", "hidden"]),
+    trip_history_visibility: z.enum(["public", "followers_only", "private"]),
+    online_status_visible: z.boolean(),
+  }).partial().safeParse(settings);
+  if (!parsed.success) return { error: t("errors.validationFailed") };
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
   const { error } = await supabase
     .from("user_privacy_settings")
-    .upsert({ user_id: user.id, ...settings }, { onConflict: "user_id" });
+    .upsert({ ...parsed.data, user_id: user.id }, { onConflict: "user_id" });
 
   if (error) return { error: error.message };
   return { error: null };

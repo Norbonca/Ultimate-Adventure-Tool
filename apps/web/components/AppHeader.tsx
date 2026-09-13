@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { ChevronDown, Home, Sparkles, Users, CreditCard } from "@/lib/icons";
+import { ChevronDown, Home, Sparkles, Users, CreditCard, Map } from "@/lib/icons";
 
 // ── Types ──────────────────────────────────────────────────────────
 interface AnchorLink {
@@ -28,6 +28,7 @@ interface AppHeaderProps {
 // ── Navigation menu items (static) ────────────────────────────────
 const NAV_ITEMS = [
   { key: "nav.home", href: "/", icon: Home },
+  { key: "nav.tripPlanner", href: "/trips", icon: Map },
   { key: "nav.getStarted", href: "/get-started", icon: Sparkles },
   { key: "nav.community", href: "/community", icon: Users },
   { key: "nav.pricing", href: "/pricing", icon: CreditCard },

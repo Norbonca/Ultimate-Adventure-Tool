@@ -1,5 +1,31 @@
 # Trevu — Tesztelési Terv v1.0
 
+## 2026-09-12 — Auditjavítások ellenőrzése
+
+CI környezetjavítás (2026-09-13): Node 20 alatt a jsdom/undici inicializáció meghiúsult (`markAsUncloneable`). A workflow Node 24-et használ, a lockfile változatlan.
+
+| Ellenőrzés | Eredmény |
+|---|---|
+| Vitest unit/action/component | 86 PASS; 3 integrációs eset alapfuttatásban SKIP; 24 korábbi TODO |
+| Valódi Supabase életciklus | PASS: mentés, publikálás, státusz/slug megőrzés, idegen módosítás elutasítása, jelentkezés, duplikáció tiltás, visszavonás, számláló; privát publikáció anon olvasásának tiltása |
+| SQL jogosultságok | PASS: anon privátmező-tiltás, saját profil RPC, rendszermezők INSERT/UPDATE tiltása, önjóváhagyás tiltása, szervezői jóváhagyás, visszavonás/újrajelentkezés |
+| Atomi írások | PASS: hibás érdeklődéslista nem törli a régit; utolsó helyre két párhuzamos kérésből pontosan egy sikeres |
+| Migráció 031/032 | Helyben alkalmazva; elkülönített adatbázisban kétszeri futtatás sikeres |
+| Chromium HU | PASS: regisztráció → helyi sablon → publikálás → anonim megtekintés → másik felhasználó belépése/jelentkezése → mobilmenü |
+| Chromium EN | Ugyanez PASS |
+| TypeScript | PASS |
+| ESLint | 0 hiba, 9 figyelmeztetés |
+| i18n kulcs/helyőrző-paritás | 1341 HU / 1341 EN; 0 eltérés |
+| i18n nyelvi heurisztika | 0 hiba, 12 jelzés; több téves pozitív (pl. angol „ban”) |
+| Production build | PASS; sandboxon kívül futtatva, deploy nélkül |
+
+**Hatókör:** a felsorolt regressziók helyi ellenőrzése. Nem teljes tesztlefedettség, nem teljes Lighthouse/axe audit, nem éles penetrációs teszt. A helyi signup konfigurációban az email-megerősítés kikapcsolt; az éles email-megerősítéses folyamatot ez az E2E nem minősíti. A korábbi TODO/fixme fájlok terv/backlog állapotúak, nem sikeres tesztek.
+
+**Futtatás a monorepóból:** `pnpm test`, `pnpm type-check`, `pnpm lint`, `pnpm build`; `pnpm test:db:audit` (helyi Docker), `pnpm test:integration`, `pnpm test:critical-e2e` (futó helyi app szükséges). Az utóbbi kettő a gyökér `.env.local` fájlját tölti be; távoli Supabase/app célpontot a tesztsegédek elutasítanak. `PLAYWRIGHT_BASE_URL` helyi alternatív portot adhat meg.
+
+**Védelem:** nincs teljes táblatörlés a tesztfixture-ben; csak az adott futás saját felhasználóihoz tartozó sorokat és feltöltéseket takarítja. A DB-audit saját ideiglenes adatbázist hoz létre és töröl. A böngészőteszt nem futtat rejtetten migrációt. A fejlesztési adatbázis a migrációk előtt mentve lett: `.backups/audit-stabilization-20260912/database.dump`.
+
+
 > **Dátum:** 2026-03-22
 > **Projekt:** Ultimate Adventure Tool (Trevu)
 > **Verzió:** MVP (Fázis 1–2)

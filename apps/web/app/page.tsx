@@ -28,12 +28,13 @@ async function fetchPublishedTrips() {
     )
     .eq("status", "published")
     .eq("visibility", "public")
+    .eq("show_on_landing", true)
     .is("deleted_at", null)
     .order("published_at", { ascending: false });
 
   if (error) {
     console.error("Discover trips fetch error:", error);
-    return [];
+    throw new Error("Unable to load discovery data");
   }
   return data || [];
 }
@@ -48,7 +49,7 @@ async function fetchActiveCategories() {
 
   if (error) {
     console.error("Categories fetch error:", error);
-    return [];
+    throw new Error("Unable to load discovery data");
   }
   return data || [];
 }

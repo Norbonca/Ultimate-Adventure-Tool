@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin-client";
 import { redirect } from "next/navigation";
 
 // ─── Admin jogosultság ellenőrzés ────────────────────────────────────────────
@@ -14,21 +15,17 @@ async function requireAdmin() {
   if (!user) redirect("/login");
 
   const adminEmail = process.env.ADMIN_EMAIL;
-  if (adminEmail && user.email === adminEmail) return { supabase, user };
-
-  try {
-    const { data: role } = await supabase
-      .from("admin_roles")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("is_active", true)
-      .single();
-    if (!role) redirect("/dashboard");
-  } catch {
-    // Tábla nem létezik — dev módban folytatjuk
+  if (adminEmail && user.email === adminEmail && user.email_confirmed_at) {
+    return { supabase: createAdminClient(), user };
   }
-
-  return { supabase, user };
+  const { data: role, error } = await supabase
+    .from("admin_roles")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("is_active", true)
+    .maybeSingle();
+  if (error || !role) redirect("/dashboard");
+  return { supabase: createAdminClient(), user };
 }
 
 // ─── Dashboard statisztikák ──────────────────────────────────────────────────

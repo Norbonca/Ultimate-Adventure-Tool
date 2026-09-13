@@ -7,7 +7,7 @@
  * so it works inside forms without submitting them.
  */
 
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 
 export interface ToggleProps {
   checked: boolean;
@@ -31,12 +31,14 @@ export function Toggle({
   className,
   "aria-label": ariaLabel,
 }: ToggleProps) {
+  const labelId = useId();
   const track = (
     <button
       type="button"
       role="switch"
       aria-checked={checked}
       aria-label={ariaLabel}
+      aria-labelledby={!ariaLabel && label ? labelId : undefined}
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={`relative h-6 w-11 shrink-0 rounded-full transition-colors focus:outline-none focus-visible:ring-[3px] focus-visible:ring-trevu-600/30 disabled:opacity-50 disabled:pointer-events-none ${
@@ -55,7 +57,7 @@ export function Toggle({
 
   const text = (
     <span className="min-w-0">
-      <span className="text-sm font-medium text-navy-700">{label}</span>
+      <span id={labelId} className="text-sm font-medium text-navy-700">{label}</span>
       {description && <span className="block text-xs text-navy-400">{description}</span>}
     </span>
   );
