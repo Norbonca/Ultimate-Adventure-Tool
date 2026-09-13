@@ -884,6 +884,15 @@ const en: TranslationKeys = {
       inviteAddedExistingDesc: "{name} is already on Trevu. They've been added to the crew with the chosen position.",
       inviteAnother: "Invite another",
       assignWillAppear: "The person will appear as a participant immediately.",
+      applicationsLoading: "Loading applications…",
+      noApplications: "There are no pending applications right now.",
+      appliedOn: "Applied: {date}",
+      messageAttached: "message attached",
+      confirmReject: "Reject this application? The applicant will see the rejection.",
+      deciding: "Saving…",
+      membersLoading: "Loading crew members…",
+      noMembers: "No approved crew members yet.",
+      moreMembers: "+{count}",
     },
 
     participant: {
@@ -916,6 +925,7 @@ const en: TranslationKeys = {
       alreadyOnTrip: "This user is already on the trip.",
       inviteInvalidEmail: "Invalid email address.",
       inviteFailed: "The invite could not be sent. Please try again.",
+      applicationNotPending: "This application is no longer pending — it was withdrawn or already decided.",
     },
   },
 
