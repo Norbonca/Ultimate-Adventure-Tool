@@ -888,7 +888,7 @@ const en: TranslationKeys = {
       noApplications: "There are no pending applications right now.",
       appliedOn: "Applied: {date}",
       messageAttached: "message attached",
-      confirmReject: "Reject this application? The applicant will see the rejection.",
+      confirmReject: "Reject this application? The applicant will see the rejection on the trip page.",
       deciding: "Saving…",
       membersLoading: "Loading crew members…",
       noMembers: "No approved crew members yet.",

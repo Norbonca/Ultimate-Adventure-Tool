@@ -915,7 +915,7 @@ const hu = {
       noApplications: "Jelenleg nincs függőben lévő jelentkezés.",
       appliedOn: "Jelentkezett: {date}",
       messageAttached: "üzenet mellékelve",
-      confirmReject: "Biztosan elutasítod ezt a jelentkezést? A jelentkező értesítést kap az elutasításról.",
+      confirmReject: "Biztosan elutasítod ezt a jelentkezést? A jelentkező a túra oldalán látni fogja az elutasítást.",
       deciding: "Mentés…",
       membersLoading: "Csapattagok betöltése…",
       noMembers: "Még nincs elfogadott csapattag.",

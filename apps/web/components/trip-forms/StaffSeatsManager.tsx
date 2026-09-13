@@ -10,6 +10,7 @@ import {
 } from "@/app/(app)/trips/actions";
 import { AddStaffMemberModal } from "./AddStaffMemberModal";
 import { Icon } from "@/components/Icon";
+import { notifyParticipantsChanged, useParticipantsChanged } from "@/lib/participants-events";
 
 interface StaffSeat {
   participantId: string;
@@ -61,6 +62,9 @@ export function StaffSeatsManager({ tripId, totalSeats }: StaffSeatsManagerProps
     setSeats(res.assigned);
     setGuest(res.guestSeats);
   };
+  useParticipantsChanged(tripId, () => {
+    void reload();
+  });
 
   const handleSelfAssign = async () => {
     setError(null);
@@ -84,6 +88,7 @@ export function StaffSeatsManager({ tripId, totalSeats }: StaffSeatsManagerProps
       setPickerPositionId(null);
       setPickerCustomLabel("");
       await reload();
+      notifyParticipantsChanged(tripId);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       console.error("[StaffSeatsManager] assignStaffSeat threw:", e);
@@ -103,6 +108,7 @@ export function StaffSeatsManager({ tripId, totalSeats }: StaffSeatsManagerProps
         return;
       }
       await reload();
+      notifyParticipantsChanged(tripId);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       setError(`Kivétel: ${msg}`);
@@ -333,6 +339,7 @@ export function StaffSeatsManager({ tripId, totalSeats }: StaffSeatsManagerProps
           onAssigned={async () => {
             setAddModalOpenIdx(null);
             await reload();
+      notifyParticipantsChanged(tripId);
           }}
           onInvited={() => {
             void reload();

@@ -20,6 +20,7 @@ import {
   fetchTripParticipants,
 } from "@/app/(app)/trips/actions";
 import { Icon } from "@/components/Icon";
+import { notifyParticipantsChanged, useParticipantsChanged } from "@/lib/participants-events";
 
 type ProfileLite = { display_name: string | null; avatar_url: string | null } | null;
 
@@ -52,6 +53,7 @@ function Avatar({ name, size = 36 }: { name: string; size?: number }) {
 
 function useParticipants(tripId: string, initial?: ParticipantRow[]) {
   const [rows, setRows] = useState<ParticipantRow[] | null>(initial ?? null);
+  const [reloadKey, setReloadKey] = useState(0);
   useEffect(() => {
     if (initial) return;
     let alive = true;
@@ -61,7 +63,8 @@ function useParticipants(tripId: string, initial?: ParticipantRow[]) {
     return () => {
       alive = false;
     };
-  }, [tripId, initial]);
+  }, [tripId, initial, reloadKey]);
+  useParticipantsChanged(tripId, () => setReloadKey((k) => k + 1));
   return [rows, setRows] as const;
 }
 
@@ -110,6 +113,7 @@ export function ApplicationsManager({ tripId, initial }: ApplicationsManagerProp
             : p
         )
       );
+      notifyParticipantsChanged(tripId);
       router.refresh();
     });
   };
