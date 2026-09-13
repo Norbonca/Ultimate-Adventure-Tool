@@ -10,6 +10,7 @@ const en: TranslationKeys = {
   // Common
   // ============================================================================
   common: {
+    retry: "Try again",
     appName: "Trevu",
     appTagline: "Trek beyond ordinary",
     loading: "Loading...",

@@ -9,6 +9,7 @@ const hu = {
   // Közös (minden oldalon használt)
   // ============================================================================
   common: {
+    retry: "Újrapróbálás",
     appName: "Trevu",
     appTagline: "Trek beyond ordinary",
     loading: "Betöltés...",

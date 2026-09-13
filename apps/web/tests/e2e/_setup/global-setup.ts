@@ -1,12 +1,7 @@
-import { spawnSync } from 'node:child_process';
-
 export default async function globalSetup() {
-  // Apply latest migrations to local DB. NEVER 'db reset'!
-  const r = spawnSync('npx', ['supabase', 'migration', 'up'], {
-    cwd: '../..',
-    stdio: 'inherit',
-  });
-  if (r.status !== 0) {
-    console.warn('[playwright global-setup] supabase migration up failed (continuing — assume schema is current)');
+  const url = new URL(process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000");
+  if (!["localhost", "127.0.0.1"].includes(url.hostname)) {
+    throw new Error("E2E tests require an explicit local test environment");
   }
+  // Migrations are an explicit preparation step, never a silent test side effect.
 }

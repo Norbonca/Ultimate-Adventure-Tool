@@ -5,6 +5,8 @@ import { createAdminClient } from "@/lib/supabase/admin-client";
 import { revalidatePath } from "next/cache";
 import { getServerT } from "@/lib/i18n/server";
 import { computeDefaultRequireApproval, getAutoApprovalThreshold } from "@/lib/system-settings";
+import { draftTripSchema, publishTripSchema } from "@/lib/trip-validation";
+import { z } from "zod";
 import type { WizardFormData } from "./types";
 
 // ============================================
@@ -20,7 +22,7 @@ function generateSlug(title: string): string {
     .replace(/[úùûüű]/g, "u")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "")
-    .slice(0, 200);
+    .slice(0, 73);
   // Add random suffix for uniqueness
   const suffix = Math.random().toString(36).substring(2, 8);
   return `${base}-${suffix}`;
@@ -42,6 +44,12 @@ export async function saveDraft(
   if (!user) {
     return { tripId: "", error: t('errors.notAuthenticated') };
   }
+
+  const parsed = draftTripSchema.safeParse(formData);
+  if (!parsed.success || (existingTripId && !z.string().uuid().safeParse(existingTripId).success)) {
+    return { tripId: "", error: t("errors.validationFailed") };
+  }
+  formData = parsed.data;
 
   // Get or create profile (defensive — trigger should create it, but fallback if not)
   let { data: profile } = await supabase
@@ -121,7 +129,7 @@ export async function saveDraft(
     staff_seats: Math.max(0, Math.min(50, formData.staff_seats ?? 0)),
     difficulty: formData.difficulty || 1,
     category_details: formData.category_details || {},
-    visibility: formData.visibility || "public",
+    visibility: formData.visibility || "private",
     require_approval: requireApproval,
     registration_deadline: formData.registration_deadline || null,
     price_amount: formData.price_amount || null,
@@ -132,6 +140,7 @@ export async function saveDraft(
     card_image_url: formData.card_image_url || null,
     card_image_source: formData.card_image_source || "system",
     tags: formData.tags || [],
+    show_on_landing: formData.show_on_landing ?? true,
     status: "draft" as const,
   };
 
@@ -142,7 +151,7 @@ export async function saveDraft(
     // .update() with payloadWithoutStatus keeps the published flag intact.
     // See CLAUDE.md §3.5 + .skills/trevu-code-consistency/references/upsert-tables.md.
     const { status: _ignoreStatus, ...payloadWithoutStatus } = tripPayload;
-    const { error } = await supabase
+    const { data: updated, error } = await supabase
       .from("trips")
       .update({
         ...payloadWithoutStatus,
@@ -150,11 +159,13 @@ export async function saveDraft(
         updated_at: new Date().toISOString(),
       })
       .eq("id", existingTripId)
-      .eq("organizer_id", profile.id);
+      .eq("organizer_id", profile.id)
+      .select("id")
+      .maybeSingle();
 
-    if (error) {
+    if (error || !updated) {
       console.error("Draft update error:", error);
-      return { tripId: existingTripId, error: error.message };
+      return { tripId: existingTripId, error: t("errors.saveFailed") };
     }
     return { tripId: existingTripId };
   } else {
@@ -167,7 +178,7 @@ export async function saveDraft(
 
     if (error) {
       console.error("Draft insert error:", error);
-      return { tripId: "", error: error.message };
+      return { tripId: "", error: t("errors.saveFailed") };
     }
     return { tripId: data.id };
   }
@@ -188,6 +199,10 @@ export async function publishTrip(
 
   if (!user) {
     return { slug: "", error: t('errors.notAuthenticated') };
+  }
+
+  if (!z.string().uuid().safeParse(tripId).success || !publishTripSchema.safeParse(formData).success) {
+    return { slug: "", error: t("errors.validationFailed") };
   }
 
   // First save all data
@@ -211,7 +226,7 @@ export async function publishTrip(
 
   if (error) {
     console.error("Publish error:", error);
-    return { slug: "", error: error.message };
+    return { slug: "", error: t("errors.saveFailed") };
   }
 
   return { slug: data.slug };
@@ -230,7 +245,7 @@ export async function fetchCategories() {
 
   if (error) {
     console.error("Categories fetch error:", error);
-    return [];
+    throw new Error("Unable to load trip data");
   }
   return data || [];
 }
@@ -249,7 +264,7 @@ export async function fetchSubDisciplines(categoryId: string) {
 
   if (error) {
     console.error("Sub-disciplines fetch error:", error);
-    return [];
+    throw new Error("Unable to load trip data");
   }
   return data || [];
 }
@@ -281,7 +296,7 @@ export async function fetchCategoryParameters(
 
   if (error) {
     console.error("Parameters fetch error:", error);
-    return [];
+    throw new Error("Unable to load trip data");
   }
   return data || [];
 }
@@ -301,7 +316,7 @@ export async function fetchParameterOptions(parameterIds: string[]) {
 
   if (error) {
     console.error("Parameter options fetch error:", error);
-    return [];
+    throw new Error("Unable to load trip data");
   }
   return data || [];
 }
@@ -380,7 +395,7 @@ export async function fetchMyTrips() {
 
   if (error) {
     console.error("My trips fetch error:", error);
-    return [];
+    throw new Error("Unable to load trip data");
   }
   return data || [];
 }
@@ -479,7 +494,7 @@ export async function fetchCoverImages(categoryId?: string) {
   const { data, error } = await query;
   if (error) {
     console.error("Cover images fetch error:", error);
-    return [];
+    throw new Error("Unable to load trip data");
   }
   return data || [];
 }
@@ -502,7 +517,7 @@ export async function fetchExperienceLevels(categoryId?: string) {
   const { data, error } = await query;
   if (error) {
     console.error("Experience levels fetch error:", error);
-    return [];
+    throw new Error("Unable to load trip data");
   }
   return data || [];
 }
@@ -608,7 +623,7 @@ export async function fetchTripParticipants(tripId: string) {
 
   if (error) {
     console.error("Participants fetch error:", error);
-    return [];
+    throw new Error("Unable to load trip data");
   }
   return data || [];
 }
@@ -626,7 +641,7 @@ export async function fetchCrewPositions(tripId: string) {
 
   if (error) {
     console.error("Crew positions fetch error:", error);
-    return [];
+    throw new Error("Unable to load trip data");
   }
   return data || [];
 }
@@ -644,7 +659,7 @@ export async function fetchTripItinerary(tripId: string) {
 
   if (error) {
     console.error("Itinerary fetch error:", error);
-    return [];
+    throw new Error("Unable to load trip data");
   }
   return data || [];
 }
@@ -713,6 +728,9 @@ export async function applyToTrip(
     return { ok: false, error: t("trips.errors.tripNotAcceptingApplications") };
   }
 
+  if (applicationText && applicationText.length > 5000) {
+    return { ok: false, error: t("errors.validationFailed") };
+  }
   const spotsLeft = trip.max_participants - (trip.current_participants || 0);
   // require_approval=false → azonnal approved, helyet foglal → ellenőrizzük a spot-ot
   // require_approval=true → pending, nem foglal helyet → nem kell spot ellenőrzés
@@ -750,13 +768,13 @@ export async function applyToTrip(
       .eq("id", existing.id);
     if (error) {
       console.error("applyToTrip update error:", error);
-      return { ok: false, error: error.message };
+      return { ok: false, error: t("errors.saveFailed") };
     }
   } else {
     const { error } = await supabase.from("trip_participants").insert(payload);
     if (error) {
       console.error("applyToTrip insert error:", error);
-      return { ok: false, error: error.message };
+      return { ok: false, error: t(error.message === "trip_full" ? "trips.errors.tripFull" : "errors.saveFailed") };
     }
   }
 
@@ -804,7 +822,7 @@ export async function cancelApplication(
 
   if (error) {
     console.error("cancelApplication error:", error);
-    return { ok: false, error: error.message };
+    return { ok: false, error: t("errors.saveFailed") };
   }
 
   revalidatePath(`/trips`);
@@ -894,7 +912,7 @@ export async function assignStaffSeat(
       .select("id");
     if (error) {
       console.error("assignStaffSeat update error:", error);
-      return { ok: false, error: error.message };
+      return { ok: false, error: t("errors.saveFailed") };
     }
     if (!data || data.length === 0) {
       return { ok: false, error: "A frissítés nem érintett rekordot." };
@@ -906,7 +924,7 @@ export async function assignStaffSeat(
       .select("id");
     if (error) {
       console.error("assignStaffSeat insert error:", error);
-      return { ok: false, error: error.message };
+      return { ok: false, error: t("errors.saveFailed") };
     }
     if (!data || data.length === 0) {
       return { ok: false, error: "A beszúrás nem hozott létre rekordot." };
@@ -953,7 +971,7 @@ export async function removeStaffSeat(
 
   if (error) {
     console.error("removeStaffSeat error:", error);
-    return { ok: false, error: error.message };
+    return { ok: false, error: t("errors.saveFailed") };
   }
 
   revalidatePath(`/trips`);
@@ -1244,12 +1262,12 @@ export async function inviteStaffByEmail(
         .from("trip_participants")
         .update(payload)
         .eq("id", existing.id);
-      if (error) return { ok: false as const, error: error.message };
+      if (error) return { ok: false as const, error: t("errors.saveFailed") };
     } else {
       const { error } = await admin
         .from("trip_participants")
         .insert(payload);
-      if (error) return { ok: false as const, error: error.message };
+      if (error) return { ok: false as const, error: t("errors.saveFailed") };
     }
     return { ok: true as const };
   };

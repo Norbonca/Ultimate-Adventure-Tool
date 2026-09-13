@@ -27,7 +27,7 @@ export default defineConfig({
     { name: 'firefox',     use: { ...devices['Desktop Firefox'] } },
     { name: 'mobile-safari', use: { ...devices['iPhone 14'] } },
   ],
-  webServer: process.env.CI
+  webServer: process.env.CI || process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
         command: 'pnpm dev',

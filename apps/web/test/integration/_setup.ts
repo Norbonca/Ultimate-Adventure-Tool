@@ -15,8 +15,13 @@ const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY ?? '';
 
 export const INTEGRATION_ENABLED = process.env.INTEGRATION === '1';
 
+const testUserIds = new Set<string>();
+
 let _admin: SupabaseClient | null = null;
 export function admin(): SupabaseClient {
+  if (!['localhost', '127.0.0.1'].includes(new URL(SUPABASE_URL).hostname)) {
+    throw new Error('Integration tests require a local Supabase URL');
+  }
   if (!_admin) {
     if (!SERVICE_ROLE) {
       throw new Error(
@@ -45,11 +50,18 @@ export async function createTestUser(prefix = 'int'): Promise<TestUser> {
     email_confirm: true,
   });
   if (error) throw error;
+  testUserIds.add(data.user!.id);
   return { id: data.user!.id, email, password };
 }
 
 export async function deleteTestUser(id: string) {
+  if (!testUserIds.has(id)) throw new Error('Refusing to delete a non-fixture user');
+  const { error: tripError } = await admin().from('trips').delete().eq('organizer_id', id);
+  if (tripError) throw tripError;
+  const { error } = await admin().from('profiles').delete().eq('id', id);
+  if (error) throw error;
   await admin().auth.admin.deleteUser(id);
+  testUserIds.delete(id);
 }
 
 /**
@@ -58,7 +70,10 @@ export async function deleteTestUser(id: string) {
  */
 export async function truncate(tables: string[]) {
   for (const table of tables) {
-    await admin().from(table).delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    if (table !== 'trips') throw new Error('Only fixture trips may be cleaned');
+    if (!testUserIds.size) continue;
+    const { error } = await admin().from(table).delete().in('organizer_id', [...testUserIds]);
+    if (error) throw error;
   }
 }
 
@@ -66,11 +81,14 @@ export async function truncate(tables: string[]) {
  * Create a minimal trip rekord for the given organizer.
  */
 export async function createTestTrip(organizerId: string, overrides: Record<string, unknown> = {}) {
+  const { data: category, error: categoryError } = await admin().from('categories').select('id').eq('status', 'active').limit(1).single();
+  if (categoryError) throw categoryError;
   const slug = `test-trip-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`;
   const { data, error } = await admin()
     .from('trips')
     .insert({
       organizer_id: organizerId,
+      category_id: category!.id,
       title: 'Integration Test Trip',
       slug,
       description: 'Test',
@@ -88,4 +106,13 @@ export async function createTestTrip(organizerId: string, overrides: Record<stri
     .single();
   if (error) throw error;
   return data;
+}
+
+export async function clientFor(user: TestUser) {
+  const client = createClient(SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  const { error } = await client.auth.signInWithPassword({ email: user.email, password: user.password });
+  if (error) throw error;
+  return client;
 }

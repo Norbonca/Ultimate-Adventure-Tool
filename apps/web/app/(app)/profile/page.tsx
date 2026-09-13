@@ -153,10 +153,7 @@ export default function ProfilePage() {
 
         // Fetch profile
         const { data: profileData, error: profileError } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", authUser.id)
-          .single();
+          .rpc("get_my_profile");
 
         if (profileError && profileError.code !== "PGRST116") {
           console.error("Profile fetch error:", profileError);
@@ -183,10 +180,10 @@ export default function ProfilePage() {
               },
               { onConflict: "id" }
             )
-            .select()
+            .select("id, display_name, avatar_url, slug")
             .single();
 
-          if (newProfile) loadedProfile = newProfile;
+          if (newProfile) loadedProfile = { ...newProfile, email: authUser.email || "" };
         }
 
         const finalProfile: Profile = loadedProfile || {
