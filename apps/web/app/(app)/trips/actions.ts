@@ -1306,3 +1306,94 @@ export async function inviteStaffByEmail(
   revalidatePath(`/trips`);
   return { ok: true, mode: "invited", email: trimmedEmail };
 }
+
+// ============================================
+// Szervezői döntés a jelentkezésről (spec §11.5.2)
+// approve: pending/waitlisted → approved (a számláló-trigger foglal helyet, telt túránál 'trip_full')
+// reject:  pending/waitlisted → rejected (opcionális indoklás, a jelentkező látja)
+// UPDATE (nem upsert): létező, azonosított rekord státuszváltása.
+// ============================================
+const DECIDABLE_STATUSES = ["pending", "waitlisted"] as const;
+
+async function decideApplication(
+  tripId: string,
+  participantId: string,
+  decision: "approve" | "reject",
+  reason?: string
+): Promise<{ ok: boolean; error?: string }> {
+  const { t } = await getServerT();
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { ok: false, error: t("errors.notAuthenticated") };
+  }
+
+  if (
+    !z.string().uuid().safeParse(tripId).success ||
+    !z.string().uuid().safeParse(participantId).success ||
+    (reason !== undefined && reason.length > 1000)
+  ) {
+    return { ok: false, error: t("errors.validationFailed") };
+  }
+
+  const { data: trip } = await supabase
+    .from("trips")
+    .select("organizer_id, slug")
+    .eq("id", tripId)
+    .maybeSingle();
+
+  if (!trip || trip.organizer_id !== user.id) {
+    return { ok: false, error: t("trips.errors.organizerOnly") };
+  }
+
+  const now = new Date().toISOString();
+  const payload =
+    decision === "approve"
+      ? { status: "approved" as const, approved_at: now, rejection_reason: null }
+      : { status: "rejected" as const, rejection_reason: reason?.trim() || null };
+
+  // A státusz-feltétel a WHERE-ben: párhuzamos döntés vagy közben visszavont
+  // jelentkezés esetén nem érint sort, és ezt hibaként jelezzük.
+  const { data: updated, error } = await supabase
+    .from("trip_participants")
+    .update(payload)
+    .eq("id", participantId)
+    .eq("trip_id", tripId)
+    .eq("is_staff_seat", false)
+    .in("status", [...DECIDABLE_STATUSES])
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    console.error(`${decision}Application error:`, error);
+    return {
+      ok: false,
+      error: t(error.message === "trip_full" ? "trips.errors.tripFull" : "errors.saveFailed"),
+    };
+  }
+  if (!updated) {
+    return { ok: false, error: t("trips.errors.applicationNotPending") };
+  }
+
+  revalidatePath("/trips");
+  revalidatePath(`/trips/${trip.slug}`);
+  revalidatePath(`/trips/${trip.slug}/manage`);
+  revalidatePath(`/trips/${trip.slug}/edit`);
+  return { ok: true };
+}
+
+export async function approveApplication(
+  tripId: string,
+  participantId: string
+): Promise<{ ok: boolean; error?: string }> {
+  return decideApplication(tripId, participantId, "approve");
+}
+
+export async function rejectApplication(
+  tripId: string,
+  participantId: string,
+  reason?: string
+): Promise<{ ok: boolean; error?: string }> {
+  return decideApplication(tripId, participantId, "reject", reason);
+}

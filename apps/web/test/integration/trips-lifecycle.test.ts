@@ -6,7 +6,7 @@ let currentClient: SupabaseClient;
 vi.mock("@/lib/supabase/server", () => ({ createClient: async () => currentClient }));
 vi.mock("@/lib/i18n/server", () => ({ getServerT: async () => ({ t: (key: string) => key }) }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
-import { saveDraft, publishTrip, applyToTrip, cancelApplication, fetchCategoryParametersForDisplay } from "@/app/(app)/trips/actions";
+import { saveDraft, publishTrip, applyToTrip, cancelApplication, approveApplication, rejectApplication, fetchCategoryParametersForDisplay } from "@/app/(app)/trips/actions";
 
 (INTEGRATION_ENABLED ? describe : describe.skip)("real Supabase trip lifecycle", () => {
   let owner: TestUser, applicant: TestUser;
@@ -41,6 +41,38 @@ import { saveDraft, publishTrip, applyToTrip, cancelApplication, fetchCategoryPa
     const { data: final } = await admin().from("trips").select("current_participants").eq("id", draft.tripId).single();
     expect(final?.current_participants).toBe(0);
   });
+  it("lets only the organizer approve or reject pending applications, with correct counters", async () => {
+    currentClient = await clientFor(owner);
+    const { data: category } = await admin().from("categories").select("id").eq("status", "active").limit(1).single();
+    const form = { ...INITIAL_FORM_DATA, category_id: category!.id, title: "Approval lifecycle trip",
+      start_date: "2027-02-01", end_date: "2027-02-02", require_approval: true, visibility: "public" as const,
+      cover_image_url: "https://example.com/cover.jpg" };
+    const draft = await saveDraft(form);
+    expect(draft.error).toBeUndefined();
+    expect((await publishTrip(draft.tripId, form)).error).toBeUndefined();
+
+    currentClient = await clientFor(applicant);
+    expect(await applyToTrip(draft.tripId, "Szeretnék menni")).toMatchObject({ ok: true, status: "pending" });
+    const { data: row } = await admin().from("trip_participants").select("id").eq("trip_id", draft.tripId).eq("user_id", applicant.id).single();
+    expect((await approveApplication(draft.tripId, row!.id)).error).toBe("trips.errors.organizerOnly");
+
+    currentClient = await clientFor(owner);
+    expect(await approveApplication(draft.tripId, row!.id)).toEqual({ ok: true });
+    const { data: approved } = await admin().from("trip_participants").select("status,approved_at").eq("id", row!.id).single();
+    expect(approved?.status).toBe("approved");
+    expect(approved?.approved_at).toBeTruthy();
+    const { data: counted } = await admin().from("trips").select("current_participants").eq("id", draft.tripId).single();
+    expect(counted?.current_participants).toBe(1);
+    expect((await rejectApplication(draft.tripId, row!.id)).error).toBe("trips.errors.applicationNotPending");
+
+    await admin().from("trip_participants").update({ status: "pending", approved_at: null }).eq("id", row!.id);
+    expect(await rejectApplication(draft.tripId, row!.id, "Betelt a tapasztalt keret")).toEqual({ ok: true });
+    const { data: rejected } = await admin().from("trip_participants").select("status,rejection_reason").eq("id", row!.id).single();
+    expect(rejected).toMatchObject({ status: "rejected", rejection_reason: "Betelt a tapasztalt keret" });
+    const { data: after } = await admin().from("trips").select("current_participants").eq("id", draft.tripId).single();
+    expect(after?.current_participants).toBe(0);
+  });
+
   it("keeps a default private publication hidden from anonymous readers", async () => {
     currentClient = await clientFor(owner);
     const { data: category } = await admin().from("categories").select("id").eq("status", "active").limit(1).single();

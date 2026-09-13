@@ -911,6 +911,15 @@ const hu = {
       inviteAddedExistingDesc: "{name} már regisztrált a Trevu-n. A megadott pozícióval rögtön bekerült a szervezői csapatba.",
       inviteAnother: "Új meghívás",
       assignWillAppear: "A személy azonnal résztvevőként megjelenik.",
+      applicationsLoading: "Jelentkezések betöltése…",
+      noApplications: "Jelenleg nincs függőben lévő jelentkezés.",
+      appliedOn: "Jelentkezett: {date}",
+      messageAttached: "üzenet mellékelve",
+      confirmReject: "Biztosan elutasítod ezt a jelentkezést? A jelentkező a túra oldalán látni fogja az elutasítást.",
+      deciding: "Mentés…",
+      membersLoading: "Csapattagok betöltése…",
+      noMembers: "Még nincs elfogadott csapattag.",
+      moreMembers: "+{count}",
     },
 
     // Participant dashboard (/trips/[slug]/participant)
@@ -944,6 +953,7 @@ const hu = {
       alreadyOnTrip: "Ez a felhasználó már része a csapatnak.",
       inviteInvalidEmail: "Érvénytelen email cím.",
       inviteFailed: "A meghívás nem sikerült. Próbáld újra.",
+      applicationNotPending: "Ez a jelentkezés már nem függő állapotú — időközben visszavonták vagy elbírálták.",
     },
   },
 
