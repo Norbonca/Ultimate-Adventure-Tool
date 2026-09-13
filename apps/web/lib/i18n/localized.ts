@@ -26,3 +26,31 @@ export function getLocalizedText(
   if (value && value.trim()) return value;
   return base ?? null;
 }
+
+export interface ParameterDisplayOption {
+  value: string;
+  label: string;
+  label_localized?: Record<string, string> | null;
+}
+
+/** Resolve saved option codes using the same reference labels as the editor. */
+export function formatParameterValue(
+  value: unknown,
+  fieldType: string,
+  unit: string | null,
+  options: ParameterDisplayOption[],
+  locale: string
+): string {
+  const formatOne = (item: unknown): string => {
+    if (fieldType === "select" || fieldType === "multiselect") {
+      const option = options.find((candidate) => candidate.value === String(item));
+      if (option) return getLocalizedText(option.label, option.label_localized, locale) ?? String(item);
+    }
+    // Keep legacy/custom values readable if their reference option was removed.
+    return typeof item === "number"
+      ? item.toLocaleString(locale === "en" ? "en-US" : "hu-HU")
+      : String(item);
+  };
+  const text = Array.isArray(value) ? value.map(formatOne).join(", ") : formatOne(value);
+  return text && unit ? `${text} ${unit}` : text;
+}
