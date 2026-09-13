@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Button } from "@/components/ui/Button";
 import { getServerT } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
 import { Icon } from "@/components/Icon";
@@ -88,12 +88,12 @@ export default async function PricingPage() {
                 key={tier.key}
                 className={`relative flex flex-col rounded-2xl border bg-white p-6 transition-all ${
                   tier.popular
-                    ? "border-emerald-500 shadow-lg ring-1 ring-emerald-500/20"
+                    ? "border-trevu-600 shadow-lg ring-1 ring-trevu-600/20"
                     : "border-slate-200 hover:border-slate-300"
                 }`}
               >
                 {tier.popular && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-white bg-emerald-500 rounded-full">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-white bg-trevu-600 rounded-full">
                     {t("pricing.popularBadge")}
                   </span>
                 )}
@@ -120,7 +120,7 @@ export default async function PricingPage() {
                 <ul className="flex-1 space-y-2.5 text-sm text-slate-700">
                   {features.map((feat, i) => (
                     <li key={i} className="flex gap-2">
-                      <span className="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                      <span className="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full bg-trevu-50 text-trevu-700 flex items-center justify-center">
                         <Icon name="check" size={10} strokeWidth={3} />
                       </span>
                       <span>{feat}</span>
@@ -128,16 +128,14 @@ export default async function PricingPage() {
                   ))}
                 </ul>
 
-                <Link
+                <Button
                   href={tier.ctaHref}
-                  className={`mt-6 block w-full text-center px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
-                    tier.popular
-                      ? "bg-emerald-500 text-white hover:bg-emerald-600"
-                      : "bg-slate-900 text-white hover:bg-slate-800"
-                  }`}
+                  variant={tier.popular ? "primary" : "outline"}
+                  fullWidth
+                  className="mt-6"
                 >
                   {cta}
-                </Link>
+                </Button>
               </div>
             );
           })}
