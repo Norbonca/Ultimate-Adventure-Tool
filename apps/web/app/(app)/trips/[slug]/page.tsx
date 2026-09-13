@@ -9,6 +9,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { BackButton } from "@/components/BackButton";
 import { ApplyButton } from "@/components/ApplyButton";
 import { Icon } from "@/components/Icon";
+import { formatParameterValue, type ParameterDisplayOption } from "@/lib/i18n/localized";
 
 interface TripDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -300,6 +301,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                               value={val}
                               fieldType={param.field_type}
                               unit={param.unit}
+                              options={param.options}
                               locale={locale}
                             />
                           </span>
@@ -532,33 +534,19 @@ function _TripStatusBadge({ status, t }: { status: string; t: (key: string) => s
 
 function DetailValue({
   value,
-  fieldType: _fieldType,
+  fieldType,
   unit,
+  options,
   locale,
 }: {
   value: unknown;
   fieldType: string;
   unit: string | null;
+  options: ParameterDisplayOption[];
   locale: string;
 }) {
   if (typeof value === "boolean") {
     return value ? <Icon name="check-circle-2" size={16} className="text-emerald-600" label={locale === "en" ? "Yes" : "Igen"} /> : <Icon name="x-circle" size={16} className="text-red-500" label={locale === "en" ? "No" : "Nem"} />;
   }
-  if (Array.isArray(value)) {
-    return <>{value.join(", ")}</>;
-  }
-  if (typeof value === "number") {
-    return (
-      <>
-        {value.toLocaleString(locale === "en" ? "en-US" : "hu-HU")}
-        {unit ? ` ${unit}` : ""}
-      </>
-    );
-  }
-  return (
-    <>
-      {String(value)}
-      {unit ? ` ${unit}` : ""}
-    </>
-  );
+  return <>{formatParameterValue(value, fieldType, unit, options, locale)}</>;
 }

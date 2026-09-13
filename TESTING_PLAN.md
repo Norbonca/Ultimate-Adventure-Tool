@@ -437,3 +437,9 @@ A jó hír: ezek mind HOZZÁADHATÓK anélkül, hogy a meglévő tervet újra ke
 ---
 
 *Utolsó frissítés: 2026-03-22*
+
+## 2026-09-13 — Túrarészletek opciófeliratainak regressziója
+
+Felhasználói képernyőkép alapján a részletes oldal select/multiselect értékei nyers kódként jelentek meg. A ref_parameter_options fordításait most a részletes lekérdezés is betölti; a formatter locale szerinti címkét, hiányában az alapcímkét használja. Eltávolított opció esetén a mentett érték olvasható marad; a szabad szöveget nem fordítja. A mértékegység és a lokalizált számformátum megmarad.
+
+7 célzott unit teszt; összesen 93 unit/action PASS. 3 valódi Supabase-integráció PASS, köztük az anonim beágyazott opciólekérés; build/type-check PASS. A 2026-09-13-i korábbi általános anonim smoke a kategóriaparaméterek tartalmát nem ellenőrizte; ezt nem tekintjük a részletoldali fordítás igazolásának.

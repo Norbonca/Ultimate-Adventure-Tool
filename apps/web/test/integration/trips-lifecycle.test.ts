@@ -6,7 +6,7 @@ let currentClient: SupabaseClient;
 vi.mock("@/lib/supabase/server", () => ({ createClient: async () => currentClient }));
 vi.mock("@/lib/i18n/server", () => ({ getServerT: async () => ({ t: (key: string) => key }) }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
-import { saveDraft, publishTrip, applyToTrip, cancelApplication } from "@/app/(app)/trips/actions";
+import { saveDraft, publishTrip, applyToTrip, cancelApplication, fetchCategoryParametersForDisplay } from "@/app/(app)/trips/actions";
 
 (INTEGRATION_ENABLED ? describe : describe.skip)("real Supabase trip lifecycle", () => {
   let owner: TestUser, applicant: TestUser;
@@ -55,6 +55,18 @@ import { saveDraft, publishTrip, applyToTrip, cancelApplication } from "@/app/(a
     const { data, error } = await anonymous.from("trips").select("id").eq("id", draft.tripId);
     expect(error).toBeNull();
     expect(data).toEqual([]);
+  });
+
+  it("loads localized reference options for anonymous trip detail readers", async () => {
+    currentClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { auth: { persistSession: false, autoRefreshToken: false } });
+    const { data: category, error } = await currentClient.from("categories").select("id").eq("name", "Water Sports").single();
+    expect(error).toBeNull();
+    const definitions = await fetchCategoryParametersForDisplay(category!.id);
+    const water = definitions.find((parameter) => parameter.parameter_key === "water_type");
+    expect(water?.options).toEqual(expect.arrayContaining([
+      expect.objectContaining({ value: "sea", label: "Sea / Ocean", label_localized: expect.objectContaining({ hu: "Tenger / Óceán" }) }),
+    ]));
   });
 
 });

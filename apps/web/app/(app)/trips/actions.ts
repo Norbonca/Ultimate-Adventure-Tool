@@ -587,7 +587,7 @@ export async function fetchCategoryParametersForDisplay(
 
   let query = supabase
     .from("ref_category_parameters")
-    .select("parameter_key, label, label_localized, unit, icon_name, field_type, group_key, group_label, group_label_localized, show_on_detail")
+    .select("parameter_key, label, label_localized, unit, icon_name, field_type, group_key, group_label, group_label_localized, show_on_detail, options:ref_parameter_options(value, label, label_localized)")
     .eq("category_id", categoryId)
     .eq("status", "active")
     .eq("show_on_detail", true)
