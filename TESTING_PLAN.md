@@ -2,6 +2,8 @@
 
 ## 2026-09-12 — Auditjavítások ellenőrzése
 
+CI környezetjavítás (2026-09-13): Node 20 alatt a jsdom/undici inicializáció meghiúsult (`markAsUncloneable`). A workflow Node 24-et használ, a lockfile változatlan.
+
 | Ellenőrzés | Eredmény |
 |---|---|
 | Vitest unit/action/component | 86 PASS; 3 integrációs eset alapfuttatásban SKIP; 24 korábbi TODO |

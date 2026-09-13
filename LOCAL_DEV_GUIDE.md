@@ -2,6 +2,8 @@
 
 ## Auditjavítások helyi futtatása — 2026-09-12
 
+A teljes tesztkészlethez Node.js 24.15+ (24.x) ajánlott; a CI Node 24-et használ. A rögzített jsdom 30.0.1 Node-követelménye `^22.22.2 || ^24.15.0 || >=26.0.0`; Node 20 alatt a Vitest környezet nem indul.
+
 A 031 és 032 migrációhoz a hozzá tartozó alkalmazáskód is kell. Előbb adatbázismentés és `pnpm test:db:audit`, majd `supabase migration up --local` (nem reset). A saját profilhoz ezután `get_my_profile()` RPC kell a régi SELECT * helyett.
 
 - `pnpm test:integration`: valódi helyi Supabase szerveraction-életciklus, `.env.local` betöltésével.
