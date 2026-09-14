@@ -6,16 +6,22 @@
  * question, not a rendering one, and that is why it lives here and not in the
  * renderer:
  *
- *  - NASA GIBS Blue Marble — public NASA imagery, no key, CORS enabled, max
- *    zoom 8 (~600 m/px). Default, because it is safe for a paid product.
- *  - EOX Sentinel-2 cloudless — 10 m imagery, but the free licence is
- *    CC-BY-NC-SA 4.0 (non-commercial); commercial use needs an "EOX Commercial
+ *  - EOX Sentinel-2 cloudless — 10 m imagery, the surface sharpens as you
+ *    zoom in (max zoom 13). The free licence is CC-BY-NC-SA 4.0
+ *    (non-commercial); commercial use needs an "EOX Commercial
  *    Attribution-RestrictedUse" licence from EOX (cloudless.eox.at/documentation
- *    /license, read 2026-09-14). Opt-in only.
+ *    /license, read 2026-09-14). **Default since 2026-09-14 by Norbert's
+ *    decision (NyK-13): the licence is bought before go-live — until then the
+ *    product is in local testing only.** Going live without it is a licence
+ *    breach, not a rendering bug.
+ *  - NASA GIBS Blue Marble — public NASA imagery, no key, CORS enabled, max
+ *    zoom 8 (~600 m/px), blurry when zoomed in. Fallback that is safe for a
+ *    paid product without any licence.
  *
- * Selection: NEXT_PUBLIC_GLOBE_TILES=gibs|eox (default gibs). This is the
+ * Selection: NEXT_PUBLIC_GLOBE_TILES=eox|gibs (default eox). This is the
  * stop-gap before the M121 provider registry (spec 0.2 §6.5) — when the
- * registry lands, this table becomes one of its `basemap` providers.
+ * registry lands, this table becomes one of its `basemap` providers and the
+ * registry's licence guard (`commercialUse`) takes over this comment's job.
  */
 
 export type GlobeTileProviderKey = 'gibs' | 'eox';
@@ -58,8 +64,8 @@ const PROVIDERS: Record<GlobeTileProviderKey, GlobeTileProvider> = {
 
 export function getGlobeTileProvider(): GlobeTileProvider {
   const wanted = process.env.NEXT_PUBLIC_GLOBE_TILES;
-  if (wanted === 'eox') return PROVIDERS.eox;
-  return PROVIDERS.gibs;
+  if (wanted === 'gibs') return PROVIDERS.gibs;
+  return PROVIDERS.eox;
 }
 
 /** Natural Earth (via world-atlas) is public domain; credited alongside the tiles. */
