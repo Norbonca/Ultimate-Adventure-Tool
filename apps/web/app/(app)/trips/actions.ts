@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { getServerT } from "@/lib/i18n/server";
 import { computeDefaultRequireApproval, getAutoApprovalThreshold } from "@/lib/system-settings";
 import { draftTripSchema, publishTripSchema } from "@/lib/trip-validation";
+import { geocodeLocation } from "@/lib/geocoding";
 import { z } from "zod";
 import type { WizardFormData } from "./types";
 
@@ -26,6 +27,96 @@ function generateSlug(title: string): string {
   // Add random suffix for uniqueness
   const suffix = Math.random().toString(36).substring(2, 8);
   return `${base}-${suffix}`;
+}
+
+// ============================================
+// Helper: helyszín → koordináta (Terepgömb)
+// ============================================
+/**
+ * Resolves the trip's coordinates for the globe view. Geocoding is a
+ * best-effort side job of saving: a Nominatim outage must never block a draft,
+ * so every failure path returns "leave the coordinates alone".
+ *
+ * Skips the network call when an existing trip already has Nominatim-resolved
+ * coordinates and its location fields are unchanged.
+ */
+async function resolveTripCoordinates(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  location: { country: string; region: string | null; city: string | null },
+  existingTripId?: string
+): Promise<{
+  location_lat: number;
+  location_lng: number;
+  location_geocoded_at: string;
+  location_geocode_source: string;
+} | null> {
+  if (!location.country) return null;
+
+  if (existingTripId) {
+    const { data: current } = await supabase
+      .from("trips")
+      .select(
+        "location_country, location_region, location_city, location_lat, location_geocode_source"
+      )
+      .eq("id", existingTripId)
+      .maybeSingle();
+
+    const unchanged =
+      current &&
+      current.location_country === location.country &&
+      (current.location_region ?? null) === location.region &&
+      (current.location_city ?? null) === location.city &&
+      current.location_lat !== null &&
+      current.location_geocode_source === "nominatim";
+
+    if (unchanged) return null;
+  }
+
+  // Saving a draft must not wait on a third-party service. Nominatim's own
+  // rate limit means a full narrowing search can take tens of seconds; past
+  // this budget we save without coordinates and let the next save (or
+  // scripts/geocode-trips.mjs) fill them in.
+  const GEOCODE_BUDGET_MS = 3000;
+  const result = await Promise.race([
+    geocodeLocation({
+      country: location.country,
+      region: location.region,
+      city: location.city,
+    }),
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), GEOCODE_BUDGET_MS)),
+  ]);
+  if (!result) return null;
+
+  return {
+    location_lat: result.lat,
+    location_lng: result.lng,
+    location_geocoded_at: new Date().toISOString(),
+    location_geocode_source: result.source,
+  };
+}
+
+/**
+ * Read-only geocode used by the wizard's step 2 to show what the globe will
+ * get. Returns null when the place cannot be resolved — the caller then tells
+ * the organizer their trip will sit on the country centroid.
+ */
+export async function previewGeocode(location: {
+  country: string;
+  region?: string | null;
+  city?: string | null;
+}): Promise<{ lat: number; lng: number; displayName: string } | null> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null; // organizers only — do not proxy Nominatim for anonymous callers
+
+  const result = await geocodeLocation({
+    country: location.country,
+    region: location.region ?? null,
+    city: location.city ?? null,
+  });
+  return result ? { lat: result.lat, lng: result.lng, displayName: result.displayName } : null;
 }
 
 // ============================================
@@ -111,6 +202,17 @@ export async function saveDraft(
   const requireApproval =
     formData.require_approval ?? computeDefaultRequireApproval(maxParticipants, threshold);
 
+  // Coordinates for the globe view. Never fatal: null means "keep what's there".
+  const coordinates = await resolveTripCoordinates(
+    supabase,
+    {
+      country: formData.location_country || "HU",
+      region: formData.location_region || null,
+      city: formData.location_city || null,
+    },
+    existingTripId
+  );
+
   const tripPayload = {
     organizer_id: profile.id,
     category_id: formData.category_id || null,
@@ -142,6 +244,7 @@ export async function saveDraft(
     tags: formData.tags || [],
     show_on_landing: formData.show_on_landing ?? true,
     status: "draft" as const,
+    ...(coordinates ?? {}),
   };
 
   if (existingTripId) {

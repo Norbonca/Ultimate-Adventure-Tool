@@ -224,6 +224,12 @@ export const trips = pgTable(
     locationCountry: varchar('location_country', { length: 2 }).notNull(),
     locationRegion: varchar('location_region', { length: 100 }),
     locationCity: varchar('location_city', { length: 100 }),
+    // Geocoordinates for the globe discovery view (migration 034).
+    // location_geocode_source: 'country_centroid' | 'nominatim' | 'manual'
+    locationLat: decimal('location_lat', { precision: 9, scale: 6 }),
+    locationLng: decimal('location_lng', { precision: 9, scale: 6 }),
+    locationGeocodedAt: timestamp('location_geocoded_at', { withTimezone: true }),
+    locationGeocodeSource: varchar('location_geocode_source', { length: 20 }),
 
     // Participants
     maxParticipants: integer('max_participants').notNull(),

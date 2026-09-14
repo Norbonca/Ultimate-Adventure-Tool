@@ -1,5 +1,12 @@
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORY_DISPLAY, DIFFICULTY_LEVELS } from "@/lib/categories";
+import {
+  DEFAULT_DISCOVER_VIEW,
+  DISCOVER_VIEW_COOKIE,
+  isDiscoverView,
+  type DiscoverView,
+} from "@/lib/discover-view";
 import DiscoverClient from "./discover-client";
 
 export const metadata = {
@@ -74,11 +81,23 @@ async function fetchCurrentUser() {
   } : null;
 }
 
+/**
+ * Reads the remembered Discover view from the `trevu-discover-view` cookie.
+ * Contract: components/discover/discover-view-toggle.md. Server-side so the
+ * first paint already shows the right view — no flash of the wrong layout.
+ */
+async function readDiscoverView(): Promise<DiscoverView> {
+  const store = await cookies();
+  const value = store.get(DISCOVER_VIEW_COOKIE)?.value;
+  return isDiscoverView(value) ? value : DEFAULT_DISCOVER_VIEW;
+}
+
 export default async function DiscoverPage() {
-  const [trips, categories, currentUser] = await Promise.all([
+  const [trips, categories, currentUser, initialView] = await Promise.all([
     fetchPublishedTrips(),
     fetchActiveCategories(),
     fetchCurrentUser(),
+    readDiscoverView(),
   ]);
 
   return (
@@ -88,6 +107,7 @@ export default async function DiscoverPage() {
       categoryDisplay={CATEGORY_DISPLAY}
       difficultyLevels={DIFFICULTY_LEVELS}
       currentUser={currentUser}
+      initialView={initialView}
     />
   );
 }

@@ -4,10 +4,13 @@
  * Wizard Step 2 — Basic Information — design/D02_Trip_Management.pen#sGfJS
  */
 
+import { useEffect, useState } from "react";
 import type { WizardFormData, SubDisciplineRow } from "../../types";
 import { DIFFICULTY_LEVELS } from "@/lib/categories";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { Input } from "@/components/ui";
+import { Icon } from "@/components/Icon";
+import { previewGeocode } from "../../actions";
 
 interface Step2Props {
   formData: WizardFormData;
@@ -32,6 +35,49 @@ export function Step2Basics({
   onSubDisciplineChange,
 }: Step2Props) {
   const { t, locale } = useTranslation();
+
+  // Live geocoding preview: shows the organizer where the trip will land on the
+  // globe. The authoritative geocoding happens server-side on save; this is the
+  // same lookup, debounced, so they are not surprised afterwards.
+  //
+  // Results are keyed by location, and the displayed state is derived during
+  // render — no setState inside the effect, so a stale answer can never
+  // overwrite a newer one.
+  type GeocodePreview = { lat: number; lng: number; displayName: string } | null;
+  const [resolved, setResolved] = useState<Record<string, GeocodePreview>>({});
+
+  const country = formData.location_country;
+  const region = formData.location_region || "";
+  const city = formData.location_city || "";
+  const locationKey = `${country}|${region}|${city}`;
+
+  useEffect(() => {
+    if (!country) return;
+
+    const timer = setTimeout(async () => {
+      let result: GeocodePreview = null;
+      try {
+        result = await previewGeocode({ country, region: region || null, city: city || null });
+      } catch {
+        result = null;
+      }
+      setResolved((previous) => ({ ...previous, [locationKey]: result }));
+    }, 700);
+
+    return () => clearTimeout(timer);
+  }, [locationKey, country, region, city]);
+
+  const geocode: 
+    | { state: "idle" }
+    | { state: "loading" }
+    | { state: "found"; lat: number; lng: number; displayName: string }
+    | { state: "missing" } = !country
+    ? { state: "idle" }
+    : !(locationKey in resolved)
+      ? { state: "loading" }
+      : resolved[locationKey]
+        ? { state: "found", ...(resolved[locationKey] as NonNullable<GeocodePreview>) }
+        : { state: "missing" };
 
   return (
     <div className="space-y-6">
@@ -157,6 +203,26 @@ export function Step2Basics({
           onChange={(e) => onChange({ location_city: e.target.value })}
           placeholder={t('trips.wizard.cityPlaceholder')}
         />
+      </div>
+
+      {/* Where this trip will appear on the globe */}
+      <div
+        className="flex items-start gap-2 text-sm text-navy-500"
+        data-testid="geocode-status"
+        aria-live="polite"
+      >
+        <Icon name="globe" size={16} className="mt-0.5 shrink-0 text-trevu-600" aria-hidden="true" />
+        {geocode.state === "loading" && <span>{t('trips.wizard.geocodeLoading')}</span>}
+        {geocode.state === "found" && (
+          <span>
+            {t('trips.wizard.geocodeFound')
+              .replace('{place}', geocode.displayName)
+              .replace('{lat}', geocode.lat.toFixed(4))
+              .replace('{lng}', geocode.lng.toFixed(4))}
+          </span>
+        )}
+        {geocode.state === "missing" && <span>{t('trips.wizard.geocodeMissing')}</span>}
+        {geocode.state === "idle" && <span>{t('trips.wizard.geocodeIdle')}</span>}
       </div>
 
       {/* Participants & Difficulty */}
