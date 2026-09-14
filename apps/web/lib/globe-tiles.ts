@@ -6,8 +6,11 @@
  * question, not a rendering one, and that is why it lives here and not in the
  * renderer:
  *
- *  - EOX Sentinel-2 cloudless — 10 m imagery, the surface sharpens as you
- *    zoom in (max zoom 13). The free licence is CC-BY-NC-SA 4.0
+ *  - EOX Sentinel-2 cloudless — 10 m/px imagery, the surface sharpens as you
+ *    zoom in (max zoom 13). 10 m means coastlines, islands and relief are
+ *    crisp, buildings and streets are not — street-level imagery would need
+ *    ArcGIS World Imagery (terms to be verified) or a paid source. Not a goal:
+ *    in this phase the globe is an overview picture (Norbert, 2026-09-14). The free licence is CC-BY-NC-SA 4.0
  *    (non-commercial); commercial use needs an "EOX Commercial
  *    Attribution-RestrictedUse" licence from EOX (cloudless.eox.at/documentation
  *    /license, read 2026-09-14). **Default since 2026-09-14 by Norbert's
