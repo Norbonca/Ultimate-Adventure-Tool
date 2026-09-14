@@ -3,47 +3,87 @@
 /**
  * GlobeDiscover — React shell around the Terepgömb renderer.
  *
- * Owns data loading, the hover card, the empty/error states and accessibility;
- * the three.js work lives in `terepgomb.js`. Markers come from
- * `/api/v1/trips/globe`, not from the page's own trip list, because the globe
- * needs coordinates the card query does not fetch.
+ * Owns data loading, i18n, the tile-provider choice and accessibility; the
+ * globe itself (d3-geo + Web Mercator tiles) lives in `terepgomb.js` and is
+ * mounted into a container whose inner markup comes from `globe-markup.ts`.
+ * Markers come from `/api/v1/trips/globe`, not from the page's own trip list,
+ * because the globe needs coordinates and routes the card query does not fetch.
+ *
+ * The globe owns its own filtering (category tokens, time scrubber), so it
+ * takes no filter props from the Discover page — see discover-view-toggle.md.
  */
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n/useTranslation';
 import { StateTemplate } from '@/components/ui';
-import { Icon } from '@/components/Icon';
-import type { GlobeMarker, ScreenPosition } from './terepgomb';
+import { GLOBE_ATLAS_ATTRIBUTION, GLOBE_ATLAS_URL, getGlobeTileProvider } from '@/lib/globe-tiles';
+import { buildGlobeMarkup } from './globe-markup';
+import type { GlobeCategory, GlobeMarker, GlobePayload, GlobeRoutes, GlobeStrings, GlobeTrip, TerepgombInstance } from './terepgomb';
+import './globe.css';
 
-interface GlobeDiscoverProps {
-  /** Category filter shared with the grid view; 'all' shows everything. */
-  activeCategory?: string;
-  /** Restricts the globe to these trip ids when the page has active filters. */
-  visibleTripIds?: string[] | null;
-  className?: string;
+type LoadState = 'loading' | 'ready' | 'error';
+
+type Translate = ReturnType<typeof useTranslation>['t'];
+
+function formatPrice(marker: GlobeMarker, locale: string, t: Translate): string {
+  if (marker.priceAmount === null || marker.priceAmount === 0) {
+    return marker.isCostSharing ? t('discover.globe.costSharing') : t('discover.globe.free');
+  }
+  const intlLocale = locale === 'en' ? 'en-US' : 'hu-HU';
+  try {
+    return new Intl.NumberFormat(intlLocale, {
+      style: 'currency',
+      currency: marker.priceCurrency,
+      maximumFractionDigits: 0,
+    }).format(marker.priceAmount);
+  } catch {
+    return `${marker.priceAmount} ${marker.priceCurrency}`;
+  }
 }
 
-type LoadState = 'loading' | 'ready' | 'error' | 'unsupported';
+/**
+ * "City, Region, Country" without repeating a part — city-states and
+ * single-city regions (Split, Split, HR) would otherwise read twice.
+ */
+function formatPlace(marker: GlobeMarker): string {
+  const parts: string[] = [];
+  for (const part of [marker.city, marker.region, marker.country]) {
+    const value = part?.trim();
+    if (!value) continue;
+    if (parts.some((p) => p.localeCompare(value, undefined, { sensitivity: 'base' }) === 0)) continue;
+    parts.push(value);
+  }
+  return parts.join(', ');
+}
 
-export default function GlobeDiscover({
-  activeCategory = 'all',
-  visibleTripIds = null,
-  className = '',
-}: GlobeDiscoverProps) {
+function toGlobeTrip(marker: GlobeMarker, locale: string, t: Translate): GlobeTrip {
+  return {
+    id: marker.id,
+    slug: marker.slug,
+    title: marker.title,
+    cat: marker.categoryId,
+    place: formatPlace(marker),
+    host: marker.host ?? '',
+    week: marker.week,
+    days: marker.days,
+    price: formatPrice(marker, locale, t),
+    spots: marker.spotsLeft,
+    diff: marker.difficulty,
+    ll: [marker.lng, marker.lat],
+    approximate: marker.geocodeSource === 'country_centroid',
+  };
+}
+
+export default function GlobeDiscover() {
   const { t, locale } = useTranslation();
   const router = useRouter();
 
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const globeRef = useRef<{ setMarkers: (m: GlobeMarker[]) => void; destroy: () => void } | null>(null);
-  // The renderer is created behind a dynamic import, so it can come up *after*
-  // the markers are ready. This ref hands it the current set the moment it
-  // exists — without it the globe stays empty until the next filter change.
-  const pendingMarkersRef = useRef<GlobeMarker[]>([]);
+  const globeRef = useRef<TerepgombInstance | null>(null);
 
-  const [markers, setMarkers] = useState<GlobeMarker[]>([]);
+  const [payload, setPayload] = useState<GlobePayload | null>(null);
   const [state, setState] = useState<LoadState>('loading');
-  const [hovered, setHovered] = useState<{ marker: GlobeMarker; position: ScreenPosition } | null>(null);
 
   // ── data ────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -54,9 +94,15 @@ export default function GlobeDiscover({
       try {
         const response = await fetch('/api/v1/trips/globe', { signal: controller.signal });
         if (!response.ok) throw new Error(`globe endpoint returned ${response.status}`);
-        const payload = (await response.json()) as { markers?: GlobeMarker[] };
+        const data = (await response.json()) as GlobePayload;
         if (cancelled) return;
-        setMarkers(Array.isArray(payload.markers) ? payload.markers : []);
+        setPayload({
+          markers: Array.isArray(data.markers) ? data.markers : [],
+          count: data.count ?? 0,
+          week0: data.week0,
+          routes: data.routes ?? {},
+          categories: Array.isArray(data.categories) ? data.categories : [],
+        });
         setState('ready');
       } catch (error) {
         if (cancelled || (error as Error).name === 'AbortError') return;
@@ -71,102 +117,129 @@ export default function GlobeDiscover({
     };
   }, []);
 
-  const filteredMarkers = useMemo(() => {
-    let result = markers;
-    if (activeCategory && activeCategory !== 'all') {
-      result = result.filter((marker) => marker.categoryId === activeCategory);
-    }
-    if (visibleTripIds) {
-      const allowed = new Set(visibleTripIds);
-      result = result.filter((marker) => allowed.has(marker.id));
-    }
-    return result;
-  }, [markers, activeCategory, visibleTripIds]);
+  const tiles = useMemo(() => getGlobeTileProvider(), []);
+
+  const strings = useMemo<GlobeStrings>(
+    () => ({
+      autumn: t('discover.globe.seasonAutumn'),
+      winter: t('discover.globe.seasonWinterName'),
+      spring: t('discover.globe.seasonSpringName'),
+      summer: t('discover.globe.seasonSummerName'),
+      seasonNow: {
+        autumn: t('discover.globe.chipNowAutumn'),
+        winter: t('discover.globe.chipNowWinter'),
+        spring: t('discover.globe.chipNowSpring'),
+        summer: t('discover.globe.chipNowSummer'),
+      },
+      seasonWinter: t('discover.globe.chipWinter'),
+      seasonSpring: t('discover.globe.chipNextSpring'),
+      seasonSpringBreak: t('discover.globe.chipSpringBreak'),
+      seasonSummer: t('discover.globe.chipSummer'),
+      tokenHint: t('discover.globe.tokenHint'),
+      tokenDropOn: t('discover.globe.tokenDropOn'),
+      tokenDropOff: t('discover.globe.tokenDropOff'),
+      inWindow: t('discover.globe.inWindow'),
+      hiddenBehind: t('discover.globe.hiddenBehind'),
+      tripsCount: t('discover.globe.tripsCount'),
+      days: t('discover.globe.days'),
+      spotsLeft: t('discover.spotsLeft'),
+      details: t('discover.globe.details'),
+      routePoints: t('discover.globe.routePoints'),
+      fitRoute: t('discover.globe.fitRoute'),
+      close: t('discover.globe.close'),
+      approximate: t('discover.globe.approximate'),
+      reliefFail: t('discover.globe.reliefFail'),
+    }),
+    [t]
+  );
+
+  const markup = useMemo(
+    () =>
+      buildGlobeMarkup(
+        {
+          loading: t('discover.globe.loading'),
+          kicker: t('discover.globe.kicker'),
+          gyro: t('discover.globe.gyro'),
+          water: t('discover.globe.water'),
+          world: t('discover.globe.worldView'),
+          reset: t('discover.globe.resetView'),
+          tokenHint: t('discover.globe.tokenHint'),
+          hints: t('discover.globe.hints'),
+        },
+        [tiles.attribution, GLOBE_ATLAS_ATTRIBUTION]
+      ),
+    [t, tiles]
+  );
+
+  const categories = useMemo<GlobeCategory[]>(
+    () =>
+      (payload?.categories ?? []).map((category) => ({
+        id: category.id,
+        label: category.name_localized?.[locale] ?? category.name,
+        color: category.color_hex ?? '#0D9488',
+      })),
+    [payload, locale]
+  );
+
+  const trips = useMemo<GlobeTrip[]>(
+    () => (payload?.markers ?? []).map((marker) => toGlobeTrip(marker, locale, t)),
+    [payload, locale, t]
+  );
+
+  const routes: GlobeRoutes = payload?.routes ?? {};
 
   // ── renderer lifecycle ──────────────────────────────────────────────────
-  const handleMarkerClick = useCallback(
-    (marker: GlobeMarker) => {
-      router.push(`/trips/${marker.slug}`);
-    },
-    [router]
-  );
-
-  const handleMarkerHover = useCallback(
-    (marker: GlobeMarker | null, position: ScreenPosition | null) => {
-      setHovered(marker && position ? { marker, position } : null);
-    },
-    []
-  );
-
+  // Re-mounted on locale change: the container markup carries translated
+  // strings, so a language switch rebuilds the globe (cheap, tiles are cached
+  // by the browser).
   useEffect(() => {
-    if (state !== 'ready') return;
+    if (state !== 'ready' || !payload) return;
     const container = containerRef.current;
     if (!container) return;
 
-    let instance: InstanceType<typeof import('./terepgomb').Terepgomb> | null = null;
     let cancelled = false;
+    container.innerHTML = markup;
 
     (async () => {
-      const { Terepgomb, isWebGLAvailable } = await import('./terepgomb');
-      if (cancelled) return;
-
-      if (!isWebGLAvailable()) {
-        setState('unsupported');
-        return;
-      }
-
       try {
-        instance = new Terepgomb(container, {
-          onMarkerClick: handleMarkerClick,
-          onMarkerHover: handleMarkerHover,
+        const { mountGlobe } = await import('./terepgomb');
+        if (cancelled) return;
+        const instance = await mountGlobe(container, {
+          trips,
+          categories,
+          routes,
+          week0: payload.week0,
+          tiles,
+          atlasUrl: GLOBE_ATLAS_URL,
+          locale,
+          t: strings,
+          onOpen: (slug: string) => router.push(`/trips/${slug}`),
         });
+        if (cancelled) {
+          instance.destroy();
+          return;
+        }
         globeRef.current = instance;
-        instance.setMarkers(pendingMarkersRef.current);
-
-        // Development-only handle so E2E tests can aim at a marker instead of
+        // Development-only handle so E2E tests can aim at a trip instead of
         // guessing pixel positions from a screenshot. Never exposed in production.
         if (process.env.NODE_ENV !== 'production') {
           (window as Window & { __trevuGlobe?: unknown }).__trevuGlobe = instance;
         }
       } catch (error) {
         console.error('[GlobeDiscover] renderer failed to start:', error);
-        setState('unsupported');
+        if (!cancelled) setState('error');
       }
     })();
 
     return () => {
       cancelled = true;
-      instance?.destroy();
+      globeRef.current?.destroy();
       globeRef.current = null;
+      container.innerHTML = '';
     };
-  }, [state, handleMarkerClick, handleMarkerHover]);
-
-  // Feed markers whenever the filtered set changes; the ref covers the case
-  // where the renderer is not up yet.
-  useEffect(() => {
-    pendingMarkersRef.current = filteredMarkers;
-    globeRef.current?.setMarkers(filteredMarkers);
-  }, [filteredMarkers]);
-
-  // ── helpers ─────────────────────────────────────────────────────────────
-  const formatLocation = (marker: GlobeMarker) => {
-    if (marker.geocodeSource === 'country_centroid') {
-      return [marker.city, marker.region, marker.country].filter(Boolean).join(', ');
-    }
-    return [marker.city, marker.region].filter(Boolean).join(', ') || marker.country;
-  };
-
-  const formatDates = (marker: GlobeMarker) => {
-    if (!marker.startDate) return null;
-    const intlLocale = locale === 'en' ? 'en-US' : 'hu-HU';
-    const formatter = new Intl.DateTimeFormat(intlLocale, { month: 'short', day: 'numeric' });
-    const start = formatter.format(new Date(marker.startDate));
-    if (!marker.endDate) return start;
-    return `${start}–${formatter.format(new Date(marker.endDate))}`;
-  };
-
-  const categoryLabel = (marker: GlobeMarker) =>
-    marker.categoryNameLocalized?.[locale] ?? marker.categoryName ?? '';
+    // The renderer is rebuilt only when the data or the language changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state, payload, locale, markup]);
 
   // ── render ──────────────────────────────────────────────────────────────
   if (state === 'error') {
@@ -180,26 +253,15 @@ export default function GlobeDiscover({
     );
   }
 
-  if (state === 'unsupported') {
-    return (
-      <StateTemplate
-        variant="empty"
-        title={t('discover.globe.unsupportedTitle')}
-        description={t('discover.globe.unsupportedHint')}
-        className="my-8"
-      />
-    );
-  }
-
   return (
     <section
-      className={`globe-discover ${className}`.trim()}
+      className="globe-discover"
       data-testid="globe-discover"
       aria-label={t('discover.globe.regionLabel')}
     >
       <div
         ref={containerRef}
-        className="globe-canvas-host"
+        className="terepgomb"
         role="application"
         aria-label={t('discover.globe.canvasLabel')}
       />
@@ -210,46 +272,18 @@ export default function GlobeDiscover({
         </div>
       )}
 
-      {state === 'ready' && filteredMarkers.length === 0 && (
+      {state === 'ready' && trips.length === 0 && (
         <div className="globe-status" role="status">
           {t('discover.globe.noMarkers')}
         </div>
       )}
 
-      {hovered && (
-        <article
-          className="globe-tooltip"
-          style={{ left: hovered.position.x, top: hovered.position.y }}
-          aria-hidden="true"
-        >
-          <h3 className="globe-tooltip__title">{hovered.marker.title}</h3>
-          <p className="globe-tooltip__meta">
-            {[categoryLabel(hovered.marker), formatLocation(hovered.marker), formatDates(hovered.marker)]
-              .filter(Boolean)
-              .join(' · ')}
-          </p>
-          {hovered.marker.geocodeSource === 'country_centroid' && (
-            <p className="globe-tooltip__note">{t('discover.globe.approximate')}</p>
-          )}
-        </article>
-      )}
-
-      <footer className="globe-legend">
-        <span className="globe-legend__count">
-          {t('discover.globe.markerCount').replace('{count}', String(filteredMarkers.length))}
-        </span>
-        <span className="globe-legend__hint">
-          <Icon name="compass" size={14} aria-hidden="true" />
-          {t('discover.globe.dragHint')}
-        </span>
-      </footer>
-
       {/* Keyboard and screen-reader path to the same trips the globe shows. */}
       <ul className="globe-fallback-list">
-        {filteredMarkers.map((marker) => (
+        {(payload?.markers ?? []).map((marker) => (
           <li key={marker.id}>
             <a href={`/trips/${marker.slug}`}>
-              {marker.title} — {formatLocation(marker)}
+              {marker.title} — {formatPlace(marker)}
             </a>
           </li>
         ))}

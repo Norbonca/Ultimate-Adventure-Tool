@@ -376,6 +376,9 @@ export const tripItineraryDays = pgTable(
     elevationGainM: integer('elevation_gain_m'),
     estimatedHours: decimal('estimated_hours', { precision: 4, scale: 1 }),
     routeGeojson: jsonb('route_geojson'),
+    // 035: the day's station — the globe route is drawn from these (WGS84, paired NULL/NOT NULL)
+    latitude: decimal('latitude', { precision: 9, scale: 6 }),
+    longitude: decimal('longitude', { precision: 9, scale: 6 }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },

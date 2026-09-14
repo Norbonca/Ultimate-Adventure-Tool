@@ -32,8 +32,8 @@ import {
   type DiscoverView,
 } from "@/lib/discover-view";
 
-// three.js only runs in the browser, and the globe is a large chunk — load it
-// on demand so the grid and list views never pay for it.
+// The globe (d3-geo + tiles) only runs in the browser and is a large chunk —
+// load it on demand so the grid and list views never pay for it.
 const GlobeDiscover = dynamic(() => import('@/components/discover/GlobeDiscover'), {
   ssr: false,
 });
@@ -723,131 +723,11 @@ export default function DiscoverClient({
           margin-bottom: 3rem;
         }
 
-        /* ── Globe view (Terepgömb) ──────────────────────────────── */
+        /* ── Globe view (Terepgömb) — the globe's own styles live in
+           components/discover/globe.css; only the page-level placement is here. */
         .globe-discover {
           position: relative;
           margin-bottom: 3rem;
-        }
-
-        .globe-canvas-host {
-          position: relative;
-          width: 100%;
-          height: min(68vh, 620px);
-          min-height: 360px;
-          border-radius: 20px;
-          background:
-            radial-gradient(circle at 50% 40%, #16233c 0%, #0f172a 55%, #0a1120 100%);
-          overflow: hidden;
-          cursor: grab;
-        }
-
-        .globe-canvas-host:active {
-          cursor: grabbing;
-        }
-
-        .globe-canvas-host canvas:focus-visible {
-          outline: 2px solid #14b8a6;
-          outline-offset: -4px;
-        }
-
-        .globe-status {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          padding: 0.6rem 1.1rem;
-          border-radius: 9999px;
-          background-color: rgba(15, 23, 42, 0.78);
-          color: #e2e8f0;
-          font-size: 0.875rem;
-          pointer-events: none;
-        }
-
-        .globe-tooltip {
-          position: absolute;
-          z-index: 5;
-          max-width: 260px;
-          padding: 0.7rem 0.9rem;
-          border-radius: 12px;
-          background-color: rgba(255, 255, 255, 0.97);
-          box-shadow: 0 10px 30px rgba(15, 23, 42, 0.22);
-          transform: translate(-50%, calc(-100% - 16px));
-          pointer-events: none;
-        }
-
-        .globe-tooltip__title {
-          margin: 0 0 0.2rem;
-          font-size: 0.9rem;
-          font-weight: 700;
-          color: #0f172a;
-          line-height: 1.3;
-        }
-
-        .globe-tooltip__meta {
-          margin: 0;
-          font-size: 0.78rem;
-          color: #475569;
-        }
-
-        .globe-tooltip__note {
-          margin: 0.35rem 0 0;
-          font-size: 0.72rem;
-          color: #94a3b8;
-        }
-
-        .globe-legend {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 1rem;
-          margin-top: 0.75rem;
-          font-size: 0.8rem;
-          color: #64748b;
-        }
-
-        .globe-legend__hint {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.35rem;
-        }
-
-        /* Touch devices have no scroll wheel and no hover, so the desktop hint
-           would be telling them to do something they cannot do. */
-        @media (max-width: 640px), (hover: none) {
-          .globe-legend__hint {
-            display: none;
-          }
-
-          .globe-canvas-host {
-            height: min(60vh, 460px);
-          }
-        }
-
-        /* The globe is visual; this list keeps the same trips reachable by
-           keyboard and screen reader without showing a second card grid. */
-        .globe-fallback-list {
-          position: absolute;
-          width: 1px;
-          height: 1px;
-          margin: -1px;
-          padding: 0;
-          overflow: hidden;
-          clip: rect(0, 0, 0, 0);
-          white-space: nowrap;
-          border: 0;
-        }
-
-        .globe-fallback-list a:focus {
-          position: fixed;
-          top: 1rem;
-          left: 1rem;
-          width: auto;
-          height: auto;
-          padding: 0.5rem 0.9rem;
-          clip: auto;
-          background-color: white;
-          border-radius: 8px;
-          box-shadow: 0 4px 16px rgba(15, 23, 42, 0.2);
         }
 
 
@@ -1241,6 +1121,9 @@ export default function DiscoverClient({
         { label: t('nav.community'), href: '/community' },
       ]} />
 
+      {/* Globe view has its own time and category filters (discover-view-toggle.md),
+          so the hero and the filter bar only render for grid and list. */}
+      {viewMode !== 'globe' && (<>
       {/* HERO */}
       <section className="hero">
         <div className="hero-content">
@@ -1344,6 +1227,8 @@ export default function DiscoverClient({
         </select>
       </div>
 
+      </>)}
+
       {/* MAIN CONTENT */}
       <main className="main-content">
         <div className="results-header">
@@ -1390,10 +1275,7 @@ export default function DiscoverClient({
         </div>
 
         {viewMode === 'globe' ? (
-          <GlobeDiscover
-            activeCategory={activeCategory}
-            visibleTripIds={filteredTrips.map((trip) => trip.id)}
-          />
+          <GlobeDiscover />
         ) : filteredTrips.length === 0 ? (
           <StateTemplate variant="empty" title={t('discover.noTrips')} description={t('discover.noTripsHint')} className="my-8" />
         ) : (
