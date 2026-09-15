@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isValidTimeZone } from "@/lib/timezone";
 
 const optionalId = z.union([z.string().uuid(), z.literal("")]);
 const date = z.string().date();
@@ -18,7 +19,9 @@ export const draftTripSchema = z.object({
   staff_seats: z.number().int().min(0).max(50), difficulty: z.number().int().min(1).max(5),
   sub_discipline_id: optionalId, category_details: z.record(z.unknown()),
   visibility: z.enum(["public", "followers_only", "private"]), require_approval: z.boolean(),
-  registration_deadline: optionalDate, price_amount: z.number().finite().nonnegative().nullable(),
+  registration_deadline: optionalDate,
+  timezone: z.string().max(64).refine(isValidTimeZone, "Invalid timezone"),
+  price_amount: z.number().finite().nonnegative().nullable(),
   price_currency: z.string().regex(/^[A-Z]{3}$/), is_cost_sharing: z.boolean(),
   cover_image_url: imageUrl, cover_image_source: z.enum(["system", "user_upload"]),
   card_image_url: imageUrl, card_image_source: z.enum(["system", "user_upload"]),

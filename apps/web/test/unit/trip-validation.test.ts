@@ -20,6 +20,15 @@ describe("trip action boundary validation", () => {
   ])("rejects invalid values: %j", value => {
     expect(publishTripSchema.safeParse({ ...valid, ...value }).success).toBe(false);
   });
+  it("accepts IANA time zones and a date-only registration deadline", () => {
+    expect(publishTripSchema.safeParse({ ...valid, timezone: "Europe/Budapest", registration_deadline: "2027-01-01" }).success).toBe(true);
+    expect(publishTripSchema.safeParse({ ...valid, timezone: "UTC" }).success).toBe(true);
+  });
+  it.each([
+    { timezone: "Mars/Olympus_Mons" }, { timezone: "" }, { registration_deadline: "2027-01-01T12:00" },
+  ])("rejects invalid time zone or deadline values: %j", value => {
+    expect(publishTripSchema.safeParse({ ...valid, ...value }).success).toBe(false);
+  });
   it("strips fields outside the input contract", () => {
     expect(draftTripSchema.parse({ ...valid, organizer_id: "attacker", status: "published" }))
       .not.toHaveProperty("organizer_id");

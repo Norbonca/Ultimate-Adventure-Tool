@@ -13,6 +13,8 @@ import type { TranslationKey } from "@uat/i18n";
 import { ImagePicker } from "@/components/ImagePicker";
 import { Icon } from "@/components/Icon";
 import { Input, Toggle } from "@/components/ui";
+import { TimezoneSelect } from "@/components/trip-forms/TimezoneSelect";
+import { formatLocalDate } from "@/lib/timezone";
 
 interface Step4Props {
   formData: WizardFormData;
@@ -283,15 +285,28 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
       </div>
 
       {/* ── Registration Deadline ── */}
-      <div className="max-w-xs">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input
           id="trip-registration-deadline"
           label={t("trips.wizard.registrationDeadline")}
-          type="datetime-local"
+          type="date"
           value={formData.registration_deadline}
           onChange={(e) => onChange({ registration_deadline: e.target.value })}
         />
+        <TimezoneSelect
+          id="trip-timezone"
+          value={formData.timezone}
+          onChange={(timezone) => onChange({ timezone })}
+        />
       </div>
+      {formData.registration_deadline && (
+        <p className="-mt-2 text-sm text-navy-600">
+          {t("trips.wizard.registrationDeadlineHint", {
+            date: formatLocalDate(formData.registration_deadline, locale === "en" ? "en-US" : "hu-HU"),
+            timezone: formData.timezone || "UTC",
+          })}
+        </p>
+      )}
 
       {/* ── Show on Landing Page ── */}
       <Toggle

@@ -106,7 +106,10 @@ export interface WizardFormData {
   // Step 4 — Publish settings
   visibility: "public" | "followers_only" | "private";
   require_approval: boolean;
+  /** A jelentkezési határnap (YYYY-MM-DD); a túra időzónájában a nap végén zár. */
   registration_deadline: string;
+  /** A szervezés időzónája (IANA), alapértelmezés: UTC. */
+  timezone: string;
   price_amount: number | null;
   price_currency: string;
   is_cost_sharing: boolean;
@@ -140,6 +143,7 @@ export const INITIAL_FORM_DATA: WizardFormData = {
   visibility: "private",
   require_approval: true,
   registration_deadline: "",
+  timezone: "UTC",
   price_amount: null,
   price_currency: "EUR",
   is_cost_sharing: true,
