@@ -7,6 +7,7 @@
  */
 
 import { createClient } from "@/lib/supabase/server";
+import { resolveViewerCalendar, type ViewerCalendar } from "./context";
 import { computeCoverage, type Coverage } from "./coverage";
 import { localizedLabel, overlaps, type LocalizedLabel } from "./period";
 import type { RuleKind } from "./rules";
@@ -90,4 +91,45 @@ export async function getCalendarPeriods(query: PeriodsQuery): Promise<CalendarP
     .sort((a, b) => a.earliest.localeCompare(b.earliest) || a.label.localeCompare(b.label));
 
   return { ok: true, data: { coverage, items } };
+}
+
+const COUNTRY_RE = /^[A-Z]{2}$/;
+
+/**
+ * A bejelentkezett néző naptára (BR-M23-006): a saját profil országa, ha aktív ország. A profil a
+ * `get_my_profile()` RPC-n jön (031 óta a kliens nem olvassa közvetlenül a `profiles` táblát).
+ * Kijelentkezve, ország nélkül vagy hiba esetén `country: null`, időzóna UTC.
+ */
+export async function getViewerCalendar(): Promise<ViewerCalendar> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return resolveViewerCalendar({ profile: null, activeCountryCodes: [] });
+
+  const { data: profile } = await supabase.rpc("get_my_profile");
+  const row = (profile ?? null) as { country_code?: string | null; timezone?: string | null } | null;
+  const code = row?.country_code?.trim().toUpperCase() ?? "";
+  if (!COUNTRY_RE.test(code)) return resolveViewerCalendar({ profile: null, activeCountryCodes: [] });
+
+  const { data: country } = await supabase.from("ref_countries").select("code").eq("code", code).eq("is_active", true).maybeSingle();
+  return resolveViewerCalendar({
+    profile: { countryCode: code, timezone: row?.timezone ?? null },
+    activeCountryCodes: country ? [country.code as string] : [],
+  });
+}
+
+export type ViewerCalendarPeriodsResult =
+  | { ok: true; data: { calendar: ViewerCalendar; coverage: Coverage; items: CalendarPeriodItem[] } }
+  | { ok: false; error: "invalid_params" | "load_failed" };
+
+/**
+ * Időszakok a néző naptár-országa szerint. Ország nélkül nincs országspecifikus időszak: üres lista,
+ * `coverage: "none"` — a hívó ilyenkor nem mutat jelvényt, és a profilbeállításra utalhat.
+ */
+export async function getViewerCalendarPeriods(query: Omit<PeriodsQuery, "country">): Promise<ViewerCalendarPeriodsResult> {
+  const calendar = await getViewerCalendar();
+  if (!calendar.country) return { ok: true, data: { calendar, coverage: "none", items: [] } };
+  const result = await getCalendarPeriods({ ...query, country: calendar.country });
+  return result.ok ? { ok: true, data: { calendar, ...result.data } } : result;
 }

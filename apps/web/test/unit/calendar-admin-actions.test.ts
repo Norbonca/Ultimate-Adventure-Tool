@@ -14,6 +14,8 @@ vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 import {
   deleteCalendarOccurrence,
   generateCalendarOccurrences,
+  getCalendarAdminOverview,
+  getCalendarReferenceData,
   saveCalendarOccurrence,
   saveCalendarPeriod,
   saveCalendarTag,
@@ -104,5 +106,56 @@ describe("M23 admin Server Actionök — validáció a határon", () => {
 
   it("hibás azonosító → validationFailed", async () => {
     expect(await verifyCalendarOccurrence("not-a-uuid")).toEqual({ ok: false, error: "validationFailed" });
+  });
+});
+
+describe("M23 admin — alapország az admin profilországa, nincs rögzített HU", () => {
+  const periodsEq = vi.fn();
+  const periodsIs = vi.fn();
+
+  function adminWithProfileCountry(countryCode: string | null) {
+    const countries = [
+      { code: "AT", name_hu: "Ausztria", name_en: "Austria", is_active: true },
+      { code: "HU", name_hu: "Magyarország", name_en: "Hungary", is_active: true },
+    ];
+    const tables: Record<string, unknown> = {
+      ref_countries: { select: () => ({ eq: () => ({ order: async () => ({ data: countries }) }) }) },
+      ref_calendar_tags: { select: () => ({ order: async () => ({ data: [] }) }) },
+      ref_calendar_period_tags: { select: async () => ({ data: [] }) },
+      profiles: { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: { country_code: countryCode } }) }) }) },
+      ref_calendar_periods: {
+        select: () => ({ order: () => ({ eq: periodsEq, is: periodsIs }) }),
+      },
+      system_settings: { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: { value: 2 } }) }) }) },
+    };
+    return { from: (table: string) => tables[table], rpc: vi.fn() };
+  }
+
+  beforeEach(() => {
+    mocks.role.mockResolvedValue({ data: { id: "role" }, error: null });
+    periodsEq.mockReturnValue({ returns: async () => ({ data: [] }) });
+    periodsIs.mockReturnValue({ returns: async () => ({ data: [] }) });
+  });
+
+  it("paraméter nélkül az admin profilországa a nézet", async () => {
+    mocks.admin.mockReturnValue(adminWithProfileCountry("AT"));
+    const overview = await getCalendarAdminOverview({});
+    expect(overview.scope).toBe("AT");
+    expect(periodsEq).toHaveBeenCalledWith("country_code", "AT");
+  });
+
+  it("profilország nélkül üres állapot: nincs scope, nincs időszak-lekérdezés", async () => {
+    mocks.admin.mockReturnValue(adminWithProfileCountry(null));
+    const overview = await getCalendarAdminOverview({});
+    expect(overview.scope).toBe("");
+    expect(overview.periods).toEqual([]);
+    expect(periodsEq).not.toHaveBeenCalled();
+    expect(periodsIs).not.toHaveBeenCalled();
+  });
+
+  it("a választott ország felülírja a profilt; ismeretlen profilország nem lesz alapérték", async () => {
+    mocks.admin.mockReturnValue(adminWithProfileCountry("XX"));
+    expect((await getCalendarAdminOverview({ scope: "HU" })).scope).toBe("HU");
+    expect((await getCalendarReferenceData()).defaultCountry).toBeNull();
   });
 });

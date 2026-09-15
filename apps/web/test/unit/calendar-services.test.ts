@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveCalendarCountry, resolveTripTimezone } from "@/lib/calendar/context";
+import { resolveTripTimezone, resolveViewerCalendar } from "@/lib/calendar/context";
 import { computeCoverage, missingYears } from "@/lib/calendar/coverage";
 import { longWeekends } from "@/lib/calendar/long-weekend";
 import { formatPeriod, isIsoDate, localizedLabel, overlapDays, overlaps, toPeriod } from "@/lib/calendar/period";
@@ -89,11 +89,35 @@ describe("M23 lefedettség (BR-M23-008)", () => {
 });
 
 describe("M23 naptár-ország és túra-időzóna", () => {
-  it("naptár-ország sorrendje (BR-M23-006)", () => {
-    expect(resolveCalendarCountry({ userCountry: "AT", profileCountry: "HU", locale: "hu" })).toEqual({ country: "AT", source: "user" });
-    expect(resolveCalendarCountry({ profileCountry: "SK", locale: "hu" })).toEqual({ country: "SK", source: "profile" });
-    expect(resolveCalendarCountry({ locale: "en", defaultsByLocale: { en: "GB" } })).toEqual({ country: "GB", source: "locale" });
-    expect(resolveCalendarCountry({ locale: "en" })).toEqual({ country: "HU", source: "fallback" });
+  const active = ["HU", "AT", "SK", "DE"];
+
+  it("naptár-ország = a profil aktív országa, a profil időzónájával (BR-M23-006)", () => {
+    expect(resolveViewerCalendar({ profile: { countryCode: "SK", timezone: "Europe/Bratislava" }, activeCountryCodes: active })).toEqual({
+      country: "SK",
+      source: "profile",
+      timezone: "Europe/Bratislava",
+    });
+    expect(resolveViewerCalendar({ profile: { countryCode: "at", timezone: null }, activeCountryCodes: active })).toEqual({
+      country: "AT",
+      source: "profile",
+      timezone: "UTC",
+    });
+    expect(resolveViewerCalendar({ profile: { countryCode: "DE", timezone: "Mars/Olympus" }, activeCountryCodes: active }).timezone).toBe("UTC");
+  });
+
+  it("nincs rögzített alapország: kijelentkezve vagy ország nélkül null + UTC", () => {
+    const none = { country: null, source: "none", timezone: "UTC" };
+    expect(resolveViewerCalendar({ profile: null, activeCountryCodes: active })).toEqual(none);
+    expect(resolveViewerCalendar({ profile: { countryCode: null, timezone: "Europe/Budapest" }, activeCountryCodes: active })).toEqual(none);
+    expect(resolveViewerCalendar({ profile: { countryCode: "", timezone: "Europe/Budapest" }, activeCountryCodes: active })).toEqual(none);
+  });
+
+  it("érvénytelen vagy inaktív ország → null + UTC", () => {
+    const none = { country: null, source: "none", timezone: "UTC" };
+    expect(resolveViewerCalendar({ profile: { countryCode: "XX", timezone: "Europe/Budapest" }, activeCountryCodes: active })).toEqual(none);
+    expect(resolveViewerCalendar({ profile: { countryCode: "HUN", timezone: "Europe/Budapest" }, activeCountryCodes: active })).toEqual(none);
+    expect(resolveViewerCalendar({ profile: { countryCode: "RU", timezone: "Europe/Moscow" }, activeCountryCodes: active })).toEqual(none);
+    expect(resolveViewerCalendar({ profile: { countryCode: "HU", timezone: "Europe/Budapest" }, activeCountryCodes: [] })).toEqual(none);
   });
 
   it("túra-időzóna forrássorrendje, alapértelmezés UTC (FR-M23-011)", () => {

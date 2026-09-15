@@ -36,7 +36,7 @@ export default async function CalendarPeriodPage({
             tags={reference.tags}
             period={detail?.period ?? null}
             occurrences={detail?.occurrences ?? []}
-            defaultCountry={country && /^[A-Z]{2}$/.test(country) ? country : "HU"}
+            defaultCountry={country && reference.countries.some((c) => c.code === country) ? country : (reference.defaultCountry ?? "")}
           />
         )}
       </div>

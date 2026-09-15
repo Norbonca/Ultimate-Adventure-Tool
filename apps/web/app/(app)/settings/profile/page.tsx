@@ -270,6 +270,12 @@ export default function ProfileSettingsPage() {
               placeholder={t('profile.settings.cityPlaceholder')}
             />
           </div>
+          {/*
+            A profil országa egyben az M23 naptár-ország (BR-M23-006, S4; Norbert döntése, 2026-09-15):
+            csak aktív ország választható, üresen nincs országspecifikus naptár.
+            DESIGN-FIRST kivétel: az S4 a meglévő mezőre épül, külön Pencil-terv nem készül (Norbert kérése;
+            tervhivatkozás: D01 `oeWBG`).
+          */}
           <div>
             <label className="block text-sm font-semibold text-navy-700 mb-1.5">
               {t('profile.settings.country')}
