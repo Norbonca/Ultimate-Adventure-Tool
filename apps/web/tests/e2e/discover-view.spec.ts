@@ -129,4 +129,31 @@ test.describe('Discover — view toggle', () => {
     }
     expect(markers.length).toBeLessThanOrEqual(hrefs.length);
   });
+
+  test('DISCOVER-VIEW-8: the card shows the trip image and "Details" opens the trip, even if the globe redraws mid-click', async ({ page }) => {
+    const { markers } = (await (await page.request.get('/api/v1/trips/globe')).json()) as {
+      markers: { id: string; slug: string; imageUrl: string | null }[];
+    };
+    const trip = markers.find((m) => m.imageUrl && /^https?:/.test(m.imageUrl));
+    test.skip(!trip, 'no trip with an image in the local data');
+
+    await page.goto('/');
+    await expect(page.locator('#tg-track')).toBeVisible({ timeout: 20_000 });
+    // dev-only handle (GlobeDiscover.tsx) — aims at a trip without guessing pixel positions
+    await page.waitForFunction(() => Boolean((window as Window & { __trevuGlobe?: unknown }).__trevuGlobe));
+    await page.evaluate((id) => (window as unknown as { __trevuGlobe: { frameTrip(id: string): void } }).__trevuGlobe.frameTrip(id), trip!.id);
+
+    const card = page.locator('#tg-card.on');
+    await expect(card).toBeVisible();
+    await expect(card.locator('.tg-card-img')).toHaveAttribute('src', trip!.imageUrl!);
+
+    const cta = card.locator('[data-open]');
+    const box = (await cta.boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    // a redraw between press and release (trackpad inertia, resize) must not swap the button out
+    await page.evaluate(() => window.dispatchEvent(new Event('resize')));
+    await page.mouse.up();
+    await expect(page).toHaveURL(new RegExp(`/trips/${trip!.slug}$`), { timeout: 15_000 });
+  });
 });

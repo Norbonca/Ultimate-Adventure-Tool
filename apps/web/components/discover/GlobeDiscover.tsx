@@ -73,6 +73,7 @@ function toGlobeTrip(marker: GlobeMarker, locale: string, t: Translate): GlobeTr
     ll: [marker.lng, marker.lat],
     approximate: marker.geocodeSource === 'country_centroid',
     past: marker.past === true,
+    image: marker.imageUrl,
   };
 }
 

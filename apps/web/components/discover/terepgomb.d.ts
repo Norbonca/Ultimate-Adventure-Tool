@@ -74,6 +74,8 @@ export interface GlobeTrip {
   approximate: boolean;
   /** Ended before week 0: pinned to the start of the timeline, the card says so. */
   past: boolean;
+  /** Card image (`card_image_url`, falling back to `cover_image_url`); null → striped category placeholder. */
+  image: string | null;
 }
 
 export interface GlobeCategory {
