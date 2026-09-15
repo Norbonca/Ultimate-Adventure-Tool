@@ -46,3 +46,5 @@ _tmp_*
 # Playwright test outputs (S29)
 apps/web/playwright-report/
 apps/web/test-results/
+# Playwright MCP / ad-hoc böngészős ellenőrzések képei (S39)
+.playwright-mcp/

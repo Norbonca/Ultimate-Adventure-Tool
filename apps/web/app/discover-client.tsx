@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/i18n/useTranslation';
 import { AppHeader } from '@/components/AppHeader';
@@ -18,12 +19,24 @@ import {
   Snowflake,
   Users,
   Star,
+  Globe,
   LayoutGrid,
   List,
 } from '@/lib/icons';
 import type { LucideIcon } from '@/lib/icons';
 import { Icon } from "@/components/Icon";
 import { Card, CardImage, CardBody, Chip, StateTemplate } from "@/components/ui";
+import {
+  DEFAULT_DISCOVER_VIEW,
+  rememberDiscoverView,
+  type DiscoverView,
+} from "@/lib/discover-view";
+
+// The globe (d3-geo + tiles) only runs in the browser and is a large chunk —
+// load it on demand so the grid and list views never pay for it.
+const GlobeDiscover = dynamic(() => import('@/components/discover/GlobeDiscover'), {
+  ssr: false,
+});
 
 // Types matching Supabase query results exactly
 interface Trip {
@@ -99,6 +112,8 @@ interface DiscoverClientProps {
   categoryDisplay: CategoryDisplay;
   difficultyLevels: DifficultyLevel[];
   currentUser: CurrentUser | null;
+  /** View remembered in the `trevu-discover-view` cookie; globe by default. */
+  initialView?: DiscoverView;
 }
 
 const categoryIconMap: Record<string, LucideIcon> = {
@@ -135,10 +150,17 @@ export default function DiscoverClient({
   categoryDisplay,
   difficultyLevels,
   currentUser: _currentUser,
+  initialView = DEFAULT_DISCOVER_VIEW,
 }: DiscoverClientProps) {
   const { t, locale } = useTranslation();
   const [activeCategory, setActiveCategory] = useState<string>('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<DiscoverView>(initialView);
+
+  // Every switch is remembered for the next visit (see discover-view-toggle.md).
+  const changeView = (next: DiscoverView) => {
+    setViewMode(next);
+    rememberDiscoverView(next);
+  };
   // TODO: setSearchQuery is never called — the search box is not wired to this state.
   const [searchQuery, _setSearchQuery] = useState<string>('');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
@@ -701,6 +723,25 @@ export default function DiscoverClient({
           margin-bottom: 3rem;
         }
 
+        /* ── Globe view (Terepgömb) — the globe's own styles live in
+           components/discover/globe.css; only the page-level placement is here. */
+        .globe-discover {
+          position: relative;
+          margin-bottom: 3rem;
+        }
+
+        /* Phones: the globe runs edge to edge — the page gutter would cost it
+           a sixth of the width (S40 mobile fix). */
+        @media (max-width: 640px) {
+          .globe-discover {
+            margin-inline: -2rem;
+          }
+          .globe-discover .terepgomb {
+            border-radius: 0;
+          }
+        }
+
+
         .trips-grid.list-view {
           grid-template-columns: 1fr;
         }
@@ -1091,6 +1132,9 @@ export default function DiscoverClient({
         { label: t('nav.community'), href: '/community' },
       ]} />
 
+      {/* Globe view has its own time and category filters (discover-view-toggle.md),
+          so the hero and the filter bar only render for grid and list. */}
+      {viewMode !== 'globe' && (<>
       {/* HERO */}
       <section className="hero">
         <div className="hero-content">
@@ -1104,6 +1148,7 @@ export default function DiscoverClient({
                 <MapPin size={18} />
                 <input
                   type="text"
+                  aria-label={t('discover.whereTo')}
                   placeholder={t('discover.whereTo')}
                 />
               </div>
@@ -1111,12 +1156,13 @@ export default function DiscoverClient({
                 <Calendar size={18} />
                 <input
                   type="text"
+                  aria-label={t('discover.when')}
                   placeholder={t('discover.when')}
                 />
               </div>
               <div className="search-field">
                 <Compass size={18} />
-                <select>
+                <select aria-label={t('discover.activityType')}>
                   <option value="">{t('discover.activityType')}</option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
@@ -1125,7 +1171,7 @@ export default function DiscoverClient({
                   ))}
                 </select>
               </div>
-              <button className="search-btn">
+              <button type="button" className="search-btn" aria-label={t('common.search')}>
                 <Search size={20} />
               </button>
           </div>
@@ -1157,13 +1203,13 @@ export default function DiscoverClient({
       {/* FILTER BAR */}
       <div id="filters" className="filter-bar">
         <div className="filter-group">
-          <select className="filter-select" value={selectedDifficulty} onChange={(e) => setSelectedDifficulty(e.target.value)}>
+          <select className="filter-select" aria-label={t('discover.difficulty')} value={selectedDifficulty} onChange={(e) => setSelectedDifficulty(e.target.value)}>
             <option value="all">{t('discover.difficulty')}</option>
             {difficultyLevels.map((level) => (
               <option key={level.value} value={String(level.value)}>{locale === 'en' ? level.labelEn : level.label}</option>
             ))}
           </select>
-          <select className="filter-select" value={selectedPrice} onChange={(e) => setSelectedPrice(e.target.value)}>
+          <select className="filter-select" aria-label={t('discover.priceRange')} value={selectedPrice} onChange={(e) => setSelectedPrice(e.target.value)}>
             <option value="all">{t('discover.priceRange')}</option>
             <option value="free">{t('discover.free')}</option>
             <option value="under50">{t('discover.underPrice')}</option>
@@ -1171,7 +1217,7 @@ export default function DiscoverClient({
             <option value="200-500">€200 – €500</option>
             <option value="500+">€500+</option>
           </select>
-          <select className="filter-select" value={selectedDuration} onChange={(e) => setSelectedDuration(e.target.value)}>
+          <select className="filter-select" aria-label={t('discover.duration')} value={selectedDuration} onChange={(e) => setSelectedDuration(e.target.value)}>
             <option value="all">{t('discover.duration')}</option>
             <option value="1">{t('discover.oneDay')}</option>
             <option value="2-3">{t('discover.twoDays')}</option>
@@ -1179,14 +1225,14 @@ export default function DiscoverClient({
             <option value="1-2w">{t('discover.oneWeek')}</option>
             <option value="2w+">{t('discover.twoWeeks')}</option>
           </select>
-          <select className="filter-select" value={selectedSpots} onChange={(e) => setSelectedSpots(e.target.value)}>
+          <select className="filter-select" aria-label={t('discover.availableSpots')} value={selectedSpots} onChange={(e) => setSelectedSpots(e.target.value)}>
             <option value="all">{t('discover.availableSpots')}</option>
             <option value="1-3">{t('discover.spots13')}</option>
             <option value="4-8">{t('discover.spots48')}</option>
             <option value="9+">{t('discover.spots9')}</option>
           </select>
         </div>
-        <select className="filter-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)} style={{marginLeft:'auto'}}>
+        <select className="filter-select" aria-label={t('discover.sortLabel')} value={sortBy} onChange={(e) => setSortBy(e.target.value)} style={{marginLeft:'auto'}}>
           <option value="recent">{t('discover.sortRecent')}</option>
           <option value="price-low">{t('discover.priceLowHigh')}</option>
           <option value="price-high">{t('discover.priceHighLow')}</option>
@@ -1194,33 +1240,60 @@ export default function DiscoverClient({
         </select>
       </div>
 
+      </>)}
+
       {/* MAIN CONTENT */}
       <main className="main-content">
         <div className="results-header">
           <div className="results-count">
-            {filteredTrips.length === 0
+            {/* The globe ignores the grid filters (it has its own), so its count is the unfiltered one. */}
+            {(viewMode === 'globe' ? trips.length : filteredTrips.length) === 0
               ? t('discover.noTripsYet')
-              : t('discover.tripsAvailable').replace('{count}', String(filteredTrips.length))}
+              : t('discover.tripsAvailable').replace(
+                  '{count}',
+                  String(viewMode === 'globe' ? trips.length : filteredTrips.length)
+                )}
           </div>
-          <div id="map" className="view-toggle">
+          <div id="map" className="view-toggle" role="group" aria-label={t('discover.viewToggleLabel')}>
             <button
+              type="button"
+              className={`view-btn ${viewMode === 'globe' ? 'active' : ''}`}
+              onClick={() => changeView('globe')}
+              title={t('discover.globeView')}
+              aria-label={t('discover.globeView')}
+              aria-pressed={viewMode === 'globe'}
+              data-testid="view-toggle-globe"
+            >
+              <Globe size={16} />
+            </button>
+            <button
+              type="button"
               className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
-              onClick={() => setViewMode('grid')}
+              onClick={() => changeView('grid')}
               title={t('discover.gridView')}
+              aria-label={t('discover.gridView')}
+              aria-pressed={viewMode === 'grid'}
+              data-testid="view-toggle-grid"
             >
               <LayoutGrid size={16} />
             </button>
             <button
+              type="button"
               className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
-              onClick={() => setViewMode('list')}
+              onClick={() => changeView('list')}
               title={t('discover.listView')}
+              aria-label={t('discover.listView')}
+              aria-pressed={viewMode === 'list'}
+              data-testid="view-toggle-list"
             >
               <List size={16} />
             </button>
           </div>
         </div>
 
-        {filteredTrips.length === 0 ? (
+        {viewMode === 'globe' ? (
+          <GlobeDiscover />
+        ) : filteredTrips.length === 0 ? (
           <StateTemplate variant="empty" title={t('discover.noTrips')} description={t('discover.noTripsHint')} className="my-8" />
         ) : (
           <>

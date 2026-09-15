@@ -224,6 +224,12 @@ export const trips = pgTable(
     locationCountry: varchar('location_country', { length: 2 }).notNull(),
     locationRegion: varchar('location_region', { length: 100 }),
     locationCity: varchar('location_city', { length: 100 }),
+    // Geocoordinates for the globe discovery view (migration 034).
+    // location_geocode_source: 'country_centroid' | 'nominatim' | 'manual'
+    locationLat: decimal('location_lat', { precision: 9, scale: 6 }),
+    locationLng: decimal('location_lng', { precision: 9, scale: 6 }),
+    locationGeocodedAt: timestamp('location_geocoded_at', { withTimezone: true }),
+    locationGeocodeSource: varchar('location_geocode_source', { length: 20 }),
 
     // Participants
     maxParticipants: integer('max_participants').notNull(),
@@ -370,6 +376,9 @@ export const tripItineraryDays = pgTable(
     elevationGainM: integer('elevation_gain_m'),
     estimatedHours: decimal('estimated_hours', { precision: 4, scale: 1 }),
     routeGeojson: jsonb('route_geojson'),
+    // 035: the day's station — the globe route is drawn from these (WGS84, paired NULL/NOT NULL)
+    latitude: decimal('latitude', { precision: 9, scale: 6 }),
+    longitude: decimal('longitude', { precision: 9, scale: 6 }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },

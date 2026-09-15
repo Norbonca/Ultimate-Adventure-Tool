@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { getServerT } from "@/lib/i18n/server";
 import { computeDefaultRequireApproval, getAutoApprovalThreshold } from "@/lib/system-settings";
 import { draftTripSchema, publishTripSchema } from "@/lib/trip-validation";
+import { countryCentroid, geocodeLocation } from "@/lib/geocoding";
 import { z } from "zod";
 import type { WizardFormData } from "./types";
 
@@ -26,6 +27,127 @@ function generateSlug(title: string): string {
   // Add random suffix for uniqueness
   const suffix = Math.random().toString(36).substring(2, 8);
   return `${base}-${suffix}`;
+}
+
+// ============================================
+// Helper: helyszín → koordináta (Terepgömb)
+// ============================================
+type TripCoordinates = {
+  location_lat: number | null;
+  location_lng: number | null;
+  location_geocoded_at: string | null;
+  location_geocode_source: string | null;
+};
+
+/**
+ * Resolves the trip's coordinates for the globe view on every save — the
+ * wizard draft and the edit form both go through `saveDraft`.
+ *
+ * Geocoding is a best-effort side job of saving: a provider outage must never
+ * block a draft. Returns `null` for "leave the stored coordinates alone",
+ * otherwise the columns to write:
+ *  - unchanged location with a resolved (`nominatim`/`manual`) point → null, no network call;
+ *  - resolved within the budget → the provider result;
+ *  - not resolved, location unchanged → null (keep the placeholder; the batch script refines it);
+ *  - not resolved, location new or changed → the country centroid, or cleared
+ *    coordinates when the country has none — never the old place's point.
+ */
+async function resolveTripCoordinates(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  location: { country: string; region: string | null; city: string | null },
+  existingTripId?: string
+): Promise<TripCoordinates | null> {
+  if (!location.country) return null;
+
+  let unchanged = false;
+  if (existingTripId) {
+    const { data: current } = await supabase
+      .from("trips")
+      .select(
+        "location_country, location_region, location_city, location_lat, location_geocode_source"
+      )
+      .eq("id", existingTripId)
+      .maybeSingle();
+
+    unchanged =
+      !!current &&
+      current.location_country === location.country &&
+      (current.location_region ?? null) === location.region &&
+      (current.location_city ?? null) === location.city &&
+      current.location_lat !== null;
+
+    const resolved =
+      current?.location_geocode_source === "nominatim" ||
+      current?.location_geocode_source === "manual";
+    if (unchanged && resolved) return null;
+  }
+
+  // Saving a draft must not wait on a third-party service. Nominatim's own
+  // rate limit means a full narrowing search can take several seconds; past
+  // this budget the lookup keeps running into the cache for the next save.
+  const GEOCODE_BUDGET_MS = 3000;
+  const result = await Promise.race([
+    geocodeLocation({
+      country: location.country,
+      region: location.region,
+      city: location.city,
+    }),
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), GEOCODE_BUDGET_MS)),
+  ]);
+
+  const now = new Date().toISOString();
+  if (result) {
+    return {
+      location_lat: result.lat,
+      location_lng: result.lng,
+      location_geocoded_at: now,
+      location_geocode_source: result.source,
+    };
+  }
+  if (unchanged) return null;
+
+  const centroid = countryCentroid(location.country);
+  return centroid
+    ? {
+        location_lat: centroid.lat,
+        location_lng: centroid.lng,
+        location_geocoded_at: now,
+        location_geocode_source: centroid.source,
+      }
+    : {
+        location_lat: null,
+        location_lng: null,
+        location_geocoded_at: null,
+        location_geocode_source: null,
+      };
+}
+
+/**
+ * Read-only geocode used by the wizard's step 2 to show what the globe will
+ * get. Returns null when the place cannot be resolved — the caller then tells
+ * the organizer their trip will sit on the country centroid.
+ */
+export async function previewGeocode(location: {
+  country: string;
+  region?: string | null;
+  city?: string | null;
+}): Promise<{ lat: number; lng: number; displayName: string } | null> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null; // organizers only — do not proxy Nominatim for anonymous callers
+
+  const result = await geocodeLocation({
+    country: location.country,
+    region: location.region ?? null,
+    city: location.city ?? null,
+  });
+  // Only a resolved place counts; a country-level match is reported as "missing"
+  // so the organizer is told the trip will sit on the country centroid.
+  return result && result.source === "nominatim"
+    ? { lat: result.lat, lng: result.lng, displayName: result.displayName }
+    : null;
 }
 
 // ============================================
@@ -111,6 +233,17 @@ export async function saveDraft(
   const requireApproval =
     formData.require_approval ?? computeDefaultRequireApproval(maxParticipants, threshold);
 
+  // Coordinates for the globe view. Never fatal: null means "keep what's there".
+  const coordinates = await resolveTripCoordinates(
+    supabase,
+    {
+      country: formData.location_country || "HU",
+      region: formData.location_region || null,
+      city: formData.location_city || null,
+    },
+    existingTripId
+  );
+
   const tripPayload = {
     organizer_id: profile.id,
     category_id: formData.category_id || null,
@@ -142,6 +275,7 @@ export async function saveDraft(
     tags: formData.tags || [],
     show_on_landing: formData.show_on_landing ?? true,
     status: "draft" as const,
+    ...(coordinates ?? {}),
   };
 
   if (existingTripId) {

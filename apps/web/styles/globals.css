@@ -147,6 +147,19 @@
     --dark-text-muted: #94A3B8;
     --dark-primary: #2DD4BF;
     --dark-danger: #FCA5A1;
+    --dark-primary-hover: #5EEAD4;
+    --color-warning-text: #B45309;
+
+    /* Terepgömb — éjszakai gömb (Claude Design handoff 2026-09-14; Pencil-visszavezetés nyitott) */
+    --globe-space-top: #12203A;
+    --globe-space-bottom: #060B16;
+    --globe-ink: #0B1220;
+    --globe-stop-ink: #0B1324;
+    --globe-sphere-1: #1B2E4A;
+    --globe-sphere-2: #0E1A30;
+    --globe-sphere-3: #070C18;
+    --globe-land-1: #2A3B55;
+    --globe-land-2: #16223A;
   }
 
   html {
@@ -170,25 +183,25 @@
 @layer components {
   /* ── Buttons ── */
   .btn-trevu {
-    @apply inline-flex items-center justify-center gap-2.5
-           font-semibold rounded-xl transition-all duration-200
+    @apply inline-flex items-center justify-center gap-2 text-[15px] min-h-[48px]
+           font-semibold rounded-trevu transition-all duration-200
            focus:outline-none focus:ring-2 focus:ring-offset-2;
   }
 
   .btn-trevu-primary {
-    @apply btn-trevu px-8 py-3
-           bg-trevu-600 text-white
+    @apply btn-trevu px-7 py-3.5
+           bg-trevu-600 text-white shadow-trevu
            hover:bg-trevu-700 active:scale-[0.97];
   }
 
   .btn-trevu-secondary {
-    @apply btn-trevu px-8 py-3
+    @apply btn-trevu px-7 py-3.5
            bg-transparent text-navy-900 border-2 border-navy-200
            hover:border-navy-400;
   }
 
   .btn-trevu-outline {
-    @apply btn-trevu px-5 py-2.5
+    @apply btn-trevu px-7 py-3.5
            bg-transparent text-trevu-600 border-[1.5px] border-trevu-600
            hover:bg-trevu-50;
   }
@@ -216,8 +229,8 @@
 
   /* ── Inputs ── */
   .input-trevu {
-    @apply w-full rounded-trevu border-[1.5px] border-navy-300
-           px-4 py-3 text-base text-navy-900
+    @apply w-full min-h-[48px] rounded-trevu border-[1.5px] border-navy-300
+           px-4 py-3 text-[15px] text-navy-900
            bg-white outline-none transition-all duration-200
            placeholder:text-navy-500
            focus:border-trevu-600 focus:ring-[3px] focus:ring-trevu-600/10;
