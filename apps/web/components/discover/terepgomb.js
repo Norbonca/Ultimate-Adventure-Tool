@@ -80,8 +80,8 @@ export async function mountGlobe(root, opts) {
   // kezdőnézet: a teljes bolygó (Norbert, 2026-09-15 — a közép-európai ráközelítés induláskor nem érthető);
   // a lépték a `layout()` után áll be, mert a teljes gömb mérete a konténerből jön (floorR / baseR)
   const WORLD_ROT = [-10, -30, 0];
-  let startScalePending = true;
-  const state = { t: 3, rot: WORLD_ROT.slice(), scale: 1, active: Object.fromEntries(CATS.map((c) => [c.id, true])), selected: null, gyro: false, dx: 0, dy: 0, dragging: false };
+  // fit: amíg igaz, a lépték minden elrendezésnél a teljes gömbhöz igazodik (méretváltáskor is); nagyítás, túra-ráközelítés kikapcsolja
+  const state = { t: 3, rot: WORLD_ROT.slice(), scale: 1, fit: true, active: Object.fromEntries(CATS.map((c) => [c.id, true])), selected: null, gyro: false, dx: 0, dy: 0, dragging: false };
   const app = root, svg = d3.select($("globe")), pinsEl = $("pins"), cardEl = $("card");
   let width = 0, height = 0, R = 0, baseR = 1, floorR = 1, bottomReserve = 170;
   let chipRects = [];
@@ -178,8 +178,10 @@ export async function mountGlobe(root, opts) {
     svg.attr("width", width).attr("height", height);
     // analitikus illesztés: a fő túra-bbox (lon 13–21 × lat 46–49.5 ≈ 8° × 4°) kitölti a biztonságos sávot; px/fok a középen ≈ R·π/180
     const rad = Math.PI / 180;
-    baseR = Math.min((width - 80) / (8 * rad * Math.cos(48 * rad)), (height - 340) / (4.5 * rad));
-    floorR = Math.min(width - 40, height - 340) / 2;
+    // alsó korlát: kis vagy még méretezetlen konténerben a sugár nem lehet negatív (negatív SVG r konzolhibát ad)
+    baseR = Math.max(1, Math.min((width - 80) / (8 * rad * Math.cos(48 * rad)), (height - 340) / (4.5 * rad)));
+    floorR = Math.max(1, Math.min(width - 40, height - 340) / 2);
+    if (state.fit) state.scale = floorR / baseR;
     R = Math.max(baseR * state.scale, floorR);
     projection.scale(R).translate([width / 2, height * 0.55]).rotate([state.rot[0] + state.dx, state.rot[1] + state.dy, 0]);
   }
@@ -223,7 +225,7 @@ export async function mountGlobe(root, opts) {
       const availY = narrow ? Math.max(90, sheetTop - freeTop) : Math.max(200, height - 320);
       const spanDeg = Math.max(spanX / Math.max(.2, availX / availY), spanY, 0.05);
       const want = availY * (narrow ? .70 : .62);
-      state.scale = Math.max(.12, Math.min(80, (want / (spanDeg * Math.PI / 180)) / baseR));
+      state.fit = false; state.scale = Math.max(.12, Math.min(80, (want / (spanDeg * Math.PI / 180)) / baseR));
       const Rn = Math.max(baseR * state.scale, floorR);
       const clon2 = (Math.min(...lons) + Math.max(...lons)) / 2;
       if (narrow) {
@@ -372,7 +374,7 @@ export async function mountGlobe(root, opts) {
       const label = T.tripsCount.replace("{count}", String(cl.n));
       el.innerHTML = `<div class="stem" style="height:${cl.stem}px;left:${cl.side === 1 ? "8%" : cl.side === -1 ? "92%" : "50%"};background:linear-gradient(180deg,var(--dark-primary),transparent)"></div>
         <div class="lbl tg-cluster" style="margin-bottom:${cl.stem}px;border-color:var(--dark-primary)"><span class="tg-cluster-dots">${cl.colors.slice(0, 4).map((c) => `<span class="dot" style="background:${c}"></span>`).join("")}</span><b>${esc(label)}</b><small class="mono tg-cluster-names">${esc(cl.names)}</small><small class="mono tg-cluster-zoom">⤢</small></div>`;
-      pinBtn(el.querySelector(".lbl"), `${label} — ${cl.names}`, () => { state.rot = [-cl.ll[0], -cl.ll[1], 0]; state.scale = Math.max(state.scale * 2, 2); render(); });
+      pinBtn(el.querySelector(".lbl"), `${label} — ${cl.names}`, () => { state.rot = [-cl.ll[0], -cl.ll[1], 0]; state.fit = false; state.scale = Math.max(state.scale * 2, 2); render(); });
       pinsEl.appendChild(el);
     });
     const host = app.getBoundingClientRect();
@@ -451,12 +453,12 @@ export async function mountGlobe(root, opts) {
     if (ptrs.size === 1) pan = { x: e.clientX, y: e.clientY, rot: [...state.rot], moved: false };
     if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), s: state.scale }; } });
   globeEl.addEventListener("pointermove", (e) => { if (!ptrs.has(e.pointerId)) return; ptrs.set(e.pointerId, [e.clientX, e.clientY]);
-    if (ptrs.size === 2 && pinch) { const [a, b] = [...ptrs.values()]; state.scale = Math.max(.12, Math.min(80, pinch.s * Math.hypot(a[0] - b[0], a[1] - b[1]) / pinch.d)); render(); }
+    if (ptrs.size === 2 && pinch) { const [a, b] = [...ptrs.values()]; state.fit = false; state.scale = Math.max(.12, Math.min(80, pinch.s * Math.hypot(a[0] - b[0], a[1] - b[1]) / pinch.d)); render(); }
     else if (ptrs.size === 1 && pan) { const k = 90 / R; const dx = e.clientX - pan.x, dy = e.clientY - pan.y; if (Math.hypot(dx, dy) > 4) pan.moved = true;
       state.rot = [pan.rot[0] + dx * k, Math.max(-85, Math.min(85, pan.rot[1] - dy * k)), 0]; render(); } });
   const up = (e) => { ptrs.delete(e.pointerId); if (ptrs.size < 2) pinch = null; if (ptrs.size === 0) { if (pan && !pan.moved && state.selected) { state.selected = null; render(); } pan = null; state.dragging = false; globeEl.classList.remove("drag"); } };
   globeEl.addEventListener("pointerup", up); globeEl.addEventListener("pointercancel", up);
-  globeEl.addEventListener("wheel", (e) => { e.preventDefault(); state.scale = Math.max(.12, Math.min(80, state.scale * (e.deltaY < 0 ? 1.08 : .92))); render(); }, { passive: false });
+  globeEl.addEventListener("wheel", (e) => { e.preventDefault(); state.fit = false; state.scale = Math.max(.12, Math.min(80, state.scale * (e.deltaY < 0 ? 1.08 : .92))); render(); }, { passive: false });
   // gyro (telefonon a készülék döntése)
   const onOrient = (e) => { if (e.gamma == null) return; state.dx = Math.max(-8, Math.min(8, e.gamma / 4)); state.dy = Math.max(-6, Math.min(6, (e.beta - 45) / 8)); render(); };
   const gyroBtn = $("gyro");
@@ -465,11 +467,11 @@ export async function mountGlobe(root, opts) {
     try { if (typeof DeviceOrientationEvent !== "undefined" && DeviceOrientationEvent.requestPermission) { if (await DeviceOrientationEvent.requestPermission() !== "granted") return; } } catch (_) {}
     window.addEventListener("deviceorientation", onOrient); state.gyro = true; this.classList.add("on"); this.setAttribute("aria-pressed", "true");
   });
-  $("world").addEventListener("click", () => { state.rot = WORLD_ROT.slice(); state.selected = null; state.scale = floorR / baseR; render(); });
-  $("reset").addEventListener("click", () => { state.rot = WORLD_ROT.slice(); state.scale = floorR / baseR; state.selected = null; state.t = 3; render(); }); // vissza a kezdőnézetre
+  $("world").addEventListener("click", () => { state.rot = WORLD_ROT.slice(); state.selected = null; state.fit = true; render(); });
+  $("reset").addEventListener("click", () => { state.rot = WORLD_ROT.slice(); state.fit = true; state.selected = null; state.t = 3; render(); }); // vissza a kezdőnézetre
 
   let reliefTimer = null, painted = false;
-  function render() { if (app.clientWidth === 0 || app.clientHeight === 0) return; painted = true; layout(); if (startScalePending) { startScalePending = false; state.scale = floorR / baseR; layout(); } drawRelief(state.dragging || scrubbing); if (state.dragging) { clearTimeout(reliefTimer); reliefTimer = setTimeout(() => drawRelief(false), 120); } drawPins(); drawGeo(); renderTime(); }
+  function render() { if (app.clientWidth === 0 || app.clientHeight === 0) return; painted = true; layout(); drawRelief(state.dragging || scrubbing); if (state.dragging) { clearTimeout(reliefTimer); reliefTimer = setTimeout(() => drawRelief(false), 120); } drawPins(); drawGeo(); renderTime(); }
   const onVisibility = () => { if (!document.hidden) render(); };
   window.addEventListener("resize", render);
   const ro = new ResizeObserver(() => render()); ro.observe(app);
