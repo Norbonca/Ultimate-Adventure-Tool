@@ -143,6 +143,8 @@ méretváltásra és a lap előtérbe kerülésekor rajzol újra, kigörgetve
 (`IntersectionObserver`) és háttérben (`visibilitychange`) nem dolgozik.
 Automatikus forgás nincs; a gyro (eszköz-tájolás) csak kérésre kapcsol be.
 
+**Oldalháttér gömb nézetben** (Norbert, 2026-09-15): a Felfedezés oldal a gömb éjszakai hátterét veszi fel (`--globe-space-bottom`), a gömb a fejléc alatt szélétől szélig fut, lekerekítés és világos keret nélkül; a találatszám és a nézetváltó sötét változatot kap. Rács és lista nézetben az oldal világos marad.
+
 **Kezdőnézet: a teljes bolygó** (Norbert, 2026-09-15): a gömb a teljes földgolyóval indul (Európa–Afrika középpel), mert a közép-európai ráközelítés induláskor nem érthető. A „Teljes bolygó” és a „Nézet vissza” gomb is ide tér vissza; a „Nézet vissza” a kiválasztást és az idővonalat is alaphelyzetbe teszi.
 
 A felszín Web Mercator csempékből épül (`lib/globe-tiles.ts`,

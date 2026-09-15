@@ -265,7 +265,7 @@ export default function DiscoverClient({
   };
 
   return (
-    <div className="discover-page">
+    <div className={`discover-page${viewMode === 'globe' ? ' discover-page--globe' : ''}`}>
       <style>{`
         * {
           margin: 0;
@@ -730,14 +730,43 @@ export default function DiscoverClient({
           margin-bottom: 3rem;
         }
 
-        /* Phones: the globe runs edge to edge — the page gutter would cost it
-           a sixth of the width (S40 mobile fix). */
+        /* Globe view: the page takes the globe's night background and the globe
+           runs edge to edge — no light page around a dark box (Norbert,
+           2026-09-15). Grid and list keep the light page. Colours: tokens only. */
+        .discover-page--globe {
+          background: var(--globe-space-bottom);
+        }
+        .discover-page--globe .main-content {
+          max-width: none;
+          padding: 0;
+        }
+        .discover-page--globe .results-header {
+          max-width: 1280px;
+          margin: 0 auto;
+          padding: 0.75rem 2rem;
+        }
+        .discover-page--globe .results-count {
+          color: var(--dark-text);
+        }
+        .discover-page--globe .view-btn {
+          background: transparent;
+          border-color: var(--dark-border);
+          color: var(--dark-text-muted);
+        }
+        .discover-page--globe .view-btn.active {
+          background: var(--trevu-teal);
+          border-color: var(--trevu-teal);
+          color: var(--color-surface);
+        }
+        .discover-page--globe .globe-discover {
+          margin-bottom: 0;
+        }
+        .discover-page--globe .terepgomb {
+          border-radius: 0;
+        }
         @media (max-width: 640px) {
-          .globe-discover {
-            margin-inline: -2rem;
-          }
-          .globe-discover .terepgomb {
-            border-radius: 0;
+          .discover-page--globe .results-header {
+            padding: 0.75rem 1rem;
           }
         }
 
