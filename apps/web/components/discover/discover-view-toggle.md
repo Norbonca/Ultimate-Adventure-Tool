@@ -101,7 +101,7 @@ kérdez (országváltás, mező elhagyása), gépelés közben nem.
 A marker `geocodeSource` mezője hordozza, honnan van a koordináta:
 
 - `nominatim` — a helyszínmezőkből feloldott, valódi hely;
-- `country_centroid` — a 034 migráció backfillje, csak az ország közepe. Ezek a
+- `country_centroid` — csak az ország közepe: a 034 migráció backfillje, a mentés tartaléka (`countryCentroid`), vagy országszintű Nominatim-találat. Ezek a
   markerek szaggatott zászlót kapnak, a kártya pedig kiírja, hogy hozzávetőleges.
   Egy országközéppontra ült túráról nem állítjuk, hogy ott van.
 
@@ -124,7 +124,7 @@ fázisában áll át.
 
 6. A gömb pontosan a rács túráit mutatja (láthatósági szerződés, fent).
 
-Ezt a hat pontot a `tests/e2e/discover-view.spec.ts` teszteli (DISCOVER-VIEW-1…7).
+Ezt a hat garanciát a `tests/e2e/discover-view.spec.ts` hét tesztje fedi (DISCOVER-VIEW-1…7).
 
 **Mobil (≤ 720 px):** a gömb a telefonon a lap szélétől szélig fut; a fejsor gombjai
 és az évszak-chipek vízszintesen görgethetők, a tokensor a keretben görget, minden

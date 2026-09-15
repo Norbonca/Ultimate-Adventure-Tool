@@ -16,6 +16,7 @@ export interface GlobeMarkupStrings {
   reset: string;
   tokenHint: string;
   hints: string;
+  timeline: string;
 }
 
 export interface GlobeAttribution {
@@ -56,7 +57,7 @@ export function buildGlobeMarkup(s: GlobeMarkupStrings, attributions: GlobeAttri
       <span id="tg-nowsub" aria-live="polite"></span>
       <div id="tg-seasons"></div>
     </div>
-    <div id="tg-track" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="52"></div>
+    <div id="tg-track" role="slider" tabindex="0" aria-label="${esc(s.timeline)}" aria-valuemin="0" aria-valuemax="52" aria-valuenow="0"></div>
     <div class="tg-hints">${esc(s.hints)}</div>
     <div class="mono tg-attrib">${credits}</div>
   </div>`;

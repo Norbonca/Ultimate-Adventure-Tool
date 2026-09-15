@@ -1148,6 +1148,7 @@ export default function DiscoverClient({
                 <MapPin size={18} />
                 <input
                   type="text"
+                  aria-label={t('discover.whereTo')}
                   placeholder={t('discover.whereTo')}
                 />
               </div>
@@ -1155,12 +1156,13 @@ export default function DiscoverClient({
                 <Calendar size={18} />
                 <input
                   type="text"
+                  aria-label={t('discover.when')}
                   placeholder={t('discover.when')}
                 />
               </div>
               <div className="search-field">
                 <Compass size={18} />
-                <select>
+                <select aria-label={t('discover.activityType')}>
                   <option value="">{t('discover.activityType')}</option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
@@ -1169,7 +1171,7 @@ export default function DiscoverClient({
                   ))}
                 </select>
               </div>
-              <button className="search-btn">
+              <button type="button" className="search-btn" aria-label={t('common.search')}>
                 <Search size={20} />
               </button>
           </div>
@@ -1201,13 +1203,13 @@ export default function DiscoverClient({
       {/* FILTER BAR */}
       <div id="filters" className="filter-bar">
         <div className="filter-group">
-          <select className="filter-select" value={selectedDifficulty} onChange={(e) => setSelectedDifficulty(e.target.value)}>
+          <select className="filter-select" aria-label={t('discover.difficulty')} value={selectedDifficulty} onChange={(e) => setSelectedDifficulty(e.target.value)}>
             <option value="all">{t('discover.difficulty')}</option>
             {difficultyLevels.map((level) => (
               <option key={level.value} value={String(level.value)}>{locale === 'en' ? level.labelEn : level.label}</option>
             ))}
           </select>
-          <select className="filter-select" value={selectedPrice} onChange={(e) => setSelectedPrice(e.target.value)}>
+          <select className="filter-select" aria-label={t('discover.priceRange')} value={selectedPrice} onChange={(e) => setSelectedPrice(e.target.value)}>
             <option value="all">{t('discover.priceRange')}</option>
             <option value="free">{t('discover.free')}</option>
             <option value="under50">{t('discover.underPrice')}</option>
@@ -1215,7 +1217,7 @@ export default function DiscoverClient({
             <option value="200-500">€200 – €500</option>
             <option value="500+">€500+</option>
           </select>
-          <select className="filter-select" value={selectedDuration} onChange={(e) => setSelectedDuration(e.target.value)}>
+          <select className="filter-select" aria-label={t('discover.duration')} value={selectedDuration} onChange={(e) => setSelectedDuration(e.target.value)}>
             <option value="all">{t('discover.duration')}</option>
             <option value="1">{t('discover.oneDay')}</option>
             <option value="2-3">{t('discover.twoDays')}</option>
@@ -1223,14 +1225,14 @@ export default function DiscoverClient({
             <option value="1-2w">{t('discover.oneWeek')}</option>
             <option value="2w+">{t('discover.twoWeeks')}</option>
           </select>
-          <select className="filter-select" value={selectedSpots} onChange={(e) => setSelectedSpots(e.target.value)}>
+          <select className="filter-select" aria-label={t('discover.availableSpots')} value={selectedSpots} onChange={(e) => setSelectedSpots(e.target.value)}>
             <option value="all">{t('discover.availableSpots')}</option>
             <option value="1-3">{t('discover.spots13')}</option>
             <option value="4-8">{t('discover.spots48')}</option>
             <option value="9+">{t('discover.spots9')}</option>
           </select>
         </div>
-        <select className="filter-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)} style={{marginLeft:'auto'}}>
+        <select className="filter-select" aria-label={t('discover.sortLabel')} value={sortBy} onChange={(e) => setSortBy(e.target.value)} style={{marginLeft:'auto'}}>
           <option value="recent">{t('discover.sortRecent')}</option>
           <option value="price-low">{t('discover.priceLowHigh')}</option>
           <option value="price-high">{t('discover.priceHighLow')}</option>

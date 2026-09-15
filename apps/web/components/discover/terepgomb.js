@@ -436,6 +436,7 @@ export async function mountGlobe(root, opts) {
   function renderTime() {
     $("now").textContent = weekLabel(state.t);
     handle.style.left = (state.t / 52 * 100) + "%";
+    track.setAttribute("aria-valuenow", String(Math.round(state.t))); track.setAttribute("aria-valuetext", weekLabel(state.t));
     const a = Math.max(0, state.t - W), b = Math.min(52, state.t + W); win.style.left = (a / 52 * 100) + "%"; win.style.width = ((b - a) / 52 * 100) + "%";
     dots.forEach(({ d, tr }) => d.style.opacity = state.active[tr.cat] ? (!tr.past && Math.abs(tw(tr) - state.t) <= W ? 1 : .45) : .12);
     seasonsEl.querySelectorAll(".chip").forEach((el) => { const on = Math.abs(state.t - +el.dataset.t) < 3; el.classList.toggle("on", on); el.setAttribute("aria-pressed", on ? "true" : "false"); });

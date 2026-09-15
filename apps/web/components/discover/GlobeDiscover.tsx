@@ -167,6 +167,7 @@ export default function GlobeDiscover() {
           reset: t('discover.globe.resetView'),
           tokenHint: t('discover.globe.tokenHint'),
           hints: t('discover.globe.hints'),
+          timeline: t('discover.globe.timelineLabel'),
         },
         [tiles.attribution, GLOBE_ATLAS_ATTRIBUTION]
       ),

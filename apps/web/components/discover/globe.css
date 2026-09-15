@@ -51,6 +51,7 @@
 .terepgomb .tg-cluster-names { color: var(--dark-text-muted); }
 .terepgomb .tg-cluster-zoom { color: var(--dark-primary); }
 .terepgomb .tg-dotpin { position: absolute; transform: translate(-50%,-50%); width: 10px; height: 10px; border-radius: 999px; pointer-events: auto; cursor: pointer; }
+.terepgomb .tg-dotpin::after { content: ""; position: absolute; inset: -9px; border-radius: 999px; } /* 28×28 px érintési felület a 10 px-es pont körül (UX-009) */
 .terepgomb .tg-dotpin:focus-visible { outline: 2px solid var(--dark-primary); outline-offset: 2px; }
 
 /* adatlap-kártya */
@@ -110,8 +111,10 @@
 .terepgomb .city { font-size: 10px; fill: rgba(203,213,225,.55); pointer-events: none; }
 
 /* a gömbbel azonos túrák billentyűzetről és felolvasóval — vizuálisan rejtve, de elérhető */
-.globe-fallback-list { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.globe-fallback-list a:focus { position: static; width: auto; height: auto; overflow: visible; clip: auto; }
+.globe-fallback-list { position: absolute; top: 12px; left: 12px; margin: 0; padding: 0; list-style: none; z-index: 120; }
+.globe-fallback-list a { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* fókuszban a link látható (a szülő már nem vágja le — UX-007) */
+.globe-fallback-list a:focus { width: auto; height: auto; overflow: visible; clip: auto; padding: 8px 12px; border-radius: 8px; background: var(--color-surface); color: var(--deep-navy); outline: 2px solid var(--dark-primary); }
 .globe-status { padding: 24px; text-align: center; color: var(--dark-text-muted); font-size: 14px; }
 
 /* szűk nézet (≤ 720 px) — S40 mobil-finomítás: a fejsor gombjai férjenek ki, a tokensor görgessen a keret
