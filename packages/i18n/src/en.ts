@@ -731,6 +731,7 @@ const en: TranslationKeys = {
       newTripHeader: "Create a new trip",
       editTripHeader: "Edit trip",
       saveDraftFirst: "Save draft first",
+      missingRequired: "Missing required fields: {fields}",
     },
 
     fields: {
@@ -1342,6 +1343,18 @@ const en: TranslationKeys = {
       banSuccess: "User has been banned successfully.",
       unbanSuccess: "Ban has been lifted.",
       showingOf: "{shown} of {total} users",
+      detailPersonalInfo: "Personal information",
+      detailFullName: "Full name",
+      detailEmail: "Email",
+      detailPhone: "Phone",
+      detailRegistered: "Registered",
+      detailLastLogin: "Last login",
+      detailNeverLoggedIn: "Never logged in",
+      detailLocation: "Location",
+      detailTripHistory: "Trip history",
+      detailTripCount: "{count} trips",
+      detailNoTrips: "No trips yet.",
+      detailNotFound: "User not found.",
     },
     // Trip Operations (M02)
     trips: {

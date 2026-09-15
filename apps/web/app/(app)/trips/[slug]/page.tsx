@@ -11,6 +11,7 @@ import { ApplyButton } from "@/components/ApplyButton";
 import { Icon } from "@/components/Icon";
 import { formatParameterValue, type ParameterDisplayOption } from "@/lib/i18n/localized";
 import { formatLocalDate } from "@/lib/timezone";
+import { fetchTripBySlugForAdmin } from "@/lib/admin-auth";
 
 interface TripDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -18,7 +19,7 @@ interface TripDetailPageProps {
 
 export async function generateMetadata({ params }: TripDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const trip = await fetchTripBySlug(slug);
+  const trip = (await fetchTripBySlug(slug)) ?? (await fetchTripBySlugForAdmin(slug));
   if (!trip) return {};
 
   const description =
@@ -48,7 +49,7 @@ export async function generateMetadata({ params }: TripDetailPageProps): Promise
 
 export default async function TripDetailPage({ params }: TripDetailPageProps) {
   const { slug } = await params;
-  const trip = await fetchTripBySlug(slug);
+  const trip = (await fetchTripBySlug(slug)) ?? (await fetchTripBySlugForAdmin(slug));
 
   if (!trip) {
     notFound();
