@@ -4,7 +4,7 @@
  * GlobeDiscover — React shell around the Terepgömb renderer.
  *
  * Owns data loading, i18n, the tile-provider choice and accessibility; the
- * globe itself (d3-geo + Web Mercator tiles) lives in `terepgomb.js` and is
+ * globe itself (MapLibre GL JS globe projection + a DOM/SVG overlay) lives in `terepgomb.js` and is
  * mounted into a container whose inner markup comes from `globe-markup.ts`.
  * Markers come from `/api/v1/trips/globe`, not from the page's own trip list,
  * because the globe needs coordinates and routes the card query does not fetch.
@@ -20,6 +20,7 @@ import { StateTemplate } from '@/components/ui';
 import { GLOBE_ATLAS_ATTRIBUTION, GLOBE_ATLAS_URL, getGlobeTileProvider } from '@/lib/globe-tiles';
 import { buildGlobeMarkup } from './globe-markup';
 import type { GlobeCategory, GlobeMarker, GlobePayload, GlobeRoutes, GlobeStrings, GlobeTrip, TerepgombInstance } from './terepgomb';
+import 'maplibre-gl/dist/maplibre-gl.css';
 import './globe.css';
 
 type LoadState = 'loading' | 'ready' | 'error';

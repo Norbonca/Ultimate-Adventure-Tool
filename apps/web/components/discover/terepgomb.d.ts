@@ -69,7 +69,7 @@ export interface GlobeTrip {
   price: string;
   spots: number;
   diff: number;
-  /** [lon, lat] — d3-geo order. */
+  /** [lon, lat] — GeoJSON / MapLibre order. */
   ll: [number, number];
   approximate: boolean;
   /** Ended before week 0: pinned to the start of the timeline, the card says so. */
