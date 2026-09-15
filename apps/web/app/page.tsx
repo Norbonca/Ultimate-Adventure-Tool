@@ -2,9 +2,8 @@ import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORY_DISPLAY, DIFFICULTY_LEVELS } from "@/lib/categories";
 import {
-  DEFAULT_DISCOVER_VIEW,
   DISCOVER_VIEW_COOKIE,
-  isDiscoverView,
+  parseDiscoverView,
   type DiscoverView,
 } from "@/lib/discover-view";
 import DiscoverClient from "./discover-client";
@@ -88,8 +87,7 @@ async function fetchCurrentUser() {
  */
 async function readDiscoverView(): Promise<DiscoverView> {
   const store = await cookies();
-  const value = store.get(DISCOVER_VIEW_COOKIE)?.value;
-  return isDiscoverView(value) ? value : DEFAULT_DISCOVER_VIEW;
+  return parseDiscoverView(store.get(DISCOVER_VIEW_COOKIE)?.value);
 }
 
 export default async function DiscoverPage() {

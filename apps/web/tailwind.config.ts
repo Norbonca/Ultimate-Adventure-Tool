@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import plugin from "tailwindcss/plugin";
 
 const config: Config = {
   content: [
@@ -54,6 +55,41 @@ const config: Config = {
           motorsport: "#B91C1C",
         },
 
+        /* ── Felület-mód tokenek (Brand Guide v2, 1b) ──
+           CSS-változóra képeznek le, ezért a [data-surface="night"] scope
+           automatikusan átszínezi őket. Night-felületre szánt komponens
+           ezeket használja, nem a fenti nyers hexes palettát. */
+        canvas: "var(--color-bg)",
+        surface: "var(--color-surface)",
+        ink: {
+          DEFAULT: "var(--color-text)",
+          muted: "var(--color-text-muted)",
+          secondary: "var(--color-text-secondary)",
+          body: "var(--color-text-body)",
+        },
+        line: {
+          DEFAULT: "var(--color-border)",
+          strong: "var(--color-border-strong)",
+        },
+        accent: {
+          DEFAULT: "var(--color-primary)",
+          hover: "var(--color-primary-hover)",
+          on: "var(--color-on-primary)",
+        },
+        ghost: "var(--color-ghost)",
+        glass: "var(--color-glass)",
+        scrim: "var(--color-scrim)",
+        "cat-token": {
+          hiking: "var(--cat-hiking)",
+          climbing: "var(--cat-climbing)",
+          water: "var(--cat-water)",
+          cycling: "var(--cat-cycling)",
+          running: "var(--cat-running)",
+          winter: "var(--cat-winter)",
+          expedition: "var(--cat-expedition)",
+          motorsport: "var(--cat-motorsport)",
+        },
+
         /* ── Semantic Aliases ── */
         brand: {
           50:  "#F0FDFA",
@@ -71,6 +107,16 @@ const config: Config = {
       fontFamily: {
         sans: ['"DM Sans"', "system-ui", "sans-serif"],
         display: ['"DM Sans"', "system-ui", "sans-serif"],
+      },
+      fontSize: {
+        /* Hero Display — csak Night hero (Brand Guide v2 §4) */
+        "hero-display": ["var(--font-hero-display)", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "800" }],
+        "hero-display-mobile": ["var(--font-hero-display-mobile)", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "800" }],
+      },
+      backgroundImage: {
+        /* Olvashatósági gradiens a hero-fotón — kontrasztfeltétel (v2 §5) */
+        "hero-scrim": "var(--hero-scrim)",
+        "hero-scrim-mobile": "var(--hero-scrim-mobile)",
       },
       borderRadius: {
         "trevu":  "10px",
@@ -103,7 +149,17 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    /* `night:` variáns — a Night-régión belül, de nem egy beágyazott Day-régióban
+       (Brand Guide v2 §2, §8). Csak olyan közös komponensben kell (AppHeader), amely
+       Day és Night oldalon is fut; új Night-komponens a szemantikus színeket használja. */
+    plugin(({ addVariant }) => {
+      addVariant("night", [
+        '[data-surface="night"] &:not([data-surface="day"] *)',
+        '&[data-surface="night"]',
+      ]);
+    }),
+  ],
 };
 
 export default config;
