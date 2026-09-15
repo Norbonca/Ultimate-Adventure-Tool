@@ -112,10 +112,16 @@ export async function getViewerCalendar(): Promise<ViewerCalendar> {
   const code = row?.country_code?.trim().toUpperCase() ?? "";
   if (!COUNTRY_RE.test(code)) return resolveViewerCalendar({ profile: null, activeCountryCodes: [] });
 
-  const { data: country } = await supabase.from("ref_countries").select("code").eq("code", code).eq("is_active", true).maybeSingle();
+  const [{ data: country }, { data: zones }] = await Promise.all([
+    supabase.from("ref_countries").select("code, primary_timezone").eq("code", code).eq("is_active", true).maybeSingle(),
+    supabase.from("ref_timezones").select("tz_id").eq("country_code", code).eq("is_active", true),
+  ]);
+  const countryRow = (country ?? null) as { code: string; primary_timezone?: string | null } | null;
   return resolveViewerCalendar({
     profile: { countryCode: code, timezone: row?.timezone ?? null },
-    activeCountryCodes: country ? [country.code as string] : [],
+    activeCountryCodes: countryRow ? [countryRow.code] : [],
+    countryTimezones: ((zones ?? []) as Array<{ tz_id: string }>).map((z) => z.tz_id),
+    countryPrimaryTimezone: countryRow?.primary_timezone ?? null,
   });
 }
 

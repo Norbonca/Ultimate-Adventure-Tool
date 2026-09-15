@@ -91,18 +91,42 @@ describe("M23 lefedettség (BR-M23-008)", () => {
 describe("M23 naptár-ország és túra-időzóna", () => {
   const active = ["HU", "AT", "SK", "DE"];
 
-  it("naptár-ország = a profil aktív országa, a profil időzónájával (BR-M23-006)", () => {
-    expect(resolveViewerCalendar({ profile: { countryCode: "SK", timezone: "Europe/Bratislava" }, activeCountryCodes: active })).toEqual({
-      country: "SK",
-      source: "profile",
-      timezone: "Europe/Bratislava",
-    });
-    expect(resolveViewerCalendar({ profile: { countryCode: "at", timezone: null }, activeCountryCodes: active })).toEqual({
+  it("naptár-ország = a profil aktív országa, az országhoz tartozó profilzónával (BR-M23-006)", () => {
+    expect(
+      resolveViewerCalendar({
+        profile: { countryCode: "SK", timezone: "Europe/Bratislava" },
+        activeCountryCodes: active,
+        countryTimezones: ["Europe/Bratislava"],
+        countryPrimaryTimezone: "Europe/Bratislava",
+      }),
+    ).toEqual({ country: "SK", source: "profile", timezone: "Europe/Bratislava" });
+    expect(
+      resolveViewerCalendar({
+        profile: { countryCode: "US", timezone: "America/Phoenix" },
+        activeCountryCodes: ["US"],
+        countryTimezones: ["America/New_York", "America/Phoenix"],
+        countryPrimaryTimezone: "America/New_York",
+      }).timezone,
+    ).toBe("America/Phoenix");
+  });
+
+  it("hiányzó, érvénytelen vagy nem az országhoz tartozó profilzóna → az ország fő zónája (040)", () => {
+    const at = { activeCountryCodes: active, countryTimezones: ["Europe/Vienna"], countryPrimaryTimezone: "Europe/Vienna" };
+    expect(resolveViewerCalendar({ profile: { countryCode: "at", timezone: null }, ...at })).toEqual({
       country: "AT",
       source: "profile",
-      timezone: "UTC",
+      timezone: "Europe/Vienna",
     });
+    expect(resolveViewerCalendar({ profile: { countryCode: "AT", timezone: "America/New_York" }, ...at }).timezone).toBe("Europe/Vienna");
+    expect(resolveViewerCalendar({ profile: { countryCode: "AT", timezone: "Mars/Olympus" }, ...at }).timezone).toBe("Europe/Vienna");
+  });
+
+  it("fő zóna nélkül (védekező tartalék) UTC", () => {
     expect(resolveViewerCalendar({ profile: { countryCode: "DE", timezone: "Mars/Olympus" }, activeCountryCodes: active }).timezone).toBe("UTC");
+    expect(
+      resolveViewerCalendar({ profile: { countryCode: "DE", timezone: null }, activeCountryCodes: active, countryPrimaryTimezone: "Mars/Olympus" })
+        .timezone,
+    ).toBe("UTC");
   });
 
   it("nincs rögzített alapország: kijelentkezve vagy ország nélkül null + UTC", () => {
