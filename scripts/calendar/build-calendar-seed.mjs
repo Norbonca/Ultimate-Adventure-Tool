@@ -128,7 +128,7 @@ const HU_SWAPS_2026 = [
 ];
 for (const [type, date, hu, en, note] of HU_SWAPS_2026) {
   const key = `hu_${type}_${date.replace(/-/g, "_")}`;
-  addPeriod({ country: "HU", key, hu, en, type, ruleKind: "explicit", params: {}, dayOff: type === "bridge_day", source: NGM_2026 });
+  addPeriod({ country: "HU", key, hu, en, type, ruleKind: "explicit", params: { one_off: true }, dayOff: type === "bridge_day", source: NGM_2026 });
   occurrences.push({ country: "HU", key, year: 2026, earliest: date, latest: date, status: "verified", note: `${NGM_2026}; ${note}; ${VERIFY_NOTE}` });
 }
 
