@@ -63,7 +63,7 @@ export default function ProfileSettingsPage() {
   const [form, setForm] = useState<Profile>({
     first_name: "", last_name: "", phone: "", bio: "",
     location_city: "", country_code: "", preferred_language: "hu",
-    preferred_currency: "HUF", timezone: "Europe/Budapest",
+    preferred_currency: "HUF", timezone: "",
     avatar_url: "", avatar_source: "system",
   });
   const [emergency, setEmergency] = useState<EmergencyContact>({ name: "", phone: "", relationship: "" });
@@ -97,7 +97,7 @@ export default function ProfileSettingsPage() {
           country_code: p.country_code || "",
           preferred_language: p.preferred_language || "hu",
           preferred_currency: p.preferred_currency || "HUF",
-          timezone: p.timezone || "Europe/Budapest",
+          timezone: p.timezone || "",
           avatar_url: p.avatar_url || "",
           avatar_source: p.avatar_source || "system",
         });
@@ -144,7 +144,7 @@ export default function ProfileSettingsPage() {
       country_code: form.country_code || null,
       preferred_language: form.preferred_language,
       preferred_currency: form.preferred_currency,
-      timezone: form.timezone,
+      timezone: form.timezone || null,
       avatar_url: form.avatar_url || null,
       avatar_source: form.avatar_source,
     }, { onConflict: "id" });
@@ -292,6 +292,9 @@ export default function ProfileSettingsPage() {
                 </option>
               ))}
             </select>
+            <p className="text-xs text-navy-400 mt-1">
+              {t('profile.settings.countryCalendarHint')}
+            </p>
           </div>
         </div>
 
@@ -337,10 +340,14 @@ export default function ProfileSettingsPage() {
             onChange={(e) => setForm({ ...form, timezone: e.target.value })}
             className="input-trevu"
           >
+            <option value="">{t('profile.settings.timezonePlaceholder')}</option>
             {refTimezones.map((tz) => (
               <option key={tz.tz_id} value={tz.tz_id}>{tz.display_name} ({tz.utc_offset_text})</option>
             ))}
           </select>
+          <p className="text-xs text-navy-400 mt-1">
+            {t('profile.settings.timezoneHint')}
+          </p>
         </div>
 
         {/* Bio */}
