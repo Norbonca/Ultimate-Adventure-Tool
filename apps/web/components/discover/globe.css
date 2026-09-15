@@ -10,9 +10,12 @@
 .terepgomb a:hover { color: var(--dark-primary-hover); }
 .terepgomb .mono { font-family: "IBM Plex Mono", monospace; }
 
-#tg-relief { position: absolute; inset: 0; pointer-events: none; }
-#tg-globe { position: absolute; inset: 0; cursor: grab; }
-#tg-globe.drag { cursor: grabbing; }
+/* a gömb felszínét és földrajzi alaprétegét a MapLibre rajzolja (#tg-map); fölötte az SVG-réteg csak rajzol, nem fogad eseményt */
+#tg-map { position: absolute; inset: 0; }
+#tg-map .maplibregl-canvas-container.maplibregl-interactive { cursor: grab; }
+#tg-map.drag .maplibregl-canvas-container.maplibregl-interactive { cursor: grabbing; }
+#tg-map .maplibregl-canvas:focus-visible { outline: none; }
+#tg-globe { position: absolute; inset: 0; pointer-events: none; }
 #tg-pins { position: absolute; inset: 0; pointer-events: none; }
 #tg-loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-slate); font-size: 13px; }
 
