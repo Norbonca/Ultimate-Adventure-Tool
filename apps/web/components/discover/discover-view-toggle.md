@@ -145,9 +145,10 @@ Automatikus forgás nincs; a gyro (eszköz-tájolás) csak kérésre kapcsol be.
 
 A felszín Web Mercator csempékből épül (`lib/globe-tiles.ts`,
 `NEXT_PUBLIC_GLOBE_TILES=eox|gibs`; alap: **EOX Sentinel-2 cloudless**, max.
-z13 — ráközelítve élesedik; Norbert döntése 2026-09-14, NyK-13: az EOX
-kereskedelmi licencét **élesítés előtt** vesszük meg, addig csak lokális
-tesztelés). Tartalék a NASA GIBS Blue Marble (kulcs és licenc nélkül, max. z8,
+z13 — ráközelítve élesedik; Norbert döntése 2026-09-14, NyK-13; pontosítva
+2026-09-15: az oldal jelenlegi állapotában nem kereskedelmi, ezért az EOX a
+CC-BY-NC-SA 4.0 feltételeivel, attribúcióval élesben is használható — a
+kereskedelmi licenc akkor kell, amikor az oldal kereskedelmi működésre vált). Tartalék a NASA GIBS Blue Marble (kulcs és licenc nélkül, max. z8,
 ráközelítve elmosódik). A csempéket a böngésző gyorsítótárazza. Az országhatárok a `public/globe/countries-50m.json`
 (world-atlas 1:50M) fájlból jönnek. Nyelvváltáskor a gömb újramountol, mert a
 markup fordított szövegeket hordoz; a csempék a cache-ből jönnek.

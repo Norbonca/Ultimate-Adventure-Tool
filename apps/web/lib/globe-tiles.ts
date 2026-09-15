@@ -14,9 +14,11 @@
  *    (non-commercial); commercial use needs an "EOX Commercial
  *    Attribution-RestrictedUse" licence from EOX (cloudless.eox.at/documentation
  *    /license, read 2026-09-14). **Default since 2026-09-14 by Norbert's
- *    decision (NyK-13): the licence is bought before go-live — until then the
- *    product is in local testing only.** Going live without it is a licence
- *    breach, not a rendering bug.
+ *    decision (NyK-13). Norbert, 2026-09-15: the site is non-commercial in its
+ *    current state, so EOX goes live under CC-BY-NC-SA 4.0 (attribution shown
+ *    in the globe footer). The commercial licence is due when the site turns
+ *    commercial (paid plans, paid bookings) — at that point this default must
+ *    be re-decided, not silently kept.**
  *  - NASA GIBS Blue Marble — public NASA imagery, no key, CORS enabled, max
  *    zoom 8 (~600 m/px), blurry when zoomed in. Fallback that is safe for a
  *    paid product without any licence.
