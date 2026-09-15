@@ -750,6 +750,7 @@ const hu = {
       newTripHeader: "Új túra létrehozása",
       editTripHeader: "Túra szerkesztése",
       saveDraftFirst: "Először mentsd el a piszkozatot",
+      missingRequired: "Hiányzó kötelező mezők: {fields}",
     },
 
     // Fields
@@ -1370,6 +1371,18 @@ const hu = {
       banSuccess: "Felhasználó sikeresen tiltva.",
       unbanSuccess: "Tiltás feloldva.",
       showingOf: "{shown} / {total} felhasználó",
+      detailPersonalInfo: "Személyes adatok",
+      detailFullName: "Teljes név",
+      detailEmail: "E-mail",
+      detailPhone: "Telefon",
+      detailRegistered: "Regisztráció",
+      detailLastLogin: "Utolsó belépés",
+      detailNeverLoggedIn: "Még nem lépett be",
+      detailLocation: "Helyszín",
+      detailTripHistory: "Túratörténet",
+      detailTripCount: "{count} túra",
+      detailNoTrips: "Még nincs túrája.",
+      detailNotFound: "A felhasználó nem található.",
     },
     // Trip Operations (M02)
     trips: {

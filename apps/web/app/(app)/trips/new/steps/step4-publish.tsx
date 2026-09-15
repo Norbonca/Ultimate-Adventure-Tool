@@ -107,7 +107,7 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
       {/* ── Cover Image ── */}
       <div>
         <label className="block text-sm font-semibold text-navy-700 mb-3">
-          {t("trips.wizard.coverImage")}
+          {t("trips.wizard.coverImage")} <span className="text-coral">*</span>
         </label>
         <ImagePicker
           type="cover"

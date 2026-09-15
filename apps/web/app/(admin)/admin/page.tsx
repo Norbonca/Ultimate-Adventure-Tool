@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getServerT } from "@/lib/i18n/server";
 import { getAdminStats } from "./actions";
 import { Icon } from "@/components/Icon";
@@ -139,12 +140,12 @@ export default async function AdminDashboardPage() {
             <h2 className="font-semibold text-slate-900">
               {t("admin.dashboard.recentActivity")}
             </h2>
-            <a
+            <Link
               href="/admin/users"
               className="text-xs text-emerald-600 hover:underline"
             >
               {t("admin.dashboard.viewAll")}
-            </a>
+            </Link>
           </div>
           <div className="space-y-3">
             {[
@@ -164,7 +165,7 @@ export default async function AdminDashboardPage() {
 
           {/* Quick links */}
           <div className="mt-6 pt-4 border-t border-slate-100 space-y-2">
-            <a
+            <Link
               href="/admin/users"
               className="flex items-center gap-2 text-sm text-slate-600 hover:text-emerald-600 transition-colors"
             >
@@ -172,8 +173,8 @@ export default async function AdminDashboardPage() {
               <span>
                 {stats.totalUsers} {t("admin.nav.users")}
               </span>
-            </a>
-            <a
+            </Link>
+            <Link
               href="/admin/trips"
               className="flex items-center gap-2 text-sm text-slate-600 hover:text-emerald-600 transition-colors"
             >
@@ -181,7 +182,7 @@ export default async function AdminDashboardPage() {
               <span>
                 {stats.activeTrips} {t("admin.nav.trips")}
               </span>
-            </a>
+            </Link>
           </div>
         </div>
       </div>
