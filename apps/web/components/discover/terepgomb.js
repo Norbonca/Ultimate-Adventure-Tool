@@ -18,7 +18,7 @@
 // Használat:
 //   const globe = await mountGlobe(rootEl, { trips, categories, routes, week0, tiles, atlasUrl, locale, t, onOpen });
 //   globe.update({ trips, routes }); globe.destroy();
-// - trips: [{ id, slug, cat, title, place, host, week, days, price, spots, diff, ll: [lon, lat], approximate, past }]
+// - trips: [{ id, slug, cat, title, place, host, week, days, price, spots, diff, ll: [lon, lat], approximate, past, image }]
 // - categories: [{ id, label, color }]
 // - routes: { [tripId]: [[név, lon, lat], …] } — a napi program pontjai; üres objektum is mehet
 // - week0: 'YYYY-MM-DD' — a 0. hét napja (az API adja)
@@ -83,6 +83,18 @@ export async function mountGlobe(root, opts) {
   // fit: amíg igaz, a lépték minden elrendezésnél a teljes gömbhöz igazodik (méretváltáskor is); nagyítás, túra-ráközelítés kikapcsolja
   const state = { t: 3, rot: WORLD_ROT.slice(), scale: 1, fit: true, active: Object.fromEntries(CATS.map((c) => [c.id, true])), selected: null, gyro: false, dx: 0, dy: 0, dragging: false };
   const app = root, svg = d3.select($("globe")), pinsEl = $("pins"), cardEl = $("card");
+  let cardKey = "";
+  // a kártya eseményei egyszer, delegálva kötődnek (a tartalom cserélhető alatta)
+  cardEl.addEventListener("pointerdown", (e) => e.stopPropagation());
+  cardEl.addEventListener("click", (e) => {
+    const trip = TRIPS.find((t) => t.id === state.selected); if (!trip) return;
+    const target = e.target instanceof Element ? e.target : null; if (!target) return;
+    if (target.closest("[data-close]")) { e.stopPropagation(); state.selected = null; render(); return; }
+    if (target.closest("[data-fit]")) { e.stopPropagation(); frameRoute(trip); render(); return; }
+    const open = target.closest("[data-open]");
+    // módosító billentyűvel (új lap) a böngésző saját linkkezelése marad
+    if (open && opts.onOpen && !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1)) { e.preventDefault(); opts.onOpen(trip.slug); }
+  });
   let width = 0, height = 0, R = 0, baseR = 1, floorR = 1, bottomReserve = 170;
   let chipRects = [];
   const projection = d3.geoOrthographic().clipAngle(90);
@@ -284,11 +296,13 @@ export async function mountGlobe(root, opts) {
     });
   }
 
+  // csak http(s) kép-URL mehet a kártyába (a borítókép a túra adatából jön)
+  const safeImage = (u) => typeof u === "string" && /^https?:\/\//i.test(u);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
   function cardMarkup(tr) {
     const c = catOf(tr.cat); const rt = ROUTES[tr.id];
-    return `<div class="panel"><div class="scroll"><div class="tg-card-hero" style="background:repeating-linear-gradient(135deg,${c.color}55 0 12px,${c.color}33 12px 24px)">
+    return `<div class="panel"><div class="scroll"><div class="tg-card-hero" style="background:repeating-linear-gradient(135deg,${c.color}55 0 12px,${c.color}33 12px 24px)">${safeImage(tr.image) ? `<img class="tg-card-img" src="${esc(tr.image)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">` : ""}
           <span class="tg-card-tag">${esc(c.label)} · ${esc(T.days.replace("{count}", String(tr.days)))}</span>
           <button type="button" data-close class="tg-card-close" aria-label="${esc(T.close)}">×</button></div>
           <div class="tg-card-title">${esc(tr.title)}</div>
@@ -386,14 +400,15 @@ export async function mountGlobe(root, opts) {
       if (shift) el.style.transform = `translateX(${shift / k}px)`;
     });
     pinsEl.querySelectorAll(".lbl").forEach((el) => { const r = el.getBoundingClientRect(); chipRects.push({ l: r.left - host.left, r: r.right - host.left, t: r.top - host.top, b: r.bottom - host.top }); });
+    // a kártya DOM-ja csak akkor épül újra, ha a kiválasztott túra változik — különben egy kattintás közbeni
+    // újrarajzolás (görgetés/trackpad-tehetetlenség, méretváltás) kicserélné a gombot, és a „Részletek” elveszne
     const cardTrip = TRIPS.find((t) => t.id === state.selected) || null;
-    cardEl.className = cardTrip ? "on" : "";
-    cardEl.innerHTML = cardTrip ? cardMarkup(cardTrip) : "";
-    if (cardTrip) {
-      cardEl.onpointerdown = (e) => e.stopPropagation();
-      const fit = cardEl.querySelector("[data-fit]"); if (fit) fit.onclick = (e) => { e.stopPropagation(); frameRoute(cardTrip); render(); };
-      const op = cardEl.querySelector("[data-open]"); if (op && opts.onOpen) op.onclick = (e) => { e.preventDefault(); opts.onOpen(cardTrip.slug); };
-      cardEl.querySelector("[data-close]").onclick = (e) => { e.stopPropagation(); state.selected = null; render(); };
+    const nextCardKey = cardTrip ? cardTrip.id : "";
+    if (nextCardKey !== cardKey) {
+      cardKey = nextCardKey;
+      cardEl.className = cardTrip ? "on" : "";
+      cardEl.innerHTML = cardTrip ? cardMarkup(cardTrip) : "";
+      const img = cardEl.querySelector(".tg-card-img"); if (img) img.addEventListener("error", () => img.remove(), { once: true }); // hibás kép → marad a csíkos helyőrző
     }
     const inWin = TRIPS.filter((tr) => state.active[tr.cat] && !tr.past && Math.abs(tw(tr) - state.t) <= W); const hidden = inWin.filter((tr) => !visible(tr.ll)).length;
     $("nowsub").textContent = `${season(state.t)} · ${T.inWindow.replace("{count}", String(inWin.length))}` + (hidden ? ` · ${T.hiddenBehind.replace("{count}", String(hidden))}` : "");
@@ -483,7 +498,7 @@ export async function mountGlobe(root, opts) {
   return {
     /** A szűrt túrakészlet cseréje újramountolás nélkül (a Discover szűrői, nyelvváltás). */
     update({ trips, routes }) {
-      TRIPS = trips.slice(); ROUTES = routes || {};
+      TRIPS = trips.slice(); ROUTES = routes || {}; cardKey = "";
       if (state.selected && !TRIPS.some((t) => t.id === state.selected)) state.selected = null;
       buildDots(); renderTokens(); render();
     },

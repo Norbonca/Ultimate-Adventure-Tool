@@ -66,8 +66,10 @@
 }
 .terepgomb .panel { width: 100%; background: rgba(248,250,252,.97); color: var(--deep-navy); border-radius: 18px; padding: 16px; box-shadow: 0 30px 80px rgba(0,0,0,.6); cursor: default; text-align: left; }
 .tg-card-hero { height: 110px; border-radius: 12px; margin-bottom: 12px; position: relative; }
-.tg-card-tag { position: absolute; top: 8px; left: 8px; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; background: rgba(255,255,255,.9); }
-.tg-card-close { position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border-radius: 999px; border: 0; background: rgba(15,23,42,.7); color: var(--color-surface); display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; }
+.tg-card-hero { overflow: hidden; }
+.tg-card-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.tg-card-tag { z-index: 1; position: absolute; top: 8px; left: 8px; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; background: rgba(255,255,255,.9); }
+.tg-card-close { z-index: 1; position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border-radius: 999px; border: 0; background: rgba(15,23,42,.7); color: var(--color-surface); display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; }
 .tg-card-title { font-size: 17px; font-weight: 800; line-height: 1.15; margin-bottom: 4px; }
 .tg-card-meta { font-size: 12.5px; color: var(--text-secondary); margin-bottom: 10px; }
 .tg-card-past { display: block; margin-top: 4px; font-size: 11px; font-weight: 700; color: var(--text-secondary); }
