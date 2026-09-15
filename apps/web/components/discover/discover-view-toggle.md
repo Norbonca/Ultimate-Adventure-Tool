@@ -143,6 +143,8 @@ méretváltásra és a lap előtérbe kerülésekor rajzol újra, kigörgetve
 (`IntersectionObserver`) és háttérben (`visibilitychange`) nem dolgozik.
 Automatikus forgás nincs; a gyro (eszköz-tájolás) csak kérésre kapcsol be.
 
+**Kezdőnézet: a teljes bolygó** (Norbert, 2026-09-15): a gömb a teljes földgolyóval indul (Európa–Afrika középpel), mert a közép-európai ráközelítés induláskor nem érthető. A „Teljes bolygó” és a „Nézet vissza” gomb is ide tér vissza; a „Nézet vissza” a kiválasztást és az idővonalat is alaphelyzetbe teszi.
+
 A felszín Web Mercator csempékből épül (`lib/globe-tiles.ts`,
 `NEXT_PUBLIC_GLOBE_TILES=eox|gibs`; alap: **EOX Sentinel-2 cloudless**, max.
 z13 — ráközelítve élesedik; Norbert döntése 2026-09-14, NyK-13; pontosítva

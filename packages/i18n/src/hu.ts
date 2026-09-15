@@ -1066,7 +1066,6 @@ const hu = {
       unsupportedHint: "A 3D nézethez WebGL kell. Válts rács vagy lista nézetre.",
       kicker: "terepgömb",
       gyro: "Gyro",
-      water: "Vízrajz",
       worldView: "Teljes bolygó",
       resetView: "Nézet vissza",
       tokenHint: "Húzd a gömbre vagy le róla · koppintás = kapcsol",

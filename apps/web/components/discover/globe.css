@@ -106,7 +106,6 @@
 
 /* földrajzi feliratok (SVG) */
 .terepgomb .geo-label { font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; fill: rgba(148,163,184,.75); pointer-events: none; }
-.terepgomb .geo-label.water { fill: rgba(56,189,248,.8); }
 .terepgomb .geo-label.range { fill: rgba(251,191,36,.75); }
 .terepgomb .city { font-size: 10px; fill: rgba(203,213,225,.55); pointer-events: none; }
 
