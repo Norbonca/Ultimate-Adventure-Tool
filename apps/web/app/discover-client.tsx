@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/i18n/useTranslation';
@@ -31,6 +31,7 @@ import {
   rememberDiscoverView,
   type DiscoverView,
 } from "@/lib/discover-view";
+import { buildTripSearchText, matchesQuery, parseWhen, tripMatchesWhen } from "@/lib/trip-search";
 
 // The globe (d3-geo + tiles) only runs in the browser and is a large chunk —
 // load it on demand so the grid and list views never pay for it.
@@ -161,8 +162,19 @@ export default function DiscoverClient({
     setViewMode(next);
     rememberDiscoverView(next);
   };
-  // TODO: setSearchQuery is never called — the search box is not wired to this state.
-  const [searchQuery, _setSearchQuery] = useState<string>('');
+  // Hero search (lib/trip-search.ts): the typed text applies on Enter or the
+  // search button (US-M09-001); emptying a field clears its filter at once.
+  const [whereInput, setWhereInput] = useState<string>('');
+  const [whenInput, setWhenInput] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [whenQuery, setWhenQuery] = useState<string>('');
+  const whenFilter = useMemo(() => parseWhen(whenQuery), [whenQuery]);
+  const submitSearch = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSearchQuery(whereInput.trim());
+    setWhenQuery(whenInput.trim());
+    document.getElementById('discover-results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
   const [selectedPrice, setSelectedPrice] = useState<string>('all');
   const [selectedDuration, setSelectedDuration] = useState<string>('all');
@@ -184,18 +196,30 @@ export default function DiscoverClient({
     return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
   };
 
+  const searchTexts = useMemo(
+    () =>
+      new Map(
+        trips.map((trip) => {
+          const category = resolveJoin(trip.categories);
+          const display = category ? categoryDisplay[category.name]?.nameHu : undefined;
+          return [trip.id, buildTripSearchText(trip, display ? [display] : [])] as const;
+        })
+      ),
+    [trips, categoryDisplay]
+  );
+
   const filteredTrips = trips.filter((trip) => {
     // Category filter
     if (activeCategory !== 'all' && trip.category_id !== activeCategory) {
       return false;
     }
-    // Search filter
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      const loc = (trip.location_city || '') + (trip.location_region || '') + (trip.location_country || '');
-      if (!trip.title.toLowerCase().includes(q) && !loc.toLowerCase().includes(q)) {
-        return false;
-      }
+    // Search filter — "Hova?" (title, description, place, country, category, organizer)
+    if (searchQuery && !matchesQuery(searchTexts.get(trip.id) ?? trip.title, searchQuery)) {
+      return false;
+    }
+    // Date filter — "Mikor?"
+    if (!tripMatchesWhen(whenFilter, trip.start_date, trip.end_date)) {
+      return false;
     }
     // Difficulty filter
     if (selectedDifficulty !== 'all' && String(trip.difficulty) !== selectedDifficulty) {
@@ -1172,26 +1196,45 @@ export default function DiscoverClient({
             {t('discover.heroSubtitle')}
           </p>
 
-          <div className="search-bar">
+          <form className="search-bar" role="search" onSubmit={submitSearch} data-testid="discover-hero-search">
               <div className="search-field">
                 <MapPin size={18} />
                 <input
                   type="text"
+                  enterKeyHint="search"
                   aria-label={t('discover.whereTo')}
                   placeholder={t('discover.whereTo')}
+                  value={whereInput}
+                  onChange={(e) => {
+                    setWhereInput(e.target.value);
+                    if (!e.target.value.trim()) setSearchQuery('');
+                  }}
+                  data-testid="discover-search-where"
                 />
               </div>
               <div className="search-field">
                 <Calendar size={18} />
                 <input
                   type="text"
+                  enterKeyHint="search"
                   aria-label={t('discover.when')}
                   placeholder={t('discover.when')}
+                  value={whenInput}
+                  onChange={(e) => {
+                    setWhenInput(e.target.value);
+                    if (!e.target.value.trim()) setWhenQuery('');
+                  }}
+                  data-testid="discover-search-when"
                 />
               </div>
               <div className="search-field">
                 <Compass size={18} />
-                <select aria-label={t('discover.activityType')}>
+                <select
+                  aria-label={t('discover.activityType')}
+                  value={activeCategory === 'all' ? '' : activeCategory}
+                  onChange={(e) => setActiveCategory(e.target.value || 'all')}
+                  data-testid="discover-search-category"
+                >
                   <option value="">{t('discover.activityType')}</option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
@@ -1200,10 +1243,10 @@ export default function DiscoverClient({
                   ))}
                 </select>
               </div>
-              <button type="button" className="search-btn" aria-label={t('common.search')}>
+              <button type="submit" className="search-btn" aria-label={t('common.search')} data-testid="discover-search-submit">
                 <Search size={20} />
               </button>
-          </div>
+          </form>
 
           <div id="categories" className="category-pills">
             <button
@@ -1272,7 +1315,7 @@ export default function DiscoverClient({
       </>)}
 
       {/* MAIN CONTENT */}
-      <main className="main-content">
+      <main id="discover-results" className="main-content">
         <div className="results-header">
           <div className="results-count">
             {/* The globe ignores the grid filters (it has its own), so its count is the unfiltered one. */}
