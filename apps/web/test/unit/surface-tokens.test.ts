@@ -61,6 +61,16 @@ describe("felület-mód tokenek (Brand Guide v2 §8)", () => {
     expect(value(night, token)).toBe(hex);
   });
 
+  it("a beágyazott Day-régió minden Night-ban felülírt tokent visszaállít", () => {
+    const day = block('[data-surface="day"]');
+    expect(day).not.toBe("");
+    const overridden = [...night.matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1]);
+    expect(overridden.length).toBeGreaterThan(20);
+    for (const token of overridden) {
+      expect(day, token).toMatch(new RegExp(`${token}\\s*:`));
+    }
+  });
+
   it("a Night-ban felülírt új tokeneknek van Day értéke a :root-ban", () => {
     const root = block(":root");
     for (const token of ["--color-on-primary", "--color-ghost", "--color-glass", "--color-input-bg", "--hero-scrim"]) {
@@ -72,7 +82,7 @@ describe("felület-mód tokenek (Brand Guide v2 §8)", () => {
     const colors = tailwindConfig.theme?.extend?.colors as Record<string, unknown>;
     const flat = (v: unknown): string[] =>
       typeof v === "string" ? [v] : Object.values(v as Record<string, unknown>).flatMap(flat);
-    for (const key of ["canvas", "surface", "ink", "line", "accent", "ghost", "glass", "cat-token"]) {
+    for (const key of ["canvas", "surface", "ink", "line", "accent", "ghost", "glass", "scrim", "cat-token"]) {
       const values = flat(colors[key]);
       expect(values.length, key).toBeGreaterThan(0);
       for (const v of values) expect(v, key).toMatch(/^var\(--/);

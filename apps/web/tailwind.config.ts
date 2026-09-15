@@ -78,6 +78,7 @@ const config: Config = {
         },
         ghost: "var(--color-ghost)",
         glass: "var(--color-glass)",
+        scrim: "var(--color-scrim)",
         "cat-token": {
           hiking: "var(--cat-hiking)",
           climbing: "var(--cat-climbing)",
@@ -148,9 +149,14 @@ const config: Config = {
     },
   },
   plugins: [
-    /* `night:` variáns — a Night-régión belül (Brand Guide v2 §8). */
+    /* `night:` variáns — a Night-régión belül, de nem egy beágyazott Day-régióban
+       (Brand Guide v2 §2, §8). Csak olyan közös komponensben kell (AppHeader), amely
+       Day és Night oldalon is fut; új Night-komponens a szemantikus színeket használja. */
     plugin(({ addVariant }) => {
-      addVariant("night", ['[data-surface="night"] &', '&[data-surface="night"]']);
+      addVariant("night", [
+        '[data-surface="night"] &:not([data-surface="day"] *)',
+        '&[data-surface="night"]',
+      ]);
     }),
   ],
 };
