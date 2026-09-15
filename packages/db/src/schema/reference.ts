@@ -64,6 +64,8 @@ export const refCountries = pgTable(
     isActive: boolean('is_active').notNull().default(true),
     /** Rendezési sorrend */
     sortOrder: integer('sort_order').notNull().default(999),
+    /** M23: fő IANA-időzóna (FK → ref_timezones.tz_id); NULL = nincs meghatározva → UTC (037) */
+    primaryTimezone: varchar('primary_timezone', { length: 50 }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
