@@ -1038,7 +1038,6 @@ const en: TranslationKeys = {
       unsupportedHint: "The 3D view needs WebGL. Switch to grid or list view.",
       kicker: "terrain globe",
       gyro: "Gyro",
-      water: "Water",
       worldView: "Whole planet",
       resetView: "Reset view",
       tokenHint: "Drag onto the globe or off it · tap = toggle",

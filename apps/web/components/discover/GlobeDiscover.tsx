@@ -162,7 +162,6 @@ export default function GlobeDiscover() {
           loading: t('discover.globe.loading'),
           kicker: t('discover.globe.kicker'),
           gyro: t('discover.globe.gyro'),
-          water: t('discover.globe.water'),
           world: t('discover.globe.worldView'),
           reset: t('discover.globe.resetView'),
           tokenHint: t('discover.globe.tokenHint'),

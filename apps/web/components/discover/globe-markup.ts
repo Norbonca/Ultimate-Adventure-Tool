@@ -11,7 +11,6 @@ export interface GlobeMarkupStrings {
   loading: string;
   kicker: string;
   gyro: string;
-  water: string;
   world: string;
   reset: string;
   tokenHint: string;
@@ -43,7 +42,6 @@ export function buildGlobeMarkup(s: GlobeMarkupStrings, attributions: GlobeAttri
     <span class="mono tg-kicker">${esc(s.kicker)}</span>
     <span class="tg-spacer"></span>
     <button type="button" class="btn" id="tg-gyro" aria-pressed="false">${esc(s.gyro)}</button>
-    <button type="button" class="btn on" id="tg-water" aria-pressed="true">${esc(s.water)}</button>
     <button type="button" class="btn" id="tg-world">${esc(s.world)}</button>
     <button type="button" class="btn" id="tg-reset">${esc(s.reset)}</button>
   </div>

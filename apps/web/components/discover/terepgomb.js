@@ -47,15 +47,7 @@ export async function mountGlobe(root, opts) {
   let ROUTES = opts.routes || {};          // { [tripId]: [[név, lon, lat], …] }
   const catOf = (id) => CATS.find((c) => c.id === id) || { color: COL.primary, label: "" };
 
-  // Tájékozódási feliratok: csak nevek — a geometriát a csempe adja (a vízrajz-réteg a képből számol)
-  const WATER_LABELS = [
-    { n: "Adriai-tenger", ll: [15.2, 43.6], r: 90 }, { n: "Északi-tenger", ll: [4.5, 55.5], r: 90 },
-    { n: "Balti-tenger", ll: [18.5, 56.0], r: 90 }, { n: "Fekete-tenger", ll: [32.0, 43.5], r: 90 }, { n: "Földközi-tenger", ll: [8.0, 39.5], r: 90 },
-    { n: "Balaton", ll: [17.73, 46.85], r: 38, dy: 14, minK: .8 }, { n: "Duna", ll: [15.6, 48.35], r: 30, dy: -6, minK: .8 },
-    { n: "Tisza", ll: [20.9, 46.9], r: 24, dy: 14, minK: .9 }, { n: "Visztula", ll: [21.3, 51.9], r: 22, minK: .9 },
-    { n: "Dráva", ll: [16.6, 46.4], r: 18, dy: 12, minK: 1.1 }, { n: "Bodeni-tó", ll: [9.4, 47.6], r: 22, dy: 12, minK: 1.1 },
-    { n: "Garda-tó", ll: [10.65, 45.65], r: 16, dy: 12, minK: 1.1 }
-  ];
+  // Tájékozódási feliratok: csak nevek — a geometriát a csempe adja (a vízrajz-réteg 2026-09-15-én kikerült: nem működött megbízhatóan)
   const RANGES = [ { n: "Magas-Tátra", ll: [20.1, 49.2], r: 34 }, { n: "Alpok", ll: [11.5, 47.0], r: 120 }, { n: "Júliai-Alpok", ll: [13.8, 46.4], r: 26 }, { n: "Bükk", ll: [20.5, 48.05], r: 16 }, { n: "Mátra", ll: [19.85, 47.85], r: 12, minK: 1.2 }, { n: "Alacsony-Tátra", ll: [19.6, 48.9], r: 22, below: true }, { n: "Kárpátok", ll: [24.5, 47.0], r: 90 }, { n: "Dolomitok", ll: [11.6, 46.55], r: 30, minK: 1.3 } ];
   const CITIES = [ { n: "Budapest", ll: [19.04, 47.5] }, { n: "Wien", ll: [16.37, 48.21] }, { n: "Praha", ll: [14.42, 50.09] }, { n: "Kraków", ll: [19.94, 50.06] }, { n: "Bratislava", ll: [17.11, 48.14] }, { n: "Ljubljana", ll: [14.51, 46.06] }, { n: "Zagreb", ll: [15.98, 45.81] }, { n: "München", ll: [11.58, 48.14] }, { n: "Berlin", ll: [13.4, 52.52] }, { n: "Beograd", ll: [20.46, 44.82] } ];
   const W = 4;
@@ -85,7 +77,11 @@ export async function mountGlobe(root, opts) {
     { l: T.seasonSummer, t: weeksUntil(7, 18) },
   ];
 
-  const state = { t: 3, rot: [-17.2, -48, 0], scale: 1, active: Object.fromEntries(CATS.map((c) => [c.id, true])), selected: null, gyro: false, dx: 0, dy: 0, dragging: false, water: true };
+  // kezdőnézet: a teljes bolygó (Norbert, 2026-09-15 — a közép-európai ráközelítés induláskor nem érthető);
+  // a lépték a `layout()` után áll be, mert a teljes gömb mérete a konténerből jön (floorR / baseR)
+  const WORLD_ROT = [-10, -30, 0];
+  let startScalePending = true;
+  const state = { t: 3, rot: WORLD_ROT.slice(), scale: 1, active: Object.fromEntries(CATS.map((c) => [c.id, true])), selected: null, gyro: false, dx: 0, dy: 0, dragging: false };
   const app = root, svg = d3.select($("globe")), pinsEl = $("pins"), cardEl = $("card");
   let width = 0, height = 0, R = 0, baseR = 1, floorR = 1, bottomReserve = 170;
   let chipRects = [];
@@ -137,9 +133,8 @@ export async function mountGlobe(root, opts) {
       if (!got) continue;
       const lum = R0 * .3 + G0 * .59 + B0 * .11;
       // éjszakai tónus: a műholdszínek hűvösítve, sötétítve
-      let rr = Math.min(255, 12 + R0 * .40 + lum * .04), gg = Math.min(255, 22 + G0 * .46 + lum * .07), bb = Math.min(255, 42 + B0 * .55 + lum * .10);
+      const rr = Math.min(255, 12 + R0 * .40 + lum * .04), gg = Math.min(255, 22 + G0 * .46 + lum * .07), bb = Math.min(255, 42 + B0 * .55 + lum * .10);
       // vízrajz-réteg: a képen víznek látszó pixelek kiemelve — tájékozódási pont, nem rajzolt vonal
-      if (state.water && B0 > R0 + 5 && B0 >= G0 - 3 && lum < 165) { rr = Math.min(255, rr * .62); gg = Math.min(255, gg * .92 + 12); bb = Math.min(255, bb * 1.18 + 34); }
       for (let yy = 0; yy < step; yy++) for (let xx = 0; xx < step; xx++) { const pX = x + xx, pY = y + yy; if (pX >= width || pY >= height) continue; const oi = (pY * width + pX) * 4; od[oi] = rr; od[oi + 1] = gg; od[oi + 2] = bb; od[oi + 3] = 255; }
     }
     ctx.putImageData(out, 0, 0);
@@ -202,11 +197,10 @@ export async function mountGlobe(root, opts) {
     const inChip = (x, y) => chipRects.some((r) => x > r.l && x < r.r && y > r.t && y < r.b);
     citiesG.selectAll("g").data(CITIES.filter((c) => { if (!visible(c.ll) || k <= 0.8) return false; const [x, y] = projection(c.ll); return y > 140 && y < height - bottomReserve && !inChip(x, y); })).join((enter) => { const gg = enter.append("g"); gg.append("circle"); gg.append("text"); return gg; })
       .each(function (d) { const [x, y] = projection(d.ll); const gg = d3.select(this); gg.select("circle").attr("cx", x).attr("cy", y).attr("r", 1.8).attr("fill", "rgba(203,213,225,.6)"); gg.select("text").attr("class", "city").attr("x", x + 5).attr("y", y + 3).text(d.n); });
-    const labels = [...RANGES.filter((r) => !r.minK || k > r.minK).map((r) => ({ ...r, cls: "range", dy: r.below ? r.r * k * .5 + 12 : -r.r * k * .5 - 4 })),
-      ...WATER_LABELS.filter((w) => !w.minK || k > w.minK).map((w) => ({ ...w, cls: "water", dy: w.dy || 0 }))].filter((l) => visible(l.ll) && k > 0.6).filter((l) => { const [x, y] = projection(l.ll); const yy = y + l.dy; return yy > 140 && yy < height - bottomReserve && !inChip(x, yy); });
+    const labels = [...RANGES.filter((r) => !r.minK || k > r.minK).map((r) => ({ ...r, cls: "range", dy: r.below ? r.r * k * .5 + 12 : -r.r * k * .5 - 4 }))].filter((l) => visible(l.ll) && k > 0.6).filter((l) => { const [x, y] = projection(l.ll); const yy = y + l.dy; return yy > 140 && yy < height - bottomReserve && !inChip(x, yy); });
     labels.sort((a, b) => (b.r || 0) - (a.r || 0)); const kept = [];
     labels.forEach((l) => { const [x, y] = projection(l.ll); const yy = y + l.dy; if (!kept.some((o) => Math.abs(o.x - x) < (o.n.length + l.n.length) * 3.6 && Math.abs(o.yy - yy) < 14)) kept.push({ ...l, x, yy }); });
-    labelsG.selectAll("text").data(state.water ? kept : kept.filter((d) => d.cls !== "water"), (d) => d.n).join("text").attr("class", (d) => "geo-label " + d.cls).attr("text-anchor", "middle")
+    labelsG.selectAll("text").data(kept, (d) => d.n).join("text").attr("class", (d) => "geo-label " + d.cls).attr("text-anchor", "middle")
       .attr("x", (d) => projection(d.ll)[0]).attr("y", (d) => projection(d.ll)[1] + d.dy).text((d) => d.n);
     drawRoute(k);
   }
@@ -317,7 +311,7 @@ export async function mountGlobe(root, opts) {
     }).sort((a, b) => a.y - b.y);
     // klaszter: 70 px-en belüli zászlók egy chipbe olvadnak (3+), amíg nem közelítünk rá; a kiválasztott sosem
     const clusters = [], used = new Set();
-    all.forEach((p) => { if (used.has(p) || p.sel) return; const grp = all.filter((q) => !used.has(q) && !q.sel && Math.hypot(q.x - p.x, q.y - p.y) < 70 * Math.min(1, Math.sqrt(state.scale))); if (grp.length >= 3 && state.scale < 1.8) { grp.forEach((q) => used.add(q)); clusters.push(grp); } });
+    all.forEach((p) => { if (used.has(p) || p.sel) return; const grp = all.filter((q) => !used.has(q) && !q.sel && Math.hypot(q.x - p.x, q.y - p.y) < 70); if (grp.length >= 3 && state.scale < 1.8) { grp.forEach((q) => used.add(q)); clusters.push(grp); } });
     const vis = all.filter((p) => !used.has(p));
     for (let i = 0; i < vis.length; i++) for (let j = 0; j < i; j++) {
       const a = vis[i], b = vis[j]; if (!(a.mid && b.mid)) continue;
@@ -338,6 +332,14 @@ export async function mountGlobe(root, opts) {
     const prect = (p) => { const w = Math.min(width - 16, 60 + p.tr.title.length * 7.5), l = p.side === 1 ? p.x - w * .08 : p.side === -1 ? p.x - w * .92 : p.x - w / 2, t = p.y - p.stem - 38; return { l, r: l + w, t, b: t + 38 }; };
     const hit = (a, b) => a.l < b.r && a.r > b.l && a.t < b.b && a.b > b.t;
     vis.forEach((p) => { if (p.hideLabel || p.sel) return; clusterEls.forEach((c) => { if (p.hideLabel || !hit(prect(p), crect(c))) return; if (p.near) c.stem += 44; else p.hideLabel = true; }); });
+    // egymást fedő zászlófeliratok (főleg teljes bolygó nézetben és mobilon): fontossági sorrendben (kiválasztott → ablakon belüli → többi)
+    // csak az első marad felirat, a többi pont lesz — a pont koppintásra ugyanúgy kiválaszt
+    const keptRects = clusterEls.map(crect);
+    [...vis].sort((a, b) => (b.sel - a.sel) || (b.near - a.near) || (b.mid - a.mid)).forEach((p) => {
+      if (p.hideLabel) return; const r = prect(p);
+      if (!p.sel && keptRects.some((k) => hit(r, k))) { p.hideLabel = true; return; }
+      keptRects.push(r);
+    });
     // a chipek alatt nincs földrajzi felirat
     chipRects = clusterEls.filter((c) => c.cy - c.stem - 40 <= height - bottomReserve - 30 && c.cy <= height - bottomReserve).map((c) => { const w = 282, l = c.side === 1 ? c.cx - w * .08 : c.side === -1 ? c.cx - w * .92 : c.cx - w / 2; return { l, r: l + w, t: c.cy - c.stem - 44, b: c.cy - c.stem + 4 }; });
     pinsEl.innerHTML = "";
@@ -463,12 +465,11 @@ export async function mountGlobe(root, opts) {
     try { if (typeof DeviceOrientationEvent !== "undefined" && DeviceOrientationEvent.requestPermission) { if (await DeviceOrientationEvent.requestPermission() !== "granted") return; } } catch (_) {}
     window.addEventListener("deviceorientation", onOrient); state.gyro = true; this.classList.add("on"); this.setAttribute("aria-pressed", "true");
   });
-  $("water").addEventListener("click", function () { state.water = !state.water; this.classList.toggle("on", state.water); this.setAttribute("aria-pressed", state.water ? "true" : "false"); render(); });
-  $("world").addEventListener("click", () => { state.rot = [-10, -30, 0]; state.selected = null; render(); state.scale = floorR / baseR; render(); });
-  $("reset").addEventListener("click", () => { state.rot = [-17.2, -48, 0]; state.scale = 1; state.selected = null; render(); });
+  $("world").addEventListener("click", () => { state.rot = WORLD_ROT.slice(); state.selected = null; state.scale = floorR / baseR; render(); });
+  $("reset").addEventListener("click", () => { state.rot = WORLD_ROT.slice(); state.scale = floorR / baseR; state.selected = null; state.t = 3; render(); }); // vissza a kezdőnézetre
 
   let reliefTimer = null, painted = false;
-  function render() { if (app.clientWidth === 0 || app.clientHeight === 0) return; painted = true; layout(); drawRelief(state.dragging || scrubbing); if (state.dragging) { clearTimeout(reliefTimer); reliefTimer = setTimeout(() => drawRelief(false), 120); } drawPins(); drawGeo(); renderTime(); }
+  function render() { if (app.clientWidth === 0 || app.clientHeight === 0) return; painted = true; layout(); if (startScalePending) { startScalePending = false; state.scale = floorR / baseR; layout(); } drawRelief(state.dragging || scrubbing); if (state.dragging) { clearTimeout(reliefTimer); reliefTimer = setTimeout(() => drawRelief(false), 120); } drawPins(); drawGeo(); renderTime(); }
   const onVisibility = () => { if (!document.hidden) render(); };
   window.addEventListener("resize", render);
   const ro = new ResizeObserver(() => render()); ro.observe(app);
