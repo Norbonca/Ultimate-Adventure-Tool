@@ -730,6 +730,17 @@ export default function DiscoverClient({
           margin-bottom: 3rem;
         }
 
+        /* Phones: the globe runs edge to edge — the page gutter would cost it
+           a sixth of the width (S40 mobile fix). */
+        @media (max-width: 640px) {
+          .globe-discover {
+            margin-inline: -2rem;
+          }
+          .globe-discover .terepgomb {
+            border-radius: 0;
+          }
+        }
+
 
         .trips-grid.list-view {
           grid-template-columns: 1fr;
@@ -1233,9 +1244,13 @@ export default function DiscoverClient({
       <main className="main-content">
         <div className="results-header">
           <div className="results-count">
-            {filteredTrips.length === 0
+            {/* The globe ignores the grid filters (it has its own), so its count is the unfiltered one. */}
+            {(viewMode === 'globe' ? trips.length : filteredTrips.length) === 0
               ? t('discover.noTripsYet')
-              : t('discover.tripsAvailable').replace('{count}', String(filteredTrips.length))}
+              : t('discover.tripsAvailable').replace(
+                  '{count}',
+                  String(viewMode === 'globe' ? trips.length : filteredTrips.length)
+                )}
           </div>
           <div id="map" className="view-toggle" role="group" aria-label={t('discover.viewToggleLabel')}>
             <button

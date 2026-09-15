@@ -111,4 +111,22 @@ test.describe('Discover — view toggle', () => {
       expect(await links.count()).toBe(count);
     }
   });
+
+  test('DISCOVER-VIEW-7: the globe shows exactly the trips the grid lists (same visibility rules)', async ({ page }) => {
+    const response = await page.request.get('/api/v1/trips/globe');
+    const { markers } = (await response.json()) as { markers: { slug: string }[] };
+
+    await page.goto('/');
+    await page.getByTestId('view-toggle-grid').click();
+    await expect(page.locator('.trips-grid')).toBeVisible();
+
+    const hrefs = await page.locator('.trips-grid a[href^="/trips/"]').evaluateAll((links) =>
+      [...new Set(links.map((link) => link.getAttribute('href')))]
+    );
+    // Every marker is a listed card; a card may only be missing from the globe when it has no coordinates.
+    for (const marker of markers) {
+      expect(hrefs).toContain(`/trips/${marker.slug}`);
+    }
+    expect(markers.length).toBeLessThanOrEqual(hrefs.length);
+  });
 });

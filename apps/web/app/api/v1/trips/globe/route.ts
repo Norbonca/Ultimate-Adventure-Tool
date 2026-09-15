@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { buildRoute, todayIso, tripDays, weeksFrom, type ItineraryDayRow } from "@/lib/globe-payload";
+import { buildRoute, isPastTrip, todayIso, tripDays, weeksFrom, type ItineraryDayRow } from "@/lib/globe-payload";
 
 /**
  * GET /api/v1/trips/globe
@@ -87,8 +87,11 @@ export async function GET() {
         trip_itinerary_days (day_number, title, latitude, longitude)
       `
       )
+      // Same visibility contract as the grid/list query in app/page.tsx
+      // (fetchPublishedTrips) — the globe must never show a trip the cards hide.
       .eq("status", "published")
       .eq("visibility", "public")
+      .eq("show_on_landing", true)
       .is("deleted_at", null)
       .not("location_lat", "is", null)
       .not("location_lng", "is", null)
@@ -128,6 +131,7 @@ export async function GET() {
       endDate: trip.end_date,
       week: weeksFrom(week0, trip.start_date),
       days: tripDays(trip.start_date, trip.end_date),
+      past: isPastTrip(week0, trip.start_date, trip.end_date),
       host: organizer?.display_name ?? null,
       difficulty: trip.difficulty,
       priceAmount: trip.price_amount === null ? null : Number(trip.price_amount),

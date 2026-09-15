@@ -72,6 +72,7 @@ function toGlobeTrip(marker: GlobeMarker, locale: string, t: Translate): GlobeTr
     diff: marker.difficulty,
     ll: [marker.lng, marker.lat],
     approximate: marker.geocodeSource === 'country_centroid',
+    past: marker.past === true,
   };
 }
 
@@ -148,6 +149,7 @@ export default function GlobeDiscover() {
       fitRoute: t('discover.globe.fitRoute'),
       close: t('discover.globe.close'),
       approximate: t('discover.globe.approximate'),
+      past: t('discover.globe.past'),
       reliefFail: t('discover.globe.reliefFail'),
     }),
     [t]
@@ -176,7 +178,7 @@ export default function GlobeDiscover() {
       (payload?.categories ?? []).map((category) => ({
         id: category.id,
         label: category.name_localized?.[locale] ?? category.name,
-        color: category.color_hex ?? '#0D9488',
+        color: category.color_hex ?? 'var(--trevu-teal)',
       })),
     [payload, locale]
   );

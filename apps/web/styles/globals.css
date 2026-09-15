@@ -147,6 +147,19 @@
     --dark-text-muted: #94A3B8;
     --dark-primary: #2DD4BF;
     --dark-danger: #FCA5A1;
+    --dark-primary-hover: #5EEAD4;
+    --color-warning-text: #B45309;
+
+    /* Terepgömb — éjszakai gömb (Claude Design handoff 2026-09-14; Pencil-visszavezetés nyitott) */
+    --globe-space-top: #12203A;
+    --globe-space-bottom: #060B16;
+    --globe-ink: #0B1220;
+    --globe-stop-ink: #0B1324;
+    --globe-sphere-1: #1B2E4A;
+    --globe-sphere-2: #0E1A30;
+    --globe-sphere-3: #070C18;
+    --globe-land-1: #2A3B55;
+    --globe-land-2: #16223A;
   }
 
   html {

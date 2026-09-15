@@ -36,13 +36,15 @@ export function Step2Basics({
 }: Step2Props) {
   const { t, locale } = useTranslation();
 
-  // Live geocoding preview: shows the organizer where the trip will land on the
+  // Geocoding preview: shows the organizer where the trip will land on the
   // globe. The authoritative geocoding happens server-side on save; this is the
-  // same lookup, debounced, so they are not surprised afterwards.
+  // same lookup, so they are not surprised afterwards.
   //
-  // Results are keyed by location, and the displayed state is derived during
-  // render — no setState inside the effect, so a stale answer can never
-  // overwrite a newer one.
+  // Nominatim's usage policy forbids autocomplete-style querying, so the
+  // lookup runs for a *committed* location only — when the country changes or
+  // the region/city field loses focus — never while the organizer is typing.
+  // Results are keyed by location and the displayed state is derived during
+  // render, so a stale answer can never overwrite a newer one.
   type GeocodePreview = { lat: number; lng: number; displayName: string } | null;
   const [resolved, setResolved] = useState<Record<string, GeocodePreview>>({});
 
@@ -51,33 +53,48 @@ export function Step2Basics({
   const city = formData.location_city || "";
   const locationKey = `${country}|${region}|${city}`;
 
-  useEffect(() => {
-    if (!country) return;
+  const [committed, setCommitted] = useState({ country, region, city });
+  const committedKey = `${committed.country}|${committed.region}|${committed.city}`;
+  const commitLocation = (next: Partial<typeof committed> = {}) =>
+    setCommitted({ country, region, city, ...next });
 
-    const timer = setTimeout(async () => {
+  useEffect(() => {
+    if (!committed.country || committedKey in resolved) return;
+    let cancelled = false;
+    (async () => {
       let result: GeocodePreview = null;
       try {
-        result = await previewGeocode({ country, region: region || null, city: city || null });
+        result = await previewGeocode({
+          country: committed.country,
+          region: committed.region || null,
+          city: committed.city || null,
+        });
       } catch {
         result = null;
       }
-      setResolved((previous) => ({ ...previous, [locationKey]: result }));
-    }, 700);
+      if (!cancelled) setResolved((previous) => ({ ...previous, [committedKey]: result }));
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // `resolved` is read only to skip repeat lookups; it must not re-trigger one.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [committedKey]);
 
-    return () => clearTimeout(timer);
-  }, [locationKey, country, region, city]);
-
-  const geocode: 
+  const geocode:
     | { state: "idle" }
+    | { state: "pending" }
     | { state: "loading" }
     | { state: "found"; lat: number; lng: number; displayName: string }
     | { state: "missing" } = !country
     ? { state: "idle" }
-    : !(locationKey in resolved)
-      ? { state: "loading" }
-      : resolved[locationKey]
-        ? { state: "found", ...(resolved[locationKey] as NonNullable<GeocodePreview>) }
-        : { state: "missing" };
+    : locationKey !== committedKey
+      ? { state: "pending" }
+      : !(locationKey in resolved)
+        ? { state: "loading" }
+        : resolved[locationKey]
+          ? { state: "found", ...(resolved[locationKey] as NonNullable<GeocodePreview>) }
+          : { state: "missing" };
 
   return (
     <div className="space-y-6">
@@ -177,7 +194,10 @@ export function Step2Basics({
           <select
             id="trip-country"
             value={formData.location_country}
-            onChange={(e) => onChange({ location_country: e.target.value })}
+            onChange={(e) => {
+              onChange({ location_country: e.target.value });
+              commitLocation({ country: e.target.value });
+            }}
             className={SELECT_CLASSES}
           >
             {countries.map((c) => (
@@ -193,6 +213,7 @@ export function Step2Basics({
           type="text"
           value={formData.location_region}
           onChange={(e) => onChange({ location_region: e.target.value })}
+          onBlur={() => commitLocation()}
           placeholder={t('trips.wizard.regionPlaceholder')}
         />
         <Input
@@ -201,6 +222,7 @@ export function Step2Basics({
           type="text"
           value={formData.location_city}
           onChange={(e) => onChange({ location_city: e.target.value })}
+          onBlur={() => commitLocation()}
           placeholder={t('trips.wizard.cityPlaceholder')}
         />
       </div>
@@ -213,6 +235,7 @@ export function Step2Basics({
       >
         <Icon name="globe" size={16} className="mt-0.5 shrink-0 text-trevu-600" aria-hidden="true" />
         {geocode.state === "loading" && <span>{t('trips.wizard.geocodeLoading')}</span>}
+        {geocode.state === "pending" && <span>{t('trips.wizard.geocodePending')}</span>}
         {geocode.state === "found" && (
           <span>
             {t('trips.wizard.geocodeFound')

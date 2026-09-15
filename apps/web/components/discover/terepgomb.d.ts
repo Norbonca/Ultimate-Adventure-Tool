@@ -18,10 +18,12 @@ export interface GlobeMarker {
   city: string | null;
   startDate: string | null;
   endDate: string | null;
-  /** Weeks from `week0` to the start date (fractional). */
+  /** Weeks from `week0` to the start date (fractional; negative for past trips, may exceed 52). */
   week: number;
   /** Trip length in days (at least 1). */
   days: number;
+  /** The trip ended before `week0`; the grid still lists it, so the globe does too. */
+  past: boolean;
   host: string | null;
   difficulty: number;
   priceAmount: number | null;
@@ -70,6 +72,8 @@ export interface GlobeTrip {
   /** [lon, lat] — d3-geo order. */
   ll: [number, number];
   approximate: boolean;
+  /** Ended before week 0: pinned to the start of the timeline, the card says so. */
+  past: boolean;
 }
 
 export interface GlobeCategory {
@@ -108,6 +112,7 @@ export interface GlobeStrings {
   fitRoute: string;
   close: string;
   approximate: string;
+  past: string;
   reliefFail: string;
 }
 

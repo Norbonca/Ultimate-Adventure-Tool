@@ -74,6 +74,30 @@ a `test/unit/globe-payload.test.ts` fedi őket.
 | `routes` | `trip_itinerary_days.latitude/longitude` (035), napszám szerint — a koordinátákat a részletes túratervező trip timeline beállításában adja meg a felhasználó (M20, még nincs UI; ma tesztadat) | a kiválasztott túra útvonala (halo + vonal + állomások); csak ≥ 2 koordinátás nap esetén |
 | `categories[]` | aktív kategóriák, lokalizált névvel és színnel | tokenek |
 
+**Láthatóság — ugyanaz, mint a rácsé.** A végpont pontosan azokat a túrákat adja,
+amelyeket a rács listáz (`app/page.tsx` `fetchPublishedTrips`): `status = published`,
+`visibility = public`, `show_on_landing = true`, nem törölt — és ezek közül azokat,
+amelyeknek van koordinátája. Mock- vagy rögzített túralista a kliensben nincs;
+a rendererben rögzítve csak a tájékozódási feliratok (városok, vizek, hegységek)
+vannak. A `DISCOVER-VIEW-7` e2e teszt ellenőrzi, hogy minden marker kártyaként is
+szerepel. Gömb nézetben a találatszám a szűretlen készletet mutatja, mert a gömb a
+rács szűrőit nem használja.
+
+**Múltbeli túrák.** A rács a lezajlott publikált túrát is listázza, ezért a gömb is
+megtartja: a `markers[].past` (utolsó nap < `week0`) jelöli, a renderer az
+idővonal elejére teszi, halványan rajzolja, az ablak darabszámába nem számolja, a
+kártya pedig kiírja: „Lezajlott túra”. Az 52 héten túli túra az idővonal végére
+kerül (`timelineWeek`).
+
+**Geokódolás mentéskor.** A varázsló és a szerkesztő ugyanazt a `saveDraft`
+actiont hívja, amely a `lib/geocoding.ts`-en át geokódol (3 mp-es keret, sosem
+blokkol): változatlan, már feloldott helyszínnél nincs hívás; változott helyszínnél
+újra feloldja, és ha nem sikerül, az ország középpontjára teszi (`country_centroid`)
+— a régi hely pontja sosem marad. A provider a `LOCATION_GEOCODER` környezeti
+változóból jön (alap: `nominatim`), a teljes regiszter az M121 1b lépése. A
+varázsló előnézete a Nominatim-szabályzat miatt csak a véglegesített helyszínre
+kérdez (országváltás, mező elhagyása), gépelés közben nem.
+
 A marker `geocodeSource` mezője hordozza, honnan van a koordináta:
 
 - `nominatim` — a helyszínmezőkből feloldott, valódi hely;
@@ -98,7 +122,16 @@ fázisában áll át.
    markerek mögötti túrák pedig billentyűzetről és képernyőolvasóval a
    `.globe-fallback-list` listán keresztül elérhetők.
 
-Ezt az öt pontot a `tests/e2e/discover-view.spec.ts` teszteli.
+6. A gömb pontosan a rács túráit mutatja (láthatósági szerződés, fent).
+
+Ezt a hat pontot a `tests/e2e/discover-view.spec.ts` teszteli (DISCOVER-VIEW-1…7).
+
+**Mobil (≤ 720 px):** a gömb a telefonon a lap szélétől szélig fut; a fejsor gombjai
+és az évszak-chipek vízszintesen görgethetők, a tokensor a keretben görget, minden
+második hónapfelirat rejtett, a gesztus-tipp elmarad; a zászló- és klaszterfeliratok
+a keret szélén belül maradnak, egyedi zászló és klaszterchip nem fedi egymást, az
+alsó lap az idősáv fölött áll meg (`--tg-bottom-h`). Színek: kizárólag `globals.css`
+tokenek (PLAN-011).
 
 ## Teljesítmény
 
@@ -121,6 +154,8 @@ markup fordított szövegeket hordoz; a csempék a cache-ből jönnek.
 
 ---
 
-*Frissítve: 2026-09-14 (S39b) — a Claude Design Terepgömb-handoff bekötése:
+*Frissítve: 2026-09-15 (S40) — láthatósági egyezés a ráccsal, múltbeli túrák,
+geokódolás szerkesztéskor és országközéppont-tartalékkal, mobil 390 px, tokenek.
+Korábban: 2026-09-14 (S39b) — a Claude Design Terepgömb-handoff bekötése:
 csempés felszín, kategória-tokenek, idővonal, klaszterek, útvonal a napi
 programból, dokkolt kártya. Forrás: `handoff/globe/README.md`.*

@@ -10,11 +10,15 @@
 //   - update({ trips, routes }) a szűrt túrakészlet cseréjére újramountolás nélkül;
 //   - a11y: a zászlók gombok (role, aria-label, billentyű), a kapcsolók aria-pressed-et kapnak;
 //   - a destroy minden window/document figyelőt leszed.
+// 2026-09-15 (S40):
+//   - színek a globals.css tokenjeiből (PLAN-011), nincs hex a rendererben;
+//   - a múltbeli és az 52 héten túli túrák az idővonal szélére kerülnek (tw), a kártya jelzi a lezajlottat;
+//   - szűk nézet: a zászló- és klaszterfeliratok a gömb szélén belül maradnak, az alsó sáv valós magassága a határ.
 //
 // Használat:
 //   const globe = await mountGlobe(rootEl, { trips, categories, routes, week0, tiles, atlasUrl, locale, t, onOpen });
 //   globe.update({ trips, routes }); globe.destroy();
-// - trips: [{ id, slug, cat, title, place, host, week, days, price, spots, diff, ll: [lon, lat], approximate }]
+// - trips: [{ id, slug, cat, title, place, host, week, days, price, spots, diff, ll: [lon, lat], approximate, past }]
 // - categories: [{ id, label, color }]
 // - routes: { [tripId]: [[név, lon, lat], …] } — a napi program pontjai; üres objektum is mehet
 // - week0: 'YYYY-MM-DD' — a 0. hét napja (az API adja)
@@ -29,10 +33,19 @@ export async function mountGlobe(root, opts) {
   const T = opts.t;
   const intlLocale = opts.locale === "en" ? "en-US" : "hu-HU";
 
+  // színek a globals.css tokenjeiből — a gyökérelemen olvasva, így egy helyen állíthatók (PLAN-011)
+  const rootStyle = getComputedStyle(root);
+  const token = (name) => rootStyle.getPropertyValue(name).trim();
+  const COL = {
+    primary: token("--dark-primary"), label: token("--border-subtle"), stopInk: token("--globe-stop-ink"),
+    sphere: [token("--globe-sphere-1"), token("--globe-sphere-2"), token("--globe-sphere-3")],
+    land: [token("--globe-land-1"), token("--globe-land-2")],
+  };
+
   const CATS = opts.categories;            // [{id,label,color}]
   let TRIPS = opts.trips.slice();          // update() cseréli
   let ROUTES = opts.routes || {};          // { [tripId]: [[név, lon, lat], …] }
-  const catOf = (id) => CATS.find((c) => c.id === id) || { color: "#2DD4BF", label: "" };
+  const catOf = (id) => CATS.find((c) => c.id === id) || { color: COL.primary, label: "" };
 
   // Tájékozódási feliratok: csak nevek — a geometriát a csempe adja (a vízrajz-réteg a képből számol)
   const WATER_LABELS = [
@@ -46,6 +59,9 @@ export async function mountGlobe(root, opts) {
   const RANGES = [ { n: "Magas-Tátra", ll: [20.1, 49.2], r: 34 }, { n: "Alpok", ll: [11.5, 47.0], r: 120 }, { n: "Júliai-Alpok", ll: [13.8, 46.4], r: 26 }, { n: "Bükk", ll: [20.5, 48.05], r: 16 }, { n: "Mátra", ll: [19.85, 47.85], r: 12, minK: 1.2 }, { n: "Alacsony-Tátra", ll: [19.6, 48.9], r: 22, below: true }, { n: "Kárpátok", ll: [24.5, 47.0], r: 90 }, { n: "Dolomitok", ll: [11.6, 46.55], r: 30, minK: 1.3 } ];
   const CITIES = [ { n: "Budapest", ll: [19.04, 47.5] }, { n: "Wien", ll: [16.37, 48.21] }, { n: "Praha", ll: [14.42, 50.09] }, { n: "Kraków", ll: [19.94, 50.06] }, { n: "Bratislava", ll: [17.11, 48.14] }, { n: "Ljubljana", ll: [14.51, 46.06] }, { n: "Zagreb", ll: [15.98, 45.81] }, { n: "München", ll: [11.58, 48.14] }, { n: "Berlin", ll: [13.4, 52.52] }, { n: "Beograd", ll: [20.46, 44.82] } ];
   const W = 4;
+  const HORIZON = 52;
+  // az idővonalon elfoglalt hely: a múltbeli (negatív hét) és a 52 héten túli túra a sáv szélére kerül
+  const tw = (tr) => Math.max(0, Math.min(HORIZON, Number.isFinite(tr.week) ? tr.week : 0));
 
   // ── idő: a 0. hét napja az API-ból ───────────────────────────────────────
   const week0 = new Date(opts.week0 + "T12:00:00");
@@ -71,7 +87,7 @@ export async function mountGlobe(root, opts) {
 
   const state = { t: 3, rot: [-17.2, -48, 0], scale: 1, active: Object.fromEntries(CATS.map((c) => [c.id, true])), selected: null, gyro: false, dx: 0, dy: 0, dragging: false, water: true };
   const app = root, svg = d3.select($("globe")), pinsEl = $("pins"), cardEl = $("card");
-  let width = 0, height = 0, R = 0, baseR = 1, floorR = 1;
+  let width = 0, height = 0, R = 0, baseR = 1, floorR = 1, bottomReserve = 170;
   let chipRects = [];
   const projection = d3.geoOrthographic().clipAngle(90);
   const path = d3.geoPath(projection);
@@ -137,12 +153,12 @@ export async function mountGlobe(root, opts) {
   // ── SVG-váz ──────────────────────────────────────────────────────────────
   const defs = svg.append("defs");
   const sphereGrad = defs.append("radialGradient").attr("id", "tg-sph").attr("cx", "42%").attr("cy", "32%").attr("r", "75%");
-  sphereGrad.append("stop").attr("offset", "0%").attr("stop-color", "#1B2E4A");
-  sphereGrad.append("stop").attr("offset", "70%").attr("stop-color", "#0E1A30");
-  sphereGrad.append("stop").attr("offset", "100%").attr("stop-color", "#070C18");
+  sphereGrad.append("stop").attr("offset", "0%").attr("stop-color", COL.sphere[0]);
+  sphereGrad.append("stop").attr("offset", "70%").attr("stop-color", COL.sphere[1]);
+  sphereGrad.append("stop").attr("offset", "100%").attr("stop-color", COL.sphere[2]);
   const landGrad = defs.append("radialGradient").attr("id", "tg-lnd").attr("cx", "42%").attr("cy", "32%").attr("r", "80%");
-  landGrad.append("stop").attr("offset", "0%").attr("stop-color", "#2A3B55");
-  landGrad.append("stop").attr("offset", "100%").attr("stop-color", "#16223A");
+  landGrad.append("stop").attr("offset", "0%").attr("stop-color", COL.land[0]);
+  landGrad.append("stop").attr("offset", "100%").attr("stop-color", COL.land[1]);
   const rim = defs.append("radialGradient").attr("id", "tg-rim").attr("cx", "50%").attr("cy", "50%").attr("r", "50%");
   rim.append("stop").attr("offset", "86%").attr("stop-color", "rgba(45,212,191,0)");
   rim.append("stop").attr("offset", "100%").attr("stop-color", "rgba(45,212,191,.35)");
@@ -161,6 +177,9 @@ export async function mountGlobe(root, opts) {
 
   function layout() {
     width = app.clientWidth; height = app.clientHeight;
+    // az alsó sáv (idő, évszakok, attribúció) valós magassága — szűk nézetben két-három sorra törik
+    const bottomEl = app.querySelector(".tg-bottom"); bottomReserve = Math.max(170, bottomEl ? bottomEl.offsetHeight + 12 : 170);
+    app.style.setProperty("--tg-bottom-h", (bottomEl ? bottomEl.offsetHeight : 150) + "px");
     svg.attr("width", width).attr("height", height);
     // analitikus illesztés: a fő túra-bbox (lon 13–21 × lat 46–49.5 ≈ 8° × 4°) kitölti a biztonságos sávot; px/fok a középen ≈ R·π/180
     const rad = Math.PI / 180;
@@ -181,10 +200,10 @@ export async function mountGlobe(root, opts) {
       .attr("cx", (d) => projection(d.ll)[0]).attr("cy", (d) => projection(d.ll)[1]).attr("r", (d) => d.r * k * .45)
       .attr("fill", "none").attr("stroke", "rgba(251,191,36,.35)").attr("stroke-width", 1).attr("stroke-dasharray", "1 4");
     const inChip = (x, y) => chipRects.some((r) => x > r.l && x < r.r && y > r.t && y < r.b);
-    citiesG.selectAll("g").data(CITIES.filter((c) => { if (!visible(c.ll) || k <= 0.8) return false; const [x, y] = projection(c.ll); return y > 140 && y < height - 170 && !inChip(x, y); })).join((enter) => { const gg = enter.append("g"); gg.append("circle"); gg.append("text"); return gg; })
+    citiesG.selectAll("g").data(CITIES.filter((c) => { if (!visible(c.ll) || k <= 0.8) return false; const [x, y] = projection(c.ll); return y > 140 && y < height - bottomReserve && !inChip(x, y); })).join((enter) => { const gg = enter.append("g"); gg.append("circle"); gg.append("text"); return gg; })
       .each(function (d) { const [x, y] = projection(d.ll); const gg = d3.select(this); gg.select("circle").attr("cx", x).attr("cy", y).attr("r", 1.8).attr("fill", "rgba(203,213,225,.6)"); gg.select("text").attr("class", "city").attr("x", x + 5).attr("y", y + 3).text(d.n); });
     const labels = [...RANGES.filter((r) => !r.minK || k > r.minK).map((r) => ({ ...r, cls: "range", dy: r.below ? r.r * k * .5 + 12 : -r.r * k * .5 - 4 })),
-      ...WATER_LABELS.filter((w) => !w.minK || k > w.minK).map((w) => ({ ...w, cls: "water", dy: w.dy || 0 }))].filter((l) => visible(l.ll) && k > 0.6).filter((l) => { const [x, y] = projection(l.ll); const yy = y + l.dy; return yy > 140 && yy < height - 170 && !inChip(x, yy); });
+      ...WATER_LABELS.filter((w) => !w.minK || k > w.minK).map((w) => ({ ...w, cls: "water", dy: w.dy || 0 }))].filter((l) => visible(l.ll) && k > 0.6).filter((l) => { const [x, y] = projection(l.ll); const yy = y + l.dy; return yy > 140 && yy < height - bottomReserve && !inChip(x, yy); });
     labels.sort((a, b) => (b.r || 0) - (a.r || 0)); const kept = [];
     labels.forEach((l) => { const [x, y] = projection(l.ll); const yy = y + l.dy; if (!kept.some((o) => Math.abs(o.x - x) < (o.n.length + l.n.length) * 3.6 && Math.abs(o.yy - yy) < 14)) kept.push({ ...l, x, yy }); });
     labelsG.selectAll("text").data(state.water ? kept : kept.filter((d) => d.cls !== "water"), (d) => d.n).join("text").attr("class", (d) => "geo-label " + d.cls).attr("text-anchor", "middle")
@@ -204,7 +223,7 @@ export async function mountGlobe(root, opts) {
       const narrow = width <= 720;
       // szabad terület: széles nézetben a kártya melletti sáv, szűkben a lap fölötti sáv — a kártya valós méretéből
       const hostR = app.getBoundingClientRect(), cr = cardEl.getBoundingClientRect();
-      const sheetTop = cr.height ? cr.top - hostR.top : height - 150 - Math.min(height * .45, Math.max(0, height - 340));
+      const sheetTop = cr.height ? cr.top - hostR.top : height - bottomReserve - Math.min(height * .45, Math.max(0, height - 340));
       const freeTop = 150;
       const availX = narrow ? Math.max(200, width - 60) : Math.max(240, width - 120 - 340);
       const availY = narrow ? Math.max(90, sheetTop - freeTop) : Math.max(200, height - 320);
@@ -261,10 +280,10 @@ export async function mountGlobe(root, opts) {
       const gg = d3.select(this), first = d.i === 0;
       const r = first || d.last ? rBase * 1.35 : rBase;
       gg.select("circle.ring").attr("cx", d.x).attr("cy", d.y).attr("r", r + Math.max(2.5, rBase * .7)).attr("fill", "none").attr("stroke", col).attr("stroke-opacity", first ? .85 : .4).attr("stroke-width", 1.2);
-      gg.select("circle.dot").attr("cx", d.x).attr("cy", d.y).attr("r", r).attr("fill", first ? col : "#0B1324").attr("stroke", col).attr("stroke-width", 1.6);
+      gg.select("circle.dot").attr("cx", d.x).attr("cy", d.y).attr("r", r).attr("fill", first ? col : COL.stopInk).attr("stroke", col).attr("stroke-width", 1.6);
       gg.select("text.sl").attr("x", d.x).attr("y", d.y - r - Math.max(6, fs * .62)).attr("text-anchor", "middle")
         .attr("font-family", "IBM Plex Mono, monospace").attr("font-size", fs)
-        .attr("fill", "#E2E8F0").attr("stroke", "rgba(6,11,22,.85)").attr("stroke-width", Math.max(2.5, fs * .28)).attr("paint-order", "stroke")
+        .attr("fill", COL.label).attr("stroke", "rgba(6,11,22,.85)").attr("stroke-width", Math.max(2.5, fs * .28)).attr("paint-order", "stroke")
         .attr("opacity", lset.has(d.i) ? 1 : 0).text(d.n);
     });
   }
@@ -277,7 +296,7 @@ export async function mountGlobe(root, opts) {
           <span class="tg-card-tag">${esc(c.label)} · ${esc(T.days.replace("{count}", String(tr.days)))}</span>
           <button type="button" data-close class="tg-card-close" aria-label="${esc(T.close)}">×</button></div>
           <div class="tg-card-title">${esc(tr.title)}</div>
-          <div class="tg-card-meta">${esc(weekLabel(tr.week))} · ${esc(tr.place)}${tr.host ? " · " + esc(tr.host) : ""}${tr.approximate ? `<span class="tg-card-approx">${esc(T.approximate)}</span>` : ""}</div>${rt ? `<div class="tg-card-route"><span class="tg-card-route-line" style="background:${c.color}"></span><span class="tg-card-route-text">${esc(T.routePoints.replace("{count}", String(rt.length)))} · ${esc(rt[0][0])} → ${esc(rt[rt.length - 1][0])}</span><button type="button" data-fit class="tg-card-fit">${esc(T.fitRoute)}</button></div>` : ""}
+          <div class="tg-card-meta">${esc(weekLabel(tr.week))} · ${esc(tr.place)}${tr.host ? " · " + esc(tr.host) : ""}${tr.past ? `<span class="tg-card-past">${esc(T.past)}</span>` : ""}${tr.approximate ? `<span class="tg-card-approx">${esc(T.approximate)}</span>` : ""}</div>${rt ? `<div class="tg-card-route"><span class="tg-card-route-line" style="background:${c.color}"></span><span class="tg-card-route-text">${esc(T.routePoints.replace("{count}", String(rt.length)))} · ${esc(rt[0][0])} → ${esc(rt[rt.length - 1][0])}</span><button type="button" data-fit class="tg-card-fit">${esc(T.fitRoute)}</button></div>` : ""}
           </div><div class="foot"><div class="tg-card-price-wrap"><div class="tg-card-price">${esc(tr.price)}</div><div class="tg-card-spots">${esc(T.spotsLeft.replace("{count}", String(tr.spots)))}</div></div>
           <a data-open href="/trips/${esc(tr.slug)}" class="tg-card-cta">${esc(T.details)}</a></div></div>`;
   }
@@ -292,7 +311,7 @@ export async function mountGlobe(root, opts) {
 
   function drawPins() {
     const all = TRIPS.filter((tr) => state.active[tr.cat] && visible(tr.ll)).map((tr) => {
-      const c = catOf(tr.cat), d = Math.abs(tr.week - state.t), near = d <= W, mid = d <= 12, sel = state.selected === tr.id;
+      const c = catOf(tr.cat), d = tr.past ? W + 1 + Math.max(0, state.t) : Math.abs(tw(tr) - state.t), near = d <= W, mid = d <= 12, sel = state.selected === tr.id;
       const [x, y] = projection(tr.ll);
       return { tr, c, x, y, near, mid, sel, opacity: sel || near ? 1 : mid ? .55 : .18, scale: sel ? 1.12 : near ? 1 : mid ? .82 : .66, stem: sel ? 54 : near ? 30 + tr.spots * 2 : mid ? 20 : 12, side: 0 };
     }).sort((a, b) => a.y - b.y);
@@ -304,7 +323,7 @@ export async function mountGlobe(root, opts) {
       const a = vis[i], b = vis[j]; if (!(a.mid && b.mid)) continue;
       if (Math.abs(a.x - b.x) < 220 && Math.abs(a.y - b.y) < 46) { if (!a.side) a.side = b.side === 1 ? -1 : 1; else if (a.stem < 90) a.stem = Math.min(90, a.stem + 44); }
     }
-    vis.forEach((p) => { p.stem = Math.min(90, p.stem); const top = p.y - p.stem - 38; if (top < 140) p.stem = Math.max(12, p.y - 178); if (p.x < 40) p.hideLabel = true; else if (p.x < 300) p.side = 1; else if (p.x > width - 300) p.side = -1; p.hideLabel = p.hideLabel || p.y - p.stem - 38 > height - 200 || p.y > height - 170 || (state.scale < .45 && !p.near && !p.sel && d3.geoDistance(p.tr.ll, [-state.rot[0], -state.rot[1]]) < 0.35); });
+    vis.forEach((p) => { p.stem = Math.min(90, p.stem); const top = p.y - p.stem - 38; if (top < 140) p.stem = Math.max(12, p.y - 178); const edge = Math.min(300, width * .3); if (p.x < 40) p.hideLabel = true; else if (p.x < edge) p.side = 1; else if (p.x > width - edge) p.side = -1; p.hideLabel = p.hideLabel || p.y - p.stem - 38 > height - bottomReserve - 30 || p.y > height - bottomReserve || (state.scale < .45 && !p.near && !p.sel && d3.geoDistance(p.tr.ll, [-state.rot[0], -state.rot[1]]) < 0.35); });
     const clusterEls = clusters.map((grp) => {
       const cx = d3.mean(grp, (q) => q.x), cy = d3.mean(grp, (q) => q.y), near = grp.some((q) => q.near);
       const uniq = [...new Set(grp.map((q) => q.tr.place.split(",")[0]))]; const names = uniq.slice(0, 2).join(" · ") + (grp.length > 2 ? " · +" + (grp.length - 2) : "");
@@ -315,10 +334,14 @@ export async function mountGlobe(root, opts) {
     for (let i = 0; i < clusterEls.length; i++) for (let j = 0; j < i; j++) { const a = clusterEls[i], b = clusterEls[j]; if (Math.abs(a.cx - b.cx) < 320 && Math.abs(a.cy - b.cy) < 46 + Math.abs(a.stem - b.stem)) { if (!a.side) a.side = b.side === 1 ? -1 : 1; else a.stem += 44; } }
     const crect = (c) => { const w = 320, l = c.side === 1 ? c.cx - w * .08 : c.side === -1 ? c.cx - w * .92 : c.cx - w / 2, t = c.cy - c.stem - 38; return { l, r: l + w, t, b: t + 38 }; };
     for (let pass = 0; pass < 3; pass++) for (let i = 0; i < clusterEls.length; i++) for (let j = 0; j < i; j++) { const a = clusterEls[i], b = clusterEls[j], ra = crect(a), rb = crect(b); if (ra.l < rb.r && ra.r > rb.l && ra.t < rb.b && ra.b > rb.t) a.stem += 44; }
+    // egyedi zászló és klaszterchip ne fedje egymást: a közeli (ablakon belüli) zászló feltolja a chipet, a halvány ponttá válik
+    const prect = (p) => { const w = Math.min(width - 16, 60 + p.tr.title.length * 7.5), l = p.side === 1 ? p.x - w * .08 : p.side === -1 ? p.x - w * .92 : p.x - w / 2, t = p.y - p.stem - 38; return { l, r: l + w, t, b: t + 38 }; };
+    const hit = (a, b) => a.l < b.r && a.r > b.l && a.t < b.b && a.b > b.t;
+    vis.forEach((p) => { if (p.hideLabel || p.sel) return; clusterEls.forEach((c) => { if (p.hideLabel || !hit(prect(p), crect(c))) return; if (p.near) c.stem += 44; else p.hideLabel = true; }); });
     // a chipek alatt nincs földrajzi felirat
-    chipRects = clusterEls.filter((c) => c.cy - c.stem - 40 <= height - 200 && c.cy <= height - 170).map((c) => { const w = 282, l = c.side === 1 ? c.cx - w * .08 : c.side === -1 ? c.cx - w * .92 : c.cx - w / 2; return { l, r: l + w, t: c.cy - c.stem - 44, b: c.cy - c.stem + 4 }; });
+    chipRects = clusterEls.filter((c) => c.cy - c.stem - 40 <= height - bottomReserve - 30 && c.cy <= height - bottomReserve).map((c) => { const w = 282, l = c.side === 1 ? c.cx - w * .08 : c.side === -1 ? c.cx - w * .92 : c.cx - w / 2; return { l, r: l + w, t: c.cy - c.stem - 44, b: c.cy - c.stem + 4 }; });
     pinsEl.innerHTML = "";
-    const select = (tr) => { state.selected = tr.id; state.t = tr.week; render(); };
+    const select = (tr) => { state.selected = tr.id; state.t = tw(tr); render(); };
     vis.forEach((p) => {
       if (p.x < 0 || p.x > width || p.y < 0 || p.y > height) return;
       if (p.hideLabel) {
@@ -332,25 +355,32 @@ export async function mountGlobe(root, opts) {
       el.className = "pin" + (p.near ? " near" : "") + (p.sel ? " sel" : "");
       el.style.left = p.x + "px"; el.style.top = p.y + "px"; el.style.opacity = p.opacity; el.style.zIndex = p.sel ? 100 : p.near ? 50 : 10;
       const tx = p.side === 1 ? "-8%" : p.side === -1 ? "-92%" : "-50%"; el.style.transformOrigin = p.side === 1 ? "8% 100%" : p.side === -1 ? "92% 100%" : "50% 100%";
-      el.style.transform = `translate(${tx},-100%) scale(${p.scale})`; el.style.pointerEvents = p.mid || p.sel ? "auto" : "none";
+      el.style.transform = `translate(${tx},-100%) scale(${p.scale})`; el.dataset.s = String(p.scale); el.style.pointerEvents = p.mid || p.sel ? "auto" : "none";
       el.innerHTML = `<div class="stem" style="height:${p.stem}px;left:${p.side === 1 ? "8%" : p.side === -1 ? "92%" : "50%"};background:linear-gradient(180deg,${p.c.color},transparent)"></div>
-        <div class="lbl${p.tr.approximate ? " approx" : ""}" style="margin-bottom:${p.stem}px;border-color:${p.sel || p.near ? p.c.color : "#334155"}"><span class="dot" style="background:${p.c.color};box-shadow:0 0 10px ${p.c.color}"></span><b>${esc(p.tr.title)}</b><small class="mono" style="color:${p.near ? p.c.color : "#64748B"}">${esc(weekLabel(p.tr.week))}</small></div>`;
+        <div class="lbl${p.tr.approximate ? " approx" : ""}" style="margin-bottom:${p.stem}px;border-color:${p.sel || p.near ? p.c.color : "var(--dark-border)"}"><span class="dot" style="background:${p.c.color};box-shadow:0 0 10px ${p.c.color}"></span><b>${esc(p.tr.title)}</b><small class="mono" style="color:${p.near ? p.c.color : "var(--text-slate)"}">${esc(weekLabel(p.tr.week))}</small></div>`;
       const lbl = el.querySelector(".lbl");
       pinBtn(lbl, p.tr.title, () => { if (p.sel) { state.selected = null; render(); return; } select(p.tr); }, () => { select(p.tr); frameRoute(p.tr); render(); });
       if (p.sel) lbl.setAttribute("aria-pressed", "true");
       pinsEl.appendChild(el);
     });
-    clusterEls.filter((cl) => cl.cy - cl.stem - 40 <= height - 200 && cl.cy <= height - 170).forEach((cl) => {
+    clusterEls.filter((cl) => cl.cy - cl.stem - 40 <= height - bottomReserve - 30 && cl.cy <= height - bottomReserve).forEach((cl) => {
       const el = document.createElement("div"); el.className = "pin" + (cl.near ? " near" : "");
       el.style.left = cl.cx + "px"; el.style.top = cl.cy + "px"; el.style.opacity = cl.near ? 1 : .6; el.style.zIndex = 60; el.style.pointerEvents = "auto";
       const ctx = cl.side === 1 ? "-8%" : cl.side === -1 ? "-92%" : "-50%"; el.style.transform = `translate(${ctx},-100%)`;
       const label = T.tripsCount.replace("{count}", String(cl.n));
-      el.innerHTML = `<div class="stem" style="height:${cl.stem}px;left:${cl.side === 1 ? "8%" : cl.side === -1 ? "92%" : "50%"};background:linear-gradient(180deg,#2DD4BF,transparent)"></div>
-        <div class="lbl" style="margin-bottom:${cl.stem}px;border-color:#2DD4BF"><span class="tg-cluster-dots">${cl.colors.slice(0, 4).map((c) => `<span class="dot" style="background:${c}"></span>`).join("")}</span><b>${esc(label)}</b><small class="mono tg-cluster-names">${esc(cl.names)}</small><small class="mono tg-cluster-zoom">⤢</small></div>`;
+      el.innerHTML = `<div class="stem" style="height:${cl.stem}px;left:${cl.side === 1 ? "8%" : cl.side === -1 ? "92%" : "50%"};background:linear-gradient(180deg,var(--dark-primary),transparent)"></div>
+        <div class="lbl tg-cluster" style="margin-bottom:${cl.stem}px;border-color:var(--dark-primary)"><span class="tg-cluster-dots">${cl.colors.slice(0, 4).map((c) => `<span class="dot" style="background:${c}"></span>`).join("")}</span><b>${esc(label)}</b><small class="mono tg-cluster-names">${esc(cl.names)}</small><small class="mono tg-cluster-zoom">⤢</small></div>`;
       pinBtn(el.querySelector(".lbl"), `${label} — ${cl.names}`, () => { state.rot = [-cl.ll[0], -cl.ll[1], 0]; state.scale = Math.max(state.scale * 2, 2); render(); });
       pinsEl.appendChild(el);
     });
     const host = app.getBoundingClientRect();
+    // szűk nézetben a felirat nem lóghat ki a gömb keretéből: vízszintesen visszatoljuk (a zászló szára a helyén marad)
+    pinsEl.querySelectorAll(".lbl").forEach((el) => {
+      const r = el.getBoundingClientRect(), k = Number(el.parentElement?.dataset.s) || 1, pad = 8;
+      const over = r.right - (host.right - pad), under = (host.left + pad) - r.left;
+      const shift = under > 0 ? under : over > 0 ? -Math.min(over, r.left - (host.left + pad)) : 0;
+      if (shift) el.style.transform = `translateX(${shift / k}px)`;
+    });
     pinsEl.querySelectorAll(".lbl").forEach((el) => { const r = el.getBoundingClientRect(); chipRects.push({ l: r.left - host.left, r: r.right - host.left, t: r.top - host.top, b: r.bottom - host.top }); });
     const cardTrip = TRIPS.find((t) => t.id === state.selected) || null;
     cardEl.className = cardTrip ? "on" : "";
@@ -361,7 +391,7 @@ export async function mountGlobe(root, opts) {
       const op = cardEl.querySelector("[data-open]"); if (op && opts.onOpen) op.onclick = (e) => { e.preventDefault(); opts.onOpen(cardTrip.slug); };
       cardEl.querySelector("[data-close]").onclick = (e) => { e.stopPropagation(); state.selected = null; render(); };
     }
-    const inWin = TRIPS.filter((tr) => state.active[tr.cat] && Math.abs(tr.week - state.t) <= W); const hidden = inWin.filter((tr) => !visible(tr.ll)).length;
+    const inWin = TRIPS.filter((tr) => state.active[tr.cat] && !tr.past && Math.abs(tw(tr) - state.t) <= W); const hidden = inWin.filter((tr) => !visible(tr.ll)).length;
     $("nowsub").textContent = `${season(state.t)} · ${T.inWindow.replace("{count}", String(inWin.length))}` + (hidden ? ` · ${T.hiddenBehind.replace("{count}", String(hidden))}` : "");
   }
 
@@ -386,11 +416,11 @@ export async function mountGlobe(root, opts) {
 
   // ── idővonal (52 hét) ────────────────────────────────────────────────────
   const track = $("track");
-  MONTHS.forEach((m, i) => { const x = (i / 12 * 100) + "%"; const t = document.createElement("div"); t.className = "tick"; t.style.left = x; track.appendChild(t); const l = document.createElement("div"); l.className = "tickl mono"; l.style.left = x; l.textContent = m; track.appendChild(l); });
+  MONTHS.forEach((m, i) => { const x = (i / 12 * 100) + "%"; const t = document.createElement("div"); t.className = "tick"; t.style.left = x; track.appendChild(t); const l = document.createElement("div"); l.className = "tickl mono" + (i % 2 ? " tg-tick-odd" : ""); l.style.left = x; l.textContent = m; track.appendChild(l); });
   let dots = [];
   function buildDots() {
     dots.forEach(({ d }) => d.remove());
-    dots = TRIPS.map((tr) => { const d = document.createElement("div"); d.className = "tld"; d.style.left = (tr.week / 52 * 100) + "%"; d.style.width = Math.max(6, tr.days * 3) + "px"; d.style.background = catOf(tr.cat).color; track.insertBefore(d, win); return { d, tr }; });
+    dots = TRIPS.map((tr) => { const d = document.createElement("div"); d.className = "tld"; d.style.left = (tw(tr) / 52 * 100) + "%"; d.style.width = Math.max(6, tr.days * 3) + "px"; d.style.background = catOf(tr.cat).color; track.insertBefore(d, win); return { d, tr }; });
   }
   const win = document.createElement("div"); win.id = "tg-win"; track.appendChild(win);
   const handle = document.createElement("div"); handle.id = "tg-handle"; track.appendChild(handle);
@@ -407,7 +437,7 @@ export async function mountGlobe(root, opts) {
     $("now").textContent = weekLabel(state.t);
     handle.style.left = (state.t / 52 * 100) + "%";
     const a = Math.max(0, state.t - W), b = Math.min(52, state.t + W); win.style.left = (a / 52 * 100) + "%"; win.style.width = ((b - a) / 52 * 100) + "%";
-    dots.forEach(({ d, tr }) => d.style.opacity = state.active[tr.cat] ? (Math.abs(tr.week - state.t) <= W ? 1 : .45) : .12);
+    dots.forEach(({ d, tr }) => d.style.opacity = state.active[tr.cat] ? (!tr.past && Math.abs(tw(tr) - state.t) <= W ? 1 : .45) : .12);
     seasonsEl.querySelectorAll(".chip").forEach((el) => { const on = Math.abs(state.t - +el.dataset.t) < 3; el.classList.toggle("on", on); el.setAttribute("aria-pressed", on ? "true" : "false"); });
   }
 
@@ -453,7 +483,7 @@ export async function mountGlobe(root, opts) {
       if (state.selected && !TRIPS.some((t) => t.id === state.selected)) state.selected = null;
       buildDots(); renderTokens(); render();
     },
-    frameTrip(id) { const tr = TRIPS.find((t) => t.id === id); if (!tr) return; state.selected = tr.id; state.t = tr.week; frameRoute(tr); render(); },
+    frameTrip(id) { const tr = TRIPS.find((t) => t.id === id); if (!tr) return; state.selected = tr.id; state.t = tw(tr); frameRoute(tr); render(); },
     destroy() {
       clearTimeout(tickTO); clearTimeout(reliefTimer); if (reliefTO) clearTimeout(reliefTO);
       ro.disconnect(); io.disconnect();

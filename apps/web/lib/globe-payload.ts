@@ -30,6 +30,27 @@ export function weeksFrom(week0: string, date: string | null): number {
   return (b - a) / WEEK_MS;
 }
 
+/**
+ * True when the trip is over by `week0` (its last day — or its only known day —
+ * is before week 0). The grid lists past published trips, so the globe keeps
+ * them too; the renderer pins them to the start of the timeline and the card
+ * says the trip has ended.
+ */
+export function isPastTrip(week0: string, start: string | null, end: string | null): boolean {
+  const last = end ?? start;
+  if (!last) return false;
+  const a = Date.parse(`${week0}T00:00:00Z`);
+  const b = Date.parse(`${last}T00:00:00Z`);
+  if (Number.isNaN(a) || Number.isNaN(b)) return false;
+  return b < a;
+}
+
+/** Position on the 52-week scrubber: past and far-future trips are clamped to its ends. */
+export function timelineWeek(week: number, horizon = 52): number {
+  if (!Number.isFinite(week)) return 0;
+  return Math.max(0, Math.min(horizon, week));
+}
+
 /** Inclusive length of a trip in days, at least 1. */
 export function tripDays(start: string | null, end: string | null): number {
   if (!start || !end) return 1;

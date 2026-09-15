@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildRoute, todayIso, tripDays, weeksFrom } from "@/lib/globe-payload";
+import { buildRoute, isPastTrip, timelineWeek, todayIso, tripDays, weeksFrom } from "@/lib/globe-payload";
 
 describe("globe payload helpers", () => {
   it("counts weeks from week0, fractional and negative alike", () => {
@@ -42,5 +42,20 @@ describe("globe payload helpers", () => {
     expect(buildRoute([{ day_number: 1, title: "A", latitude: 47, longitude: 19 }], (n) => String(n))).toBeNull();
     expect(buildRoute([], (n) => String(n))).toBeNull();
     expect(buildRoute(null, (n) => String(n))).toBeNull();
+  });
+
+  it("flags a trip as past only once its last day is before week 0", () => {
+    expect(isPastTrip("2026-09-15", "2026-07-12", "2026-07-14")).toBe(true);
+    expect(isPastTrip("2026-09-15", "2026-09-10", "2026-09-16")).toBe(false); // running now
+    expect(isPastTrip("2026-09-15", "2026-09-14", null)).toBe(true);
+    expect(isPastTrip("2026-09-15", "2026-11-12", "2026-11-15")).toBe(false);
+    expect(isPastTrip("2026-09-15", null, null)).toBe(false);
+  });
+
+  it("clamps the timeline position to the 52-week scrubber", () => {
+    expect(timelineWeek(-17.3)).toBe(0);
+    expect(timelineWeek(10.5)).toBe(10.5);
+    expect(timelineWeek(55.4)).toBe(52);
+    expect(timelineWeek(Number.NaN)).toBe(0);
   });
 });
