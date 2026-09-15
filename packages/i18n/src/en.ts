@@ -579,6 +579,7 @@ const en: TranslationKeys = {
 
     // Detail page
     detail: {
+      registrationDeadlineUntil: "Until 23:59 on {date} ({timezone})",
       organizer: "Organizer",
       description: "Description",
       details: "Details",
@@ -717,6 +718,9 @@ const en: TranslationKeys = {
       pricePerPerson: "Price per Person",
       currency: "Currency",
       registrationDeadline: "Registration Deadline (optional)",
+      timezone: "Trip time zone",
+      timezoneHint: "The deadline and the trip times follow this time zone.",
+      registrationDeadlineHint: "Registration is open until 23:59 on {date} ({timezone}).",
       back: "Back",
       next: "Next",
       saveDraft: "Save Draft",

@@ -10,6 +10,7 @@ import { BackButton } from "@/components/BackButton";
 import { ApplyButton } from "@/components/ApplyButton";
 import { Icon } from "@/components/Icon";
 import { formatParameterValue, type ParameterDisplayOption } from "@/lib/i18n/localized";
+import { formatLocalDate } from "@/lib/timezone";
 
 interface TripDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -499,7 +500,12 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                 <div className="flex justify-between">
                   <span className="text-navy-500">{t("trips.wizard.registrationDeadline")}</span>
                   <span className="font-medium text-navy-700">
-                    {new Date(trip.registration_deadline).toLocaleDateString(dateLocale)}
+                    {trip.registration_deadline_date
+                      ? t("trips.detail.registrationDeadlineUntil", {
+                          date: formatLocalDate(String(trip.registration_deadline_date), dateLocale),
+                          timezone: trip.timezone || "UTC",
+                        })
+                      : new Date(trip.registration_deadline).toLocaleDateString(dateLocale, { timeZone: "UTC" })}
                   </span>
                 </div>
               )}

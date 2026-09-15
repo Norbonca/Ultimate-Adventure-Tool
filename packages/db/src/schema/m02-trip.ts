@@ -255,7 +255,11 @@ export const trips = pgTable(
     showOnLanding: boolean('show_on_landing').notNull().default(true),
     requireApproval: boolean('require_approval').notNull().default(true),
     autoAccept: boolean('auto_accept').notNull().default(false),
+    /** Zárópillanat (kizárólagos felső határ); a 036-os trigger számolja a határnapból és az időzónából. */
     registrationDeadline: timestamp('registration_deadline', { withTimezone: true }),
+    registrationDeadlineDate: date('registration_deadline_date'),
+    /** A szervezés időzónája (IANA), alapértelmezés: UTC. */
+    timezone: text('timezone').notNull().default('UTC'),
     publishedAt: timestamp('published_at', { withTimezone: true }),
     cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
     cancelledReason: varchar('cancelled_reason', { length: 50 }),

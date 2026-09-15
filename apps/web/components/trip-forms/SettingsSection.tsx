@@ -4,6 +4,7 @@ import type { WizardFormData } from "@/app/(app)/trips/types";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import type { TranslationKey } from "@uat/i18n";
 import { Icon } from "@/components/Icon";
+import { TimezoneSelect } from "./TimezoneSelect";
 
 interface SettingsSectionProps {
   data: WizardFormData;
@@ -176,6 +177,12 @@ export function SettingsSection({ data, onChange }: SettingsSectionProps) {
             className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
           />
         </div>
+        <TimezoneSelect
+          id="edit-trip-timezone"
+          value={data.timezone}
+          onChange={(timezone) => onChange({ timezone })}
+          className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 bg-white focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
+        />
       </div>
 
       {/* Show on landing */}

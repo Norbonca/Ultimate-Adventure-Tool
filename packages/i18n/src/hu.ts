@@ -588,6 +588,7 @@ const hu = {
 
     // Detail page
     detail: {
+      registrationDeadlineUntil: "{date} 23:59-ig ({timezone})",
       organizer: "Szervező",
       description: "Leírás",
       details: "Részletek",
@@ -735,6 +736,9 @@ const hu = {
       pricePerPerson: "Ár személyenként",
       currency: "Valuta",
       registrationDeadline: "Jelentkezési határidő (opcionális)",
+      timezone: "A szervezés időzónája",
+      timezoneHint: "A határidő és a túra időpontjai ennek az időzónának megfelelően értendők.",
+      registrationDeadlineHint: "Jelentkezni {date} 23:59-ig lehet ({timezone} szerint).",
       // Actions
       back: "Vissza",
       next: "Tovább",

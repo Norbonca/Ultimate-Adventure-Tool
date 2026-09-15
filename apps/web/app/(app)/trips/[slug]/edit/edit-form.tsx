@@ -53,6 +53,8 @@ interface TripData {
   visibility: string;
   require_approval: boolean;
   registration_deadline: string | null;
+  registration_deadline_date?: string | null;
+  timezone?: string | null;
   price_amount: number | string | null;
   price_currency: string;
   is_cost_sharing: boolean;
@@ -116,9 +118,12 @@ export function EditTripForm({
     category_details: (trip.category_details as Record<string, unknown>) || {},
     visibility: (trip.visibility as WizardFormData["visibility"]) || "public",
     require_approval: trip.require_approval,
-    registration_deadline: trip.registration_deadline
-      ? String(trip.registration_deadline).slice(0, 10)
-      : "",
+    registration_deadline: trip.registration_deadline_date
+      ? String(trip.registration_deadline_date)
+      : trip.registration_deadline
+        ? String(trip.registration_deadline).slice(0, 10)
+        : "",
+    timezone: trip.timezone || "UTC",
     price_amount: trip.price_amount ? Number(trip.price_amount) : null,
     price_currency: trip.price_currency || "EUR",
     is_cost_sharing: trip.is_cost_sharing,

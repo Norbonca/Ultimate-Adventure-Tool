@@ -264,7 +264,10 @@ export async function saveDraft(
     category_details: formData.category_details || {},
     visibility: formData.visibility || "private",
     require_approval: requireApproval,
-    registration_deadline: formData.registration_deadline || null,
+    // A zárópillanatot (registration_deadline) az adatbázis számolja a határnapból és az
+    // időzónából (036-os migráció): a megadott napot követő nap 00:00 a túra zónájában.
+    registration_deadline_date: formData.registration_deadline || null,
+    timezone: formData.timezone || "UTC",
     price_amount: formData.price_amount || null,
     price_currency: formData.price_currency || "EUR",
     is_cost_sharing: formData.is_cost_sharing ?? true,
@@ -589,7 +592,10 @@ export async function fetchTripForEdit(tripId: string): Promise<{
     category_details: (trip.category_details as Record<string, unknown>) || {},
     visibility: trip.visibility || "public",
     require_approval: trip.require_approval ?? true,
-    registration_deadline: trip.registration_deadline ? String(trip.registration_deadline).slice(0, 10) : "",
+    registration_deadline: trip.registration_deadline_date
+      ? String(trip.registration_deadline_date)
+      : trip.registration_deadline ? String(trip.registration_deadline).slice(0, 10) : "",
+    timezone: trip.timezone || "UTC",
     price_amount: trip.price_amount ? Number(trip.price_amount) : null,
     price_currency: trip.price_currency || "EUR",
     is_cost_sharing: trip.is_cost_sharing ?? true,
