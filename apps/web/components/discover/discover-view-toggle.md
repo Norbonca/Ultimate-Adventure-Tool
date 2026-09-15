@@ -153,7 +153,7 @@ z13 — ráközelítve élesedik; Norbert döntése 2026-09-14, NyK-13; pontosí
 2026-09-15: az oldal jelenlegi állapotában nem kereskedelmi, ezért az EOX a
 CC-BY-NC-SA 4.0 feltételeivel, attribúcióval élesben is használható — a
 kereskedelmi licenc akkor kell, amikor az oldal kereskedelmi működésre vált). Tartalék a NASA GIBS Blue Marble (kulcs és licenc nélkül, max. z8,
-ráközelítve elmosódik). A csempéket a böngésző gyorsítótárazza. Az országhatárok a `public/globe/countries-50m.json`
+ráközelítve elmosódik). A csempéket a böngésző gyorsítótárazza. **Zoom-teljesítmény (2026-09-15):** a csempe pixelei betöltéskor egyszer dekódolódnak; legfeljebb 8 csempekérés fut egyszerre, az elavult zoomszint kérése kiesik, a hibás csempe újrapróbálódik (korábban lyuk maradt); a z2–z3 világcsempék előre töltődnek, a hiányzó csempe helyén a szülő csempe látszik; a rajzolás `requestAnimationFrame`-mel képkockánként egyszer fut, interakció közben durvább mintavétellel; az ortografikus inverz vetítés kézzel számolódik; az SVG-utak a képernyő szélére vágódnak (`clipExtent`) — nagy nagyításnál ez vitte el a képkockát; a görgetés a görgetés mértékével arányosan nagyít. Mérés (1440×900, 60 görgetési lépés): hosszú feladatok 71 db / 8,2 s → 0. Az országhatárok a `public/globe/countries-50m.json`
 (world-atlas 1:50M) fájlból jönnek. Nyelvváltáskor a gömb újramountol, mert a
 markup fordított szövegeket hordoz; a csempék a cache-ből jönnek.
 

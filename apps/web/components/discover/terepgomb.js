@@ -107,55 +107,115 @@ export async function mountGlobe(root, opts) {
   const loadingEl = $("loading"); if (loadingEl) loadingEl.remove();
 
   // ── felszín: Web Mercator csempék a gömbre vetítve ───────────────────────
+  // Teljesítmény (S40 zoom-javítás, 2026-09-15):
+  //  - a csempe pixeleit betöltéskor EGYSZER dekódoljuk (korábban minden képkockán drawImage + getImageData csempénként);
+  //  - interakció (húzás, görgetés, csippentés, idő-húzás) közben durva mintavétel; a hiányzó csempe helyén a
+  //    legközelebbi betöltött szülő csempe látszik, amíg a pontos meg nem jön;
+  //  - legfeljebb TILE_CONCURRENCY kérés fut egyszerre, a sorban álló, már nem aktuális zoomszintű kérés kiesik;
+  //    a hibás csempe visszalépéssel újrapróbálódik (korábban örökre lyuk maradt → „széttört” felszín);
+  //  - a z2–z3 világcsempék induláskor betöltődnek, így mindig van mire visszaesni.
   const relief = { canvas: $("relief"), ctx: null, tiles: new Map(), fail: false, anyLoaded: false };
   relief.ctx = relief.canvas.getContext("2d");
-  const TILE = 256, TILE_URL = opts.tiles.url, MAX_TILE_Z = opts.tiles.maxZoom;
+  const TILE = 256, TILE_URL = opts.tiles.url, MAX_TILE_Z = opts.tiles.maxZoom, MIN_TILE_Z = 2;
+  const TILE_CONCURRENCY = 8, TILE_RETRIES = 3, DECODED_CAP = 320;
+  const tileCanvas = document.createElement("canvas"); tileCanvas.width = TILE; tileCanvas.height = TILE; const tileCtx = tileCanvas.getContext("2d", { willReadFrequently: true });
+  let tileQueue = [], tileActive = 0, wantedZ = MIN_TILE_Z, destroyed = false, decodedCount = 0, useTick = 0;
   function tileKey(z, x, y) { return z + "/" + x + "/" + y; }
-  function getTile(z, x, y) {
-    const k = tileKey(z, x, y); let t = relief.tiles.get(k); if (t) return t;
-    t = { img: new Image(), ok: false }; t.img.crossOrigin = "anonymous";
-    t.img.onload = () => { t.ok = true; relief.anyLoaded = true; scheduleRelief(); };
-    t.img.onerror = () => { if (!relief.anyLoaded && !relief.fail) { relief.fail = true; reliefFail(); } };
-    t.img.src = TILE_URL(z, x, y); relief.tiles.set(k, t); return t;
+  function pumpTiles() {
+    while (!destroyed && tileActive < TILE_CONCURRENCY && tileQueue.length) {
+      const t = tileQueue.pop(); // a legfrissebb kérés előre
+      if (t.z > MIN_TILE_Z + 1 && t.z !== wantedZ) { t.state = "idle"; continue; } // elavult zoomszint — kiesik, később újrakérhető
+      tileActive++; t.state = "loading";
+      const img = new Image(); img.crossOrigin = "anonymous"; img.decoding = "async";
+      img.onload = () => {
+        tileActive--;
+        try { tileCtx.clearRect(0, 0, TILE, TILE); tileCtx.drawImage(img, 0, 0); t.data = tileCtx.getImageData(0, 0, TILE, TILE).data; t.state = "ok"; decodedCount++; relief.anyLoaded = true; }
+        catch (_) { t.state = "failed"; }
+        evictTiles(); scheduleRelief(); pumpTiles();
+      };
+      img.onerror = () => {
+        tileActive--; t.tries++;
+        if (t.tries < TILE_RETRIES) { t.state = "retry"; setTimeout(() => { if (!destroyed && t.state === "retry") { t.state = "queued"; tileQueue.push(t); pumpTiles(); } }, 800 * t.tries * t.tries); }
+        else { t.state = "failed"; if (!relief.anyLoaded && !relief.fail && t.z <= MIN_TILE_Z + 1) { relief.fail = true; reliefFail(); } }
+        pumpTiles();
+      };
+      img.src = TILE_URL(t.z, t.x, t.y);
+    }
+  }
+  function evictTiles() {
+    if (decodedCount <= DECODED_CAP) return;
+    const olds = [...relief.tiles.values()].filter((t) => t.state === "ok" && t.z > MIN_TILE_Z + 1).sort((a, b) => a.used - b.used);
+    for (const t of olds.slice(0, decodedCount - DECODED_CAP)) { t.data = null; t.state = "idle"; decodedCount--; }
+  }
+  /** A csempe pixelei, ha betöltött; `request` esetén a hiányzót sorba állítja. */
+  function tilePixels(z, x, y, request) {
+    const n = 1 << z; x = ((x % n) + n) % n; if (y < 0 || y >= n) return null;
+    const k = tileKey(z, x, y); let t = relief.tiles.get(k);
+    if (!t) { t = { z, x, y, state: "idle", tries: 0, data: null, used: 0 }; relief.tiles.set(k, t); }
+    if (t.state === "ok") { t.used = useTick; return t.data; }
+    if (request && t.state === "idle") { t.state = "queued"; tileQueue.push(t); }
+    return null;
   }
   function reliefFail() { const el = document.createElement("div"); el.className = "mono tg-relief-fail"; el.setAttribute("role", "status"); el.textContent = T.reliefFail; app.appendChild(el); }
   const merc = { x: (lon, z) => (lon + 180) / 360 * (1 << z), y: (lat, z) => { const s = Math.sin(lat * Math.PI / 180); return (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * (1 << z); } };
-  function zoomLevel() { const pxPerDeg = projection.scale() * Math.PI / 180; return Math.max(2, Math.min(MAX_TILE_Z, Math.round(Math.log2(pxPerDeg * 360 / TILE) + 0.6))); }
+  function zoomLevel() { const pxPerDeg = projection.scale() * Math.PI / 180; return Math.max(MIN_TILE_Z, Math.min(MAX_TILE_Z, Math.round(Math.log2(pxPerDeg * 360 / TILE) + 0.6))); }
+  let reliefImage = null;
   function drawRelief(fast) {
-    const cv = relief.canvas; if (cv.width !== width || cv.height !== height) { cv.width = width; cv.height = height; }
+    const cv = relief.canvas; if (cv.width !== width || cv.height !== height) { cv.width = width; cv.height = height; reliefImage = null; }
     const ctx = relief.ctx; ctx.clearRect(0, 0, width, height);
     if (relief.fail && !relief.anyLoaded) return;
+    useTick++;
     const [cx, cy] = projection.translate(), r = projection.scale();
-    const z = zoomLevel(), step = fast ? 4 : 2;
-    // minden képernyőpixelt visszavetítünk → a Mercator-csempe pixele; a betöltött csempékből mintavételezünk (szülő csempére visszaesve)
-    const out = ctx.createImageData(width, height), od = out.data;
+    // interakció közben is kérünk csempét a pillanatnyi zoomszintre, de a sor az elavult szinteket eldobja és
+    // legfeljebb TILE_CONCURRENCY kérés fut — így nincs kérésvihar, és a felszín menet közben is élesedik
+    const z = zoomLevel(), step = fast ? 3 : 2, request = true;
+    if (request && z !== wantedZ) { wantedZ = z; tileQueue = tileQueue.filter((t) => { const keep = t.z <= MIN_TILE_Z + 1 || t.z === z; if (!keep) t.state = "idle"; return keep; }); }
+    if (!reliefImage) reliefImage = ctx.createImageData(width, height);
+    const out = reliefImage, od = out.data; od.fill(0);
     const x0 = Math.max(0, Math.floor(cx - r)), x1 = Math.min(width, Math.ceil(cx + r)), y0 = Math.max(0, Math.floor(cy - r)), y1 = Math.min(height, Math.ceil(cy + r));
-    const cache = new Map(); // key → a csempe ImageData-ja (képkockánként egyszer dekódolva)
-    const tilePixels = (tz, tx, ty) => { const k = tileKey(tz, tx, ty); if (cache.has(k)) return cache.get(k); const t = getTile(tz, ((tx % (1 << tz)) + (1 << tz)) % (1 << tz), ty); let d = null; if (t.ok) { tileCtx.clearRect(0, 0, TILE, TILE); tileCtx.drawImage(t.img, 0, 0); try { d = tileCtx.getImageData(0, 0, TILE, TILE).data; } catch (_) { d = null; } } cache.set(k, d); return d; };
+    // az ortografikus vetítés inverze kézzel (a d3 általános invert-lánca pixelenként drága; egyezése a d3-mal ellenőrizve, hiba < 1e-12°)
+    const rot = projection.rotate(), dl = rot[0] * Math.PI / 180, dp = rot[1] * Math.PI / 180, cosP = Math.cos(dp), sinP = Math.sin(dp);
+    const DEG = 180 / Math.PI, LAT_MAX = 85 * Math.PI / 180, TWO_PI = Math.PI * 2;
+    let hitZ = -1, hitX = -1, hitY = -1, hitData = null; // az előző pixel célcsempéje és feloldása — a szomszédos pixelek jellemzően ugyanabba esnek
     for (let y = y0; y < y1; y += step) for (let x = x0; x < x1; x += step) {
-      const dx = x - cx, dy = y - cy; if (dx * dx + dy * dy > r * r) continue;
-      const ll = projection.invert([x, y]); if (!ll || isNaN(ll[0]) || Math.abs(ll[1]) > 85) continue;
+      const px = (x - cx) / r, py = (cy - y) / r, rho2 = px * px + py * py; if (rho2 > 1) continue;
+      const Z = Math.sqrt(1 - rho2);
+      const latR = Math.asin(py * cosP - Z * sinP); if (latR > LAT_MAX || latR < -LAT_MAX) continue;
+      let lonR = Math.atan2(px, Z * cosP + py * sinP) - dl; lonR -= TWO_PI * Math.floor((lonR + Math.PI) / TWO_PI);
+      const ll0 = lonR * DEG, ll1 = latR * DEG;
       let R0 = 0, G0 = 0, B0 = 0, got = false;
-      for (let tz = z, tries = 0; tz >= 2 && tries < 5; tz--, tries++) {
-        const mx = merc.x(ll[0], tz), my = merc.y(ll[1], tz); const tx = Math.floor(mx), ty = Math.floor(my); if (ty < 0 || ty >= (1 << tz)) break;
-        const d = tilePixels(tz, tx, ty); if (!d) continue;
-        const px = Math.min(TILE - 1, Math.floor((mx - tx) * TILE)), py = Math.min(TILE - 1, Math.floor((my - ty) * TILE)); const i = (py * TILE + px) * 4;
-        R0 = d[i]; G0 = d[i + 1]; B0 = d[i + 2]; got = true; break;
+      // a kívánt zoomszint csempéje; ha még nincs, a legközelebbi betöltött szülő (a z2 mindig megvan)
+      const mx0 = merc.x(ll0, z), my0 = merc.y(ll1, z), tx0 = Math.floor(mx0), ty0 = Math.floor(my0);
+      // a célcsempe → a ténylegesen használt (betöltött) csempe feloldása csak csempeváltáskor
+      if (tx0 !== hitX || ty0 !== hitY) {
+        hitX = tx0; hitY = ty0; hitData = null; hitZ = -1;
+        for (let tz = z; tz >= MIN_TILE_Z; tz--) {
+          const f = 1 << (z - tz), d = tilePixels(tz, Math.floor(tx0 / f), Math.floor(ty0 / f), request && tz === z);
+          if (d) { hitData = d; hitZ = tz; break; }
+        }
+      }
+      if (hitData) {
+        const f = 1 << (z - hitZ), mx = mx0 / f, my = my0 / f, tx = Math.floor(mx), ty = Math.floor(my);
+        const px2 = Math.min(TILE - 1, Math.floor((mx - tx) * TILE)), py2 = Math.min(TILE - 1, Math.floor((my - ty) * TILE)); const i = (py2 * TILE + px2) * 4;
+        R0 = hitData[i]; G0 = hitData[i + 1]; B0 = hitData[i + 2]; got = true;
       }
       if (!got) continue;
       const lum = R0 * .3 + G0 * .59 + B0 * .11;
       // éjszakai tónus: a műholdszínek hűvösítve, sötétítve
-      const rr = Math.min(255, 12 + R0 * .40 + lum * .04), gg = Math.min(255, 22 + G0 * .46 + lum * .07), bb = Math.min(255, 42 + B0 * .55 + lum * .10);
-      // vízrajz-réteg: a képen víznek látszó pixelek kiemelve — tájékozódási pont, nem rajzolt vonal
-      for (let yy = 0; yy < step; yy++) for (let xx = 0; xx < step; xx++) { const pX = x + xx, pY = y + yy; if (pX >= width || pY >= height) continue; const oi = (pY * width + pX) * 4; od[oi] = rr; od[oi + 1] = gg; od[oi + 2] = bb; od[oi + 3] = 255; }
+      const rr = 12 + R0 * .40 + lum * .04, gg = 22 + G0 * .46 + lum * .07, bb = 42 + B0 * .55 + lum * .10;
+      const yEnd = Math.min(height, y + step), xEnd = Math.min(width, x + step);
+      for (let pY = y; pY < yEnd; pY++) for (let pX = x; pX < xEnd; pX++) { const oi = (pY * width + pX) * 4; od[oi] = rr; od[oi + 1] = gg; od[oi + 2] = bb; od[oi + 3] = 255; }
     }
     ctx.putImageData(out, 0, 0);
+    if (request) pumpTiles();
     const g2 = ctx.createRadialGradient(cx - r * .25, cy - r * .3, r * .2, cx, cy, r); g2.addColorStop(0, "rgba(255,255,255,.06)"); g2.addColorStop(.8, "rgba(6,11,22,0)"); g2.addColorStop(1, "rgba(6,11,22,.75)");
     ctx.fillStyle = g2; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
     if (relief.anyLoaded) { sphere.attr("fill", "rgba(0,0,0,0)"); landP.attr("fill", "rgba(10,18,34,.14)"); }
   }
-  const tileCanvas = document.createElement("canvas"); tileCanvas.width = TILE; tileCanvas.height = TILE; const tileCtx = tileCanvas.getContext("2d", { willReadFrequently: true });
-  let reliefTO = null; function scheduleRelief() { if (reliefTO) return; reliefTO = setTimeout(() => { reliefTO = null; drawRelief(false); }, 60); }
+  // világcsempék előre (z2: 16, z3: 64) — a visszaesés alapja
+  for (let pz = MIN_TILE_Z; pz <= MIN_TILE_Z + 1; pz++) for (let px = 0; px < (1 << pz); px++) for (let py = 0; py < (1 << pz); py++) tilePixels(pz, px, py, true);
+  pumpTiles();
+  let reliefTO = null; function scheduleRelief() { if (reliefTO || interacting()) return; reliefTO = setTimeout(() => { reliefTO = null; if (!interacting()) render(); }, 80); }
 
   // ── SVG-váz ──────────────────────────────────────────────────────────────
   const defs = svg.append("defs");
@@ -196,16 +256,19 @@ export async function mountGlobe(root, opts) {
     if (state.fit) state.scale = floorR / baseR;
     R = Math.max(baseR * state.scale, floorR);
     projection.scale(R).translate([width / 2, height * 0.55]).rotate([state.rot[0] + state.dx, state.rot[1] + state.dy, 0]);
+    // az SVG-utak a képernyő szélére vágva: nagy nagyításnál a gömb, a szárazföld és a határok egyébként több tízezer
+    // pixeles, képernyőn kívüli poligonok lennének, és a böngésző raszterizálása viszi el a képkockát (S40 zoom-javítás)
+    projection.clipExtent([[-40, -40], [width + 40, height + 40]]);
   }
 
   function drawGeo() {
     const k = R / baseR;
     sphere.attr("d", path({ type: "Sphere" })); rimP.attr("d", path({ type: "Sphere" }));
     grat.attr("d", path(graticule())); landP.attr("d", path(land)); bord.attr("d", path(borders));
-    rangesG.selectAll("circle.halo").data(RANGES.filter((r) => visible(r.ll))).join("circle").attr("class", "halo")
+    rangesG.selectAll("circle.halo").data(RANGES.filter((r) => visible(r.ll) && r.r * k < 260 && !interacting())).join("circle").attr("class", "halo")
       .attr("cx", (d) => projection(d.ll)[0]).attr("cy", (d) => projection(d.ll)[1]).attr("r", (d) => d.r * k)
       .attr("fill", `rgba(251,191,36,${Math.min(.12, .08 * k)})`).attr("filter", "url(#tg-glow)");
-    rangesG.selectAll("circle.core").data(RANGES.filter((r) => visible(r.ll))).join("circle").attr("class", "core")
+    rangesG.selectAll("circle.core").data(RANGES.filter((r) => visible(r.ll) && r.r * k < 1200)).join("circle").attr("class", "core")
       .attr("cx", (d) => projection(d.ll)[0]).attr("cy", (d) => projection(d.ll)[1]).attr("r", (d) => d.r * k * .45)
       .attr("fill", "none").attr("stroke", "rgba(251,191,36,.35)").attr("stroke-width", 1).attr("stroke-dasharray", "1 4");
     const inChip = (x, y) => chipRects.some((r) => x > r.l && x < r.r && y > r.t && y < r.b);
@@ -448,7 +511,7 @@ export async function mountGlobe(root, opts) {
   const tFrom = (e) => { const r = track.getBoundingClientRect(); return Math.max(0, Math.min(52, (e.clientX - r.left) / r.width * 52)); };
   track.addEventListener("pointerdown", (e) => { track.setPointerCapture(e.pointerId); scrubbing = true; state.t = tFrom(e); state.selected = null; render(); });
   track.addEventListener("pointermove", (e) => { if (scrubbing) { state.t = tFrom(e); render(); } });
-  track.addEventListener("pointerup", () => scrubbing = false); track.addEventListener("pointercancel", () => scrubbing = false);
+  track.addEventListener("pointerup", () => { scrubbing = false; render(); }); track.addEventListener("pointercancel", () => scrubbing = false);
   track.addEventListener("keydown", (e) => { const step = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0; if (!step) return; e.preventDefault(); state.t = Math.max(0, Math.min(52, state.t + step)); state.selected = null; render(); });
   const seasonsEl = $("seasons");
   SEASONS.forEach((s) => { const el = document.createElement("button"); el.type = "button"; el.className = "chip"; el.textContent = s.l; el.addEventListener("click", () => { state.t = s.t; state.selected = null; render(); }); el.dataset.t = s.t; seasonsEl.appendChild(el); });
@@ -468,12 +531,12 @@ export async function mountGlobe(root, opts) {
     if (ptrs.size === 1) pan = { x: e.clientX, y: e.clientY, rot: [...state.rot], moved: false };
     if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), s: state.scale }; } });
   globeEl.addEventListener("pointermove", (e) => { if (!ptrs.has(e.pointerId)) return; ptrs.set(e.pointerId, [e.clientX, e.clientY]);
-    if (ptrs.size === 2 && pinch) { const [a, b] = [...ptrs.values()]; state.fit = false; state.scale = Math.max(.12, Math.min(80, pinch.s * Math.hypot(a[0] - b[0], a[1] - b[1]) / pinch.d)); render(); }
+    if (ptrs.size === 2 && pinch) { const [a, b] = [...ptrs.values()]; markZooming(); state.fit = false; state.scale = Math.max(.12, Math.min(80, pinch.s * Math.hypot(a[0] - b[0], a[1] - b[1]) / pinch.d)); render(); }
     else if (ptrs.size === 1 && pan) { const k = 90 / R; const dx = e.clientX - pan.x, dy = e.clientY - pan.y; if (Math.hypot(dx, dy) > 4) pan.moved = true;
       state.rot = [pan.rot[0] + dx * k, Math.max(-85, Math.min(85, pan.rot[1] - dy * k)), 0]; render(); } });
-  const up = (e) => { ptrs.delete(e.pointerId); if (ptrs.size < 2) pinch = null; if (ptrs.size === 0) { if (pan && !pan.moved && state.selected) { state.selected = null; render(); } pan = null; state.dragging = false; globeEl.classList.remove("drag"); } };
+  const up = (e) => { ptrs.delete(e.pointerId); if (ptrs.size < 2) pinch = null; if (ptrs.size === 0) { if (pan && !pan.moved && state.selected) { state.selected = null; render(); } pan = null; state.dragging = false; globeEl.classList.remove("drag"); render(); } };
   globeEl.addEventListener("pointerup", up); globeEl.addEventListener("pointercancel", up);
-  globeEl.addEventListener("wheel", (e) => { e.preventDefault(); state.fit = false; state.scale = Math.max(.12, Math.min(80, state.scale * (e.deltaY < 0 ? 1.08 : .92))); render(); }, { passive: false });
+  globeEl.addEventListener("wheel", (e) => { e.preventDefault(); markZooming(); state.fit = false; const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY; state.scale = Math.max(.12, Math.min(80, state.scale * Math.exp(-Math.max(-120, Math.min(120, dy)) * 0.0016))); /* a görgetés mértékével arányos: trackpadon finom, egérgörgőn ~17%/kattanás */ render(); }, { passive: false });
   // gyro (telefonon a készülék döntése)
   const onOrient = (e) => { if (e.gamma == null) return; state.dx = Math.max(-8, Math.min(8, e.gamma / 4)); state.dy = Math.max(-6, Math.min(6, (e.beta - 45) / 8)); render(); };
   const gyroBtn = $("gyro");
@@ -485,8 +548,18 @@ export async function mountGlobe(root, opts) {
   $("world").addEventListener("click", () => { state.rot = WORLD_ROT.slice(); state.selected = null; state.fit = true; render(); });
   $("reset").addEventListener("click", () => { state.rot = WORLD_ROT.slice(); state.fit = true; state.selected = null; state.t = 3; render(); }); // vissza a kezdőnézetre
 
-  let reliefTimer = null, painted = false;
-  function render() { if (app.clientWidth === 0 || app.clientHeight === 0) return; painted = true; layout(); drawRelief(state.dragging || scrubbing); if (state.dragging) { clearTimeout(reliefTimer); reliefTimer = setTimeout(() => drawRelief(false), 120); } drawPins(); drawGeo(); renderTime(); }
+  // Rajzolás képkockánként legfeljebb egyszer (requestAnimationFrame); interakció közben durva felszín,
+  // megállás után 160 ms-mal éles felszín és csempekérés.
+  let reliefTimer = null, painted = false, zooming = false, zoomTO = null, rafId = 0;
+  function interacting() { return state.dragging || scrubbing || zooming; }
+  function markZooming() { zooming = true; clearTimeout(zoomTO); zoomTO = setTimeout(() => { zooming = false; render(); }, 160); }
+  function renderNow() {
+    rafId = 0; if (destroyed || app.clientWidth === 0 || app.clientHeight === 0) return; painted = true; layout();
+    const fast = interacting(); projection.precision(fast ? 2.5 : 0.7); drawRelief(fast);
+    if (fast && !zooming) { clearTimeout(reliefTimer); reliefTimer = setTimeout(() => { if (!interacting()) render(); }, 160); }
+    drawPins(); drawGeo(); renderTime();
+  }
+  function render() { if (destroyed || rafId) return; rafId = requestAnimationFrame(renderNow); }
   const onVisibility = () => { if (!document.hidden) render(); };
   window.addEventListener("resize", render);
   const ro = new ResizeObserver(() => render()); ro.observe(app);
@@ -504,6 +577,7 @@ export async function mountGlobe(root, opts) {
     },
     frameTrip(id) { const tr = TRIPS.find((t) => t.id === id); if (!tr) return; state.selected = tr.id; state.t = tw(tr); frameRoute(tr); render(); },
     destroy() {
+      destroyed = true; tileQueue = []; if (rafId) cancelAnimationFrame(rafId); clearTimeout(zoomTO);
       clearTimeout(tickTO); clearTimeout(reliefTimer); if (reliefTO) clearTimeout(reliefTO);
       ro.disconnect(); io.disconnect();
       window.removeEventListener("resize", render); window.removeEventListener("load", render); window.removeEventListener("pageshow", render);
