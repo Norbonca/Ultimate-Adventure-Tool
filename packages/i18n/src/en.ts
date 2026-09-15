@@ -1585,6 +1585,7 @@ const en: TranslationKeys = {
         global: "Country-independent (seasons)",
         search: "Search by name or key",
         inactiveCountry: "not selectable",
+        chooseCountry: "Choose a country",
       },
       columns: {
         dates: "Dates",
@@ -1628,6 +1629,7 @@ const en: TranslationKeys = {
         missingYears: "{count} yearly definitions are missing the {year} or {nextYear} occurrence",
         unverified: "{count} unverified occurrences",
         noPeriods: "There is no calendar data for this country.",
+        noCountry: "Choose a country to view its calendar. The country set in your profile is used as the default here.",
         noResults: "No periods match the filters.",
         missing: "missing",
         noOccurrence: "none this year",

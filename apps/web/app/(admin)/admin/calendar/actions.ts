@@ -143,6 +143,7 @@ export type AdminPeriodRow = AdminPeriod & { occurrence: AdminOccurrence | null;
 export interface CalendarAdminOverview {
   countries: AdminCountry[];
   tags: AdminTag[];
+  /** Ország-kód vagy `_global`; üres, ha nincs választott ország és az admin profiljában sincs érvényes. */
   scope: string;
   year: number;
   periods: AdminPeriodRow[];
@@ -175,21 +176,37 @@ async function loadReferenceData(admin: AdminClient): Promise<{ countries: Admin
   };
 }
 
-export async function getCalendarReferenceData(): Promise<{ countries: AdminCountry[]; tags: AdminTag[] }> {
-  const { admin } = await requireAdmin();
-  return loadReferenceData(admin);
+/**
+ * Az admin saját profilországa, ha szerepel a karbantartható országok között. Nincs rögzített
+ * alapország (Norbert döntése, 2026-09-15); `null` esetén a felület országválasztást kér.
+ */
+async function adminProfileCountry(admin: AdminClient, userId: string, countries: AdminCountry[]): Promise<string | null> {
+  const { data } = await admin.from("profiles").select("country_code").eq("id", userId).maybeSingle();
+  const code = typeof data?.country_code === "string" ? data.country_code.trim().toUpperCase() : "";
+  return countries.some((c) => c.code === code) ? code : null;
+}
+
+export async function getCalendarReferenceData(): Promise<{ countries: AdminCountry[]; tags: AdminTag[]; defaultCountry: string | null }> {
+  const { admin, user } = await requireAdmin();
+  const reference = await loadReferenceData(admin);
+  return { ...reference, defaultCountry: await adminProfileCountry(admin, user.id, reference.countries) };
 }
 
 export async function getCalendarAdminOverview(params: { scope?: string; year?: number }): Promise<CalendarAdminOverview> {
-  const { admin } = await requireAdmin();
+  const { admin, user } = await requireAdmin();
   const currentYear = new Date().getUTCFullYear();
   const year = params.year && Number.isInteger(params.year) && params.year >= 1900 && params.year <= 2198 ? params.year : currentYear;
-  const scope = params.scope && (params.scope === GLOBAL_SCOPE || /^[A-Z]{2}$/.test(params.scope)) ? params.scope : "HU";
 
   const { countries, tags } = await loadReferenceData(admin);
-  const base = admin.from("ref_calendar_periods").select(PERIOD_COLUMNS).order("key");
-  const { data: periodRows } = await (scope === GLOBAL_SCOPE ? base.is("country_code", null) : base.eq("country_code", scope)).returns<PeriodRow[]>();
-  const periods = (periodRows ?? []).map(toAdminPeriod);
+  const requested = params.scope && (params.scope === GLOBAL_SCOPE || /^[A-Z]{2}$/.test(params.scope)) ? params.scope : null;
+  const scope = requested ?? (await adminProfileCountry(admin, user.id, countries)) ?? "";
+
+  let periods: AdminPeriod[] = [];
+  if (scope) {
+    const base = admin.from("ref_calendar_periods").select(PERIOD_COLUMNS).order("key");
+    const { data: periodRows } = await (scope === GLOBAL_SCOPE ? base.is("country_code", null) : base.eq("country_code", scope)).returns<PeriodRow[]>();
+    periods = (periodRows ?? []).map(toAdminPeriod);
+  }
 
   const ids = periods.map((p) => p.id);
   const occurrences: AdminOccurrence[] = [];

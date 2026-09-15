@@ -95,6 +95,7 @@ export function CalendarAdminClient({ overview, initialTab }: { overview: Calend
             <label className="flex flex-col gap-1 text-xs font-medium text-slate-600">
               {t("admin.calendar.filters.country")}
               <select className={inputCls} value={overview.scope} onChange={(e) => navigate({ country: e.target.value })}>
+                {!overview.scope && <option value="">{t("admin.calendar.filters.chooseCountry")}</option>}
                 {overview.countries.map((c) => (
                   <option key={c.code} value={c.code}>
                     {`${locale === "en" ? c.name_en : c.name_hu} (${c.code})${c.is_active ? "" : ` — ${t("admin.calendar.filters.inactiveCountry")}`}`}
@@ -154,7 +155,9 @@ export function CalendarAdminClient({ overview, initialTab }: { overview: Calend
               >
                 {busy ? t("admin.calendar.actions.working") : t("admin.calendar.actions.generate", overview.generateRange)}
               </button>
-              <Link href="/admin/calendar/periods/new" className="px-4 py-2 text-sm bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
+              <Link
+                href={overview.scope && overview.scope !== GLOBAL_SCOPE ? `/admin/calendar/periods/new?country=${overview.scope}` : "/admin/calendar/periods/new"}
+                className="px-4 py-2 text-sm bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
                 + {t("admin.calendar.actions.newPeriod")}
               </Link>
             </div>
@@ -175,7 +178,9 @@ export function CalendarAdminClient({ overview, initialTab }: { overview: Calend
           </div>
 
           <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto">
-            {overview.periods.length === 0 ? (
+            {!overview.scope ? (
+              <p className="text-sm text-slate-400 text-center py-10">{t("admin.calendar.summary.noCountry")}</p>
+            ) : overview.periods.length === 0 ? (
               <p className="text-sm text-slate-400 text-center py-10">{t("admin.calendar.summary.noPeriods")}</p>
             ) : rows.length === 0 ? (
               <p className="text-sm text-slate-400 text-center py-10">{t("admin.calendar.summary.noResults")}</p>

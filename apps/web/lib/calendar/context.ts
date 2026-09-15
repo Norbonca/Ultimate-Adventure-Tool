@@ -5,24 +5,37 @@
 
 import { DEFAULT_TRIP_TIMEZONE, isValidTimeZone } from "@/lib/timezone";
 
-export const FALLBACK_CALENDAR_COUNTRY = "HU";
-
 const COUNTRY_RE = /^[A-Z]{2}$/;
 
-export type CalendarCountrySource = "user" | "profile" | "locale" | "fallback";
+/** Időzóna, ha a néző naptára nem határozható meg (nincs ország, nincs bejelentkezve). */
+export const VIEWER_FALLBACK_TIMEZONE = DEFAULT_TRIP_TIMEZONE;
 
-/** 1. a felhasználó beállítása; 2. a profil országa; 3. a nyelvhez rendelt alapország; 4. HU. */
-export function resolveCalendarCountry(input: {
-  userCountry?: string | null;
-  profileCountry?: string | null;
-  locale: string;
-  defaultsByLocale?: Record<string, string> | null;
-}): { country: string; source: CalendarCountrySource } {
-  if (input.userCountry && COUNTRY_RE.test(input.userCountry)) return { country: input.userCountry, source: "user" };
-  if (input.profileCountry && COUNTRY_RE.test(input.profileCountry)) return { country: input.profileCountry, source: "profile" };
-  const byLocale = input.defaultsByLocale?.[input.locale];
-  if (byLocale && COUNTRY_RE.test(byLocale)) return { country: byLocale, source: "locale" };
-  return { country: FALLBACK_CALENDAR_COUNTRY, source: "fallback" };
+export type CalendarCountrySource = "profile" | "none";
+
+export interface ViewerCalendar {
+  /** ISO 3166-1 alpha-2; `null` = nincs országspecifikus naptár (időszakok, jelvények nem jelennek meg). */
+  country: string | null;
+  source: CalendarCountrySource;
+  timezone: string;
+}
+
+/**
+ * A néző naptár-országa (BR-M23-006; Norbert döntése, 2026-09-15): a felhasználó profiljában megadott
+ * saját ország (`profiles.country_code`), ha az aktív, választható ország (`ref_countries.is_active`).
+ * Nincs rögzített alapország és nyelv szerinti alapország sem. Ország nélkül (vagy kijelentkezve)
+ * `country: null`, időzóna UTC; országgal a profil érvényes időzónája, különben UTC.
+ */
+export function resolveViewerCalendar(input: {
+  profile: { countryCode?: string | null; timezone?: string | null } | null;
+  activeCountryCodes: Iterable<string>;
+}): ViewerCalendar {
+  const code = input.profile?.countryCode?.trim().toUpperCase() ?? "";
+  const active = new Set(input.activeCountryCodes);
+  if (!COUNTRY_RE.test(code) || !active.has(code)) {
+    return { country: null, source: "none", timezone: VIEWER_FALLBACK_TIMEZONE };
+  }
+  const tz = input.profile?.timezone;
+  return { country: code, source: "profile", timezone: tz && isValidTimeZone(tz) ? tz : VIEWER_FALLBACK_TIMEZONE };
 }
 
 export type TripTimezoneSource = "organizer" | "coordinates" | "country" | "organizer_profile" | "default";

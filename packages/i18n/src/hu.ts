@@ -1613,6 +1613,7 @@ const hu = {
         global: "Országfüggetlen (évszakok)",
         search: "Keresés név vagy kulcs szerint",
         inactiveCountry: "nem választható",
+        chooseCountry: "Válassz országot",
       },
       columns: {
         dates: "Dátum",
@@ -1656,6 +1657,7 @@ const hu = {
         missingYears: "{count} évenként megadott definícióból hiányzik a {year}. vagy a {nextYear}. évi előfordulás",
         unverified: "{count} ellenőrizetlen előfordulás",
         noPeriods: "Ehhez az országhoz nincs naptáradat.",
+        noCountry: "Válassz országot a naptár megtekintéséhez. A profilodban megadott ország itt alapértelmezésként jelenik meg.",
         noResults: "Nincs a szűrőknek megfelelő időszak.",
         missing: "hiányzik",
         noOccurrence: "nincs ebben az évben",
