@@ -17,6 +17,7 @@
 
 import React, { useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/i18n/useTranslation';
 import { AppHeader } from '@/components/AppHeader';
@@ -473,13 +474,20 @@ export default function DiscoverClient({
         </main>
       ) : (
         <>
-          {/* HERO — v2 §5; fotó-asset még nincs, ezért a fotó nélküli recept: Deep Navy + 12 %-os Trevu-derengés */}
+          {/* HERO — v2 §5: Deep Navy alapon a terv panorámafotója (D02 #H1rRQE / #l87Il, ugyanaz a kép
+              asztalin és mobilon), alulról kötelező olvashatósági gradienssel (--hero-scrim).
+              Fotó: Andy Arbeit, Unsplash (unsplash.com/@izeberg) — public/discover/hero-night.jpg */}
           <section className="relative overflow-hidden bg-canvas">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -left-40 -top-40 h-[520px] w-[720px] rounded-full opacity-[0.12] blur-3xl [background:var(--gradient-trevu)]"
+            <Image
+              src="/discover/hero-night.jpg"
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
             />
-            <div className="relative mx-auto flex min-h-[320px] max-w-7xl flex-col justify-end gap-3 px-5 pb-8 pt-16 md:min-h-[420px] md:gap-4 md:px-[120px] md:pb-12">
+            <div aria-hidden className="absolute inset-0 bg-hero-scrim-mobile md:bg-hero-scrim" />
+            <div className="relative mx-auto flex min-h-[380px] max-w-7xl flex-col justify-end gap-3 px-5 pb-8 pt-16 md:min-h-[480px] md:gap-4 md:px-[120px] md:pb-12">
               <p className="text-sm font-medium text-ink-secondary">
                 {t('discover.heroStats')
                   .replace('{trips}', String(trips.length))
@@ -488,7 +496,7 @@ export default function DiscoverClient({
               <h1 className="max-w-[720px] text-hero-display-mobile text-ink [text-wrap:balance] md:text-hero-display">
                 {t('discover.heroTitle')}
               </h1>
-              <p className="max-w-[720px] text-base text-ink-body md:text-lg">{t('discover.heroSubtitle')}</p>
+              <p className="hidden max-w-[720px] text-lg text-ink-body md:block">{t('discover.heroSubtitle')}</p>
               <SearchPill
                 className="mt-2 max-w-[720px] md:mt-4"
                 value={queryInput}

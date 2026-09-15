@@ -116,6 +116,7 @@ const config: Config = {
       backgroundImage: {
         /* Olvashatósági gradiens a hero-fotón — kontrasztfeltétel (v2 §5) */
         "hero-scrim": "var(--hero-scrim)",
+        "hero-scrim-mobile": "var(--hero-scrim-mobile)",
       },
       borderRadius: {
         "trevu":  "10px",
