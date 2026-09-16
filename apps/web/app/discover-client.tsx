@@ -1,14 +1,27 @@
 'use client';
 
-import React, { useState } from 'react';
+/**
+ * Felfedezés (/) — Brand Guide v2 „Éjszakai túra” (1b), Night felület.
+ *
+ * Design:
+ *   design/D02_Trip_Management.pen#H1rRQE  Discover lista nézet, 1440
+ *   design/D02_Trip_Management.pen#l87Il   Discover lista nézet, mobil 390
+ *   design/D02_Trip_Management.pen#W9Kgy   szűrőpanel nyitva (asztali) + üres állapot
+ *   design/D02_Trip_Management.pen#RTE9l   FilterSheet, mobil 390
+ * Komponensek: components/ui/SearchPill, OptionChip, FilterSheet; components/discover/TripBand.
+ * Nézetszerződés: components/discover/discover-view-toggle.md.
+ *
+ * A teljes oldal Night (data-surface="night"); az alsó CTA-sáv az egyetlen Day-régió
+ * (Night→Day váltás felülről lefelé, v2 §2/2). Minden szín szemantikus tokenből jön.
+ */
+
+import React, { useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/i18n/useTranslation';
 import { AppHeader } from '@/components/AppHeader';
 import {
-  Search,
-  MapPin,
-  Calendar,
   Compass,
   Mountain,
   Triangle,
@@ -17,26 +30,28 @@ import {
   Bike,
   Timer,
   Snowflake,
-  Users,
-  Star,
+  Sparkles,
   Globe,
-  LayoutGrid,
   List,
+  SlidersHorizontal,
 } from '@/lib/icons';
 import type { LucideIcon } from '@/lib/icons';
-import { Icon } from "@/components/Icon";
-import { Card, CardImage, CardBody, Chip, StateTemplate } from "@/components/ui";
+import { SearchPill, OptionChip, FilterSheet } from '@/components/ui';
+import { TripBand, CATEGORY_TEXT, type CategoryToken } from '@/components/discover/TripBand';
 import {
   DEFAULT_DISCOVER_VIEW,
   rememberDiscoverView,
   type DiscoverView,
-} from "@/lib/discover-view";
+} from '@/lib/discover-view';
+import { buildTripSearchText, createTripSearch } from '@/lib/trip-search';
 
 // The globe (d3-geo + tiles) only runs in the browser and is a large chunk —
-// load it on demand so the grid and list views never pay for it.
+// load it on demand so the list view never pays for it.
 const GlobeDiscover = dynamic(() => import('@/components/discover/GlobeDiscover'), {
   ssr: false,
 });
+
+type Joined<T> = T | T[] | null;
 
 // Types matching Supabase query results exactly
 interface Trip {
@@ -63,9 +78,9 @@ interface Trip {
   current_participants: number;
   status: string;
   visibility: string;
-  categories: { id: string; name: string; name_localized: Record<string, string>; icon_name: string; color_hex: string } | { id: string; name: string; name_localized: Record<string, string>; icon_name: string; color_hex: string }[] | null;
-  sub_disciplines: { id: string; name: string; name_localized: Record<string, string> } | { id: string; name: string; name_localized: Record<string, string> }[] | null;
-  profiles: { id: string; display_name: string; avatar_url: string | null; slug: string; subscription_tier: string } | { id: string; display_name: string; avatar_url: string | null; slug: string; subscription_tier: string }[] | null;
+  categories: Joined<{ id: string; name: string; name_localized: Record<string, string>; icon_name: string; color_hex: string }>;
+  sub_disciplines: Joined<{ id: string; name: string; name_localized: Record<string, string> }>;
+  profiles: Joined<{ id: string; display_name: string; avatar_url: string | null; slug: string; subscription_tier: string }>;
 }
 
 interface Category {
@@ -116,33 +131,83 @@ interface DiscoverClientProps {
   initialView?: DiscoverView;
 }
 
-const categoryIconMap: Record<string, LucideIcon> = {
-  Hiking: Mountain,
-  Mountaineering: Triangle,
-  'Water Sports': Waves,
-  Cycling: Bike,
-  Motorsport: Gauge,
-  Running: Timer,
-  'Winter Sports': Snowflake,
-  Expedition: Compass,
+/** DB kategórianév → ikon és --cat-* token. */
+const CATEGORY_META: Record<string, { icon: LucideIcon; token: CategoryToken }> = {
+  Hiking: { icon: Mountain, token: 'hiking' },
+  Mountaineering: { icon: Triangle, token: 'climbing' },
+  Mountain: { icon: Triangle, token: 'climbing' },
+  Climbing: { icon: Triangle, token: 'climbing' },
+  'Water Sports': { icon: Waves, token: 'water' },
+  Cycling: { icon: Bike, token: 'cycling' },
+  Motorsport: { icon: Gauge, token: 'motorsport' },
+  Running: { icon: Timer, token: 'running' },
+  'Winter Sports': { icon: Snowflake, token: 'winter' },
+  Expedition: { icon: Compass, token: 'expedition' },
+};
+const categoryMeta = (name: string) => CATEGORY_META[name] ?? { icon: Mountain, token: 'hiking' as const };
+
+const PAGE_SIZE = 10;
+
+const resolveJoin = <T,>(val: Joined<T>): T | null => {
+  if (!val) return null;
+  return Array.isArray(val) ? val[0] ?? null : val;
 };
 
-const getCategoryIcon = (categoryName: string) => {
-  return categoryIconMap[categoryName] || Mountain;
+const tripDurationDays = (trip: Trip): number => {
+  if (!trip.start_date || !trip.end_date) return 0;
+  const start = new Date(trip.start_date);
+  const end = new Date(trip.end_date);
+  return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
 };
 
-const formatDateRange = (startDate: string, endDate: string, locale: string): string => {
-  const intlLocale = locale === 'en' ? 'en-US' : 'hu-HU';
-  const formatter = new Intl.DateTimeFormat(intlLocale, {
-    month: 'short',
-    day: 'numeric',
-  });
+type Choice = 'all' | string;
 
-  const start = new Date(startDate);
-  const end = new Date(endDate);
+interface AdvancedFilters {
+  difficulty: Choice;
+  price: Choice;
+  duration: Choice;
+  spots: Choice;
+}
 
-  return `${formatter.format(start)}–${formatter.format(end)}`;
-};
+const NO_FILTERS: AdvancedFilters = { difficulty: 'all', price: 'all', duration: 'all', spots: 'all' };
+
+function matchesAdvanced(trip: Trip, f: AdvancedFilters): boolean {
+  if (f.difficulty !== 'all' && String(trip.difficulty) !== f.difficulty) return false;
+  if (f.price !== 'all') {
+    const price = trip.price_amount || 0;
+    if (f.price === 'free' && price > 0) return false;
+    if (f.price === 'under50' && (price === 0 || price >= 50)) return false;
+    if (f.price === '50-200' && (price < 50 || price > 200)) return false;
+    if (f.price === '200-500' && (price < 200 || price > 500)) return false;
+    if (f.price === '500+' && price < 500) return false;
+  }
+  if (f.duration !== 'all') {
+    const days = tripDurationDays(trip);
+    if (f.duration === '1' && days > 1) return false;
+    if (f.duration === '2-3' && (days < 2 || days > 3)) return false;
+    if (f.duration === '4-7' && (days < 4 || days > 7)) return false;
+    if (f.duration === '1-2w' && (days < 7 || days > 14)) return false;
+    if (f.duration === '2w+' && days < 14) return false;
+  }
+  if (f.spots !== 'all') {
+    const spots = trip.max_participants - (trip.current_participants || 0);
+    if (f.spots === '1-3' && (spots < 1 || spots > 3)) return false;
+    if (f.spots === '4-8' && (spots < 4 || spots > 8)) return false;
+    if (f.spots === '9+' && spots < 9) return false;
+  }
+  return true;
+}
+
+function FilterGroup({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
+  return (
+    <fieldset className={`flex flex-col gap-2.5 ${className ?? ''}`}>
+      <legend className="mb-2.5 text-sm font-semibold text-ink-secondary">{label}</legend>
+      <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-2">
+        {children}
+      </div>
+    </fieldset>
+  );
+}
 
 export default function DiscoverClient({
   trips,
@@ -153,83 +218,54 @@ export default function DiscoverClient({
   initialView = DEFAULT_DISCOVER_VIEW,
 }: DiscoverClientProps) {
   const { t, locale } = useTranslation();
-  const [activeCategory, setActiveCategory] = useState<string>('all');
-  const [viewMode, setViewMode] = useState<DiscoverView>(initialView);
+  const intlLocale = locale === 'en' ? 'en-US' : 'hu-HU';
 
+  const [viewMode, setViewMode] = useState<DiscoverView>(initialView);
   // Every switch is remembered for the next visit (see discover-view-toggle.md).
   const changeView = (next: DiscoverView) => {
     setViewMode(next);
     rememberDiscoverView(next);
   };
-  // TODO: setSearchQuery is never called — the search box is not wired to this state.
-  const [searchQuery, _setSearchQuery] = useState<string>('');
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
-  const [selectedPrice, setSelectedPrice] = useState<string>('all');
-  const [selectedDuration, setSelectedDuration] = useState<string>('all');
-  const [selectedSpots, setSelectedSpots] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<string>('recent');
 
-  // Helper: resolve Supabase join (can be object or array)
-  const resolveJoin = <T,>(val: T | T[] | null): T | null => {
-    if (!val) return null;
-    if (Array.isArray(val)) return val[0] || null;
-    return val;
+  // Pirula-kereső (lib/trip-search.ts createTripSearch): a beírt szöveg Enterre vagy a
+  // Keresés gombra érvényesül; a mező kiürítése azonnal visszaállítja a listát.
+  const [queryInput, setQueryInput] = useState('');
+  const [query, setQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState<Choice>('all');
+  const [filters, setFilters] = useState<AdvancedFilters>(NO_FILTERS);
+  const [sortBy, setSortBy] = useState('recent');
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [page, setPage] = useState({ key: '', count: PAGE_SIZE });
+
+  const submitSearch = () => {
+    setQuery(queryInput.trim());
+    document.getElementById('discover-results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  // Helper: calculate trip duration in days
-  const getTripDurationDays = (trip: Trip): number => {
-    if (!trip.start_date || !trip.end_date) return 0;
-    const start = new Date(trip.start_date);
-    const end = new Date(trip.end_date);
-    return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-  };
+  const categoryLabel = (name: string) =>
+    locale === 'en' ? name : categoryDisplay[name]?.nameHu || name;
 
-  const filteredTrips = trips.filter((trip) => {
-    // Category filter
-    if (activeCategory !== 'all' && trip.category_id !== activeCategory) {
-      return false;
-    }
-    // Search filter
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      const loc = (trip.location_city || '') + (trip.location_region || '') + (trip.location_country || '');
-      if (!trip.title.toLowerCase().includes(q) && !loc.toLowerCase().includes(q)) {
-        return false;
-      }
-    }
-    // Difficulty filter
-    if (selectedDifficulty !== 'all' && String(trip.difficulty) !== selectedDifficulty) {
-      return false;
-    }
-    // Price filter
-    if (selectedPrice !== 'all') {
-      const price = trip.price_amount || 0;
-      if (selectedPrice === 'free' && price > 0) return false;
-      if (selectedPrice === 'under50' && (price === 0 || price >= 50)) return false;
-      if (selectedPrice === '50-200' && (price < 50 || price > 200)) return false;
-      if (selectedPrice === '200-500' && (price < 200 || price > 500)) return false;
-      if (selectedPrice === '500+' && price < 500) return false;
-    }
-    // Duration filter
-    if (selectedDuration !== 'all') {
-      const days = getTripDurationDays(trip);
-      if (selectedDuration === '1' && days > 1) return false;
-      if (selectedDuration === '2-3' && (days < 2 || days > 3)) return false;
-      if (selectedDuration === '4-7' && (days < 4 || days > 7)) return false;
-      if (selectedDuration === '1-2w' && (days < 7 || days > 14)) return false;
-      if (selectedDuration === '2w+' && days < 14) return false;
-    }
-    // Available spots filter
-    if (selectedSpots !== 'all') {
-      const spots = trip.max_participants - (trip.current_participants || 0);
-      if (selectedSpots === '1-3' && (spots < 1 || spots > 3)) return false;
-      if (selectedSpots === '4-8' && (spots < 4 || spots > 8)) return false;
-      if (selectedSpots === '9+' && spots < 9) return false;
-    }
-    return true;
-  });
+  const searchTexts = useMemo(
+    () =>
+      new Map(
+        trips.map((trip) => {
+          const category = resolveJoin(trip.categories);
+          const display = category ? categoryDisplay[category.name]?.nameHu : undefined;
+          return [trip.id, buildTripSearchText(trip, display ? [display] : [])] as const;
+        })
+      ),
+    [trips, categoryDisplay]
+  );
 
-  // Sort
+  const search = useMemo(() => createTripSearch(query), [query]);
+
+  const filteredTrips = trips.filter(
+    (trip) =>
+      (activeCategory === 'all' || trip.category_id === activeCategory) &&
+      search(searchTexts.get(trip.id) ?? trip.title, trip.start_date, trip.end_date) &&
+      matchesAdvanced(trip, filters)
+  );
+
   const sortedTrips = [...filteredTrips].sort((a, b) => {
     if (sortBy === 'price-low') return (a.price_amount || 0) - (b.price_amount || 0);
     if (sortBy === 'price-high') return (b.price_amount || 0) - (a.price_amount || 0);
@@ -238,1214 +274,424 @@ export default function DiscoverClient({
       if (!b.start_date) return -1;
       return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
     }
-    // Default: recent (by published order, which is how Supabase returns them)
-    return 0;
+    return 0; // recent: published order, as Supabase returns it
   });
 
-  const getDifficultyLabel = (level: number) => {
-    return difficultyLevels.find((d) => d.value === level) || difficultyLevels[0];
+  // Lapozás: szűrés-/rendezésváltáskor újra az első oldal (állapot kulccsal, effekt nélkül).
+  const pageKey = [query, activeCategory, sortBy, filters.difficulty, filters.price, filters.duration, filters.spots].join('|');
+  const visibleCount = page.key === pageKey ? page.count : PAGE_SIZE;
+  const visibleTrips = sortedTrips.slice(0, visibleCount);
+  const remaining = sortedTrips.length - visibleTrips.length;
+
+  const advancedCount = Object.values(filters).filter((v) => v !== 'all').length;
+  const mobileFilterCount = advancedCount + (activeCategory === 'all' ? 0 : 1);
+
+  const countryCount = useMemo(() => new Set(trips.map((trip) => trip.location_country).filter(Boolean)).size, [trips]);
+
+  const regionNames = useMemo(() => {
+    try {
+      return new Intl.DisplayNames([intlLocale], { type: 'region' });
+    } catch {
+      return null;
+    }
+  }, [intlLocale]);
+
+  const formatPlace = (trip: Trip) => {
+    const local = trip.location_city || trip.location_region;
+    let country = trip.location_country;
+    try {
+      country = (trip.location_country && regionNames?.of(trip.location_country.toUpperCase())) || trip.location_country;
+    } catch {
+      // not a region code — keep as stored
+    }
+    return [local, country].filter(Boolean).join(', ');
   };
 
-  const getCategoryInfo = (trip: Trip) => {
-    const cat = resolveJoin(trip.categories);
-    if (!cat) return null;
-    return { ...categoryDisplay[cat.name], dbCat: cat };
+  const formatDates = (trip: Trip) => {
+    if (!trip.start_date) return '';
+    // A dátum napként értendő (UTC), és a Node és a böngésző ICU-ja eltérő szóközt
+    // (keskeny / nem törhető) tehet a tartományba — egységesítve, különben hidratálási hiba.
+    const fmt = new Intl.DateTimeFormat(intlLocale, { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' });
+    const text = trip.end_date
+      ? fmt.formatRange(new Date(trip.start_date), new Date(trip.end_date))
+      : fmt.format(new Date(trip.start_date));
+    return text.replace(/[\u00a0\u2009\u202f]/g, ' ');
   };
 
-  const getOrganizer = (trip: Trip) => {
-    return resolveJoin(trip.profiles);
+  const formatPrice = (trip: Trip) => {
+    if (!trip.price_amount || trip.price_amount <= 0) return t('discover.free');
+    try {
+      return new Intl.NumberFormat(intlLocale, {
+        style: 'currency',
+        currency: trip.price_currency || 'EUR',
+        currencyDisplay: 'narrowSymbol',
+        maximumFractionDigits: 0,
+      }).format(trip.price_amount).replace(/[\u00a0\u2009\u202f]/g, ' ');
+    } catch {
+      return `${trip.price_amount} ${trip.price_currency}`;
+    }
   };
 
-  const getSpotsLeft = (trip: Trip) => {
-    return trip.max_participants - (trip.current_participants || 0);
+  const setFilter = (key: keyof AdvancedFilters, value: Choice) =>
+    setFilters((current) => ({ ...current, [key]: current[key] === value ? 'all' : value }));
+
+  const clearFilters = () => {
+    setFilters(NO_FILTERS);
+    setActiveCategory('all');
   };
 
-  const getLocation = (trip: Trip) => {
-    return trip.location_city || trip.location_region || trip.location_country || '';
-  };
+  const sortOptions: Array<[string, string]> = [
+    ['recent', t('discover.sortRecent')],
+    ['date', t('discover.sortSoonestLong')],
+    ['price-low', t('discover.priceLowHigh')],
+    ['price-high', t('discover.priceHighLow')],
+  ];
+
+  const filterGroups: Array<{ key: keyof AdvancedFilters; label: string; options: Array<[string, string]> }> = [
+    {
+      key: 'difficulty',
+      label: t('discover.difficulty'),
+      options: difficultyLevels.map((level) => [String(level.value), locale === 'en' ? level.labelEn : level.label]),
+    },
+    {
+      key: 'price',
+      label: t('discover.priceRange'),
+      options: [
+        ['free', t('discover.free')],
+        ['under50', t('discover.underPrice')],
+        ['50-200', '€50–200'],
+        ['200-500', '€200–500'],
+        ['500+', '€500+'],
+      ],
+    },
+    {
+      key: 'duration',
+      label: t('discover.duration'),
+      options: [
+        ['1', t('discover.oneDay')],
+        ['2-3', t('discover.twoDays')],
+        ['4-7', t('discover.fourDays')],
+        ['1-2w', t('discover.oneWeek')],
+        ['2w+', t('discover.twoWeeks')],
+      ],
+    },
+    {
+      key: 'spots',
+      label: t('discover.availableSpots'),
+      options: [
+        ['1-3', t('discover.spots13')],
+        ['4-8', t('discover.spots48')],
+        ['9+', t('discover.spots9')],
+      ],
+    },
+  ];
+
+  const categoryPills = (testIdPrefix: string) => (
+    <>
+      <OptionChip
+        selected={activeCategory === 'all'}
+        onClick={() => setActiveCategory('all')}
+        icon={<Sparkles size={16} aria-hidden />}
+        testId={`${testIdPrefix}-all`}
+      >
+        {t('discover.allTrips')}
+      </OptionChip>
+      {categories.map((category) => {
+        const meta = categoryMeta(category.name);
+        const Icon = meta.icon;
+        const selected = activeCategory === category.id;
+        return (
+          <OptionChip
+            key={category.id}
+            selected={selected}
+            onClick={() => setActiveCategory(selected ? 'all' : category.id)}
+            icon={<Icon size={16} aria-hidden className={selected ? undefined : CATEGORY_TEXT[meta.token]} />}
+            testId={`${testIdPrefix}-${category.id}`}
+          >
+            {categoryLabel(category.name)}
+          </OptionChip>
+        );
+      })}
+    </>
+  );
+
+  const viewToggle = (
+    <div
+      role="group"
+      aria-label={t('discover.viewToggleLabel')}
+      className="flex shrink-0 gap-1 rounded-trevu border border-line bg-surface p-1"
+    >
+      {([
+        ['globe', Globe, t('discover.globeView')],
+        ['list', List, t('discover.listView')],
+      ] as const).map(([view, Icon, label]) => {
+        const active = viewMode === view;
+        return (
+          <button
+            key={view}
+            type="button"
+            onClick={() => changeView(view)}
+            aria-pressed={active}
+            aria-label={label}
+            title={label}
+            data-testid={`view-toggle-${view}`}
+            className={[
+              'inline-flex h-9 min-w-10 items-center justify-center gap-2 rounded-lg px-2.5 text-sm font-semibold transition-colors md:px-3.5',
+              'focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]',
+              active ? 'bg-ghost text-ink' : 'text-ink-muted hover:text-ink',
+            ].join(' ')}
+          >
+            <Icon size={16} aria-hidden className={active ? 'text-accent' : undefined} />
+            <span className="hidden md:inline">{view === 'globe' ? t('discover.globeView') : t('discover.listView')}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
 
   return (
-    <div className={`discover-page${viewMode === 'globe' ? ' discover-page--globe' : ''}`}>
-      <style>{`
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-
-        body {
-          font-family: 'DM Sans', system-ui, sans-serif;
-          background-color: #f9fafb;
-          color: #1f2937;
-        }
-
-        .discover-page {
-          width: 100%;
-          min-height: 100vh;
-        }
-
-        /* HEADER */
-        .header {
-          position: sticky;
-          top: 0;
-          z-index: 50;
-          background-color: rgba(255, 255, 255, 0.8);
-          backdrop-filter: blur(10px);
-          border-bottom: 1px solid #e5e7eb;
-          padding: 1rem 2rem;
-        }
-
-        .header-content {
-          max-width: 1280px;
-          margin: 0 auto;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 2rem;
-        }
-
-        .header-logo-link {
-          text-decoration: none;
-          flex-shrink: 0;
-        }
-
-        .header-logo {
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: #0f172a;
-          letter-spacing: -0.02em;
-        }
-
-        .header-logo span {
-          color: #0d9488;
-        }
-
-        .header-nav {
-          display: none;
-          gap: 2rem;
-          flex: 1;
-        }
-
-        .header-nav a {
-          text-decoration: none;
-          color: #6b7280;
-          font-size: 0.95rem;
-          transition: color 0.3s;
-          position: relative;
-        }
-
-        .header-nav a:hover {
-          color: #0f172a;
-        }
-
-        .header-nav a.active {
-          color: #0d9488;
-          font-weight: 600;
-        }
-
-        .header-nav a.active::after {
-          content: '';
-          position: absolute;
-          bottom: -8px;
-          left: 0;
-          right: 0;
-          height: 2px;
-          background-color: #0d9488;
-        }
-
-        .header-search {
-          flex: 1;
-          max-width: 300px;
-          display: none;
-        }
-
-        .header-search input {
-          width: 100%;
-          padding: 0.5rem 1rem;
-          border: 1px solid #e5e7eb;
-          border-radius: 6px;
-          font-size: 0.9rem;
-          background-color: #f3f4f6;
-        }
-
-        .header-search input:focus {
-          outline: none;
-          border-color: #0d9488;
-          background-color: #fff;
-        }
-
-        .header-right {
-          display: flex;
-          align-items: center;
-          gap: 1.5rem;
-          flex-shrink: 0;
-        }
-
-        .bell-btn {
-          background: none;
-          border: none;
-          cursor: pointer;
-          color: #6b7280;
-          transition: color 0.3s;
-          padding: 0.5rem;
-        }
-
-        .bell-btn:hover {
-          color: #0f172a;
-        }
-
-        .user-avatar {
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
-          color: white;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 600;
-          font-size: 0.875rem;
-          cursor: pointer;
-          text-decoration: none;
-          transition: transform 0.2s;
-        }
-
-        .user-avatar:hover {
-          transform: scale(1.1);
-        }
-
-        .mobile-menu-btn {
-          display: flex;
-          background: none;
-          border: none;
-          cursor: pointer;
-          color: #0f172a;
-        }
-
-        @media (min-width: 1024px) {
-          .header {
-            padding: 1.25rem 2rem;
-          }
-
-          .header-nav {
-            display: flex;
-          }
-
-          .header-search {
-            display: block;
-          }
-
-          .mobile-menu-btn {
-            display: none;
-          }
-        }
-
-        /* HERO */
-        .hero {
-          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-          color: white;
-          padding: 4rem 2rem;
-          text-align: center;
-        }
-
-        .hero-content {
-          max-width: 800px;
-          margin: 0 auto;
-        }
-
-        .hero-title {
-          font-size: 2.5rem;
-          font-weight: 700;
-          margin-bottom: 1rem;
-          line-height: 1.2;
-        }
-
-        .hero-subtitle {
-          font-size: 1.1rem;
-          color: #cbd5e1;
-          margin-bottom: 2rem;
-          line-height: 1.6;
-        }
-
-        .search-bar {
-          display: flex;
-          background: var(--text-white, #fff);
-          border-radius: 12px;
-          overflow: hidden;
-          width: 100%;
-          max-width: 720px;
-          margin: 0 auto;
-          box-shadow: 0 4px 24px rgba(0,0,0,0.15);
-        }
-
-        .search-field {
-          flex: 1;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding: 14px 20px;
-          border-right: 1px solid var(--border-subtle, #E2E8F0);
-        }
-
-        .search-field:last-of-type { border-right: none; }
-
-        .search-field svg { color: var(--text-muted, #94A3B8); flex-shrink: 0; }
-
-        .search-field input,
-        .search-field select {
-          border: none;
-          outline: none;
-          font-family: 'DM Sans', sans-serif;
-          font-size: 14px;
-          color: var(--text-primary, #0F172A);
-          background: transparent;
-          width: 100%;
-        }
-
-        .search-field input::placeholder,
-        .search-field select { color: var(--text-muted, #94A3B8); }
-        .search-field select option { color: var(--text-primary, #0F172A); }
-
-        .search-btn {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 14px 20px;
-          background: var(--trevu-teal, #0D9488);
-          border: none;
-          cursor: pointer;
-          transition: background 0.2s;
-          flex-shrink: 0;
-          color: white;
-        }
-
-        .search-btn:hover { background: var(--trevu-teal-dark, #0F766E); }
-
-        @media (max-width: 1024px) {
-          .search-bar { flex-direction: column; max-width: 500px; }
-          .search-field { border-right: none; border-bottom: 1px solid var(--border-subtle, #E2E8F0); }
-          .search-field:last-of-type { border-bottom: none; }
-        }
-
-        @media (min-width: 768px) {
-          .search-fields-placeholder {
-            display: none;
-          }
-        }
-
-        .category-pills {
-          display: flex;
-          gap: 0.75rem;
-          margin-top: 2rem;
-          flex-wrap: wrap;
-          justify-content: center;
-        }
-
-        .pill {
-          padding: 0.5rem 1rem;
-          border: none;
-          border-radius: 20px;
-          cursor: pointer;
-          font-size: 0.9rem;
-          font-weight: 500;
-          transition: all 0.3s;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          text-decoration: none;
-        }
-
-        .pill-default {
-          background-color: #1e293b;
-          color: white;
-        }
-
-        .pill-default:hover {
-          background-color: #334155;
-        }
-
-        .pill-active {
-          background-color: #0d9488;
-          color: white;
-        }
-
-        .pill svg {
-          width: 16px;
-          height: 16px;
-        }
-
-        @media (min-width: 640px) {
-          .hero-title {
-            font-size: 3rem;
-          }
-
-          .hero-subtitle {
-            font-size: 1.25rem;
-          }
-        }
-
-        /* FILTER BAR */
-        .filter-bar {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 12px 80px;
-          background: #FFFFFF;
-          border-bottom: 1px solid var(--border-subtle, #E2E8F0);
-        }
-
-        .filter-group {
-          display: flex;
-          gap: 12px;
-          align-items: center;
-        }
-
-        .filter-select {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          padding: 8px 28px 8px 14px;
-          border: 1px solid var(--border-subtle, #E2E8F0);
-          border-radius: 8px;
-          font-family: 'DM Sans', sans-serif;
-          font-size: 13px;
-          font-weight: 500;
-          color: var(--text-secondary, #475569);
-          background: #fff;
-          cursor: pointer;
-          transition: border-color 0.2s;
-          appearance: none;
-          -webkit-appearance: none;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-          background-repeat: no-repeat;
-          background-position: right 10px center;
-        }
-
-        .filter-select:hover { border-color: var(--trevu-teal, #0D9488); }
-
-        .sort-toggle {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 13px;
-          font-weight: 500;
-          color: var(--text-secondary, #475569);
-          cursor: pointer;
-          background: none;
-          border: none;
-        }
-
-        @media (max-width: 640px) {
-          .pill,
-          .filter-select {
-            min-height: 44px;
-          }
-        }
-
-        @media (max-width: 640px) {
-          .filter-bar {
-            padding: 1rem;
-          }
-
-          .filter-bar-content {
-            flex-direction: column;
-            align-items: stretch;
-          }
-
-          .filter-group {
-            flex: 1;
-            flex-direction: column;
-          }
-
-          .filter-select {
-            width: 100%;
-          }
-
-          .sort-toggle {
-            margin-left: 0;
-            width: 100%;
-            justify-content: center;
-          }
-        }
-
-        /* MAIN CONTENT */
-        .main-content {
-          max-width: 1280px;
-          margin: 0 auto;
-          padding: 2rem;
-        }
-
-        .results-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 2rem;
-          flex-wrap: wrap;
-          gap: 1rem;
-        }
-
-        .results-count {
-          font-size: 1.1rem;
-          color: #1f2937;
-          font-weight: 600;
-        }
-
-        .view-toggle {
-          display: flex;
-          gap: 0.5rem;
-        }
-
-        .view-btn {
-          padding: 0.5rem 1rem;
-          border: 1px solid #e5e7eb;
-          background-color: white;
-          cursor: pointer;
-          border-radius: 6px;
-          transition: all 0.3s;
-          color: #6b7280;
-        }
-
-        .view-btn.active {
-          background-color: #0d9488;
-          color: white;
-          border-color: #0d9488;
-        }
-
-        .view-btn svg {
-          width: 16px;
-          height: 16px;
-        }
-
-        .trips-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 24px;
-          margin-bottom: 3rem;
-        }
-
-        /* ── Globe view (Terepgömb) — the globe's own styles live in
-           components/discover/globe.css; only the page-level placement is here. */
-        .globe-discover {
-          position: relative;
-          margin-bottom: 3rem;
-        }
-
-        /* Globe view: the page takes the globe's night background and the globe
-           runs edge to edge — no light page around a dark box (Norbert,
-           2026-09-15). Grid and list keep the light page. Colours: tokens only. */
-        .discover-page--globe {
-          background: var(--globe-space-bottom);
-        }
-        .discover-page--globe .main-content {
-          max-width: none;
-          padding: 0;
-        }
-        .discover-page--globe .results-header {
-          max-width: 1280px;
-          margin: 0 auto;
-          padding: 0.75rem 2rem;
-        }
-        .discover-page--globe .results-count {
-          color: var(--dark-text);
-        }
-        .discover-page--globe .view-btn {
-          background: transparent;
-          border-color: var(--dark-border);
-          color: var(--dark-text-muted);
-        }
-        .discover-page--globe .view-btn.active {
-          background: var(--trevu-teal);
-          border-color: var(--trevu-teal);
-          color: var(--color-surface);
-        }
-        .discover-page--globe .globe-discover {
-          margin-bottom: 0;
-        }
-        .discover-page--globe .terepgomb {
-          border-radius: 0;
-        }
-        @media (max-width: 640px) {
-          .discover-page--globe .results-header {
-            padding: 0.75rem 1rem;
-          }
-        }
-
-
-        .trips-grid.list-view {
-          grid-template-columns: 1fr;
-        }
-
-        .trips-grid.list-view .trip-card {
-          display: flex;
-          flex-direction: row;
-        }
-
-        .trips-grid.list-view .trip-card-image {
-          width: 280px;
-          min-width: 280px;
-          height: auto;
-        }
-
-        @media (max-width: 1024px) {
-          .trips-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-          .trips-grid.list-view .trip-card-image {
-            width: 200px;
-            min-width: 200px;
-          }
-        }
-
-        @media (max-width: 640px) {
-          .trips-grid {
-            grid-template-columns: 1fr;
-          }
-          .trips-grid.list-view .trip-card {
-            flex-direction: column;
-          }
-          .trips-grid.list-view .trip-card-image {
-            width: 100%;
-            min-width: auto;
-          }
-        }
-
-        .trip-card {
-          background-color: white;
-          border-radius: var(--radius-l, 16px);
-          overflow: hidden;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-          transition: all 0.3s;
-          text-decoration: none;
-          color: inherit;
-          display: flex;
-          flex-direction: column;
-          height: 100%;
-        }
-
-        .trip-card:hover {
-          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-          transform: translateY(-2px);
-        }
-
-        .trip-card-image {
-          position: relative;
-          width: 100%;
-          aspect-ratio: 3 / 2;
-          background-color: #e5e7eb;
-          overflow: hidden;
-        }
-
-        .trip-card-image img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-
-        .trip-card-image.gradient {
-          background: linear-gradient(135deg, var(--category-color-1) 0%, var(--category-color-2) 100%);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-size: 3rem;
-        }
-
-        .trip-card-badges {
-          position: absolute;
-          top: 12px;
-          left: 12px;
-          right: 12px;
-          display: flex;
-          gap: 0.5rem;
-          flex-wrap: wrap;
-        }
-
-        .badge-category {
-          display: flex;
-          align-items: center;
-          gap: 0.4rem;
-          padding: 0.4rem 0.8rem;
-          border-radius: 6px;
-          font-size: 0.8rem;
-          font-weight: 600;
-          color: white;
-        }
-
-        .badge-spots {
-          display: inline-flex;
-          align-items: center;
-          gap: 4px;
-          padding: 4px 10px;
-          border-radius: 6px;
-          font-size: 12px;
-          font-weight: 600;
-          background: rgba(255,255,255,0.92);
-          color: var(--text-primary, #0F172A);
-          backdrop-filter: blur(4px);
-        }
-
-        .trip-card-body {
-          padding: 1.5rem;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .trip-card-title {
-          font-size: 1.25rem;
-          font-weight: 700;
-          margin-bottom: 0.75rem;
-          color: #0f172a;
-          line-height: 1.4;
-        }
-
-        .trip-card-meta {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          font-size: 13px;
-          color: var(--text-muted, #94A3B8);
-        }
-
-        .trip-card-meta span {
-          display: inline-flex;
-          align-items: center;
-          gap: 4px;
-        }
-
-        .trip-card-meta svg {
-          width: 14px;
-          height: 14px;
-        }
-
-        .trip-card-details {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 1rem;
-          gap: 1rem;
-        }
-
-        .badge-difficulty {
-          display: inline-flex;
-          padding: 3px 10px;
-          border-radius: 6px;
-          font-size: 12px;
-          font-weight: 600;
-        }
-
-        .trip-card-price {
-          font-size: 16px;
-          font-weight: 700;
-          color: var(--deep-navy, #0F172A);
-        }
-
-        .trip-card-price span {
-          font-size: 13px;
-          font-weight: 400;
-          color: var(--text-muted, #94A3B8);
-        }
-
-        .trip-card-price.free {
-          color: #16a34a;
-        }
-
-        .trip-card-footer {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          padding-top: 1rem;
-          border-top: 1px solid #e5e7eb;
-        }
-
-        .organizer {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          flex: 1;
-        }
-
-        .organizer-avatar {
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          background-color: #e5e7eb;
-          flex-shrink: 0;
-        }
-
-        .organizer-avatar img {
-          width: 100%;
-          height: 100%;
-          border-radius: 50%;
-          object-fit: cover;
-        }
-
-        .organizer-info {
-          display: flex;
-          flex-direction: column;
-          gap: 0.25rem;
-        }
-
-        .organizer-name {
-          font-size: 0.9rem;
-          font-weight: 600;
-          color: #0f172a;
-        }
-
-        .organizer-rating {
-          display: flex;
-          align-items: center;
-          gap: 0.25rem;
-          font-size: 0.8rem;
-          color: #6b7280;
-        }
-
-        .organizer-rating svg {
-          width: 14px;
-          height: 14px;
-          color: #fbbf24;
-          fill: #fbbf24;
-        }
-
-        .trip-card-footer.corporate {
-          flex-direction: column;
-          align-items: stretch;
-          gap: 1rem;
-        }
-
-        .corp-row {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          padding: 0.75rem;
-          background-color: #f0fdf4;
-          border-radius: 6px;
-        }
-
-        .corp-logo {
-          width: 40px;
-          height: 40px;
-          background-color: white;
-          border-radius: 4px;
-          flex-shrink: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .corp-logo img {
-          max-width: 100%;
-          max-height: 100%;
-        }
-
-        .corp-name {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-weight: 600;
-          color: #0f766e;
-          flex: 1;
-        }
-
-        .verified-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.25rem;
-          padding: 0.25rem 0.5rem;
-          background-color: #0d9488;
-          color: white;
-          border-radius: 4px;
-          font-size: 0.75rem;
-          font-weight: 600;
-        }
-
-        .guide-row {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-size: 0.85rem;
-          color: #0f766e;
-        }
-
-        .guide-row svg {
-          width: 16px;
-          height: 16px;
-        }
-
-        /* LOAD MORE */
-        .load-more {
-          text-align: center;
-          margin: 2rem 0;
-        }
-
-        .btn-load-more {
-          padding: 0.75rem 2rem;
-          background-color: white;
-          color: #0d9488;
-          border: 2px solid #0d9488;
-          border-radius: 8px;
-          font-size: 1rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s;
-        }
-
-        .btn-load-more:hover {
-          background-color: #0d9488;
-          color: white;
-        }
-
-        /* CTA BANNER */
-        .cta-banner {
-          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-          color: white;
-          padding: 4rem 2rem;
-          text-align: center;
-        }
-
-        .cta-content {
-          max-width: 600px;
-          margin: 0 auto;
-        }
-
-        .cta-title {
-          font-size: 2rem;
-          font-weight: 700;
-          margin-bottom: 1rem;
-          line-height: 1.4;
-        }
-
-        .cta-subtitle {
-          font-size: 1.1rem;
-          color: #cbd5e1;
-          margin-bottom: 2rem;
-          line-height: 1.6;
-        }
-
-        .cta-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.875rem 2rem;
-          background-color: #0d9488;
-          color: white;
-          border: none;
-          border-radius: 8px;
-          font-size: 1rem;
-          font-weight: 600;
-          cursor: pointer;
-          text-decoration: none;
-          transition: background-color 0.3s;
-        }
-
-        .cta-btn:hover {
-          background-color: #0f766e;
-        }
-
-        .empty-state {
-          text-align: center;
-          padding: 4rem 2rem;
-          color: #6b7280;
-        }
-
-        .empty-state h2 {
-          font-size: 1.5rem;
-          margin-bottom: 0.5rem;
-          color: #1f2937;
-        }
-      `}</style>
-
-      <AppHeader anchors={[
-        { label: t('nav.discover'), href: '/' },
-        { label: t('nav.pricing'), href: '/pricing' },
-        { label: t('nav.community'), href: '/community' },
-      ]} />
-
-      {/* Globe view has its own time and category filters (discover-view-toggle.md),
-          so the hero and the filter bar only render for grid and list. */}
-      {viewMode !== 'globe' && (<>
-      {/* HERO */}
-      <section className="hero">
-        <div className="hero-content">
-          <h1 className="hero-title">{t('discover.heroTitle')}</h1>
-          <p className="hero-subtitle">
-            {t('discover.heroSubtitle')}
-          </p>
-
-          <div className="search-bar">
-              <div className="search-field">
-                <MapPin size={18} />
-                <input
-                  type="text"
-                  aria-label={t('discover.whereTo')}
-                  placeholder={t('discover.whereTo')}
-                />
+    <div data-surface="night" className="min-h-screen bg-canvas text-ink">
+      <AppHeader
+        anchors={[
+          { label: t('nav.discover'), href: '/' },
+          { label: t('nav.pricing'), href: '/pricing' },
+          { label: t('nav.community'), href: '/community' },
+        ]}
+      />
+
+      {viewMode === 'globe' ? (
+        <main id="discover-results">
+          {/* A gömb a saját szűrőit adja (discover-view-toggle.md), ezért itt csak a darabszám és a váltó. */}
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-8">
+            <p className="text-sm font-medium text-ink" data-testid="discover-count">
+              {trips.length === 0
+                ? t('discover.noTripsYet')
+                : t('discover.tripsAvailable').replace('{count}', String(trips.length))}
+            </p>
+            {viewToggle}
+          </div>
+          <GlobeDiscover />
+        </main>
+      ) : (
+        <>
+          {/* HERO — v2 §5: Deep Navy alapon a terv panorámafotója (D02 #H1rRQE / #l87Il, ugyanaz a kép
+              asztalin és mobilon), alulról kötelező olvashatósági gradienssel (--hero-scrim).
+              Fotó: Unsplash photo-1504681869696 (D03 Landing hero, @hdbernd) — public/discover/hero.jpg; Norbert választása 2026-09-16 */}
+          <section className="relative overflow-hidden bg-canvas">
+            <Image
+              src="/discover/hero.jpg"
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
+            <div aria-hidden className="absolute inset-0 bg-hero-scrim-mobile md:bg-hero-scrim" />
+            <div className="relative mx-auto flex min-h-[380px] max-w-7xl flex-col justify-end gap-3 px-5 pb-8 pt-16 md:min-h-[480px] md:gap-4 md:px-[120px] md:pb-12">
+              <p className="text-sm font-medium text-ink-secondary">
+                {t('discover.heroStats')
+                  .replace('{trips}', String(trips.length))
+                  .replace('{countries}', String(countryCount))}
+              </p>
+              <h1 className="max-w-[720px] text-hero-display-mobile text-ink [text-wrap:balance] md:text-hero-display">
+                {t('discover.heroTitle')}
+              </h1>
+              <p className="hidden max-w-[720px] text-lg text-ink-body md:block">{t('discover.heroSubtitle')}</p>
+              <SearchPill
+                className="mt-2 max-w-[720px] md:mt-4"
+                value={queryInput}
+                onChange={(value) => {
+                  setQueryInput(value);
+                  if (!value.trim()) setQuery('');
+                }}
+                onSubmit={submitSearch}
+                placeholder={t('discover.searchPill')}
+                submitLabel={t('common.search')}
+                label={t('discover.searchPillHint')}
+                testId="discover-hero-search"
+                inputTestId="discover-search-query"
+                submitTestId="discover-search-submit"
+              />
+            </div>
+          </section>
+
+          {/* TOOLBAR — asztali: kategória-pirulák | Szűrők + nézetváltó; mobil: Szűrők (n) + nézetváltó */}
+          <div className="mx-auto max-w-7xl px-4 pb-2 pt-5 md:px-[120px] md:pb-5 md:pt-7">
+            <div className="relative flex items-start justify-between gap-4">
+              <div id="categories" className="hidden flex-wrap items-center gap-2.5 md:flex" data-testid="discover-category-pills">
+                {categoryPills('category-pill')}
               </div>
-              <div className="search-field">
-                <Calendar size={18} />
-                <input
-                  type="text"
-                  aria-label={t('discover.when')}
-                  placeholder={t('discover.when')}
-                />
+              <div className="flex flex-1 items-center gap-3 md:flex-none">
+                <button
+                  type="button"
+                  onClick={() => setFiltersOpen(true)}
+                  aria-haspopup="dialog"
+                  aria-expanded={filtersOpen}
+                  data-testid="discover-filters-open"
+                  className="inline-flex h-11 items-center gap-2 rounded-trevu border border-line bg-ghost px-4 text-sm font-semibold text-ink hover:border-line-strong focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+                >
+                  <SlidersHorizontal size={16} aria-hidden />
+                  <span className="md:hidden">
+                    {mobileFilterCount > 0 ? t('discover.filtersActive').replace('{count}', String(mobileFilterCount)) : t('discover.filters')}
+                  </span>
+                  <span className="hidden md:inline">
+                    {advancedCount > 0 ? t('discover.filtersActive').replace('{count}', String(advancedCount)) : t('discover.filters')}
+                  </span>
+                </button>
+                <span className="flex-1 md:hidden" />
+                {viewToggle}
               </div>
-              <div className="search-field">
-                <Compass size={18} />
-                <select aria-label={t('discover.activityType')}>
-                  <option value="">{t('discover.activityType')}</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {locale === 'en' ? cat.name : (categoryDisplay[cat.name]?.nameHu || cat.name)}
+
+              <FilterSheet
+                open={filtersOpen}
+                onClose={() => setFiltersOpen(false)}
+                title={t('discover.filters')}
+                closeLabel={t('discover.filtersClose')}
+                clearLabel={t('discover.filtersClear')}
+                onClear={clearFilters}
+                applyLabel={t('discover.filtersApply').replace('{count}', String(filteredTrips.length))}
+                testId="discover-filter-sheet"
+              >
+                <div className="flex flex-col gap-5 pb-2">
+                  <FilterGroup label={t('discover.activityType')} className="md:hidden">
+                    {categoryPills('sheet-category')}
+                  </FilterGroup>
+                  <FilterGroup label={t('discover.sortLabel')} className="md:hidden">
+                    {sortOptions.map(([value, label]) => (
+                      <OptionChip key={value} mode="radio" selected={sortBy === value} onClick={() => setSortBy(value)}>
+                        {label}
+                      </OptionChip>
+                    ))}
+                  </FilterGroup>
+                  {filterGroups.map((group) => (
+                    <FilterGroup key={group.key} label={group.label}>
+                      {group.options.map(([value, label]) => (
+                        <OptionChip
+                          key={value}
+                          mode="radio"
+                          selected={filters[group.key] === value}
+                          onClick={() => setFilter(group.key, value)}
+                          testId={`filter-${group.key}-${value}`}
+                        >
+                          {label}
+                        </OptionChip>
+                      ))}
+                    </FilterGroup>
+                  ))}
+                </div>
+              </FilterSheet>
+            </div>
+
+            {/* mobil: aktív kategória chipként */}
+            {activeCategory !== 'all' && (
+              <div className="mt-3 flex md:hidden">
+                {(() => {
+                  const category = categories.find((c) => c.id === activeCategory);
+                  if (!category) return null;
+                  const meta = categoryMeta(category.name);
+                  const Icon = meta.icon;
+                  return (
+                    <OptionChip selected onClick={() => setActiveCategory('all')} icon={<Icon size={16} aria-hidden />}>
+                      {categoryLabel(category.name)}
+                    </OptionChip>
+                  );
+                })()}
+              </div>
+            )}
+          </div>
+
+          <main id="discover-results" className="mx-auto max-w-7xl px-4 pb-10 md:px-[120px] md:pb-16">
+            <div className="flex items-center justify-between pb-3 md:pb-4">
+              <p className="text-base font-medium text-ink md:text-lg" data-testid="discover-count">
+                {filteredTrips.length === 0
+                  ? t('discover.noTripsYet')
+                  : t('discover.tripsAvailable').replace('{count}', String(filteredTrips.length))}
+              </p>
+              <label className="hidden items-center gap-2 text-sm text-ink-secondary md:flex">
+                <span>{t('discover.sortLabel')}:</span>
+                <select
+                  value={sortBy}
+                  onChange={(event) => setSortBy(event.target.value)}
+                  data-testid="discover-sort"
+                  className="h-10 rounded-trevu border border-line bg-surface px-3 text-sm text-ink focus:border-accent focus:outline-none focus:shadow-[var(--focus-ring)]"
+                >
+                  {sortOptions.map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
                     </option>
                   ))}
                 </select>
-              </div>
-              <button type="button" className="search-btn" aria-label={t('common.search')}>
-                <Search size={20} />
-              </button>
-          </div>
-
-          <div id="categories" className="category-pills">
-            <button
-              className={`pill ${activeCategory === 'all' ? 'pill-active' : 'pill-default'}`}
-              onClick={() => setActiveCategory('all')}
-            >
-              {t('discover.allTrips')}
-            </button>
-            {categories.map((category) => {
-              const Icon = getCategoryIcon(category.name);
-              return (
-                <button
-                  key={category.id}
-                  className={`pill ${activeCategory === category.id ? 'pill-active' : 'pill-default'}`}
-                  onClick={() => setActiveCategory(category.id)}
-                >
-                  <Icon size={14} />
-                  {locale === 'en' ? category.name : (categoryDisplay[category.name]?.nameHu || category.name)}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* FILTER BAR */}
-      <div id="filters" className="filter-bar">
-        <div className="filter-group">
-          <select className="filter-select" aria-label={t('discover.difficulty')} value={selectedDifficulty} onChange={(e) => setSelectedDifficulty(e.target.value)}>
-            <option value="all">{t('discover.difficulty')}</option>
-            {difficultyLevels.map((level) => (
-              <option key={level.value} value={String(level.value)}>{locale === 'en' ? level.labelEn : level.label}</option>
-            ))}
-          </select>
-          <select className="filter-select" aria-label={t('discover.priceRange')} value={selectedPrice} onChange={(e) => setSelectedPrice(e.target.value)}>
-            <option value="all">{t('discover.priceRange')}</option>
-            <option value="free">{t('discover.free')}</option>
-            <option value="under50">{t('discover.underPrice')}</option>
-            <option value="50-200">€50 – €200</option>
-            <option value="200-500">€200 – €500</option>
-            <option value="500+">€500+</option>
-          </select>
-          <select className="filter-select" aria-label={t('discover.duration')} value={selectedDuration} onChange={(e) => setSelectedDuration(e.target.value)}>
-            <option value="all">{t('discover.duration')}</option>
-            <option value="1">{t('discover.oneDay')}</option>
-            <option value="2-3">{t('discover.twoDays')}</option>
-            <option value="4-7">{t('discover.fourDays')}</option>
-            <option value="1-2w">{t('discover.oneWeek')}</option>
-            <option value="2w+">{t('discover.twoWeeks')}</option>
-          </select>
-          <select className="filter-select" aria-label={t('discover.availableSpots')} value={selectedSpots} onChange={(e) => setSelectedSpots(e.target.value)}>
-            <option value="all">{t('discover.availableSpots')}</option>
-            <option value="1-3">{t('discover.spots13')}</option>
-            <option value="4-8">{t('discover.spots48')}</option>
-            <option value="9+">{t('discover.spots9')}</option>
-          </select>
-        </div>
-        <select className="filter-select" aria-label={t('discover.sortLabel')} value={sortBy} onChange={(e) => setSortBy(e.target.value)} style={{marginLeft:'auto'}}>
-          <option value="recent">{t('discover.sortRecent')}</option>
-          <option value="price-low">{t('discover.priceLowHigh')}</option>
-          <option value="price-high">{t('discover.priceHighLow')}</option>
-          <option value="date">{t('discover.sortSoonest')}</option>
-        </select>
-      </div>
-
-      </>)}
-
-      {/* MAIN CONTENT */}
-      <main className="main-content">
-        <div className="results-header">
-          <div className="results-count">
-            {/* The globe ignores the grid filters (it has its own), so its count is the unfiltered one. */}
-            {(viewMode === 'globe' ? trips.length : filteredTrips.length) === 0
-              ? t('discover.noTripsYet')
-              : t('discover.tripsAvailable').replace(
-                  '{count}',
-                  String(viewMode === 'globe' ? trips.length : filteredTrips.length)
-                )}
-          </div>
-          <div id="map" className="view-toggle" role="group" aria-label={t('discover.viewToggleLabel')}>
-            <button
-              type="button"
-              className={`view-btn ${viewMode === 'globe' ? 'active' : ''}`}
-              onClick={() => changeView('globe')}
-              title={t('discover.globeView')}
-              aria-label={t('discover.globeView')}
-              aria-pressed={viewMode === 'globe'}
-              data-testid="view-toggle-globe"
-            >
-              <Globe size={16} />
-            </button>
-            <button
-              type="button"
-              className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
-              onClick={() => changeView('grid')}
-              title={t('discover.gridView')}
-              aria-label={t('discover.gridView')}
-              aria-pressed={viewMode === 'grid'}
-              data-testid="view-toggle-grid"
-            >
-              <LayoutGrid size={16} />
-            </button>
-            <button
-              type="button"
-              className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
-              onClick={() => changeView('list')}
-              title={t('discover.listView')}
-              aria-label={t('discover.listView')}
-              aria-pressed={viewMode === 'list'}
-              data-testid="view-toggle-list"
-            >
-              <List size={16} />
-            </button>
-          </div>
-        </div>
-
-        {viewMode === 'globe' ? (
-          <GlobeDiscover />
-        ) : filteredTrips.length === 0 ? (
-          <StateTemplate variant="empty" title={t('discover.noTrips')} description={t('discover.noTripsHint')} className="my-8" />
-        ) : (
-          <>
-            <div className={`trips-grid${viewMode === 'list' ? ' list-view' : ''}`}>
-              {sortedTrips.map((trip) => {
-                const catInfo = getCategoryInfo(trip);
-                const organizer = getOrganizer(trip);
-                const spotsLeft = getSpotsLeft(trip);
-                const diffLevel = getDifficultyLabel(trip.difficulty);
-                const location = getLocation(trip);
-                const isCorporate = organizer && organizer.subscription_tier !== 'free';
-                const CatIcon = catInfo?.dbCat ? getCategoryIcon(catInfo.dbCat.name) : Mountain;
-
-                return (
-                  <Card
-                    key={trip.id}
-                    href={`/trips/${trip.slug}`}
-                    className="trip-card"
-                  >
-                    {/* Image — card_image_url ha van, különben cover_image_url fallback */}
-                    {(() => {
-                      const cardImg = trip.card_image_url || trip.cover_image_url;
-                      const cardSrc = trip.card_image_url ? trip.card_image_source : trip.cover_image_source;
-                      return (
-                    <CardImage src={cardImg} alt={trip.title} className="trip-card-image">
-                      {cardSrc === "user_upload" && (
-                        <span style={{ position: 'absolute', bottom: 8, right: 8, fontSize: 10, fontWeight: 600, color: '#fff', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: '2px 8px', borderTopLeftRadius: 8 }}>
-                          <Icon name="camera" size={11} className="inline -mt-0.5 mr-1" />{t('imagePicker.ownPhoto')}
-                        </span>
-                      )}
-                      <div className="trip-card-badges">
-                        {catInfo && (
-                          <Chip solid category="hiking" className="badge-category" style={{ background: catInfo.colorHex }}>
-                            <CatIcon size={12} /> {locale === 'en' ? (catInfo.dbCat?.name || '') : (catInfo.nameHu || catInfo.dbCat?.name || '')}
-                          </Chip>
-                        )}
-                        <span className="badge-spots">
-                          <Users size={12} /> {t('discover.spotsLeft').replace('{count}', String(spotsLeft))}
-                        </span>
-                      </div>
-                    </CardImage>
-                      );
-                    })()}
-
-                    {/* Body */}
-                    <CardBody className="trip-card-body">
-                      <h3 className="trip-card-title">{trip.title}</h3>
-                      <div className="trip-card-meta">
-                        <span><MapPin size={14} /> {location}</span>
-                        {trip.start_date && (
-                          <span><Calendar size={14} /> {trip.end_date ? formatDateRange(trip.start_date, trip.end_date, locale) : new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'hu-HU', { month: 'short', day: 'numeric' }).format(new Date(trip.start_date))}</span>
-                        )}
-                      </div>
-                      <div className="trip-card-details">
-                        <span className="badge-difficulty" style={{
-                          background: diffLevel.color + '20',
-                          color: diffLevel.color
-                        }}>
-                          {locale === 'en' ? diffLevel.labelEn : diffLevel.label}
-                        </span>
-                        {trip.price_amount && trip.price_amount > 0 ? (
-                          <span className="trip-card-price">€{trip.price_amount} <span>{t('discover.perPerson')}</span></span>
-                        ) : (
-                          <span className="trip-card-price" style={{ color: 'var(--color-success-text, #047857)' }}>{t('discover.free')}</span>
-                        )}
-                      </div>
-                    </CardBody>
-
-                    {/* Footer */}
-                    <div className={`trip-card-footer${isCorporate ? ' corporate' : ''}`}>
-                      {isCorporate ? (
-                        <>
-                          <div className="corp-row">
-                            <div className="corp-logo" style={{ background: catInfo?.colorHex || '#0D9488' }}>
-                              {(organizer?.display_name || 'O')[0]}
-                            </div>
-                            <span className="corp-name">{organizer?.display_name}</span>
-                            <span className="corp-spacer"></span>
-                            <span className="verified-badge">
-                              <span className="verified-badge-logo">T</span> {t('discover.verifiedOrg')}
-                            </span>
-                          </div>
-                          <div className="guide-row">
-                            <div className="organizer-avatar" style={{ background: catInfo?.colorHex || '#0D9488', width: 20, height: 20 }}></div>
-                            <span className="organizer-name">{t('discover.guide').replace('{name}', organizer?.display_name || '')}</span>
-                            <span className="corp-spacer"></span>
-                            <div className="organizer-rating"><Star size={12} /> 4.8</div>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div className="organizer">
-                            <div className="organizer-avatar" style={{ background: catInfo?.colorHex || '#0D9488' }}></div>
-                            <span className="organizer-name">{organizer?.display_name || t('discover.organizer')}</span>
-                          </div>
-                          <div className="organizer-rating">
-                            <Star size={14} /> 4.8
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </Card>
-                );
-              })}
+              </label>
             </div>
 
-            {filteredTrips.length > 6 && (
-              <div className="load-more">
-                <button className="btn-load-more">{t('discover.loadMore')}</button>
-              </div>
-            )}
-          </>
-        )}
-      </main>
+            {filteredTrips.length === 0 ? (
+              <section
+                role="status"
+                data-testid="discover-empty"
+                className="flex flex-col items-center gap-3.5 rounded-trevu-2xl border border-line bg-surface px-6 py-14 text-center"
+              >
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-ghost">
+                  <Compass size={36} aria-hidden className="text-ink-muted" />
+                </div>
+                <h2 className="text-lg font-bold text-ink">
+                  {trips.length === 0 ? t('discover.noTrips') : t('discover.noMatchTitle')}
+                </h2>
+                <p className="max-w-[420px] text-sm text-ink-muted">{t('discover.noTripsHint')}</p>
+              </section>
+            ) : (
+              <>
+                <ul className="flex flex-col gap-3 md:gap-4" data-testid="discover-trip-list">
+                  {visibleTrips.map((trip) => {
+                    const category = resolveJoin(trip.categories);
+                    const meta = category ? categoryMeta(category.name) : null;
+                    const spotsLeft = trip.max_participants - (trip.current_participants || 0);
+                    return (
+                      <li key={trip.id}>
+                        <TripBand
+                          href={`/trips/${trip.slug}`}
+                          title={trip.title}
+                          imageUrl={trip.card_image_url || trip.cover_image_url}
+                          place={formatPlace(trip)}
+                          details={[formatDates(trip), t('discover.spotsLeft').replace('{count}', String(spotsLeft))]}
+                          category={category && meta ? { label: categoryLabel(category.name), token: meta.token, icon: meta.icon } : null}
+                          price={formatPrice(trip)}
+                          priceCaption={t('discover.priceCaption')}
+                          ctaLabel={t('discover.viewDetails')}
+                        />
+                      </li>
+                    );
+                  })}
+                </ul>
 
-      {/* CTA BANNER */}
-      <section className="cta-banner">
-        <div className="cta-content">
-          <h2 className="cta-title">{t('discover.ctaTitle')}</h2>
-          <p className="cta-subtitle">
-            {t('discover.ctaSubtitle')}
-          </p>
-          <Link href="/trips/new" className="cta-btn">
+                {remaining > 0 && (
+                  <div className="flex justify-center pt-6">
+                    <button
+                      type="button"
+                      onClick={() => setPage({ key: pageKey, count: visibleCount + PAGE_SIZE })}
+                      data-testid="discover-load-more"
+                      className="h-12 rounded-trevu bg-ghost px-6 text-base font-semibold text-ink hover:bg-line focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+                    >
+                      {t('discover.loadMoreCount').replace('{count}', String(Math.min(PAGE_SIZE, remaining)))}
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </main>
+        </>
+      )}
+
+      {/* CTA — az egyetlen Day-régió: Frost sáv, Dawn Gradient gomb (v2 §2/2) */}
+      <section data-surface="day" className="bg-ghost text-ink">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 md:flex-row md:items-center md:justify-between md:px-[120px] md:py-14">
+          <div className="flex flex-col gap-2">
+            <h2 className="text-[22px] font-semibold text-ink md:text-[28px]">{t('discover.ctaTitle')}</h2>
+            <p className="text-sm text-ink-secondary md:text-base">{t('discover.ctaSubtitle')}</p>
+          </div>
+          <Link
+            href="/trips/new"
+            className="inline-flex h-12 items-center justify-center rounded-trevu px-6 text-base font-semibold text-ink [background:var(--gradient-dawn)] hover:opacity-95 focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+          >
             {t('discover.createTrip')}
           </Link>
         </div>

@@ -13,6 +13,7 @@ import { BasicInfoSection } from "@/components/trip-forms/BasicInfoSection";
 import { CategoryDetailsSection } from "@/components/trip-forms/CategoryDetailsSection";
 import { ImagesSection } from "@/components/trip-forms/ImagesSection";
 import { SettingsSection } from "@/components/trip-forms/SettingsSection";
+import { TripDangerZone } from "@/components/trip-forms/TripDangerZone";
 import { CrewSection } from "@/components/trip-forms/CrewSection";
 import { StaffSeatsManager } from "@/components/trip-forms/StaffSeatsManager";
 import { ApplicationsManager, CrewMembersRow } from "@/components/trip-forms/ApplicationsManager";
@@ -191,7 +192,12 @@ export function EditTripForm({
       case "images":
         return <ImagesSection data={formData} onChange={updateForm} />;
       case "settings":
-        return <SettingsSection data={formData} onChange={updateForm} />;
+        return (
+          <>
+            <SettingsSection data={formData} onChange={updateForm} />
+            <TripDangerZone tripId={trip.id} slug={slug} title={trip.title} status={trip.status} />
+          </>
+        );
       case "timeline":
         return <TripTimelineClient tripId={trip.id} isOrganizer={true} />;
       case "crew":
@@ -207,7 +213,7 @@ export function EditTripForm({
           />
         );
     }
-  }, [activeTab, formData, updateForm, countries, categoryParameters, parameterOptions, trip.id]);
+  }, [activeTab, formData, updateForm, countries, categoryParameters, parameterOptions, trip.id, trip.title, trip.status, slug]);
 
   return (
     <div className="bg-slate-50">

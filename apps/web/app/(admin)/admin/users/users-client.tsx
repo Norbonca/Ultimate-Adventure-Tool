@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { banUser, unbanUser, type AdminUser } from "../actions";
 import { Icon } from "@/components/Icon";
+import { BanUserModal, type BanDuration } from "@/components/admin/BanUserModal";
 
 interface AdminUsersClientProps {
   users: AdminUser[];
@@ -64,8 +65,6 @@ export function AdminUsersClient({
   const router = useRouter();
   const [search, setSearch] = useState(initialSearch);
   const [banModal, setBanModal] = useState<AdminUser | null>(null);
-  const [banReason, setBanReason] = useState("");
-  const [banDuration, setBanDuration] = useState<"1d" | "7d" | "30d" | "permanent">("7d");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -90,15 +89,14 @@ export function AdminUsersClient({
     applyFilter("search", search);
   };
 
-  const handleBan = async () => {
-    if (!banModal || !banReason.trim()) return;
+  const handleBan = async (reason: string, duration: BanDuration) => {
+    if (!banModal || !reason) return;
     setActionLoading(banModal.id);
-    const res = await banUser(banModal.id, banReason, banDuration);
+    const res = await banUser(banModal.id, reason, duration);
     setActionLoading(null);
     if (res.success) {
       showToast(t.t_ban_success);
       setBanModal(null);
-      setBanReason("");
       router.refresh();
     }
   };
@@ -339,75 +337,17 @@ export function AdminUsersClient({
 
       {/* Ban Modal */}
       {banModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-1">
-              {t.t_ban_title}
-            </h3>
-            <p className="text-sm text-slate-500 mb-4">
-              {userName(banModal)}
-            </p>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  {t.t_ban_reason}
-                </label>
-                <textarea
-                  value={banReason}
-                  onChange={(e) => setBanReason(e.target.value)}
-                  placeholder={t.t_ban_reason_placeholder}
-                  rows={3}
-                  className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-400 resize-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  {t.t_ban_duration}
-                </label>
-                <div className="flex gap-2 flex-wrap">
-                  {(
-                    [
-                      { value: "1d", label: t.t_ban_1day },
-                      { value: "7d", label: t.t_ban_7days },
-                      { value: "30d", label: t.t_ban_30days },
-                      { value: "permanent", label: t.t_ban_permanent },
-                    ] as const
-                  ).map((opt) => (
-                    <button
-                      key={opt.value}
-                      onClick={() => setBanDuration(opt.value)}
-                      className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
-                        banDuration === opt.value
-                          ? "bg-red-500 text-white border-red-500"
-                          : "border-slate-200 text-slate-600 hover:border-red-300"
-                      }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-2 mt-6">
-              <button
-                onClick={() => { setBanModal(null); setBanReason(""); }}
-                className="flex-1 px-4 py-2 text-sm border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors"
-              >
-                {t.t_cancel}
-              </button>
-              <button
-                onClick={handleBan}
-                disabled={!banReason.trim() || actionLoading !== null}
-                className="flex-1 px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50"
-              >
-                {actionLoading ? "..." : t.t_ban_confirm}
-              </button>
-            </div>
-          </div>
-        </div>
+        <BanUserModal
+          userName={userName(banModal)}
+          loading={actionLoading !== null}
+          labels={{
+            title: t.t_ban_title, reason: t.t_ban_reason, reasonPlaceholder: t.t_ban_reason_placeholder,
+            duration: t.t_ban_duration, day1: t.t_ban_1day, days7: t.t_ban_7days, days30: t.t_ban_30days,
+            permanent: t.t_ban_permanent, confirm: t.t_ban_confirm, cancel: t.t_cancel,
+          }}
+          onCancel={() => setBanModal(null)}
+          onConfirm={handleBan}
+        />
       )}
     </>
   );

@@ -118,32 +118,32 @@ export function AppHeader({ anchors, user }: AppHeaderProps) {
       : resolvedUser?.email?.charAt(0)?.toUpperCase() ?? "?";
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200 night:bg-glass night:border-line">
       <div className="max-w-7xl mx-auto h-14 px-4 flex items-center">
         {/* ── BAL ZÓNA: Logo dropdown + Trevu home link ── */}
         <div className="flex items-center gap-1 shrink-0 relative" ref={menuRef}>
           {/* Logo icon = dropdown trigger */}
           <button
             onClick={() => setMenuOpen((v) => !v)}
-            className="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center hover:bg-teal-700 transition-colors"
+            className="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center hover:bg-teal-700 transition-colors night:bg-accent night:hover:bg-accent-hover"
             aria-label={t('nav.menuLabel')}
             aria-expanded={menuOpen}
           >
-            <span className="text-white font-bold text-sm">T</span>
+            <span className="text-white font-bold text-sm night:text-accent-on">T</span>
             <ChevronDown
-              className={`w-3 h-3 text-teal-200 ml-0.5 transition-transform ${menuOpen ? "rotate-180" : ""}`}
+              className={`w-3 h-3 text-teal-200 night:text-accent-on ml-0.5 transition-transform ${menuOpen ? "rotate-180" : ""}`}
             />
           </button>
 
           {/* Trevu text = home link */}
           <Link href="/" className="font-bold text-base ml-1">
-            <span className="text-teal-600">Tre</span>
-            <span className="text-slate-900">vu</span>
+            <span className="text-teal-600 night:text-accent">Tre</span>
+            <span className="text-slate-900 night:text-ink">vu</span>
           </Link>
 
           {/* Dropdown menu */}
           {menuOpen && (
-            <div className="absolute top-full left-0 mt-1 w-52 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 z-50">
+            <div className="absolute top-full left-0 mt-1 w-52 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 z-50 night:bg-surface night:border-line night:shadow-none">
               {NAV_ITEMS.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -151,9 +151,9 @@ export function AppHeader({ anchors, user }: AppHeaderProps) {
                     key={item.key}
                     href={item.href}
                     onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-teal-600 transition-colors"
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-teal-600 transition-colors night:text-ink-body night:hover:bg-ghost night:hover:text-accent"
                   >
-                    <Icon className="w-4 h-4 text-slate-400" />
+                    <Icon className="w-4 h-4 text-slate-400 night:text-ink-muted" />
                     {t(item.key as Parameters<typeof t>[0])}
                   </Link>
                 );
@@ -174,14 +174,14 @@ export function AppHeader({ anchors, user }: AppHeaderProps) {
               return (
                 <span key={anchor.href} className="flex items-center">
                   {i > 0 && (
-                    <span className="text-slate-300 mx-1.5">·</span>
+                    <span className="text-slate-300 mx-1.5 night:text-line-strong">·</span>
                   )}
                   <a
                     href={anchor.href}
                     className={`text-sm transition-colors whitespace-nowrap ${
                       active
-                        ? "font-semibold text-teal-600"
-                        : "font-medium text-slate-500 hover:text-teal-600"
+                        ? "font-semibold text-teal-600 night:text-accent"
+                        : "font-medium text-slate-500 hover:text-teal-600 night:text-ink-secondary night:hover:text-accent"
                     }`}
                   >
                     {anchor.label}
@@ -197,14 +197,14 @@ export function AppHeader({ anchors, user }: AppHeaderProps) {
               return (
                 <span key={item.href} className="flex items-center">
                   {i > 0 && (
-                    <span className="text-slate-300 mx-1.5">·</span>
+                    <span className="text-slate-300 mx-1.5 night:text-line-strong">·</span>
                   )}
                   <Link
                     href={item.href}
                     className={`text-sm transition-colors whitespace-nowrap ${
                       active
-                        ? "font-semibold text-teal-600"
-                        : "font-medium text-slate-500 hover:text-teal-600"
+                        ? "font-semibold text-teal-600 night:text-accent"
+                        : "font-medium text-slate-500 hover:text-teal-600 night:text-ink-secondary night:hover:text-accent"
                     }`}
                   >
                     {t(item.key as Parameters<typeof t>[0])}
@@ -225,7 +225,7 @@ export function AppHeader({ anchors, user }: AppHeaderProps) {
             <>
               <Link
                 href="/profile"
-                className="h-8 px-3 rounded-full bg-teal-600 text-white flex items-center justify-center text-sm font-bold shrink-0 hover:bg-teal-700 transition-colors"
+                className="h-8 px-3 rounded-full bg-teal-600 text-white flex items-center justify-center text-sm font-bold shrink-0 hover:bg-teal-700 transition-colors night:bg-accent night:text-accent-on night:hover:bg-accent-hover"
                 title={resolvedUser!.email}
               >
                 {avatarText}
@@ -233,7 +233,7 @@ export function AppHeader({ anchors, user }: AppHeaderProps) {
               <form action="/api/v1/auth/signout" method="POST">
                 <button
                   type="submit"
-                  className="text-sm text-slate-500 hover:text-slate-700 transition-colors whitespace-nowrap"
+                  className="text-sm text-slate-500 hover:text-slate-700 transition-colors whitespace-nowrap night:text-ink-secondary night:hover:text-ink"
                 >
                   {t("auth.logout")}
                 </button>
@@ -245,13 +245,13 @@ export function AppHeader({ anchors, user }: AppHeaderProps) {
             <>
               <Link
                 href="/login"
-                className="text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
+                className="text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors night:text-ink-body night:hover:text-ink"
               >
                 {t("nav.logIn")}
               </Link>
               <Link
                 href="/register"
-                className="px-4 py-1.5 bg-teal-600 text-white text-sm font-semibold rounded-lg hover:bg-teal-700 transition-colors"
+                className="px-4 py-1.5 bg-teal-600 text-white text-sm font-semibold rounded-lg hover:bg-teal-700 transition-colors night:bg-accent night:text-accent-on night:hover:bg-accent-hover"
               >
                 {t("nav.signUp")}
               </Link>
