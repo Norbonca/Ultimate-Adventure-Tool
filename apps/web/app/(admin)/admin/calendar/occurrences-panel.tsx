@@ -115,7 +115,7 @@ export function OccurrencesPanel({
       {form && (
         <form onSubmit={submit} className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3">
           <label className="flex flex-col gap-1 text-xs font-medium text-slate-600">
-            {t("admin.calendar.columns.earliest")}
+            {t("admin.calendar.columns.earliest")} <span className="text-red-500" aria-hidden="true">*</span>
             <input
               type="date"
               required
@@ -125,7 +125,7 @@ export function OccurrencesPanel({
             />
           </label>
           <label className="flex flex-col gap-1 text-xs font-medium text-slate-600">
-            {t("admin.calendar.columns.latest")}
+            {t("admin.calendar.columns.latest")} <span className="text-red-500" aria-hidden="true">*</span>
             <input type="date" required min={form.earliest} className={inputCls} value={form.latest} onChange={(e) => setForm((f) => (f ? { ...f, latest: e.target.value } : f))} />
           </label>
           <label className="flex flex-col gap-1 text-xs font-medium text-slate-600 md:col-span-2">

@@ -201,7 +201,7 @@ export function PeriodEditorClient(props: {
           <h2 className="text-sm font-semibold text-slate-800">{t("admin.calendar.editor.sectionBasics")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <label className={labelCls}>
-              {t("admin.calendar.editor.key")}
+              {t("admin.calendar.editor.key")} <span className="text-red-500" aria-hidden="true">*</span>
               <input
                 required
                 className={`${inputCls} font-mono`}
@@ -222,11 +222,11 @@ export function PeriodEditorClient(props: {
               </select>
             </label>
             <label className={labelCls}>
-              {t("admin.calendar.editor.nameHu")}
+              {t("admin.calendar.editor.nameHu")} <span className="text-red-500" aria-hidden="true">*</span>
               <input required className={inputCls} value={form.labelHu} onChange={(e) => set("labelHu", e.target.value)} />
             </label>
             <label className={labelCls}>
-              {t("admin.calendar.editor.nameEn")}
+              {t("admin.calendar.editor.nameEn")} <span className="text-red-500" aria-hidden="true">*</span>
               <input required className={inputCls} value={form.labelEn} onChange={(e) => set("labelEn", e.target.value)} />
             </label>
             <label className={labelCls}>
@@ -391,7 +391,7 @@ export function PeriodEditorClient(props: {
           <h2 className="text-sm font-semibold text-slate-800">{t("admin.calendar.editor.sectionSource")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <label className={labelCls}>
-              {t("admin.calendar.editor.sourceText")}
+              {t("admin.calendar.editor.sourceText")} <span className="text-red-500" aria-hidden="true">*</span>
               <input
                 required
                 className={inputCls}
