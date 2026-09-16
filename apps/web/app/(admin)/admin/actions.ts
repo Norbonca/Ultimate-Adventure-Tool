@@ -294,6 +294,8 @@ export interface AdminTrip {
   organizer_id: string;
   organizer_name: string | null;
   category_id: string | null;
+  category_name: string | null;
+  category_name_localized: Record<string, string> | null;
   difficulty: string | null;
   start_date: string | null;
   end_date: string | null;
@@ -319,6 +321,7 @@ export async function getAdminTrips(params: {
       `id, title, slug, status, organizer_id, category_id, difficulty,
        start_date, end_date, current_participants, max_participants, created_at,
        location_city,
+       categories(name, name_localized),
        profiles!trips_organizer_id_fkey(display_name, first_name, last_name)`,
       { count: "exact" }
     )
@@ -355,6 +358,7 @@ export async function getAdminTrips(params: {
 
   const trips: AdminTrip[] = (data ?? []).map((t) => {
     const org = Array.isArray(t.profiles) ? t.profiles[0] : t.profiles;
+    const cat = Array.isArray(t.categories) ? t.categories[0] : t.categories;
     return {
       id: t.id,
       title: t.title,
@@ -365,6 +369,8 @@ export async function getAdminTrips(params: {
         ? org.display_name || `${org.first_name ?? ""} ${org.last_name ?? ""}`.trim() || null
         : null,
       category_id: t.category_id,
+      category_name: cat?.name ?? null,
+      category_name_localized: (cat?.name_localized as Record<string, string> | null) ?? null,
       difficulty: t.difficulty,
       start_date: t.start_date,
       end_date: t.end_date,

@@ -71,20 +71,30 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
 
   // ── Category selected → load sub-disciplines ──
   const onCategorySelect = useCallback(
-    (categoryId: string, categoryName: string) => {
+    (
+      categoryId: string,
+      categoryName: string,
+      preset?: { subDisciplineName?: string; categoryDetails?: Record<string, unknown> },
+    ) => {
       updateForm({
         category_id: categoryId,
         category_name: categoryName,
         sub_discipline_id: "",
-        category_details: {},
+        category_details: preset?.categoryDetails ?? {},
       });
 
       startTransition(async () => {
         const subs = await fetchSubDisciplines(categoryId);
         setSubDisciplines(subs);
 
-        // Load global parameters (no sub-discipline filter)
-        const params = await fetchCategoryParameters(categoryId);
+        // Sablonból: az alkategória név szerint (UX-019)
+        const presetSub = preset?.subDisciplineName
+          ? subs.find((item) => item.name === preset.subDisciplineName)
+          : undefined;
+        if (presetSub) updateForm({ sub_discipline_id: presetSub.id });
+
+        // Load parameters (global, or the preset sub-discipline's)
+        const params = await fetchCategoryParameters(categoryId, presetSub?.id);
         setParameters(params);
 
         // Load options for select/multiselect fields
@@ -160,11 +170,17 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
         setErrorMsg(t("errors.loadFailed"));
         return;
       }
-      onCategorySelect(category.id, category.name);
+      onCategorySelect(category.id, category.name, {
+        subDisciplineName: template.subDisciplineName,
+        categoryDetails: template.categoryDetails,
+      });
       updateForm({
         title: locale === "en" ? template.title : template.titleHu,
         description: locale === "en" ? template.descriptionEn : template.descriptionHu,
         max_participants: Math.max(2, template.spots),
+        ...(template.locationCountry ? { location_country: template.locationCountry } : {}),
+        ...(template.locationRegion ? { location_region: template.locationRegion } : {}),
+        ...(template.locationCity ? { location_city: template.locationCity } : {}),
       });
       setPlanningMode("template");
       setCurrentStep(1);

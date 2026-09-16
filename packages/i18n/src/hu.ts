@@ -1685,13 +1685,13 @@ const hu = {
   // M021 — Trip Timeline
   // ============================================================================
   timeline: {
-    title: "Trip Timeline",
+    title: "Menetrend",
     overallProgress: "Összesen: {completed}/{total} feladat",
     progressPercent: "{percent}%",
     addPhase: "Fázis hozzáadása",
     addMilestone: "Mérföldkő hozzáadása",
     addTask: "Feladat hozzáadása",
-    noTimeline: "Még nincs timeline ehhez a túrához.",
+    noTimeline: "Még nincs menetrend ehhez a túrához.",
     initFromTemplate: "Sablon alapján indítás",
     chooseTemplate: "Válassz sablont",
     templateMinimal: "Minimál szervezés",

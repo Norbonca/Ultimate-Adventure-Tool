@@ -102,6 +102,7 @@ export function FindFriends() {
           value={query}
           onChange={(e) => runSearch(e.target.value)}
           placeholder={t("community.findFriendsPlaceholder")}
+          aria-label={t("community.findFriendsPlaceholder")}
           className="input-trevu w-full pl-10 pr-3 py-2.5 text-sm"
         />
       </div>

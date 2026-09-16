@@ -65,6 +65,7 @@ export default async function AdminTripsPage({ searchParams }: PageProps) {
         locale={locale}
         tabLabels={tabLabels}
         t_search_placeholder={t("admin.trips.searchPlaceholder")}
+        t_search_button={t("common.search")}
         t_col_trip={t("admin.trips.colTrip")}
         t_col_organizer={t("admin.trips.colOrganizer")}
         t_col_category={t("admin.trips.colCategory")}

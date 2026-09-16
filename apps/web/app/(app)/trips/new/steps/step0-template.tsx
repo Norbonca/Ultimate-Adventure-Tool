@@ -20,6 +20,12 @@ interface TemplateData {
   organizerName: string;
   spots: number;
   duration: string;
+  /** UX-019: a sablon minden ismert, érvényes mezőt előtölt (a dátum szándékosan üres). */
+  subDisciplineName?: string;
+  locationCountry?: string;
+  locationRegion?: string;
+  locationCity?: string;
+  categoryDetails?: Record<string, unknown>;
 }
 
 export const SAMPLE_TEMPLATES: TemplateData[] = [
@@ -36,6 +42,9 @@ export const SAMPLE_TEMPLATES: TemplateData[] = [
     organizerName: "Fanni",
     spots: 3,
     duration: "4-7",
+    subDisciplineName: "Multi-day Trekking",
+    locationCountry: "RO",
+    categoryDetails: { terrain_type: ["forest", "rocky"] },
   },
   {
     id: "tmpl-2",
@@ -50,6 +59,11 @@ export const SAMPLE_TEMPLATES: TemplateData[] = [
     organizerName: "Marko",
     spots: 6,
     duration: "5-8",
+    subDisciplineName: "Sailing",
+    locationCountry: "HR",
+    locationRegion: "Split-Dalmácia",
+    locationCity: "Split",
+    categoryDetails: { water_type: "sea", vessel_type: "sailboat_small" },
   },
   {
     id: "tmpl-3",
@@ -64,6 +78,7 @@ export const SAMPLE_TEMPLATES: TemplateData[] = [
     organizerName: "Stefan",
     spots: 8,
     duration: "3-4",
+    locationCountry: "AT",
   },
 ];
 

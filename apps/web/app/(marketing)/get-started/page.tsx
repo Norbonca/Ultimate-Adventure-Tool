@@ -1260,7 +1260,7 @@ export default function HomePage() {
                   <a href="/pricing">{t('landing.footerPricing')}</a>
                 </li>
                 <li>
-                  <a href="#">{t('landing.footerRoadmap')}</a>
+                  <a aria-disabled="true">{t('landing.footerRoadmap')}</a>
                 </li>
               </ul>
             </div>
@@ -1269,16 +1269,16 @@ export default function HomePage() {
               <h3>{t('landing.footerCompany')}</h3>
               <ul>
                 <li>
-                  <a href="#">{t('landing.footerAbout')}</a>
+                  <a aria-disabled="true">{t('landing.footerAbout')}</a>
                 </li>
                 <li>
-                  <a href="#">{t('landing.footerBlog')}</a>
+                  <a aria-disabled="true">{t('landing.footerBlog')}</a>
                 </li>
                 <li>
-                  <a href="#">{t('landing.footerCareers')}</a>
+                  <a aria-disabled="true">{t('landing.footerCareers')}</a>
                 </li>
                 <li>
-                  <a href="#">{t('landing.footerContact')}</a>
+                  <a aria-disabled="true">{t('landing.footerContact')}</a>
                 </li>
               </ul>
             </div>
@@ -1287,13 +1287,13 @@ export default function HomePage() {
               <h3>{t('landing.footerLegal')}</h3>
               <ul>
                 <li>
-                  <a href="#">{t('landing.footerPrivacy')}</a>
+                  <a aria-disabled="true">{t('landing.footerPrivacy')}</a>
                 </li>
                 <li>
-                  <a href="#">{t('landing.footerTerms')}</a>
+                  <a aria-disabled="true">{t('landing.footerTerms')}</a>
                 </li>
                 <li>
-                  <a href="#">{t('landing.footerCookies')}</a>
+                  <a aria-disabled="true">{t('landing.footerCookies')}</a>
                 </li>
               </ul>
             </div>
