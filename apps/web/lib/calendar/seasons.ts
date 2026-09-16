@@ -1,6 +1,6 @@
 /**
  * M23 Calendar — meteorológiai évszakok (BR-M23-005) és a relatív évszak-választás feloldása (EC-12).
- * A tartományok megegyeznek a 037-es seed évszak-definícióival.
+ * A tartományok megegyeznek a 043-as seed évszak-definícióival.
  */
 
 import type { Period } from "./period";

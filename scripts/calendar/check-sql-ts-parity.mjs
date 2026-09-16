@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// M23 Calendar — az SQL-szabálymotor (037) és a TS-motor (apps/web/lib/calendar/rules.ts) paritása
+// M23 Calendar — az SQL-szabálymotor (043) és a TS-motor (apps/web/lib/calendar/rules.ts) paritása
 // a helyi adatbázis minden `generated` előfordulásán.
 // Futtatás: node scripts/calendar/check-sql-ts-parity.mjs  (a helyi Supabase fut: supabase_db_trevu-local)
 

@@ -25,7 +25,7 @@ export interface ViewerCalendar {
  * Nincs rögzített alapország és nyelv szerinti alapország sem. Ország nélkül (vagy kijelentkezve)
  * `country: null`, időzóna UTC.
  *
- * Aktív országnál az időzóna (040; Norbert döntése, 2026-09-15): a profil érvényes zónája, ha az az
+ * Aktív országnál az időzóna (045; Norbert döntése, 2026-09-15): a profil érvényes zónája, ha az az
  * ország aktív zónái (`countryTimezones`) között van; különben az ország fő zónája
  * (`ref_countries.primary_timezone`); végső, csak védekező tartalék az UTC.
  */

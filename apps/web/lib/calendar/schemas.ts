@@ -1,6 +1,6 @@
 /**
  * M23 Calendar — zod-sémák a Server Actionök és a lekérdező szolgáltatás határán (10. fejezet).
- * A szabályok az adatbázis CHECK-jeinek tükrei (037), hogy a hiba az űrlapon derüljön ki.
+ * A szabályok az adatbázis CHECK-jeinek tükrei (043), hogy a hiba az űrlapon derüljön ki.
  */
 
 import { z } from "zod";

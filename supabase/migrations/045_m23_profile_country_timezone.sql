@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 040: M23 — profil ország ↔ időzóna összerendelés, szerveroldali ellenőrzés
+-- Migration 045 (korábban 040, átszámozva 2026-09-16): M23 — profil ország ↔ időzóna összerendelés, szerveroldali ellenőrzés
 -- ============================================================================
 -- Norbert döntései (2026-09-15):
 --   1. Ország nélküli profilnál a böngésző nyelve/időzónája alapján a felület FELAJÁNL országot és
@@ -7,12 +7,12 @@
 --   2. Országgal megadott profil időzóna nélkül nem fordulhat elő. Az ország ↔ időzóna összerendelés
 --      a saját `ref_timezones` törzs (country_code). Ahol egy országnak több, eltérő eltolású vagy
 --      szabályú zónája van, a felhasználó választ; egyzónás országnál a zóna automatikus.
---   3. Számozás: a 039 az M121 tervezett migrációjának FENNTARTVA (ezért nincs 039-es fájl).
+--   3. Számozás: 2026-09-16-án átszámozva (élesben a 041 és a 042 már fut); az M121 migrációja 046-tól kap számot.
 --   4. A profil mentésekor szerveroldalon ellenőrizzük, hogy az ország aktív (`ref_countries.is_active`).
 --
 -- Tartalom:
 --   1. Hiányzó, eltérő eltolású/szabályú valós zónák aktív országokhoz (US, CA, MX, AU, CL, NZ).
---      Az utc_offset a standard (téli) eltolás, a has_dst jelzi a nyári időszámítást (007/037 konvenció).
+--      Az utc_offset a standard (téli) eltolás, a has_dst jelzi a nyári időszámítást (007/043 konvenció).
 --   2. `ref_countries.primary_timezone` kitöltése, ahol NULL (többzónásnál explicit, egyzónásnál az
 --      egyetlen aktív zóna). Admin által már kitöltött értéket nem ír felül.
 --   3. Backfill a trigger ELŐTT: országos profil hiányzó / nem az országhoz tartozó zónája → az ország
@@ -87,7 +87,7 @@ WHERE c.primary_timezone IS NULL
   AND (SELECT count(*) FROM public.ref_timezones t WHERE t.country_code = c.code AND t.is_active) = 1;
 
 COMMENT ON COLUMN public.ref_countries.primary_timezone IS
-  'M23: az ország fő IANA-időzónája (NyK-15). 040 óta minden aktív országnál kitöltve; a profil és a naptár tartaléka, ha a profil zónája hiányzik vagy nem az országé.';
+  'M23: az ország fő IANA-időzónája (NyK-15). 045 óta minden aktív országnál kitöltve; a profil és a naptár tartaléka, ha a profil zónája hiányzik vagy nem az országé.';
 
 -- ============================================================================
 -- 3. Backfill (a trigger előtt)
@@ -154,7 +154,7 @@ END;
 $$;
 
 COMMENT ON FUNCTION public.validate_profile_country_timezone() IS
-  'M23 (040): profil ország aktív, országgal kötelező és az országhoz tartozó aktív időzóna; ország nélkül a zóna létező ref_timezones sor.';
+  'M23 (045): profil ország aktív, országgal kötelező és az országhoz tartozó aktív időzóna; ország nélkül a zóna létező ref_timezones sor.';
 
 DROP TRIGGER IF EXISTS validate_profile_country_timezone ON public.profiles;
 CREATE TRIGGER validate_profile_country_timezone

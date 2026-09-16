@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-// M23 Calendar — seed-generátor a 037-es migrációhoz.
+// M23 Calendar — seed-generátor a 043-as migrációhoz (korábban 037).
 //
 // Futtatás a monorepo gyökeréből (Node ≥ 22.18, típuskivonással):
 //   node scripts/calendar/build-calendar-seed.mjs          # a migráció GENERATED SEED blokkjának frissítése
 //   node scripts/calendar/build-calendar-seed.mjs --check  # csak ellenőrzés, fájlírás nélkül
 //
 // Bemenet: scripts/calendar/data/nager-2026-2028 (Nager.Date, MIT), a HU hivatalos adatai (lent),
-// hu-names.mjs. Kimenet: supabase/migrations/037_m23_calendar.sql seed-blokkja.
+// hu-names.mjs. Kimenet: supabase/migrations/043_m23_calendar.sql seed-blokkja.
 // Ellenőrzés: a HU szabályos ünnepei egyeznek a Nager.Date HU-adatával; minden levezetett szabály
 // mindhárom évre visszaadja a forrás dátumát.
 
@@ -18,7 +18,7 @@ import { HU_HOLIDAY_NAMES } from "./hu-names.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const DATA_DIR = join(ROOT, "scripts/calendar/data/nager-2026-2028");
-const MIGRATION = join(ROOT, "supabase/migrations/037_m23_calendar.sql");
+const MIGRATION = join(ROOT, "supabase/migrations/043_m23_calendar.sql");
 const YEARS = [2026, 2027, 2028];
 const CHECK_ONLY = process.argv.includes("--check");
 const START = "-- >>> GENERATED SEED — scripts/calendar/build-calendar-seed.mjs; kézzel ne szerkeszd >>>";

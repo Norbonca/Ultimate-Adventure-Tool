@@ -110,7 +110,7 @@ describe("M23 naptár-ország és túra-időzóna", () => {
     ).toBe("America/Phoenix");
   });
 
-  it("hiányzó, érvénytelen vagy nem az országhoz tartozó profilzóna → az ország fő zónája (040)", () => {
+  it("hiányzó, érvénytelen vagy nem az országhoz tartozó profilzóna → az ország fő zónája (045)", () => {
     const at = { activeCountryCodes: active, countryTimezones: ["Europe/Vienna"], countryPrimaryTimezone: "Europe/Vienna" };
     expect(resolveViewerCalendar({ profile: { countryCode: "at", timezone: null }, ...at })).toEqual({
       country: "AT",
