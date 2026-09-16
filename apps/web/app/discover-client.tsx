@@ -476,10 +476,10 @@ export default function DiscoverClient({
         <>
           {/* HERO — v2 §5: Deep Navy alapon a terv panorámafotója (D02 #H1rRQE / #l87Il, ugyanaz a kép
               asztalin és mobilon), alulról kötelező olvashatósági gradienssel (--hero-scrim).
-              Fotó: Andy Arbeit, Unsplash (unsplash.com/@izeberg) — public/discover/hero-night.jpg */}
+              Fotó: Unsplash photo-1504681869696 (D03 Landing hero, @hdbernd) — public/discover/hero.jpg; Norbert választása 2026-09-16 */}
           <section className="relative overflow-hidden bg-canvas">
             <Image
-              src="/discover/hero-night.jpg"
+              src="/discover/hero.jpg"
               alt=""
               fill
               priority
