@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useId, useState } from "react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import {
   fetchTripTimeline,
@@ -152,7 +152,10 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
           milestone={selectedMilestone}
           tripId={tripId}
           isOrganizer={isOrganizer}
-          onClose={() => setSelectedMilestone(null)}
+          onClose={(changed) => {
+            setSelectedMilestone(null);
+            if (changed) loadTimeline();
+          }}
           onRefresh={() => {
             setSelectedMilestone(null);
             loadTimeline();
@@ -400,7 +403,7 @@ function MilestoneModal({
   milestone: MilestoneWithTasks;
   tripId: string;
   isOrganizer: boolean;
-  onClose: () => void;
+  onClose: (changed: boolean) => void;
   onRefresh: () => void;
 }) {
   const { t, locale } = useTranslation();
@@ -412,6 +415,25 @@ function MilestoneModal({
   const [newTaskName, setNewTaskName] = useState("");
   const [saving, setSaving] = useState(false);
   const [tasks, setTasks] = useState<TimelineTask[]>(milestone.tasks);
+  // A feladatműveletek azonnal a szerverre írnak; bezáráskor a szülő ezért újratölt (UX-014).
+  const [tasksChanged, setTasksChanged] = useState(false);
+  const [taskError, setTaskError] = useState<string | null>(null);
+
+  const runTaskAction = async (
+    action: () => Promise<{ error?: string }>,
+    apply: (current: TimelineTask[]) => TimelineTask[],
+  ) => {
+    setTaskError(null);
+    const result = await action().catch(() => ({ error: "network" }));
+    if (result?.error) {
+      setTaskError(t("errors.saveFailed"));
+      return;
+    }
+    setTasks(apply);
+    setTasksChanged(true);
+  };
+  const close = () => onClose(tasksChanged);
+  const fieldId = useId();
 
   const handleSave = async () => {
     setSaving(true);
@@ -435,38 +457,55 @@ function MilestoneModal({
 
   const handleAddTask = async () => {
     if (!newTaskName.trim()) return;
-    const result = await createTask(milestone.id, tripId, { name: newTaskName.trim() });
-    if (result.task) {
-      setTasks([...tasks, result.task]);
+    setTaskError(null);
+    const result = await createTask(milestone.id, tripId, { name: newTaskName.trim() })
+      .catch(() => ({ task: undefined, error: "network" }));
+    if (!result.task) {
+      setTaskError(t("errors.saveFailed"));
+      return;
     }
+    const created = result.task;
+    setTasks((current) => [...current, created]);
+    setTasksChanged(true);
     setNewTaskName("");
   };
 
   const handleToggleTask = async (task: TimelineTask) => {
     if (task.status === "completed") {
-      await updateTask(task.id, { status: "pending" });
-      setTasks(tasks.map((t) => t.id === task.id ? { ...t, status: "pending" } : t));
+      await runTaskAction(
+        () => updateTask(task.id, { status: "pending" }),
+        (current) => current.map((x) => x.id === task.id ? { ...x, status: "pending" } : x),
+      );
     } else if (task.status === "pending" || task.status === "rejected") {
-      await submitTask(task.id);
-      setTasks(tasks.map((t) => t.id === task.id ? { ...t, status: task.requires_verification ? "pending_verification" : "completed" } : t));
+      const next = task.requires_verification ? "pending_verification" : "completed";
+      await runTaskAction(
+        () => submitTask(task.id),
+        (current) => current.map((x) => x.id === task.id ? { ...x, status: next } : x),
+      );
     }
   };
 
   const handleVerify = async (task: TimelineTask) => {
-    await verifyTask(task.id);
-    setTasks(tasks.map((t) => t.id === task.id ? { ...t, status: "completed" } : t));
+    await runTaskAction(
+      () => verifyTask(task.id),
+      (current) => current.map((x) => x.id === task.id ? { ...x, status: "completed" } : x),
+    );
   };
 
   const handleReject = async (task: TimelineTask) => {
     const note = prompt(t("timeline.rejectionNote"));
     if (note == null) return;
-    await rejectTask(task.id, note);
-    setTasks(tasks.map((t) => t.id === task.id ? { ...t, status: "rejected" } : t));
+    await runTaskAction(
+      () => rejectTask(task.id, note),
+      (current) => current.map((x) => x.id === task.id ? { ...x, status: "rejected" } : x),
+    );
   };
 
   const handleDeleteTask = async (taskId: string) => {
-    await deleteTask(taskId);
-    setTasks(tasks.filter((t) => t.id !== taskId));
+    await runTaskAction(
+      () => deleteTask(taskId),
+      (current) => current.filter((x) => x.id !== taskId),
+    );
   };
 
   const statusOptions: { value: typeof status; label: string; color: string }[] = [
@@ -477,7 +516,7 @@ function MilestoneModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-slate-900/50" onClick={onClose} />
+      <div className="absolute inset-0 bg-slate-900/50" onClick={close} />
       <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[85vh] overflow-y-auto mx-4">
         <div className="p-6 space-y-5">
           {/* Title */}
@@ -486,6 +525,7 @@ function MilestoneModal({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              aria-label={t("timeline.milestoneName")}
               className="w-full text-lg font-bold text-slate-900 border-0 border-b-2 border-transparent focus:border-teal-400 outline-none pb-1"
             />
           ) : (
@@ -512,8 +552,9 @@ function MilestoneModal({
           {/* Due date */}
           {isOrganizer ? (
             <div>
-              <label className="text-xs font-semibold text-slate-500 block mb-1">{t("timeline.milestoneDueDate")}</label>
+              <label htmlFor={`${fieldId}-due`} className="text-xs font-semibold text-slate-500 block mb-1">{t("timeline.milestoneDueDate")}</label>
               <input
+                id={`${fieldId}-due`}
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
@@ -528,9 +569,12 @@ function MilestoneModal({
 
           {/* Tasks */}
           <div>
-            <label className="text-xs font-semibold text-slate-500 block mb-2">
+            <p className="text-xs font-semibold text-slate-500 block mb-2">
               {t("timeline.milestoneTasks")} ({tasks.filter((t) => t.status === "completed").length}/{tasks.length})
-            </label>
+            </p>
+            {taskError && (
+              <p role="alert" className="mb-2 text-xs font-medium text-red-600">{taskError}</p>
+            )}
             <div className="space-y-1.5">
               {tasks.map((task) => {
                 const isCompleted = task.status === "completed" || task.status === "skipped";
@@ -541,7 +585,10 @@ function MilestoneModal({
                   <div key={task.id} className="flex items-center gap-2 group">
                     {/* Checkbox */}
                     <button
+                      type="button"
                       onClick={() => handleToggleTask(task)}
+                      aria-label={getLocalizedName(task, locale)}
+                      aria-pressed={isPendingVerification ? "mixed" : isCompleted}
                       className={`w-5 h-5 rounded border-2 flex items-center justify-center text-xs shrink-0 transition-colors ${
                         isCompleted
                           ? "border-green-500 bg-green-50 text-green-600"
@@ -601,11 +648,13 @@ function MilestoneModal({
                   onChange={(e) => setNewTaskName(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter") handleAddTask(); }}
                   placeholder={t("timeline.addTask")}
+                  aria-label={t("timeline.taskName")}
                   className="flex-1 px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:border-teal-400 outline-none"
                 />
                 <button
                   onClick={handleAddTask}
                   disabled={!newTaskName.trim()}
+                  aria-label={t("timeline.addTask")}
                   className="px-3 py-1.5 text-xs font-semibold text-teal-600 bg-teal-50 rounded-lg hover:bg-teal-100 disabled:opacity-40"
                 >
                   +
@@ -617,8 +666,9 @@ function MilestoneModal({
           {/* Notes */}
           {isOrganizer && (
             <div>
-              <label className="text-xs font-semibold text-slate-500 block mb-1">{t("timeline.milestoneNotes")}</label>
+              <label htmlFor={`${fieldId}-notes`} className="text-xs font-semibold text-slate-500 block mb-1">{t("timeline.milestoneNotes")}</label>
               <textarea
+                id={`${fieldId}-notes`}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={2}
@@ -635,8 +685,8 @@ function MilestoneModal({
               </button>
             )}
             <div className="flex gap-2 ml-auto">
-              <button onClick={onClose} className="px-4 py-2 text-sm text-slate-500 hover:text-slate-700">
-                {t("common.cancel")}
+              <button onClick={close} className="px-4 py-2 text-sm text-slate-500 hover:text-slate-700">
+                {t(tasksChanged ? "common.close" : "common.cancel")}
               </button>
               {isOrganizer && (
                 <button
@@ -691,6 +741,7 @@ function AddPhaseButton({ tripId, onCreated }: { tripId: string; onCreated: () =
         onChange={(e) => setName(e.target.value)}
         onKeyDown={(e) => { if (e.key === "Enter") handleAdd(); if (e.key === "Escape") setAdding(false); }}
         placeholder={t("timeline.phaseName")}
+        aria-label={t("timeline.phaseName")}
         className="px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:border-teal-400 outline-none"
         autoFocus
       />

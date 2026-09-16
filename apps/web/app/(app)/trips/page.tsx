@@ -107,6 +107,7 @@ export default async function MyTripsPage({
               name="q"
               defaultValue={q ?? ""}
               placeholder={t("trips.searchPlaceholder")}
+              aria-label={t("trips.searchPlaceholder")}
               className="input-trevu w-64 pl-9 pr-3 py-2 text-sm"
             />
           </form>

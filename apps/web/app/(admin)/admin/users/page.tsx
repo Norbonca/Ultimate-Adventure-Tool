@@ -58,6 +58,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
         locale={locale}
         t_users_title={t("admin.users.title")}
         t_search_placeholder={t("admin.users.searchPlaceholder")}
+        t_search_button={t("common.search")}
         t_filter_status={t("admin.users.filterStatus")}
         t_filter_plan={t("admin.users.filterPlan")}
         t_col_user={t("admin.users.colUser")}

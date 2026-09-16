@@ -219,6 +219,7 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
                 }
               }}
               placeholder={t("trips.wizard.crewPositionPlaceholder")}
+              aria-label={t("trips.wizard.crewPositionPlaceholder")}
               className="px-3 py-1.5 rounded-lg border border-navy-200 text-sm text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none w-48"
             />
             <button
