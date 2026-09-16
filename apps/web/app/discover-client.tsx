@@ -712,8 +712,8 @@ export default function DiscoverClient({
         </>
       )}
 
-      {/* CTA — az egyetlen Day-régió: Frost sáv, Dawn Gradient gomb (v2 §2/2) */}
-      <section data-surface="day" className="bg-ghost text-ink">
+      {/* CTA — Night sáv, Dawn Gradient gomb. Norbert 2026-09-16: az alsó fehér (Day) sáv megszűnik. */}
+      <section className="border-t border-line bg-canvas text-ink" data-testid="discover-cta">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 md:flex-row md:items-center md:justify-between md:px-[120px] md:py-14">
           <div className="flex flex-col gap-2">
             <h2 className="text-[22px] font-semibold text-ink md:text-[28px]">{t('discover.ctaTitle')}</h2>
@@ -721,7 +721,7 @@ export default function DiscoverClient({
           </div>
           <Link
             href="/trips/new"
-            className="inline-flex h-12 items-center justify-center rounded-trevu px-6 text-base font-semibold text-ink [background:var(--gradient-dawn)] hover:opacity-95 focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+            className="inline-flex h-12 items-center justify-center rounded-trevu px-6 text-base font-semibold text-accent-on [background:var(--gradient-dawn)] hover:opacity-95 focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
           >
             {t('discover.createTrip')}
           </Link>
