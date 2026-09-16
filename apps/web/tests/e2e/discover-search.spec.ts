@@ -1,71 +1,85 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * Discover hero search — "Hova?", "Mikor?", activity type, search button.
+ * Discover hero search — the single pill search ("Hova, mikor, mire vágysz?"),
+ * the filter sheet and the category pills.
  *
- * Spec: modules/09_Search US-M09-001/002; logic: lib/trip-search.ts (unit tested).
- * Data-agnostic: it searches for whatever the first card is called.
- * The hero only renders in the grid and list views.
+ * Spec: modules/09_Search US-M09-001/002; logic: lib/trip-search.ts createTripSearch (unit tested).
+ * Design: design/D02_Trip_Management.pen#H1rRQE, #W9Kgy, #RTE9l (Brand Guide v2).
+ * Data-agnostic: it searches for whatever the first trip is called.
+ * The hero only renders in the list view.
  */
 
 test.describe('Discover — hero search', () => {
   test.beforeEach(async ({ page, context, baseURL }) => {
     await context.addCookies([
-      { name: 'trevu-discover-view', value: 'grid', url: baseURL ?? 'http://localhost:3000' },
+      { name: 'trevu-discover-view', value: 'list', url: baseURL ?? 'http://localhost:3000' },
     ]);
     await page.goto('/');
     await expect(page.getByTestId('discover-hero-search')).toBeVisible();
   });
 
-  test('DISCOVER-SEARCH-1: "Hova?" filters on Enter and on the button, and clearing restores the list', async ({ page }) => {
-    const cards = page.locator('.trips-grid .trip-card-title');
-    const total = await cards.count();
-    test.skip(total === 0, 'no published trips in the local data');
-    const title = (await cards.first().innerText()).trim();
+  test('DISCOVER-SEARCH-1: the pill search filters on Enter and on the button, and clearing restores the list', async ({ page }) => {
+    const titles = page.getByTestId('trip-band-title');
+    const count = page.getByTestId('discover-count');
+    test.skip((await titles.count()) === 0, 'no published trips in the local data');
+    const totalText = await count.innerText();
+    const title = (await titles.first().innerText()).trim();
 
-    const where = page.getByTestId('discover-search-where');
-    await where.fill(title);
-    await where.press('Enter');
-    await expect(cards.filter({ hasText: title }).first()).toBeVisible();
-    expect(await cards.count()).toBeLessThanOrEqual(total);
+    const query = page.getByTestId('discover-search-query');
+    await query.fill(title);
+    await query.press('Enter');
+    await expect(titles.filter({ hasText: title }).first()).toBeVisible();
 
-    await where.fill('zzzz-nincs-ilyen-tura');
+    await query.fill('zzzz-nincs-ilyen-tura');
     await page.getByTestId('discover-search-submit').click();
-    await expect(page.locator('.trips-grid')).toHaveCount(0);
+    await expect(page.getByTestId('discover-empty')).toBeVisible();
 
-    await where.fill('');
-    await expect(cards).toHaveCount(total);
+    await query.fill('');
+    await expect(count).toHaveText(totalText);
   });
 
-  test('DISCOVER-SEARCH-2: "Mikor?" with unrecognisable text shows no trips, a year keeps only trips touching it', async ({ page }) => {
-    const cards = page.locator('.trips-grid .trip-card-title');
-    const total = await cards.count();
-    test.skip(total === 0, 'no published trips in the local data');
+  test('DISCOVER-SEARCH-2: a time phrase filters by date — an impossible year shows no trips', async ({ page }) => {
+    test.skip((await page.getByTestId('trip-band-title').count()) === 0, 'no published trips in the local data');
+    const query = page.getByTestId('discover-search-query');
 
-    const when = page.getByTestId('discover-search-when');
-    await when.fill('valamikor');
-    await when.press('Enter');
-    await expect(page.locator('.trips-grid')).toHaveCount(0);
+    await query.fill('valamikor');
+    await query.press('Enter');
+    await expect(page.getByTestId('discover-empty')).toBeVisible();
 
-    await when.fill('1999');
-    await when.press('Enter');
-    await expect(page.locator('.trips-grid')).toHaveCount(0);
+    await query.fill('1999');
+    await query.press('Enter');
+    await expect(page.getByTestId('discover-empty')).toBeVisible();
 
-    await when.fill('');
-    await expect(cards).toHaveCount(total);
+    await query.fill('');
+    await expect(page.getByTestId('discover-trip-list')).toBeVisible();
   });
 
-  test('DISCOVER-SEARCH-3: the activity type select and the category pills share one state', async ({ page }) => {
-    const select = page.getByTestId('discover-search-category');
-    const options = select.locator('option');
-    test.skip((await options.count()) < 2, 'no categories in the local data');
+  test('DISCOVER-SEARCH-3: a category pill filters, and the filter sheet counts it on mobile', async ({ page }) => {
+    const pills = page.getByTestId('discover-category-pills').locator('button');
+    test.skip((await pills.count()) < 2, 'no categories in the local data');
 
-    const value = await options.nth(1).getAttribute('value');
-    const label = (await options.nth(1).innerText()).trim();
-    await select.selectOption(value!);
+    await pills.nth(1).click();
+    await expect(pills.nth(1)).toHaveAttribute('aria-pressed', 'true');
+    await expect(pills.first()).toHaveAttribute('aria-pressed', 'false');
 
-    await expect(page.locator('#categories .pill-active')).toContainText(label);
-    await page.locator('#categories .pill').first().click();
-    await expect(select).toHaveValue('');
+    await pills.first().click();
+    await expect(pills.first()).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  test('DISCOVER-SEARCH-4: the filter sheet opens, applies a filter, clears it and closes with Escape', async ({ page }) => {
+    await page.getByTestId('discover-filters-open').click();
+    const sheet = page.getByTestId('discover-filter-sheet');
+    await expect(sheet).toBeVisible();
+
+    await page.getByTestId('filter-spots-9+').click();
+    await expect(page.getByTestId('filter-spots-9+')).toHaveAttribute('aria-checked', 'true');
+    await expect(page.getByTestId('discover-filters-open')).toContainText('(1)');
+
+    await sheet.getByRole('button', { name: /Törlés|Clear/ }).click();
+    await expect(page.getByTestId('filter-spots-9+')).toHaveAttribute('aria-checked', 'false');
+
+    await page.keyboard.press('Escape');
+    await expect(sheet).toHaveCount(0);
   });
 });

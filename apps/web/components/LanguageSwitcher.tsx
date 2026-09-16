@@ -54,7 +54,7 @@ export function LanguageSwitcher({ variant = "compact", className = "" }: Langua
   return (
     <button
       onClick={() => switchLocale(nextLocale)}
-      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-navy-600 hover:text-navy-900 hover:bg-navy-100 transition-colors ${className}`}
+      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-navy-600 hover:text-navy-900 hover:bg-navy-100 night:text-ink-secondary night:hover:text-ink night:hover:bg-ghost transition-colors ${className}`}
       title={LABEL[nextLocale]}
     >
       {FLAG[locale]} <span className="uppercase text-xs font-bold">{locale}</span>
