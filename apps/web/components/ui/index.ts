@@ -16,3 +16,5 @@ export { Card, CardImage, CardBody } from "./Card";
 export type { CardProps, CardImageProps } from "./Card";
 export { StateTemplate } from "./StateTemplate";
 export type { StateTemplateProps, StateVariant } from "./StateTemplate";
+export { Dialog } from "./Dialog";
+export type { DialogProps, DialogTone } from "./Dialog";

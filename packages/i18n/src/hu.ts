@@ -399,7 +399,7 @@ const hu = {
       deleteModalBody: "A fiókod azonnal inaktív lesz, és kijelentkeztetünk. 30 napig bejelentkezéssel visszaállíthatod.",
       deleteConsequenceHidden: "A profilod és a közösségi tartalmaid azonnal elrejtődnek.",
       deleteConsequenceApplications: "A függő és elfogadott jelentkezéseidet visszavonjuk.",
-      deleteConsequenceRestore: "{date}-ig belépéssel visszaállíthatod a fiókodat.",
+      deleteConsequenceRestore: "Belépéssel visszaállíthatod a fiókodat eddig: {date}",
       deleteConsequenceAnonymize: "Utána a személyes adataidat anonimizáljuk; az összesített statisztikák megmaradnak.",
       deletePasswordLabel: "Jelszó a megerősítéshez",
       deletePasswordHint: "Google- vagy Facebook-fiókkal regisztráltál? Akkor a megerősítéshez jelentkezz ki, majd be újra, és 10 percen belül próbáld újra.",
@@ -1022,7 +1022,7 @@ const hu = {
   account: {
     restore: {
       title: "A fiókod törlésre vár",
-      body: "A fiókod {date}-én véglegesen törlődik. Szeretnéd visszaállítani?",
+      body: "A fiókod végleges törlésének napja: {date}. Szeretnéd visszaállítani?",
       note: "Visszaállításkor a profilod újra látható lesz. A visszavont jelentkezések nem állnak vissza, azokra újra jelentkezhetsz.",
       confirm: "Fiók visszaállítása",
       signOut: "Kijelentkezés",
