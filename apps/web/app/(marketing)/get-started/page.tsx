@@ -962,58 +962,41 @@ export default function HomePage() {
         }
       `}</style>
 
-      <AppHeader anchors={[
-        { label: t('nav.discover'), href: '/' },
-        { label: t('nav.pricing'), href: '/pricing' },
-        { label: t('nav.community'), href: '/community' },
-      ]} />
+      <div data-surface="night" className="contents">
+        <AppHeader anchors={[
+          { label: t('nav.discover'), href: '/' },
+          { label: t('nav.pricing'), href: '/pricing' },
+          { label: t('nav.community'), href: '/community' },
+        ]} />
+      </div>
 
-      {/* Hero Section */}
-      <section className="hero">
-        <div className="hero-content">
-          <div className="hero-badge">
-            <span className="badge-dot"></span>
+      {/* HERO — Brand Guide v2 §5 (Night), igazítva a Discover herójához.
+          Terv: design/D03_Marketing.pen#Jv6bY (Hero Section #h9sLr); kép: public/discover/hero.jpg (Unsplash @hdbernd). */}
+      <section data-surface="night" className="relative overflow-hidden bg-canvas text-ink" data-testid="landing-hero">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/discover/hero.jpg" alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <div aria-hidden className="absolute inset-0 bg-hero-scrim-mobile md:bg-hero-scrim" />
+        <div className="relative mx-auto flex min-h-[520px] max-w-7xl flex-col justify-end gap-5 px-5 pb-10 pt-24 md:min-h-[640px] md:px-[120px] md:pb-14">
+          <span className="inline-flex w-fit items-center gap-2 rounded-full bg-glass px-4 py-1.5 text-[13px] font-semibold text-ink backdrop-blur">
+            <span aria-hidden className="h-2 w-2 rounded-full bg-accent" />
             {t('landing.heroBadge')}
+          </span>
+          <h1 className="max-w-[760px] text-hero-display-mobile text-ink [text-wrap:balance] md:text-hero-display">{t('landing.heroHeadline')}</h1>
+          <p className="max-w-[640px] text-base leading-relaxed text-ink-body md:text-lg">{t('landing.heroSubheadline')}</p>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Link href="/register" className="inline-flex h-12 items-center justify-center rounded-trevu bg-accent px-7 text-base font-semibold text-accent-on hover:bg-accent-hover focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]">{t('landing.heroCta')}</Link>
+            <Link href="/" className="inline-flex h-12 items-center justify-center rounded-trevu border border-line-strong bg-glass px-7 text-base font-semibold text-ink hover:border-accent focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]">
+              <Compass size={18} aria-hidden className="mr-2" />{t('landing.heroCtaSecondary')}
+            </Link>
           </div>
-
-          <h1 className="hero-headline">{t('landing.heroHeadline')}</h1>
-
-          <p className="hero-subheadline">
-            {t('landing.heroSubheadline')}
-          </p>
-
-          <div className="hero-ctas">
-            <Link href="/register" className="btn-cta-primary">{t('landing.heroCta')}</Link>
-            <Link href="/" className="btn-cta-secondary">{t('landing.heroCtaSecondary')}</Link>
-          </div>
-
-          <img
-            src="https://images.unsplash.com/photo-1504681869696-d977211a5f4c?w=1200&q=80&fit=crop&auto=format"
-            alt="Adventure sailboat"
-            className="hero-image"
-            loading="lazy"
-          />
-
-          <div className="hero-trust">
-            <span className="trust-text">{t('landing.heroTrust')}</span>
-            <div className="trust-countries">
-              <span className="trust-country">
-                <MapPin size={16} />
-                {t('landing.heroCountryHungary')}
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2 text-sm text-ink-secondary">
+            <span>{t('landing.heroTrust')}</span>
+            {(['heroCountryHungary', 'heroCountrySlovakia', 'heroCountryCroatia', 'heroCountryGermany'] as const).map((key) => (
+              <span key={key} className="inline-flex items-center gap-1.5">
+                <MapPin size={16} aria-hidden />
+                {t(`landing.${key}`)}
               </span>
-              <span className="trust-country">
-                <MapPin size={16} />
-                {t('landing.heroCountrySlovakia')}
-              </span>
-              <span className="trust-country">
-                <MapPin size={16} />
-                {t('landing.heroCountryCroatia')}
-              </span>
-              <span className="trust-country">
-                <MapPin size={16} />
-                {t('landing.heroCountryGermany')}
-              </span>
-            </div>
+            ))}
           </div>
         </div>
       </section>
