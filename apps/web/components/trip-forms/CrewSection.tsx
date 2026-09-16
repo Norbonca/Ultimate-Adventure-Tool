@@ -89,6 +89,7 @@ export function CrewSection({ data, onChange, membersSlot, applicationsSlot, sta
               }
             }}
             placeholder={t("trips.wizard.crewPositionPlaceholder")}
+            aria-label={t("trips.wizard.crewPositionPlaceholder")}
             className="flex-1 px-4 py-2.5 rounded-xl border border-navy-200 text-sm text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
           />
           <button

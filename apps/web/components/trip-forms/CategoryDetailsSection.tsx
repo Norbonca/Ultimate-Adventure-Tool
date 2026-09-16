@@ -135,17 +135,20 @@ function ParameterField({
 
   const inputClasses =
     "w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 placeholder:text-navy-300 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors bg-white";
+  // UX-015: minden mező programozottan a címkéjéhez kötve
+  const fieldId = `catparam-${param.id}`;
 
   switch (param.field_type) {
     case "number":
       return (
         <div>
-          <label className="block text-sm font-medium text-navy-700 mb-1.5">
+          <label htmlFor={fieldId} className="block text-sm font-medium text-navy-700 mb-1.5">
             {label}
             {param.unit && <span className="text-navy-400 font-normal"> ({param.unit})</span>}
             {param.is_required && <span className="text-red-500"> *</span>}
           </label>
           <input
+            id={fieldId}
             type="number"
             value={(value as number) ?? ""}
             onChange={(e) => onChange(e.target.value ? parseFloat(e.target.value) : null)}
@@ -160,11 +163,12 @@ function ParameterField({
     case "text":
       return (
         <div>
-          <label className="block text-sm font-medium text-navy-700 mb-1.5">
+          <label htmlFor={fieldId} className="block text-sm font-medium text-navy-700 mb-1.5">
             {label}
             {param.is_required && <span className="text-red-500"> *</span>}
           </label>
           <input
+            id={fieldId}
             type="text"
             value={(value as string) ?? ""}
             onChange={(e) => onChange(e.target.value)}
@@ -176,11 +180,12 @@ function ParameterField({
     case "textarea":
       return (
         <div className="sm:col-span-2">
-          <label className="block text-sm font-medium text-navy-700 mb-1.5">
+          <label htmlFor={fieldId} className="block text-sm font-medium text-navy-700 mb-1.5">
             {label}
             {param.is_required && <span className="text-red-500"> *</span>}
           </label>
           <textarea
+            id={fieldId}
             value={(value as string) ?? ""}
             onChange={(e) => onChange(e.target.value)}
             rows={3}
@@ -193,6 +198,9 @@ function ParameterField({
         <div className="flex items-center gap-3 py-2">
           <button
             type="button"
+            role="switch"
+            aria-checked={Boolean(value)}
+            aria-label={label}
             onClick={() => onChange(!(value as boolean))}
             className={`relative w-11 h-6 rounded-full transition-colors ${
               value ? "bg-trevu-600" : "bg-navy-200"
@@ -204,17 +212,18 @@ function ParameterField({
               }`}
             />
           </button>
-          <label className="text-sm font-medium text-navy-700">{label}</label>
+          <span className="text-sm font-medium text-navy-700" aria-hidden="true">{label}</span>
         </div>
       );
     case "select":
       return (
         <div>
-          <label className="block text-sm font-medium text-navy-700 mb-1.5">
+          <label htmlFor={fieldId} className="block text-sm font-medium text-navy-700 mb-1.5">
             {label}
             {param.is_required && <span className="text-red-500"> *</span>}
           </label>
           <select
+            id={fieldId}
             value={(value as string) ?? ""}
             onChange={(e) => onChange(e.target.value)}
             className={inputClasses}
@@ -233,11 +242,11 @@ function ParameterField({
     case "multiselect": {
       const selectedValues = (value as string[]) || [];
       return (
-        <div className="sm:col-span-2">
-          <label className="block text-sm font-medium text-navy-700 mb-1.5">
+        <div className="sm:col-span-2" role="group" aria-labelledby={`${fieldId}-label`}>
+          <span id={`${fieldId}-label`} className="block text-sm font-medium text-navy-700 mb-1.5">
             {label}
             {param.is_required && <span className="text-red-500"> *</span>}
-          </label>
+          </span>
           <div className="flex flex-wrap gap-2">
             {options.map((opt) => {
               const isSelected = selectedValues.includes(opt.value);
@@ -245,6 +254,7 @@ function ParameterField({
                 <button
                   key={opt.id}
                   type="button"
+                  aria-pressed={isSelected}
                   onClick={() => {
                     if (isSelected) {
                       onChange(selectedValues.filter((v) => v !== opt.value));
@@ -274,8 +284,9 @@ function ParameterField({
     default:
       return (
         <div>
-          <label className="block text-sm font-medium text-navy-700 mb-1.5">{label}</label>
+          <label htmlFor={fieldId} className="block text-sm font-medium text-navy-700 mb-1.5">{label}</label>
           <input
+            id={fieldId}
             type="text"
             value={(value as string) ?? ""}
             onChange={(e) => onChange(e.target.value)}
