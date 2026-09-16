@@ -1,16 +1,20 @@
 # Discover nézetváltó — szerződés
 
-A Felfedezés oldal (`/`, `app/page.tsx`) három nézetben mutatja ugyanazt a
-túrakészletet. Ez a fájl rögzíti, hogy a három nézet között mi a szerződés: ki
+A Felfedezés oldal (`/`, `app/page.tsx`) két nézetben mutatja ugyanazt a
+túrakészletet. Ez a fájl rögzíti, hogy a két nézet között mi a szerződés: ki
 dönt, hol tárolódik a döntés, és mit garantálunk a felhasználónak.
 
-## A három nézet
+**2026-09-15 — Brand Guide v2 „Éjszakai túra” (1b):** a kártyarács megszűnt, a lista
+borítós sávokból áll (`components/discover/TripBand.tsx`), a váltó „Gömb nézet | Lista
+nézet”; terv: `design/D02_Trip_Management.pen#H1rRQE` (1440), `#l87Il` (390). Az egész oldal
+Night felület (`data-surface="night"`), az alsó CTA-sáv az egyetlen Day-régió.
+
+## A két nézet
 
 | Érték | Mit mutat | Komponens |
 |---|---|---|
 | `globe` | 3D földgömb a túrák helyszíneivel és útvonalával (Terepgömb) | `components/discover/GlobeDiscover.tsx` + `terepgomb.js` |
-| `grid` | Kártyarács | `app/discover-client.tsx` — `.trips-grid` |
-| `list` | Egy oszlopos lista | `app/discover-client.tsx` — `.trips-grid.list-view` |
+| `list` | Borítós sávok listája, lapozva (10-esével) | `app/discover-client.tsx` + `components/discover/TripBand.tsx` |
 
 Az értékek forrása: `lib/discover-view.ts` (`DISCOVER_VIEWS`). Új nézet csak ott
 vehető fel; a típus onnan származik, így a fordító kényszeríti ki a teljességet.
@@ -19,44 +23,44 @@ vehető fel; a típus onnan származik, így a fordító kényszeríti ki a telj
 
 Cookie nélküli látogató a gömböt kapja. Indok: a Felfedezés a termék belépő
 képernyője, és a gömb az egyetlen nézet, amely egy pillantásra megmutatja, hogy
-a túrák földrajzilag hol vannak. A rács ugyanazt a listát adja, amit minden
+a túrák földrajzilag hol vannak. A lista ugyanazt adja, amit minden
 másik utazási oldal — a gömb az, ami miatt a látogató megjegyzi az oldalt.
 
-A visszaváltás egy kattintás, és megjegyezzük: aki rácsot választ, annak
-legközelebb rács jön.
+A visszaváltás egy kattintás, és megjegyezzük: aki listát választ, annak
+legközelebb lista jön.
 
 ## A cookie
 
 | | |
 |---|---|
 | Név | `trevu-discover-view` |
-| Érték | `globe` \| `grid` \| `list` |
+| Érték | `globe` \| `list` (a korábbi `grid` a listára esik: `parseDiscoverView`) |
 | Élettartam | 1 év (`DISCOVER_VIEW_COOKIE_MAX_AGE`) |
 | Útvonal | `/` |
 | SameSite | `Lax` |
 | httpOnly | **nem** — a váltó a kliensen írja, a szerver csak olvassa |
 
 Ismeretlen vagy hiányzó érték esetén az alapértelmezés lép életbe
-(`isDiscoverView()` őrzi). A cookie tartalma megjelenítési preferencia, nem
+(`parseDiscoverView()` őrzi; a régi `grid` a lista). A cookie tartalma megjelenítési preferencia, nem
 jogosultság: nem döntünk belőle hozzáférésről, és nem tartalmaz személyes adatot.
 
 ## Felelősségek
 
 **Szerver** (`app/page.tsx`): kiolvassa a cookie-t, és `initialView` propként
 adja át. Ezért az első festés már a helyes nézettel érkezik — nincs villanás,
-amikor a rács egy pillanatra megjelenik, majd gömbre vált.
+amikor a lista egy pillanatra megjelenik, majd gömbre vált.
 
 **Kliens** (`app/discover-client.tsx`): a `changeView()` állítja az állapotot és
 írja a cookie-t (`rememberDiscoverView`). A váltás nem tölti újra az oldalt és
 nem navigál — a szűrők, a rendezés és a görgetés helyben marad.
 
-**Szűrők:** a rács és a lista a Discover hero-jának szűrősávját használja. A
+**Szűrők:** a lista a hero pirula-keresőjét (hely és idő egy mezőben, `createTripSearch`), a kategória-pirulákat és a szűrőlapot (`components/ui/FilterSheet.tsx`; asztalin panel, mobilon alsó lap — terv `#W9Kgy`, `#RTE9l`) használja. A
 gömb nézetben a hero és a szűrősáv el van rejtve (Claude Design handoff,
 2026-09-14): a gömb a saját szűrőit adja — kategória-tokenek (húzás a gömbre
 vagy le róla, koppintás = kapcsol) és az 52 hetes idővonal (évszak-chipek +
 csúszka, ±4 hetes ablak). A gömb ezért nem kap `visibleTripIds` propot; a két
 szűrőkészlet független, nézetváltáskor nem szinkronizálódik. Ez tudatos: a gömb
-a felfedezés eszköze, a rács a pontos szűrésé.
+a felfedezés eszköze, a lista a pontos szűrésé.
 
 ## A gömb adatai
 
@@ -74,16 +78,16 @@ a `test/unit/globe-payload.test.ts` fedi őket.
 | `routes` | `trip_itinerary_days.latitude/longitude` (035), napszám szerint — a koordinátákat a részletes túratervező trip timeline beállításában adja meg a felhasználó (M20, még nincs UI; ma tesztadat) | a kiválasztott túra útvonala (halo + vonal + állomások); csak ≥ 2 koordinátás nap esetén |
 | `categories[]` | aktív kategóriák, lokalizált névvel és színnel | tokenek |
 
-**Láthatóság — ugyanaz, mint a rácsé.** A végpont pontosan azokat a túrákat adja,
-amelyeket a rács listáz (`app/page.tsx` `fetchPublishedTrips`): `status = published`,
+**Láthatóság — ugyanaz, mint a listáé.** A végpont pontosan azokat a túrákat adja,
+amelyeket a lista mutat (`app/page.tsx` `fetchPublishedTrips`): `status = published`,
 `visibility = public`, `show_on_landing = true`, nem törölt — és ezek közül azokat,
 amelyeknek van koordinátája. Mock- vagy rögzített túralista a kliensben nincs;
 a rendererben rögzítve csak a tájékozódási feliratok (városok, vizek, hegységek)
 vannak. A `DISCOVER-VIEW-7` e2e teszt ellenőrzi, hogy minden marker kártyaként is
 szerepel. Gömb nézetben a találatszám a szűretlen készletet mutatja, mert a gömb a
-rács szűrőit nem használja.
+lista szűrőit nem használja.
 
-**Múltbeli túrák.** A rács a lezajlott publikált túrát is listázza, ezért a gömb is
+**Múltbeli túrák.** A lista a lezajlott publikált túrát is mutatja, ezért a gömb is
 megtartja: a `markers[].past` (utolsó nap < `week0`) jelöli, a renderer az
 idővonal elejére teszi, halványan rajzolja, az ablak darabszámába nem számolja, a
 kártya pedig kiírja: „Lezajlott túra”. Az 52 héten túli túra az idővonal végére
@@ -118,11 +122,11 @@ fázisában áll át.
 3. Újratöltés után a szerver rendereli a megjegyzett nézetet.
 4. Hibás cookie-érték nem törhet el semmit — az alapértelmezésre esünk vissza.
 5. A gömb sosem zsákutca: ha a renderer nem indul (nincs canvas, nem tölt le a
-   határ-atlasz), olvasható hibaüzenet és a rács ajánlása jelenik meg, a
+   határ-atlasz), olvasható hibaüzenet és a lista ajánlása jelenik meg, a
    markerek mögötti túrák pedig billentyűzetről és képernyőolvasóval a
    `.globe-fallback-list` listán keresztül elérhetők.
 
-6. A gömb pontosan a rács túráit mutatja (láthatósági szerződés, fent).
+6. A gömb pontosan a lista túráit mutatja (láthatósági szerződés, fent).
 
 Ezt a hat garanciát a `tests/e2e/discover-view.spec.ts` hét tesztje fedi (DISCOVER-VIEW-1…7).
 
@@ -137,13 +141,13 @@ tokenek (PLAN-011).
 
 A `GlobeDiscover` dinamikus importtal töltődik, `ssr: false` mellett, és a
 renderert (`terepgomb.js`, MapLibre GL JS + topojson) csak akkor tölti be, amikor a
-gömb nézet aktív — a rács és a lista nem fizet érte. A renderelés
+gömb nézet aktív — a lista nézet nem fizet érte. A renderelés
 eseményvezérelt: nincs animációs hurok; a gömb húzásra, görgetésre,
 méretváltásra és a lap előtérbe kerülésekor rajzol újra, kigörgetve
 (`IntersectionObserver`) és háttérben (`visibilitychange`) nem dolgozik.
 Automatikus forgás nincs; a gyro (eszköz-tájolás) csak kérésre kapcsol be.
 
-**Oldalháttér gömb nézetben** (Norbert, 2026-09-15): a Felfedezés oldal a gömb éjszakai hátterét veszi fel (`--globe-space-bottom`), a gömb a fejléc alatt szélétől szélig fut, lekerekítés és világos keret nélkül; a találatszám és a nézetváltó sötét változatot kap. Rács és lista nézetben az oldal világos marad.
+**Oldalháttér gömb nézetben** (Norbert, 2026-09-15): a Felfedezés oldal a gömb éjszakai hátterét veszi fel (`--globe-space-bottom`), a gömb a fejléc alatt szélétől szélig fut, lekerekítés és világos keret nélkül; a találatszám és a nézetváltó sötét változatot kap. Lista és lista nézetben az oldal világos marad.
 
 **Kezdőnézet: a teljes bolygó** (Norbert, 2026-09-15): a gömb a teljes földgolyóval indul (Európa–Afrika középpel), mert a közép-európai ráközelítés induláskor nem érthető. A „Teljes bolygó” és a „Nézet vissza” gomb is ide tér vissza; a „Nézet vissza” a kiválasztást és az idővonalat is alaphelyzetbe teszi.
 
@@ -161,7 +165,7 @@ markup fordított szövegeket hordoz; a csempék a cache-ből jönnek.
 
 ---
 
-*Frissítve: 2026-09-15 (S40) — láthatósági egyezés a ráccsal, múltbeli túrák,
+*Frissítve: 2026-09-15 (S41) — Brand Guide v2: rács helyett sávos lista, Night felület, pirula-kereső, szűrőlap. Korábban: 2026-09-15 (S40) — láthatósági egyezés a ráccsal, múltbeli túrák,
 geokódolás szerkesztéskor és országközéppont-tartalékkal, mobil 390 px, tokenek.
 Korábban: 2026-09-14 (S39b) — a Claude Design Terepgömb-handoff bekötése:
 csempés felszín, kategória-tokenek, idővonal, klaszterek, útvonal a napi

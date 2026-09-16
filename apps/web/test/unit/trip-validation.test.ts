@@ -34,3 +34,15 @@ describe("trip action boundary validation", () => {
       .not.toHaveProperty("organizer_id");
   });
 });
+
+describe("missingPublishFields", () => {
+  it("names every empty required field in form order", async () => {
+    const { missingPublishFields } = await import("@/lib/trip-validation");
+    expect(missingPublishFields(INITIAL_FORM_DATA)).toEqual(["category_id", "title", "start_date", "end_date", "cover_image_url"]);
+  });
+  it("reports only the cover image when that is the one gap", async () => {
+    const { missingPublishFields } = await import("@/lib/trip-validation");
+    expect(missingPublishFields({ ...valid, cover_image_url: "  " })).toEqual(["cover_image_url"]);
+    expect(missingPublishFields(valid)).toEqual([]);
+  });
+});

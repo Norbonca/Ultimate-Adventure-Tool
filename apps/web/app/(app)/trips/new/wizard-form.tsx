@@ -27,6 +27,7 @@ import { Step2Basics } from "./steps/step2-basics";
 import { Step3Details } from "./steps/step3-details";
 import { Step4Publish } from "./steps/step4-publish";
 import { CATEGORY_DISPLAY } from "@/lib/categories";
+import { missingPublishFields } from "@/lib/trip-validation";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { Icon } from "@/components/Icon";
 import { Button } from "@/components/ui";
@@ -215,7 +216,22 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
   // ── Publish ──
   const doPublish = useCallback(async () => {
     if (!tripId) {
+      setSaveStatus("error");
       setErrorMsg(t("trips.wizard.saveDraftFirst"));
+      return;
+    }
+
+    const missing = missingPublishFields(formData);
+    if (missing.length > 0) {
+      const labels = {
+        category_id: t("trips.wizard.category"),
+        title: t("trips.fields.title"),
+        start_date: t("trips.fields.startDate"),
+        end_date: t("trips.fields.endDate"),
+        cover_image_url: t("trips.wizard.coverImage"),
+      };
+      setSaveStatus("error");
+      setErrorMsg(t("trips.wizard.missingRequired", { fields: missing.map((key) => labels[key]).join(", ") }));
       return;
     }
 

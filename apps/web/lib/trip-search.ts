@@ -232,3 +232,47 @@ export function tripMatchesWhen(filter: WhenFilter | null, start: string | null,
   }
   return false;
 }
+
+// ── Egyetlen pirula-kereső: „Hova, mikor, mire vágysz?” ─────────────────────
+// Brand Guide v2 §6 (SearchBar pill), terv: design/D02_Trip_Management.pen#H1rRQE.
+// A korábbi két mező (Hova? / Mikor?) egy szövegmezővé olvadt; a szöveg időre
+// utaló szavai (év, hónap, évszak, dátum, hónaptartomány) a „Mikor?” szűrőbe,
+// a többi a „Hova?” keresésbe kerül.
+
+const DASH = /^[–—-]$/;
+
+/** A kereső szövegét „hova” és „mikor” részre bontja. */
+export function splitSearchQuery(input: string): { where: string; when: string } {
+  const tokens = input.trim().split(/\s+/).filter(Boolean);
+  const isWhen = tokens.map((token) => {
+    if (DASH.test(token)) return false;
+    const parsed = parseWhen(token);
+    return !!parsed && !parsed.invalid;
+  });
+  // Kötőjel két időszó között ("jan – márc"), illetve napszám időszó mellett ("június 15").
+  tokens.forEach((token, i) => {
+    if (isWhen[i]) return;
+    const near = Boolean(isWhen[i - 1] || isWhen[i + 1]);
+    if (DASH.test(token) && isWhen[i - 1] && isWhen[i + 1]) isWhen[i] = true;
+    else if (/^\d{1,2}\.?$/.test(token) && Number.parseInt(token, 10) <= 31 && near) isWhen[i] = true;
+  });
+  return {
+    where: tokens.filter((_, i) => !isWhen[i]).join(' '),
+    when: tokens.filter((_, i) => isWhen[i]).join(' '),
+  };
+}
+
+/**
+ * A pirula-kereső predikátuma. Egy túra akkor találat, ha
+ *  (a) a nem időre utaló szavak mind szerepelnek a szövegében ÉS az időrész illeszkedik, vagy
+ *  (b) a teljes szöveg szavai mind szerepelnek — így a „Tel Aviv” vagy a „Nyaralás” helynévként is működik.
+ */
+export function createTripSearch(input: string): (haystack: string, start: string | null, end: string | null) => boolean {
+  const query = input.trim();
+  if (!query) return () => true;
+  const { where, when } = splitSearchQuery(query);
+  const whenFilter = when ? parseWhen(when) : null;
+  return (haystack, start, end) =>
+    (whenFilter !== null && matchesQuery(haystack, where) && tripMatchesWhen(whenFilter, start, end)) ||
+    matchesQuery(haystack, query);
+}

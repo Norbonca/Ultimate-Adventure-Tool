@@ -6,6 +6,8 @@ import {
   normalizeSearchText,
   parseWhen,
   tripMatchesWhen,
+  splitSearchQuery,
+  createTripSearch,
 } from "@/lib/trip-search";
 
 const split = {
@@ -90,5 +92,34 @@ describe("trip search — Mikor?", () => {
   it("never matches a trip without dates once a date is given", () => {
     expect(tripMatchesWhen(parseWhen("2027"), null, null)).toBe(false);
     expect(tripMatchesWhen(null, null, null)).toBe(true);
+  });
+});
+
+describe("trip search — egyetlen pirula-kereső (Brand Guide v2)", () => {
+  const text = buildTripSearchText(split);
+  const junes: [string, string] = ["2027-06-05", "2027-06-12"];
+
+  it("szétválasztja a hely- és az időszavakat", () => {
+    expect(splitSearchQuery("Horvátország 2027 június")).toEqual({ where: "Horvátország", when: "2027 június" });
+    expect(splitSearchQuery("Split jan – márc")).toEqual({ where: "Split", when: "jan – márc" });
+    expect(splitSearchQuery("június 15 vitorlás")).toEqual({ where: "vitorlás", when: "június 15" });
+    expect(splitSearchQuery("tátra")).toEqual({ where: "tátra", when: "" });
+  });
+
+  it("hely + idő együtt szűr", () => {
+    expect(createTripSearch("Horvátország 2027 június")(text, ...junes)).toBe(true);
+    expect(createTripSearch("Horvátország 2026 június")(text, ...junes)).toBe(false);
+    expect(createTripSearch("tátra június")(text, ...junes)).toBe(false);
+    expect(createTripSearch("nyáron")(text, ...junes)).toBe(true);
+  });
+
+  it("üres szöveg mindent átenged, értelmezhetetlen szöveg semmit", () => {
+    expect(createTripSearch("  ")(text, ...junes)).toBe(true);
+    expect(createTripSearch("valamikor")(text, ...junes)).toBe(false);
+  });
+
+  it("időszónak látszó helynév is találat, ha a szövegben szerepel", () => {
+    const telAviv = buildTripSearchText({ ...split, title: "Tel Aviv városi futás", location_city: "Tel Aviv" });
+    expect(createTripSearch("Tel Aviv")(telAviv, "2027-01-10", "2027-01-12")).toBe(true);
   });
 });

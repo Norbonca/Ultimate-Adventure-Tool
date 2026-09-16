@@ -160,6 +160,92 @@
     --globe-sphere-3: #070C18;
     --globe-land-1: #2A3B55;
     --globe-land-2: #16223A;
+
+    /* Felület-mód tokenek — Brand Guide v2 „Éjszakai túra” (1b), Day értékek.
+       Ugyanezek a nevek a [data-surface="night"] scope-ban Night értéket kapnak.
+       Terv: design/D00_Core_Components.pen#LdX4S, design/D99_Reference.pen#pixZn */
+    --color-on-primary: #FFFFFF;
+    --color-ghost: #F1F5F9;
+    --color-glass: rgba(255, 255, 255, 0.85);
+    --color-input-bg: #FFFFFF;
+    --hero-scrim: linear-gradient(to top, rgba(15, 23, 42, 0.92) 0%, rgba(15, 23, 42, 0.65) 35%, rgba(15, 23, 42, 0) 70%);
+    /* Mobilon a hero szövegblokkja a kép felső feléig ér — erősebb, magasabbra nyúló scrim kell (v2 §7 kontraszt) */
+    --hero-scrim-mobile: linear-gradient(to top, rgba(15, 23, 42, 0.94) 0%, rgba(15, 23, 42, 0.8) 45%, rgba(15, 23, 42, 0.35) 80%, rgba(15, 23, 42, 0.15) 100%);
+    --font-hero-display: 48px;
+    --font-hero-display-mobile: 38px;
+    /* Kategória-chip háttérárnyalata: Day 10 %, Night 18 % (v2 §6) */
+    --chip-tint: 10%;
+    /* Lap/dialógus mögötti sötétítés (FilterSheet) — mindkét módban azonos */
+    --color-scrim: rgba(15, 23, 42, 0.65);
+  }
+
+  /* Night felület — Brand Guide v2 §2, §6, §8. Nem dark mode és nem felhasználói
+     kapcsoló: az útvonal teszi a Night-régió gyökerére (data-surface="night").
+     A .dark osztály a későbbi, teljes felületű dark mode-é marad. */
+  [data-surface="night"] {
+    --color-bg: #0F172A;
+    --color-surface: #1E293B;
+    --color-border: #334155;
+    --color-border-strong: #475569;
+    --color-text: #F1F5F9;
+    --color-text-muted: #94A3B8;
+    --color-text-secondary: #CBD5E1;
+    --color-text-body: #E2E8F0;
+    --color-text-subtle: #94A3B8;
+    --color-primary: #2DD4BF;
+    --color-primary-hover: #5EEAD4;
+    --color-on-primary: #0F172A;
+    --color-danger: #FCA5A1;
+    --color-success: #6EE7B7;
+    --color-rating: #FCD34D;
+    --color-ghost: rgba(255, 255, 255, 0.08);
+    --color-glass: rgba(30, 41, 59, 0.85);
+    --color-input-bg: rgba(255, 255, 255, 0.06);
+    --focus-ring: 0 0 0 3px rgba(45, 212, 191, 0.35);
+    --cat-hiking: #34D399;
+    --cat-climbing: #D9A05B;
+    --cat-water: #2DD4BF;
+    --cat-cycling: #FBBF24;
+    --cat-running: #FB7185;
+    --cat-winter: #60A5FA;
+    --cat-expedition: #A78BFA;
+    --cat-motorsport: #F87171;
+    --chip-tint: 18%;
+    color-scheme: dark;
+  }
+
+  /* Day régió Night oldalon belül (pl. a Discover alsó CTA-sávja, a Trip Detail
+     hero alatti tartalma) — a :root értékeit állítja vissza (Brand Guide v2 §2/2). */
+  [data-surface="day"] {
+    --color-bg: var(--arctic-white);
+    --color-surface: #FFFFFF;
+    --color-border: var(--border-subtle);
+    --color-border-strong: #CBD5E1;
+    --color-text: var(--text-primary);
+    --color-text-muted: var(--text-slate);
+    --color-text-secondary: #475569;
+    --color-text-body: #334155;
+    --color-text-subtle: #94A3B8;
+    --color-primary: var(--trevu-teal);
+    --color-primary-hover: var(--trevu-teal-dark);
+    --color-on-primary: #FFFFFF;
+    --color-danger: var(--sunrise-coral);
+    --color-success: var(--trail-sage);
+    --color-rating: var(--golden-hour);
+    --color-ghost: #F1F5F9;
+    --color-glass: rgba(255, 255, 255, 0.85);
+    --color-input-bg: #FFFFFF;
+    --focus-ring: 0 0 0 3px rgba(13, 148, 136, 0.12);
+    --cat-hiking: #059669;
+    --cat-climbing: #92400E;
+    --cat-water: #0D9488;
+    --cat-cycling: #D97706;
+    --cat-running: #DC2626;
+    --cat-winter: #3B82F6;
+    --cat-expedition: #8B5CF6;
+    --cat-motorsport: #B91C1C;
+    --chip-tint: 10%;
+    color-scheme: light;
   }
 
   html {

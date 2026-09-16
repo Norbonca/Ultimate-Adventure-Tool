@@ -1,7 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 
 /**
- * Discover view toggle — globe / grid / list.
+ * Discover view toggle — globe / list (Brand Guide v2: the card grid became the band list).
  *
  * Contract: components/discover/discover-view-toggle.md
  *  - the globe is the default view for a visitor with no cookie;
@@ -38,21 +38,22 @@ test.describe('Discover — view toggle', () => {
     await expect(globeButton).toHaveAttribute('aria-pressed', 'true');
     await expectGlobePresent(page);
 
-    // No trip card grid while the globe is showing.
-    await expect(page.locator('.trips-grid')).toHaveCount(0);
+    // No trip list while the globe is showing.
+    await expect(page.getByTestId('discover-trip-list')).toHaveCount(0);
   });
 
-  test('DISCOVER-VIEW-2: switching to grid writes the cookie and shows cards', async ({ page }) => {
+  test('DISCOVER-VIEW-2: switching to the list writes the cookie and shows trip bands', async ({ page }) => {
     await page.goto('/');
 
-    await page.getByTestId('view-toggle-grid').click();
+    await page.getByTestId('view-toggle-list').click();
 
-    await expect(page.getByTestId('view-toggle-grid')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('view-toggle-list')).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByTestId('view-toggle-globe')).toHaveAttribute('aria-pressed', 'false');
-    await expect(page.locator('.trips-grid')).toBeVisible();
+    await expect(page.getByTestId('discover-trip-list').or(page.getByTestId('discover-empty')).first()).toBeVisible();
     await expect(page.getByTestId('globe-discover')).toHaveCount(0);
+    await expect(page.getByTestId('view-toggle-grid')).toHaveCount(0);
 
-    expect(await readViewCookie(page)).toBe('grid');
+    expect(await readViewCookie(page)).toBe('list');
   });
 
   test('DISCOVER-VIEW-3: the remembered view is server-rendered after reload', async ({ page }) => {
@@ -65,7 +66,22 @@ test.describe('Discover — view toggle', () => {
     // Rendered by the server from the cookie — asserted before any hydration
     // would have had a chance to correct a wrong first paint.
     await expect(page.getByTestId('view-toggle-list')).toHaveAttribute('aria-pressed', 'true');
-    await expect(page.locator('.trips-grid.list-view')).toBeVisible();
+    await expect(page.getByTestId('discover-hero-search')).toBeVisible();
+  });
+
+  test('DISCOVER-VIEW-3b: a remembered legacy "grid" choice opens the list', async ({ page, context, baseURL }) => {
+    await context.addCookies([{ name: COOKIE, value: 'grid', url: baseURL ?? 'http://localhost:3000' }]);
+    await page.goto('/');
+    await expect(page.getByTestId('view-toggle-list')).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  test('DISCOVER-VIEW-3c: the Discover page is a Night surface with a single Day CTA band at the bottom', async ({ page, context, baseURL }) => {
+    await context.addCookies([{ name: COOKIE, value: 'list', url: baseURL ?? 'http://localhost:3000' }]);
+    await page.goto('/');
+    const root = page.locator('[data-surface="night"]').first();
+    await expect(root).toBeVisible();
+    await expect(root).toHaveCSS('background-color', 'rgb(15, 23, 42)');
+    await expect(page.locator('[data-surface="day"]')).toHaveCount(1);
   });
 
   test('DISCOVER-VIEW-4: an unknown cookie value falls back to the globe', async ({ page, context }) => {
@@ -112,15 +128,18 @@ test.describe('Discover — view toggle', () => {
     }
   });
 
-  test('DISCOVER-VIEW-7: the globe shows exactly the trips the grid lists (same visibility rules)', async ({ page }) => {
+  test('DISCOVER-VIEW-7: the globe shows exactly the trips the list shows (same visibility rules)', async ({ page }) => {
     const response = await page.request.get('/api/v1/trips/globe');
     const { markers } = (await response.json()) as { markers: { slug: string }[] };
 
     await page.goto('/');
-    await page.getByTestId('view-toggle-grid').click();
-    await expect(page.locator('.trips-grid')).toBeVisible();
+    await page.getByTestId('view-toggle-list').click();
+    await expect(page.getByTestId('discover-trip-list')).toBeVisible();
+    // the list is paged — open every page before collecting the links
+    const more = page.getByTestId('discover-load-more');
+    while (await more.count()) await more.click();
 
-    const hrefs = await page.locator('.trips-grid a[href^="/trips/"]').evaluateAll((links) =>
+    const hrefs = await page.getByTestId('discover-trip-list').locator('a[href^="/trips/"]').evaluateAll((links) =>
       [...new Set(links.map((link) => link.getAttribute('href')))]
     );
     // Every marker is a listed card; a card may only be missing from the globe when it has no coordinates.

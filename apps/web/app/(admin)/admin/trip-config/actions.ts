@@ -3,33 +3,22 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin-client";
 import { redirect } from "next/navigation";
+import { getPlatformAdmin } from "@/lib/admin-auth";
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
 
 async function requireAdmin() {
+  // SEC-013: a közös szabály (lib/admin-auth.ts). A redirect nem kerülhet try/catch-be:
+  // a Next.js redirect() kivételt dob, és egy üres catch továbbengedné a nem admin felhasználót.
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
   if (!user) redirect("/admin/login");
 
-  const adminEmail = process.env.ADMIN_EMAIL;
-  if (adminEmail && user.email === adminEmail) return user;
-
-  try {
-    const { data: role } = await supabase
-      .from("admin_roles")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("is_active", true)
-      .single();
-    if (!role) redirect("/admin/login");
-  } catch {
-    // table may not exist yet in dev
-  }
-
-  return user;
+  const admin = await getPlatformAdmin();
+  if (!admin) redirect("/admin/login");
+  return admin;
 }
 
 // ─── Types ───────────────────────────────────────────────────────────────────

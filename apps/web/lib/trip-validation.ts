@@ -34,8 +34,16 @@ export const draftTripSchema = z.object({
     ctx.addIssue({ code: "custom", path: ["max_participants"], message: "Invalid capacity" });
 });
 
+export const PUBLISH_REQUIRED_FIELDS = ["category_id", "title", "start_date", "end_date", "cover_image_url"] as const;
+export type PublishRequiredField = (typeof PUBLISH_REQUIRED_FIELDS)[number];
+
+/** The required publication fields that are still empty, in form order (the wizard names them to the user). */
+export function missingPublishFields(value: Partial<Record<PublishRequiredField, string | null | undefined>>): PublishRequiredField[] {
+  return PUBLISH_REQUIRED_FIELDS.filter((key) => !value[key]?.trim());
+}
+
 export const publishTripSchema = draftTripSchema.superRefine((value, ctx) => {
-  for (const key of ["category_id", "title", "start_date", "end_date", "cover_image_url"] as const) {
+  for (const key of PUBLISH_REQUIRED_FIELDS) {
     if (!value[key]?.trim()) ctx.addIssue({ code: "custom", path: [key], message: "Required" });
   }
   if (!value.title || value.title.trim().length < 3)

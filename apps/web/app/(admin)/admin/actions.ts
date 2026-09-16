@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin-client";
 import { redirect } from "next/navigation";
+import { getPlatformAdmin } from "@/lib/admin-auth";
 
 // ─── Admin jogosultság ellenőrzés ────────────────────────────────────────────
 
@@ -14,18 +15,9 @@ async function requireAdmin() {
 
   if (!user) redirect("/login");
 
-  const adminEmail = process.env.ADMIN_EMAIL;
-  if (adminEmail && user.email === adminEmail && user.email_confirmed_at) {
-    return { supabase: createAdminClient(), user };
-  }
-  const { data: role, error } = await supabase
-    .from("admin_roles")
-    .select("id")
-    .eq("user_id", user.id)
-    .eq("is_active", true)
-    .maybeSingle();
-  if (error || !role) redirect("/dashboard");
-  return { supabase: createAdminClient(), user };
+  const admin = await getPlatformAdmin();
+  if (!admin) redirect("/dashboard");
+  return { supabase: createAdminClient(), user: admin };
 }
 
 // ─── Dashboard statisztikák ──────────────────────────────────────────────────
@@ -203,6 +195,93 @@ export async function unbanUser(
   }
 
   return { success: true };
+}
+
+// ─── Felhasználó részletei (D15 `CMUG6`) ─────────────────────────────────────
+
+export interface AdminUserTripRow {
+  id: string;
+  title: string;
+  slug: string;
+  status: string;
+  start_date: string | null;
+  end_date: string | null;
+  /** "organizer", or the participation status (applied, approved, waitlisted…) */
+  role: string;
+}
+
+export interface AdminUserDetail extends AdminUser {
+  phone: string | null;
+  location_city: string | null;
+  country_code: string | null;
+  reputation_points: number | null;
+  last_sign_in_at: string | null;
+  trips: AdminUserTripRow[];
+}
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export async function getAdminUserDetail(userId: string): Promise<AdminUserDetail | null> {
+  const { supabase } = await requireAdmin();
+  if (!UUID_RE.test(userId)) return null;
+
+  const { data: p, error } = await supabase
+    .from("profiles")
+    .select(
+      `id, display_name, first_name, last_name, email, phone, location_city, country_code,
+       created_at, subscription_tier, reputation_points, deleted_at`
+    )
+    .eq("id", userId)
+    .maybeSingle();
+  if (error || !p) {
+    if (error) console.error("getAdminUserDetail error:", error);
+    return null;
+  }
+
+  const [authRes, organizedRes, participationRes] = await Promise.all([
+    supabase.auth.admin.getUserById(userId),
+    supabase
+      .from("trips")
+      .select("id, title, slug, status, start_date, end_date")
+      .eq("organizer_id", userId)
+      .is("deleted_at", null),
+    supabase
+      .from("trip_participants")
+      .select("status, trips!inner (id, title, slug, status, start_date, end_date, deleted_at, organizer_id)")
+      .eq("user_id", userId),
+  ]);
+
+  type TripCols = Omit<AdminUserTripRow, "role"> & { deleted_at?: string | null; organizer_id?: string };
+  const rows = new Map<string, AdminUserTripRow>();
+  for (const t of (organizedRes.data ?? []) as TripCols[]) {
+    rows.set(t.id, { id: t.id, title: t.title, slug: t.slug, status: t.status, start_date: t.start_date, end_date: t.end_date, role: "organizer" });
+  }
+  for (const part of participationRes.data ?? []) {
+    const raw = (part as { trips: TripCols | TripCols[] }).trips;
+    const t = Array.isArray(raw) ? raw[0] : raw;
+    if (!t || t.deleted_at || rows.has(t.id)) continue;
+    rows.set(t.id, { id: t.id, title: t.title, slug: t.slug, status: t.status, start_date: t.start_date, end_date: t.end_date, role: part.status as string });
+  }
+  const trips = [...rows.values()].sort((a, b) => (b.start_date ?? "").localeCompare(a.start_date ?? ""));
+
+  return {
+    id: p.id,
+    email: p.email ?? "",
+    display_name: p.display_name,
+    first_name: p.first_name,
+    last_name: p.last_name,
+    created_at: p.created_at,
+    subscription_tier: p.subscription_tier,
+    trip_count: trips.length,
+    is_banned: p.deleted_at != null,
+    deleted_at: p.deleted_at,
+    phone: p.phone,
+    location_city: p.location_city,
+    country_code: p.country_code,
+    reputation_points: p.reputation_points,
+    last_sign_in_at: authRes.data?.user?.last_sign_in_at ?? null,
+    trips,
+  };
 }
 
 // ─── Túrák (M02) ─────────────────────────────────────────────────────────────

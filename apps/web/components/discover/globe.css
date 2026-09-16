@@ -72,7 +72,7 @@
 .tg-card-hero { overflow: hidden; }
 .tg-card-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .tg-card-tag { z-index: 1; position: absolute; top: 8px; left: 8px; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; background: rgba(255,255,255,.9); }
-.tg-card-close { z-index: 1; position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border-radius: 999px; border: 0; background: rgba(15,23,42,.7); color: var(--color-surface); display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; }
+.tg-card-close { z-index: 1; position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border-radius: 999px; border: 0; background: rgba(15,23,42,.7); color: var(--dark-text); display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; }
 .tg-card-title { font-size: 17px; font-weight: 800; line-height: 1.15; margin-bottom: 4px; }
 .tg-card-meta { font-size: 12.5px; color: var(--text-secondary); margin-bottom: 10px; }
 .tg-card-past { display: block; margin-top: 4px; font-size: 11px; font-weight: 700; color: var(--text-secondary); }
@@ -84,8 +84,8 @@
 .tg-card-price-wrap { flex: 1; }
 .tg-card-price { font-size: 18px; font-weight: 800; }
 .tg-card-spots { font-size: 11.5px; color: var(--trevu-teal-dark); font-weight: 600; }
-.terepgomb .tg-card-cta { min-height: 42px; padding: 0 16px; background: var(--trevu-teal); color: var(--color-surface); border-radius: 10px; font-size: 13px; font-weight: 700; display: flex; align-items: center; text-decoration: none; }
-.terepgomb .tg-card-cta:hover { color: var(--color-surface); background: var(--trevu-teal-dark); }
+.terepgomb .tg-card-cta { min-height: 42px; padding: 0 16px; background: var(--color-primary); color: var(--color-on-primary); border-radius: 10px; font-size: 13px; font-weight: 700; display: flex; align-items: center; text-decoration: none; }
+.terepgomb .tg-card-cta:hover { color: var(--color-on-primary); background: var(--color-primary-hover); }
 
 /* alsó sáv: idő, évszakok, tippek, attribúció */
 .tg-bottom { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 20px 14px; z-index: 20; pointer-events: none; background: linear-gradient(180deg, rgba(6,11,22,0), rgba(6,11,22,.9) 40%); }
@@ -118,7 +118,7 @@
 .globe-fallback-list { position: absolute; top: 12px; left: 12px; margin: 0; padding: 0; list-style: none; z-index: 120; }
 .globe-fallback-list a { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 /* fókuszban a link látható (a szülő már nem vágja le — UX-007) */
-.globe-fallback-list a:focus { width: auto; height: auto; overflow: visible; clip: auto; padding: 8px 12px; border-radius: 8px; background: var(--color-surface); color: var(--deep-navy); outline: 2px solid var(--dark-primary); }
+.globe-fallback-list a:focus { width: auto; height: auto; overflow: visible; clip: auto; padding: 8px 12px; border-radius: 8px; background: var(--color-surface); color: var(--color-text); outline: 2px solid var(--dark-primary); }
 .globe-status { padding: 24px; text-align: center; color: var(--dark-text-muted); font-size: 14px; }
 
 /* szűk nézet (≤ 720 px) — S40 mobil-finomítás: a fejsor gombjai férjenek ki, a tokensor görgessen a keret
