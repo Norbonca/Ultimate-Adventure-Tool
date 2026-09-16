@@ -23,7 +23,8 @@ export type CategoryToken =
   | "expedition"
   | "motorsport";
 
-const CHIP: Record<CategoryToken, string> = {
+/** Kategória-chip osztályai (szöveg + árnyalt háttér) — a sávon és a hero-ban. */
+export const CATEGORY_CHIP: Record<CategoryToken, string> = {
   hiking: "text-cat-token-hiking bg-[color-mix(in_srgb,var(--cat-hiking)_var(--chip-tint),transparent)]",
   climbing: "text-cat-token-climbing bg-[color-mix(in_srgb,var(--cat-climbing)_var(--chip-tint),transparent)]",
   water: "text-cat-token-water bg-[color-mix(in_srgb,var(--cat-water)_var(--chip-tint),transparent)]",
@@ -87,7 +88,7 @@ export function TripBand({ href, title, imageUrl, place, details, category, pric
           <span className="line-clamp-1">{meta}</span>
         </p>
         {category && CatIcon && (
-          <span className={`hidden w-fit items-center gap-1.5 rounded-chip px-2.5 py-1 text-xs font-medium md:inline-flex ${CHIP[category.token]}`}>
+          <span className={`hidden w-fit items-center gap-1.5 rounded-chip px-2.5 py-1 text-xs font-medium md:inline-flex ${CATEGORY_CHIP[category.token]}`}>
             <CatIcon size={14} aria-hidden />
             {category.label}
           </span>
