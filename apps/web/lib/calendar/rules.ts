@@ -1,7 +1,7 @@
 /**
  * M23 Calendar — szabálymotor (FR-M23-003, FR-M23-004).
  *
- * Az SQL-motor (037: calendar_easter_date, calendar_rule_occurrence) tükre: a seed-generátor
+ * Az SQL-motor (043: calendar_easter_date, calendar_rule_occurrence) tükre: a seed-generátor
  * (scripts/calendar/build-calendar-seed.mjs) és az admin szabályelőnézete ezt használja, a paritást
  * az SQL-teszt ellenőrzi. Függőség nélküli modul (a Node típuskivonással közvetlenül importálja).
  *

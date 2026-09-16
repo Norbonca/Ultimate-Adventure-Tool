@@ -7,7 +7,7 @@
  *   (nem mentünk automatikusan).
  *
  * Tiszta függvények, kliens- és szerveroldalon is használhatók (nincs szerver-import). A szerveroldali
- * kényszer a 040-es migráció `validate_profile_country_timezone` triggere.
+ * kényszer a 045-ös migráció `validate_profile_country_timezone` triggere.
  */
 
 export interface CountryTimezoneRow {

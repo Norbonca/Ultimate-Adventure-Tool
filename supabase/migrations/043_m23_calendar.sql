@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 037: M23 Calendar — V1 (háttér + admin)
+-- Migration 043 (korábban 037, átszámozva 2026-09-16): M23 Calendar — V1 (háttér + admin)
 -- ============================================================================
 -- Spec: modules/23_Calendar/01_Funkcionalis_Specifikacio.md (V0.2) 8., 9., 11. fejezet
 -- Terv: modules/23_Calendar/02_Megvalositasi_Terv.md 4.1

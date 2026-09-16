@@ -1,4 +1,4 @@
--- M23 Calendar (037) — RLS-, szabálymotor- és seed-ellenőrzés. Helyi adatbázison, minden változás visszagördül.
+-- M23 Calendar (043, korábban 037) — RLS-, szabálymotor- és seed-ellenőrzés. Helyi adatbázison, minden változás visszagördül.
 -- Futtatás: docker exec -i supabase_db_trevu-local psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/m23-calendar.sql
 \set ON_ERROR_STOP on
 BEGIN;

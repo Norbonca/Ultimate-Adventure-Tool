@@ -65,7 +65,7 @@ interface RefTimezone {
 
 const RELATIONSHIP_OPTIONS = ["spouse", "parent", "sibling", "friend", "other"];
 
-// A 040-es trigger hibakulcsai → i18n; minden más hiba általános mentési hiba (nyers üzenet nem jelenik meg).
+// A 045-ös trigger hibakulcsai → i18n; minden más hiba általános mentési hiba (nyers üzenet nem jelenik meg).
 const PROFILE_DB_ERROR_KEYS: Record<string, TranslationKey> = {
   profile_country_inactive: "profile.settings.errors.countryInactive",
   profile_timezone_required: "profile.settings.errors.timezoneRequired",
@@ -396,7 +396,7 @@ export default function ProfileSettingsPage() {
             csak aktív ország választható, üresen nincs országspecifikus naptár.
             DESIGN-FIRST kivétel: az S4 a meglévő mezőre épül, külön Pencil-terv nem készül (Norbert kérése;
             tervhivatkozás: D01 `oeWBG`).
-            040 (Norbert döntései, 2026-09-15): országhoz kötelező az országhoz tartozó időzóna (egyzónásnál
+            045 (Norbert döntései, 2026-09-15): országhoz kötelező az országhoz tartozó időzóna (egyzónásnál
             automatikus, többzónásnál választani kell); ország nélkül böngésző alapú javaslat (csak kitölt,
             nem ment). Szintén DESIGN-FIRST kivétel, a meglévő mezők és stílus bővítése.
           */}
