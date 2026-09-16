@@ -17,7 +17,6 @@
 
 import React, { useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/i18n/useTranslation';
 import { AppHeader } from '@/components/AppHeader';
@@ -37,7 +36,7 @@ import {
 } from '@/lib/icons';
 import type { LucideIcon } from '@/lib/icons';
 import { SearchPill, OptionChip, FilterSheet } from '@/components/ui';
-import { TripBand, CATEGORY_TEXT, type CategoryToken } from '@/components/discover/TripBand';
+import { TripBand, CATEGORY_TEXT, CATEGORY_CHIP, type CategoryToken } from '@/components/discover/TripBand';
 import {
   DEFAULT_DISCOVER_VIEW,
   rememberDiscoverView,
@@ -129,6 +128,8 @@ interface DiscoverClientProps {
   currentUser: CurrentUser | null;
   /** View remembered in the `trevu-discover-view` cookie; globe by default. */
   initialView?: DiscoverView;
+  /** A szerver mai napja (YYYY-MM-DD) — a kiemelt túra kiválasztásához, hidratálási eltérés nélkül. */
+  today: string;
 }
 
 /** DB kategórianév → ikon és --cat-* token. */
@@ -216,6 +217,7 @@ export default function DiscoverClient({
   difficultyLevels,
   currentUser: _currentUser,
   initialView = DEFAULT_DISCOVER_VIEW,
+  today,
 }: DiscoverClientProps) {
   const { t, locale } = useTranslation();
   const intlLocale = locale === 'en' ? 'en-US' : 'hu-HU';
@@ -286,7 +288,15 @@ export default function DiscoverClient({
   const advancedCount = Object.values(filters).filter((v) => v !== 'all').length;
   const mobileFilterCount = advancedCount + (activeCategory === 'all' ? 0 : 1);
 
-  const countryCount = useMemo(() => new Set(trips.map((trip) => trip.location_country).filter(Boolean)).size, [trips]);
+  // Kiemelt túra a hero-ban (1b, handoff/design-canvas #1b): a legközelebb induló, borítóképes túra;
+  // ha nincs ilyen, az első borítóképes; ha egyik túrának sincs képe, a hero a fotó nélküli receptet kapja.
+  const featured = useMemo(() => {
+    const withImage = trips.filter((trip) => trip.cover_image_url || trip.card_image_url);
+    const upcoming = withImage
+      .filter((trip) => trip.start_date && trip.start_date.slice(0, 10) >= today)
+      .sort((a, b) => (a.start_date! < b.start_date! ? -1 : 1));
+    return upcoming[0] ?? withImage[0] ?? null;
+  }, [trips, today]);
 
   const regionNames = useMemo(() => {
     try {
@@ -474,46 +484,96 @@ export default function DiscoverClient({
         </main>
       ) : (
         <>
-          {/* HERO — v2 §5: Deep Navy alapon a terv panorámafotója (D02 #H1rRQE / #l87Il, ugyanaz a kép
-              asztalin és mobilon), alulról kötelező olvashatósági gradienssel (--hero-scrim).
-              Fotó: Andy Arbeit, Unsplash (unsplash.com/@izeberg) — public/discover/hero-night.jpg */}
-          <section className="relative overflow-hidden bg-canvas">
-            <Image
-              src="/discover/hero-night.jpg"
-              alt=""
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
-            />
-            <div aria-hidden className="absolute inset-0 bg-hero-scrim-mobile md:bg-hero-scrim" />
-            <div className="relative mx-auto flex min-h-[380px] max-w-7xl flex-col justify-end gap-3 px-5 pb-8 pt-16 md:min-h-[480px] md:gap-4 md:px-[120px] md:pb-12">
-              <p className="text-sm font-medium text-ink-secondary">
-                {t('discover.heroStats')
-                  .replace('{trips}', String(trips.length))
-                  .replace('{countries}', String(countryCount))}
-              </p>
-              <h1 className="max-w-[720px] text-hero-display-mobile text-ink [text-wrap:balance] md:text-hero-display">
-                {t('discover.heroTitle')}
-              </h1>
-              <p className="hidden max-w-[720px] text-lg text-ink-body md:block">{t('discover.heroSubtitle')}</p>
-              <SearchPill
-                className="mt-2 max-w-[720px] md:mt-4"
-                value={queryInput}
-                onChange={(value) => {
-                  setQueryInput(value);
-                  if (!value.trim()) setQuery('');
-                }}
-                onSubmit={submitSearch}
-                placeholder={t('discover.searchPill')}
-                submitLabel={t('common.search')}
-                label={t('discover.searchPillHint')}
-                testId="discover-hero-search"
-                inputTestId="discover-search-query"
-                submitTestId="discover-search-submit"
+          {/* HERO — kiemelt túra a saját borítóképével (handoff/design-canvas „Trevu Design Audit” #1b;
+              design/D02_Trip_Management.pen#H1rRQE, #l87Il): kategória · napok, túranév, hely · dátum · szabad helyek.
+              Alulról kötelező olvashatósági gradiens (v2 §5, §7). */}
+          <section className="relative overflow-hidden bg-canvas" data-testid="discover-hero">
+            <h1 className="sr-only">{t('discover.heroTitle')}</h1>
+            {featured ? (
+              <>
+                {/* A borítókép külső tárhelyről jön (Supabase Storage, Unsplash) — a sávokkal egyezően <img>. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={(featured.cover_image_url || featured.card_image_url)!}
+                  alt=""
+                  fetchPriority="high"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+                <div aria-hidden className="absolute inset-0 bg-hero-scrim-mobile md:bg-hero-scrim" />
+              </>
+            ) : (
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -left-40 -top-40 h-[520px] w-[720px] rounded-full opacity-[0.12] blur-3xl [background:var(--gradient-trevu)]"
               />
+            )}
+            <div className="relative mx-auto flex min-h-[340px] max-w-7xl flex-col justify-end gap-3 px-5 pb-6 pt-16 md:min-h-[440px] md:px-[120px] md:pb-10">
+              {featured ? (() => {
+                const category = resolveJoin(featured.categories);
+                const meta = category ? categoryMeta(category.name) : null;
+                const days = tripDurationDays(featured) + 1;
+                const spotsLeft = featured.max_participants - (featured.current_participants || 0);
+                const Icon = meta?.icon;
+                return (
+                  <>
+                    {category && meta && Icon && (
+                      <span
+                        className={`inline-flex w-fit items-center gap-1.5 rounded-chip px-2.5 py-1 text-xs font-semibold ${CATEGORY_CHIP[meta.token]}`}
+                      >
+                        <Icon size={14} aria-hidden />
+                        {categoryLabel(category.name)}
+                        {featured.end_date ? ` · ${days} ${t('discover.days')}` : ''}
+                      </span>
+                    )}
+                    <h2 className="max-w-[900px] text-hero-display-mobile text-ink [text-wrap:balance] md:text-hero-display">
+                      <Link
+                        href={`/trips/${featured.slug}`}
+                        className="hover:text-accent focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+                        data-testid="discover-hero-trip"
+                      >
+                        {featured.title}
+                      </Link>
+                    </h2>
+                    <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-medium text-ink-secondary">
+                      <span>{formatPlace(featured)}</span>
+                      {featured.start_date && (
+                        <>
+                          <span aria-hidden className="text-line-strong">·</span>
+                          <span>{formatDates(featured)}</span>
+                        </>
+                      )}
+                      <span aria-hidden className="text-line-strong">·</span>
+                      <span className="font-semibold text-accent">
+                        {t('discover.spotsLeft').replace('{count}', String(spotsLeft))}
+                      </span>
+                    </p>
+                  </>
+                );
+              })() : (
+                <p className="max-w-[720px] text-hero-display-mobile text-ink md:text-hero-display" aria-hidden>
+                  {t('discover.heroTitle')}
+                </p>
+              )}
             </div>
           </section>
+
+          {/* Pirula-kereső a hero alatt, saját sávban (vászon #1b) */}
+          <div className="mx-auto max-w-7xl px-4 pt-5 md:px-[120px] md:pt-6">
+            <SearchPill
+              value={queryInput}
+              onChange={(value) => {
+                setQueryInput(value);
+                if (!value.trim()) setQuery('');
+              }}
+              onSubmit={submitSearch}
+              placeholder={t('discover.searchPill')}
+              submitLabel={t('common.search')}
+              label={t('discover.searchPillHint')}
+              testId="discover-hero-search"
+              inputTestId="discover-search-query"
+              submitTestId="discover-search-submit"
+            />
+          </div>
 
           {/* TOOLBAR — asztali: kategória-pirulák | Szűrők + nézetváltó; mobil: Szűrők (n) + nézetváltó */}
           <div className="mx-auto max-w-7xl px-4 pb-2 pt-5 md:px-[120px] md:pb-5 md:pt-7">
@@ -602,11 +662,16 @@ export default function DiscoverClient({
 
           <main id="discover-results" className="mx-auto max-w-7xl px-4 pb-10 md:px-[120px] md:pb-16">
             <div className="flex items-center justify-between pb-3 md:pb-4">
-              <p className="text-base font-medium text-ink md:text-lg" data-testid="discover-count">
-                {filteredTrips.length === 0
-                  ? t('discover.noTripsYet')
-                  : t('discover.tripsAvailable').replace('{count}', String(filteredTrips.length))}
-              </p>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-semibold uppercase tracking-[0.06em] text-ink-muted">
+                  {t('discover.upcomingDepartures')}
+                </span>
+                <p className="text-base font-medium text-ink md:text-lg" data-testid="discover-count">
+                  {filteredTrips.length === 0
+                    ? t('discover.noTripsYet')
+                    : t('discover.tripsAvailable').replace('{count}', String(filteredTrips.length))}
+                </p>
+              </div>
               <label className="hidden items-center gap-2 text-sm text-ink-secondary md:flex">
                 <span>{t('discover.sortLabel')}:</span>
                 <select
