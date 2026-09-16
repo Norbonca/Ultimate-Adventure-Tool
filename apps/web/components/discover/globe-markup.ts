@@ -32,7 +32,7 @@ export function buildGlobeMarkup(s: GlobeMarkupStrings, attributions: GlobeAttri
     .join(' · ');
   return `
   <div id="tg-loading" class="mono" role="status">${esc(s.loading)}</div>
-  <canvas id="tg-relief" aria-hidden="true"></canvas>
+  <div id="tg-map" aria-hidden="true"></div>
   <svg id="tg-globe" aria-hidden="true"></svg>
   <div id="tg-pins"></div>
   <div id="tg-card"></div>

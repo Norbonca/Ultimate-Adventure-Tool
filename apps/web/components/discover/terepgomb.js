@@ -1,23 +1,22 @@
-// terepgomb.js — 3D földgömb túrakereső (vanilla, d3-geo + topojson + Web Mercator csempék).
+// terepgomb.js — 3D földgömb túrakereső (vanilla JS; MapLibre GL JS gömbvetítés + DOM/SVG réteg).
 //
 // Forrás: handoff/globe/terepgomb.js (Claude Design, Terepgomb.html végleges állapota, 2026-09-14).
-// Bekötéskor változott:
-//   - nincs CDN: a world-atlas JSON és a csempe-URL az opts-ból jön (public/globe/, lib/globe-tiles.ts);
-//   - a csempe-zoom a szolgáltató maxZoom-jára van vágva (GIBS: 8; EOX: 13);
-//   - minden felirat az opts.t szótárból jön (i18n), a hónapnevek és a hétcímkék az opts.locale szerint;
-//   - a hét számítása az API week0 napjától, nem beégetett dátumtól;
-//   - az elemazonosítók `tg-` előtagot kaptak, a gyökér osztálya `.terepgomb` (nincs globális id-ütközés);
-//   - update({ trips, routes }) a szűrt túrakészlet cseréjére újramountolás nélkül;
-//   - a11y: a zászlók gombok (role, aria-label, billentyű), a kapcsolók aria-pressed-et kapnak;
-//   - a destroy minden window/document figyelőt leszed.
-// 2026-09-15 (S40):
-//   - színek a globals.css tokenjeiből (PLAN-011), nincs hex a rendererben;
-//   - a múltbeli és az 52 héten túli túrák az idővonal szélére kerülnek (tw), a kártya jelzi a lezajlottat;
-//   - szűk nézet: a zászló- és klaszterfeliratok a gömb szélén belül maradnak, az alsó sáv valós magassága a határ.
+// Bekötéskor változott (S39b–S40): i18n szótár, week0 az API-ból, `tg-` előtag, update(), a11y, destroy,
+// tokenekből jövő színek (PLAN-011), idővonal széle a múltbeli és 52 héten túli túráknak, szűk nézet.
+//
+// 2026-09-15 — MOTORCSERE (Norbert döntése: „az engine változik, a design nem”):
+//   A felszínt és a földrajzi alapréteget (tenger, szárazföld, határok, fokhálózat) korábban a processzor
+//   rajzolta: minden képkockán pixelenként inverz ortografikus vetítés a Web Mercator csempékre, majd
+//   putImageData, fölötte óriási SVG-poligonok. Ez nagy felbontáson és gyengébb gépen lassú volt.
+//   Most a MapLibre GL JS 5 rajzolja a GPU-n, gömbvetítésben (projection: globe). A csempék éjszakai tónusát
+//   csempénként EGYSZER, betöltéskor számoljuk (addProtocol), nem képkockánként.
+//   Változatlan maradt a látvány és minden, ami fölötte van: zászlók, klaszterek, kártya, tokenek, idővonal,
+//   évszak-chipek, városok és hegységek felirata, útvonal — ezek továbbra is DOM/SVG-rétegek, a gömbre a
+//   MapLibre vetítéséből (map.project) kerülnek. A forgatás, a csippentés és a görgetés a MapLibre sajátja.
 //
 // Használat:
 //   const globe = await mountGlobe(rootEl, { trips, categories, routes, week0, tiles, atlasUrl, locale, t, onOpen });
-//   globe.update({ trips, routes }); globe.destroy();
+//   globe.update({ trips, routes }); globe.frameTrip(id); globe.destroy();
 // - trips: [{ id, slug, cat, title, place, host, week, days, price, spots, diff, ll: [lon, lat], approximate, past, image }]
 // - categories: [{ id, label, color }]
 // - routes: { [tripId]: [[név, lon, lat], …] } — a napi program pontjai; üres objektum is mehet
@@ -25,8 +24,51 @@
 // - tiles: { url(z, x, y), maxZoom }, atlasUrl: a countries-50m.json helye
 // - t: feliratszótár (ld. GlobeDiscover.tsx), locale: 'hu' | 'en'
 // - onOpen(slug): a "Részletek" gomb
-import * as d3 from "d3";
+import maplibregl from "maplibre-gl";
+import { geoDistance, geoGraticule, mean } from "d3";
 import * as topojson from "topojson-client";
+
+const TILE_PROTOCOL = "trevu-globe";
+const TILE_RETRIES = 3;
+// az aktuális csempeszolgáltató — a protokoll egyszer regisztrálódik, a mount állítja be
+let tileSource = null;
+
+/** Éjszakai tónus csempénként egyszer: a műholdszínek hűvösítve, sötétítve (a korábbi pixelképlet szürkére pontos közelítése). */
+function nightTone(bitmap) {
+  const w = bitmap.width, h = bitmap.height;
+  const canvas = typeof OffscreenCanvas !== "undefined" ? new OffscreenCanvas(w, h) : Object.assign(document.createElement("canvas"), { width: w, height: h });
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(bitmap, 0, 0);
+  ctx.globalCompositeOperation = "multiply"; ctx.fillStyle = "rgb(112,135,166)"; ctx.fillRect(0, 0, w, h);
+  ctx.globalCompositeOperation = "lighter"; ctx.fillStyle = "rgb(12,22,42)"; ctx.fillRect(0, 0, w, h);
+  return typeof canvas.transferToImageBitmap === "function" ? canvas.transferToImageBitmap() : createImageBitmap(canvas);
+}
+
+function registerTileProtocol() {
+  if (registerTileProtocol.done) return; registerTileProtocol.done = true;
+  maplibregl.addProtocol(TILE_PROTOCOL, async (params, abortController) => {
+    const m = /^trevu-globe:\/\/(\d+)\/(\d+)\/(\d+)/.exec(params.url);
+    const src = tileSource;
+    if (!m || !src) throw new Error("globe tile: no source");
+    const z = +m[1], x = +m[2], y = +m[3];
+    for (let attempt = 0; ; attempt++) {
+      try {
+        const res = await fetch(src.url(z, x, y), { signal: abortController.signal, mode: "cors" });
+        if (!res.ok) throw new Error("tile " + res.status);
+        const bitmap = await createImageBitmap(await res.blob());
+        const toned = await nightTone(bitmap); bitmap.close?.();
+        src.onLoaded();
+        return { data: toned };
+      } catch (err) {
+        if (abortController.signal.aborted) throw err;
+        // a hibás csempe visszalépéssel újrapróbálódik (korábban örökre lyuk maradt → „széttört” felszín)
+        if (attempt + 1 >= TILE_RETRIES) { src.onFailed(z); throw err; }
+        await new Promise((r) => setTimeout(r, 800 * (attempt + 1) * (attempt + 1)));
+        if (abortController.signal.aborted) throw err;
+      }
+    }
+  });
+}
 
 export async function mountGlobe(root, opts) {
   const $ = (id) => root.querySelector("#tg-" + id);
@@ -35,11 +77,11 @@ export async function mountGlobe(root, opts) {
 
   // színek a globals.css tokenjeiből — a gyökérelemen olvasva, így egy helyen állíthatók (PLAN-011)
   const rootStyle = getComputedStyle(root);
-  const token = (name) => rootStyle.getPropertyValue(name).trim();
+  const token = (name, fallback) => rootStyle.getPropertyValue(name).trim() || fallback;
   const COL = {
-    primary: token("--dark-primary"), label: token("--border-subtle"), stopInk: token("--globe-stop-ink"),
-    sphere: [token("--globe-sphere-1"), token("--globe-sphere-2"), token("--globe-sphere-3")],
-    land: [token("--globe-land-1"), token("--globe-land-2")],
+    primary: token("--dark-primary", "rgb(45,212,191)"), label: token("--border-subtle", "rgb(226,232,240)"), stopInk: token("--globe-stop-ink", "rgb(6,11,22)"),
+    sphere: [token("--globe-sphere-1", "rgb(22,40,66)"), token("--globe-sphere-2", "rgb(12,24,44)"), token("--globe-sphere-3", "rgb(6,11,22)")],
+    land: [token("--globe-land-1", "rgb(40,58,84)"), token("--globe-land-2", "rgb(24,38,60)")],
   };
 
   const CATS = opts.categories;            // [{id,label,color}]
@@ -77,15 +119,17 @@ export async function mountGlobe(root, opts) {
     { l: T.seasonSummer, t: weeksUntil(7, 18) },
   ];
 
-  // kezdőnézet: a teljes bolygó (Norbert, 2026-09-15 — a közép-európai ráközelítés induláskor nem érthető);
-  // a lépték a `layout()` után áll be, mert a teljes gömb mérete a konténerből jön (floorR / baseR)
-  const WORLD_ROT = [-10, -30, 0];
-  // fit: amíg igaz, a lépték minden elrendezésnél a teljes gömbhöz igazodik (méretváltáskor is); nagyítás, túra-ráközelítés kikapcsolja
-  const state = { t: 3, rot: WORLD_ROT.slice(), scale: 1, fit: true, active: Object.fromEntries(CATS.map((c) => [c.id, true])), selected: null, gyro: false, dx: 0, dy: 0, dragging: false };
-  const app = root, svg = d3.select($("globe")), pinsEl = $("pins"), cardEl = $("card");
+
+  // kezdőnézet: a teljes bolygó (Norbert, 2026-09-15 — a közép-európai ráközelítés induláskor nem érthető)
+  const WORLD_CENTER = [10, 30];
+  // fit: amíg igaz, a nagyítás minden elrendezésnél a teljes gömbhöz igazodik (méretváltáskor is); nagyítás, túra-ráközelítés kikapcsolja
+  const state = { t: 3, scale: 1, fit: true, active: Object.fromEntries(CATS.map((c) => [c.id, true])), selected: null, gyro: false };
+  const app = root, svgEl = $("globe"), pinsEl = $("pins"), cardEl = $("card");
+  const SVG_NS = "http://www.w3.org/2000/svg";
   let cardKey = "";
   // a kártya eseményei egyszer, delegálva kötődnek (a tartalom cserélhető alatta)
   cardEl.addEventListener("pointerdown", (e) => e.stopPropagation());
+  cardEl.addEventListener("wheel", (e) => e.stopPropagation(), { passive: true });
   cardEl.addEventListener("click", (e) => {
     const trip = TRIPS.find((t) => t.id === state.selected); if (!trip) return;
     const target = e.target instanceof Element ? e.target : null; if (!target) return;
@@ -95,190 +139,143 @@ export async function mountGlobe(root, opts) {
     // módosító billentyűvel (új lap) a böngésző saját linkkezelése marad
     if (open && opts.onOpen && !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1)) { e.preventDefault(); opts.onOpen(trip.slug); }
   });
-  let width = 0, height = 0, R = 0, baseR = 1, floorR = 1, bottomReserve = 170;
+  let width = 0, height = 0, R = 1, silR = 1, baseR = 1, floorR = 1, bottomReserve = 170, gcx = 0, gcy = 0;
   let chipRects = [];
-  const projection = d3.geoOrthographic().clipAngle(90);
-  const path = d3.geoPath(projection);
-  const graticule = d3.geoGraticule().step([5, 5]);
 
+  // ── földrajzi alapréteg (GeoJSON a GPU-nak) ──────────────────────────────
   const topo = await (await fetch(opts.atlasUrl)).json();
   const borders = topojson.mesh(topo, topo.objects.countries, (a, b) => a !== b);
   const land = topojson.merge(topo, topo.objects.countries.geometries);
-  const loadingEl = $("loading"); if (loadingEl) loadingEl.remove();
+  const graticule = geoGraticule().step([5, 5])();
+  const feature = (geometry) => ({ type: "Feature", properties: {}, geometry });
 
-  // ── felszín: Web Mercator csempék a gömbre vetítve ───────────────────────
-  // Teljesítmény (S40 zoom-javítás, 2026-09-15):
-  //  - a csempe pixeleit betöltéskor EGYSZER dekódoljuk (korábban minden képkockán drawImage + getImageData csempénként);
-  //  - interakció (húzás, görgetés, csippentés, idő-húzás) közben durva mintavétel; a hiányzó csempe helyén a
-  //    legközelebbi betöltött szülő csempe látszik, amíg a pontos meg nem jön;
-  //  - legfeljebb TILE_CONCURRENCY kérés fut egyszerre, a sorban álló, már nem aktuális zoomszintű kérés kiesik;
-  //    a hibás csempe visszalépéssel újrapróbálódik (korábban örökre lyuk maradt → „széttört” felszín);
-  //  - a z2–z3 világcsempék induláskor betöltődnek, így mindig van mire visszaesni.
-  const relief = { canvas: $("relief"), ctx: null, tiles: new Map(), fail: false, anyLoaded: false };
-  relief.ctx = relief.canvas.getContext("2d");
-  const TILE = 256, TILE_URL = opts.tiles.url, MAX_TILE_Z = opts.tiles.maxZoom, MIN_TILE_Z = 2;
-  const TILE_CONCURRENCY = 8, TILE_RETRIES = 3, DECODED_CAP = 320;
-  const tileCanvas = document.createElement("canvas"); tileCanvas.width = TILE; tileCanvas.height = TILE; const tileCtx = tileCanvas.getContext("2d", { willReadFrequently: true });
-  let tileQueue = [], tileActive = 0, wantedZ = MIN_TILE_Z, destroyed = false, decodedCount = 0, useTick = 0;
-  function tileKey(z, x, y) { return z + "/" + x + "/" + y; }
-  function pumpTiles() {
-    while (!destroyed && tileActive < TILE_CONCURRENCY && tileQueue.length) {
-      const t = tileQueue.pop(); // a legfrissebb kérés előre
-      if (t.z > MIN_TILE_Z + 1 && t.z !== wantedZ) { t.state = "idle"; continue; } // elavult zoomszint — kiesik, később újrakérhető
-      tileActive++; t.state = "loading";
-      const img = new Image(); img.crossOrigin = "anonymous"; img.decoding = "async";
-      img.onload = () => {
-        tileActive--;
-        try { tileCtx.clearRect(0, 0, TILE, TILE); tileCtx.drawImage(img, 0, 0); t.data = tileCtx.getImageData(0, 0, TILE, TILE).data; t.state = "ok"; decodedCount++; relief.anyLoaded = true; }
-        catch (_) { t.state = "failed"; }
-        evictTiles(); scheduleRelief(); pumpTiles();
-      };
-      img.onerror = () => {
-        tileActive--; t.tries++;
-        if (t.tries < TILE_RETRIES) { t.state = "retry"; setTimeout(() => { if (!destroyed && t.state === "retry") { t.state = "queued"; tileQueue.push(t); pumpTiles(); } }, 800 * t.tries * t.tries); }
-        else { t.state = "failed"; if (!relief.anyLoaded && !relief.fail && t.z <= MIN_TILE_Z + 1) { relief.fail = true; reliefFail(); } }
-        pumpTiles();
-      };
-      img.src = TILE_URL(t.z, t.x, t.y);
-    }
-  }
-  function evictTiles() {
-    if (decodedCount <= DECODED_CAP) return;
-    const olds = [...relief.tiles.values()].filter((t) => t.state === "ok" && t.z > MIN_TILE_Z + 1).sort((a, b) => a.used - b.used);
-    for (const t of olds.slice(0, decodedCount - DECODED_CAP)) { t.data = null; t.state = "idle"; decodedCount--; }
-  }
-  /** A csempe pixelei, ha betöltött; `request` esetén a hiányzót sorba állítja. */
-  function tilePixels(z, x, y, request) {
-    const n = 1 << z; x = ((x % n) + n) % n; if (y < 0 || y >= n) return null;
-    const k = tileKey(z, x, y); let t = relief.tiles.get(k);
-    if (!t) { t = { z, x, y, state: "idle", tries: 0, data: null, used: 0 }; relief.tiles.set(k, t); }
-    if (t.state === "ok") { t.used = useTick; return t.data; }
-    if (request && t.state === "idle") { t.state = "queued"; tileQueue.push(t); }
-    return null;
-  }
-  function reliefFail() { const el = document.createElement("div"); el.className = "mono tg-relief-fail"; el.setAttribute("role", "status"); el.textContent = T.reliefFail; app.appendChild(el); }
-  const merc = { x: (lon, z) => (lon + 180) / 360 * (1 << z), y: (lat, z) => { const s = Math.sin(lat * Math.PI / 180); return (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * (1 << z); } };
-  function zoomLevel() { const pxPerDeg = projection.scale() * Math.PI / 180; return Math.max(MIN_TILE_Z, Math.min(MAX_TILE_Z, Math.round(Math.log2(pxPerDeg * 360 / TILE) + 0.6))); }
-  let reliefImage = null;
-  function drawRelief(fast) {
-    const cv = relief.canvas; if (cv.width !== width || cv.height !== height) { cv.width = width; cv.height = height; reliefImage = null; }
-    const ctx = relief.ctx; ctx.clearRect(0, 0, width, height);
-    if (relief.fail && !relief.anyLoaded) return;
-    useTick++;
-    const [cx, cy] = projection.translate(), r = projection.scale();
-    // interakció közben is kérünk csempét a pillanatnyi zoomszintre, de a sor az elavult szinteket eldobja és
-    // legfeljebb TILE_CONCURRENCY kérés fut — így nincs kérésvihar, és a felszín menet közben is élesedik
-    const z = zoomLevel(), step = fast ? 3 : 2, request = true;
-    if (request && z !== wantedZ) { wantedZ = z; tileQueue = tileQueue.filter((t) => { const keep = t.z <= MIN_TILE_Z + 1 || t.z === z; if (!keep) t.state = "idle"; return keep; }); }
-    if (!reliefImage) reliefImage = ctx.createImageData(width, height);
-    const out = reliefImage, od = out.data; od.fill(0);
-    const x0 = Math.max(0, Math.floor(cx - r)), x1 = Math.min(width, Math.ceil(cx + r)), y0 = Math.max(0, Math.floor(cy - r)), y1 = Math.min(height, Math.ceil(cy + r));
-    // az ortografikus vetítés inverze kézzel (a d3 általános invert-lánca pixelenként drága; egyezése a d3-mal ellenőrizve, hiba < 1e-12°)
-    const rot = projection.rotate(), dl = rot[0] * Math.PI / 180, dp = rot[1] * Math.PI / 180, cosP = Math.cos(dp), sinP = Math.sin(dp);
-    const DEG = 180 / Math.PI, LAT_MAX = 85 * Math.PI / 180, TWO_PI = Math.PI * 2;
-    let hitZ = -1, hitX = -1, hitY = -1, hitData = null; // az előző pixel célcsempéje és feloldása — a szomszédos pixelek jellemzően ugyanabba esnek
-    for (let y = y0; y < y1; y += step) for (let x = x0; x < x1; x += step) {
-      const px = (x - cx) / r, py = (cy - y) / r, rho2 = px * px + py * py; if (rho2 > 1) continue;
-      const Z = Math.sqrt(1 - rho2);
-      const latR = Math.asin(py * cosP - Z * sinP); if (latR > LAT_MAX || latR < -LAT_MAX) continue;
-      let lonR = Math.atan2(px, Z * cosP + py * sinP) - dl; lonR -= TWO_PI * Math.floor((lonR + Math.PI) / TWO_PI);
-      const ll0 = lonR * DEG, ll1 = latR * DEG;
-      let R0 = 0, G0 = 0, B0 = 0, got = false;
-      // a kívánt zoomszint csempéje; ha még nincs, a legközelebbi betöltött szülő (a z2 mindig megvan)
-      const mx0 = merc.x(ll0, z), my0 = merc.y(ll1, z), tx0 = Math.floor(mx0), ty0 = Math.floor(my0);
-      // a célcsempe → a ténylegesen használt (betöltött) csempe feloldása csak csempeváltáskor
-      if (tx0 !== hitX || ty0 !== hitY) {
-        hitX = tx0; hitY = ty0; hitData = null; hitZ = -1;
-        for (let tz = z; tz >= MIN_TILE_Z; tz--) {
-          const f = 1 << (z - tz), d = tilePixels(tz, Math.floor(tx0 / f), Math.floor(ty0 / f), request && tz === z);
-          if (d) { hitData = d; hitZ = tz; break; }
-        }
-      }
-      if (hitData) {
-        const f = 1 << (z - hitZ), mx = mx0 / f, my = my0 / f, tx = Math.floor(mx), ty = Math.floor(my);
-        const px2 = Math.min(TILE - 1, Math.floor((mx - tx) * TILE)), py2 = Math.min(TILE - 1, Math.floor((my - ty) * TILE)); const i = (py2 * TILE + px2) * 4;
-        R0 = hitData[i]; G0 = hitData[i + 1]; B0 = hitData[i + 2]; got = true;
-      }
-      if (!got) continue;
-      const lum = R0 * .3 + G0 * .59 + B0 * .11;
-      // éjszakai tónus: a műholdszínek hűvösítve, sötétítve
-      const rr = 12 + R0 * .40 + lum * .04, gg = 22 + G0 * .46 + lum * .07, bb = 42 + B0 * .55 + lum * .10;
-      const yEnd = Math.min(height, y + step), xEnd = Math.min(width, x + step);
-      for (let pY = y; pY < yEnd; pY++) for (let pX = x; pX < xEnd; pX++) { const oi = (pY * width + pX) * 4; od[oi] = rr; od[oi + 1] = gg; od[oi + 2] = bb; od[oi + 3] = 255; }
-    }
-    ctx.putImageData(out, 0, 0);
-    if (request) pumpTiles();
-    const g2 = ctx.createRadialGradient(cx - r * .25, cy - r * .3, r * .2, cx, cy, r); g2.addColorStop(0, "rgba(255,255,255,.06)"); g2.addColorStop(.8, "rgba(6,11,22,0)"); g2.addColorStop(1, "rgba(6,11,22,.75)");
-    ctx.fillStyle = g2; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
-    if (relief.anyLoaded) { sphere.attr("fill", "rgba(0,0,0,0)"); landP.attr("fill", "rgba(10,18,34,.14)"); }
-  }
-  // világcsempék előre (z2: 16, z3: 64) — a visszaesés alapja
-  for (let pz = MIN_TILE_Z; pz <= MIN_TILE_Z + 1; pz++) for (let px = 0; px < (1 << pz); px++) for (let py = 0; py < (1 << pz); py++) tilePixels(pz, px, py, true);
-  pumpTiles();
-  let reliefTO = null; function scheduleRelief() { if (reliefTO || interacting()) return; reliefTO = setTimeout(() => { reliefTO = null; if (!interacting()) render(); }, 80); }
+  // ── felszín: Web Mercator csempék, éjszakai tónussal ─────────────────────
+  const MAX_TILE_Z = opts.tiles.maxZoom, MAX_VIEW_Z = MAX_TILE_Z + 1.5;
+  let anyLoaded = false, earlyFails = 0, reliefFailShown = false, destroyed = false;
+  tileSource = {
+    url: opts.tiles.url,
+    onLoaded() { if (!anyLoaded && !destroyed) { anyLoaded = true; if (map.getLayer("land")) map.setPaintProperty("land", "fill-color", "rgba(10,18,34,.14)"); render(); } },
+    onFailed(z) { if (!anyLoaded && z <= 3 && ++earlyFails >= 3) reliefFail(); },
+  };
+  registerTileProtocol();
+  function reliefFail() { if (reliefFailShown || destroyed) return; reliefFailShown = true; const el = document.createElement("div"); el.className = "mono tg-relief-fail"; el.setAttribute("role", "status"); el.textContent = T.reliefFail; app.appendChild(el); }
 
-  // ── SVG-váz ──────────────────────────────────────────────────────────────
-  const defs = svg.append("defs");
-  const sphereGrad = defs.append("radialGradient").attr("id", "tg-sph").attr("cx", "42%").attr("cy", "32%").attr("r", "75%");
-  sphereGrad.append("stop").attr("offset", "0%").attr("stop-color", COL.sphere[0]);
-  sphereGrad.append("stop").attr("offset", "70%").attr("stop-color", COL.sphere[1]);
-  sphereGrad.append("stop").attr("offset", "100%").attr("stop-color", COL.sphere[2]);
-  const landGrad = defs.append("radialGradient").attr("id", "tg-lnd").attr("cx", "42%").attr("cy", "32%").attr("r", "80%");
-  landGrad.append("stop").attr("offset", "0%").attr("stop-color", COL.land[0]);
-  landGrad.append("stop").attr("offset", "100%").attr("stop-color", COL.land[1]);
-  const rim = defs.append("radialGradient").attr("id", "tg-rim").attr("cx", "50%").attr("cy", "50%").attr("r", "50%");
-  rim.append("stop").attr("offset", "86%").attr("stop-color", "rgba(45,212,191,0)");
-  rim.append("stop").attr("offset", "100%").attr("stop-color", "rgba(45,212,191,.35)");
-  const glow = defs.append("filter").attr("id", "tg-glow").attr("x", "-50%").attr("y", "-50%").attr("width", "200%").attr("height", "200%");
-  glow.append("feGaussianBlur").attr("stdDeviation", 10);
-  const g = svg.append("g");
-  const sphere = g.append("path").attr("fill", "url(#tg-sph)");
-  const grat = g.append("path").attr("fill", "none").attr("stroke", "rgba(255,255,255,.045)").attr("stroke-width", 1);
-  const landP = g.append("path").attr("fill", "url(#tg-lnd)").attr("stroke", "rgba(203,213,225,.22)").attr("stroke-width", .8);
-  const rangesG = g.append("g");
-  const bord = g.append("path").attr("fill", "none").attr("stroke", "rgba(148,163,184,.28)").attr("stroke-width", .7).attr("stroke-dasharray", "2 3");
-  const citiesG = g.append("g"), routeG = g.append("g"), labelsG = g.append("g");
-  const rimP = g.append("path").attr("fill", "url(#tg-rim)").attr("pointer-events", "none");
+  const mapEl = $("map");
+  const map = new maplibregl.Map({
+    container: mapEl,
+    style: {
+      version: 8,
+      projection: { type: "globe" },
+      sources: {
+        surface: { type: "raster", tiles: [TILE_PROTOCOL + "://{z}/{x}/{y}"], tileSize: 256, minzoom: 0, maxzoom: MAX_TILE_Z },
+        land: { type: "geojson", data: feature(land) },
+        borders: { type: "geojson", data: feature(borders) },
+        graticule: { type: "geojson", data: feature(graticule) },
+      },
+      layers: [
+        { id: "sphere", type: "background", paint: { "background-color": COL.sphere[1] } },
+        { id: "surface", type: "raster", source: "surface", paint: { "raster-fade-duration": 200 } },
+        { id: "graticule", type: "line", source: "graticule", paint: { "line-color": "rgba(255,255,255,.045)", "line-width": 1 } },
+        { id: "land", type: "fill", source: "land", paint: { "fill-color": COL.land[0], "fill-antialias": false } },
+        { id: "coast", type: "line", source: "land", paint: { "line-color": "rgba(203,213,225,.22)", "line-width": 0.8 } },
+        { id: "borders", type: "line", source: "borders", paint: { "line-color": "rgba(148,163,184,.28)", "line-width": 0.7, "line-dasharray": [2, 3] } },
+      ],
+    },
+    center: WORLD_CENTER, zoom: 1, bearing: 0, pitch: 0, maxPitch: 0,
+    maxZoom: MAX_VIEW_Z,
+    attributionControl: false, // az attribúció a gömb láblécében áll (szolgáltató + Natural Earth)
+    dragRotate: false, pitchWithRotate: false, touchPitch: false, keyboard: false, doubleClickZoom: false, boxZoom: false,
+    fadeDuration: 0,
+  });
+  map.touchZoomRotate.disableRotation();
+  // a csempehibák (megszakított vagy újrapróba után is hibás csempe) nem konzolhibák; a felszín-hiba jelzését a protokoll adja
+  map.on("error", (e) => { if (e && (e.sourceId === "surface" || e.tile || (e.error && e.error.name === "AbortError"))) return; console.warn("[terepgomb] map:", e && e.error ? e.error.message : e); });
 
-  function visible(ll) { return d3.geoDistance(ll, [-state.rot[0], -state.rot[1]]) < Math.PI / 2 - 0.05; }
+  // ── SVG-réteg: gömbárnyék, perem, hegységek, városok, útvonal ────────────
+  const svgNode = (tag, attrs, parent) => { const n = document.createElementNS(SVG_NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; };
+  const defs = svgNode("defs", {}, svgEl);
+  const shade = svgNode("radialGradient", { id: "tg-shade", cx: "50%", cy: "50%", r: "50%", fx: "37.5%", fy: "35%", fr: "10%" }, defs);
+  svgNode("stop", { offset: "0%", "stop-color": "rgba(255,255,255,.06)" }, shade);
+  svgNode("stop", { offset: "80%", "stop-color": "rgba(6,11,22,0)" }, shade);
+  svgNode("stop", { offset: "100%", "stop-color": "rgba(6,11,22,.75)" }, shade);
+  const sphereGrad = svgNode("radialGradient", { id: "tg-sph", cx: "42%", cy: "32%", r: "75%" }, defs);
+  svgNode("stop", { offset: "0%", "stop-color": COL.sphere[0] }, sphereGrad);
+  svgNode("stop", { offset: "70%", "stop-color": "rgba(0,0,0,0)" }, sphereGrad);
+  const rim = svgNode("radialGradient", { id: "tg-rim", cx: "50%", cy: "50%", r: "50%" }, defs);
+  svgNode("stop", { offset: "86%", "stop-color": "rgba(45,212,191,0)" }, rim);
+  svgNode("stop", { offset: "100%", "stop-color": "rgba(45,212,191,.35)" }, rim);
+  const glow = svgNode("filter", { id: "tg-glow", x: "-50%", y: "-50%", width: "200%", height: "200%" }, defs);
+  svgNode("feGaussianBlur", { stdDeviation: 10 }, glow);
+  const g = svgNode("g", {}, svgEl);
+  const sphereLight = svgNode("circle", { fill: "url(#tg-sph)" }, g);
+  const shadeC = svgNode("circle", { fill: "url(#tg-shade)" }, g);
+  const rangesG = svgNode("g", {}, g), citiesG = svgNode("g", {}, g), routeG = svgNode("g", {}, g), labelsG = svgNode("g", {}, g);
+  const rimC = svgNode("circle", { fill: "url(#tg-rim)" }, g);
 
+  const projection = (ll) => { const p = map.project(ll); return [p.x, p.y]; };
+  const centerLL = () => { const c = map.getCenter(); return [c.lng, c.lat]; };
+  const occluded = (ll) => { const tr = map.transform; return typeof tr.isLocationOccluded === "function" ? tr.isLocationOccluded({ lng: ll[0], lat: ll[1] }) : geoDistance(ll, centerLL()) > Math.PI / 2; };
+  function visible(ll) { return !occluded(ll) && geoDistance(ll, centerLL()) < Math.PI / 2 - 0.05; }
+
+  // a gömb sugara pixelben (a MapLibre saját képlete: a nagyítás a középpont szélességén a síkvetítéssel egyező),
+  // és a látszó körvonal (perspektivikus kamera: a középpontból a kamera c távolságra van)
+  const globeRadius = (zoom, lat) => 512 * Math.pow(2, zoom) / (2 * Math.PI) / Math.cos(lat * Math.PI / 180);
+  const cameraDist = () => { const c = map.transform.cameraToCenterDistance; return Number.isFinite(c) && c > 0 ? c : 1.5 * height; };
+  const silhouette = (r, c) => c * r / Math.sqrt(c * c + 2 * c * r);
+  /** A nagyítás, amelynél a gömb látszó körvonala `s` pixel sugarú (a teljes bolygó nézethez). */
+  function zoomForSilhouette(s, lat) { const c = cameraDist(); const r = (s * s + s * Math.sqrt(s * s + c * c)) / c; return Math.log2(r * 2 * Math.PI * Math.cos(lat * Math.PI / 180) / 512); }
+  function zoomForScale(scale, lat) { return Math.log2(baseR * scale * 2 * Math.PI * Math.cos(lat * Math.PI / 180) / 512); }
+
+  let padTop = -1, adjusting = false;
   function layout() {
     width = app.clientWidth; height = app.clientHeight;
     // az alsó sáv (idő, évszakok, attribúció) valós magassága — szűk nézetben két-három sorra törik
     const bottomEl = app.querySelector(".tg-bottom"); bottomReserve = Math.max(170, bottomEl ? bottomEl.offsetHeight + 12 : 170);
     app.style.setProperty("--tg-bottom-h", (bottomEl ? bottomEl.offsetHeight : 150) + "px");
-    svg.attr("width", width).attr("height", height);
+    svgEl.setAttribute("width", String(width)); svgEl.setAttribute("height", String(height));
+    const canvas = map.getCanvas(); if (Math.abs(canvas.clientWidth - width) > 1 || Math.abs(canvas.clientHeight - height) > 1) map.resize();
+    // a gömb középpontja a nézet 55%-án (mint korábban): felső kitöltés = 10% magasság
+    const wantPad = Math.round(height * 0.1); if (wantPad !== padTop && !map.isMoving()) { padTop = wantPad; map.setPadding({ top: wantPad, bottom: 0, left: 0, right: 0 }); }
     // analitikus illesztés: a fő túra-bbox (lon 13–21 × lat 46–49.5 ≈ 8° × 4°) kitölti a biztonságos sávot; px/fok a középen ≈ R·π/180
     const rad = Math.PI / 180;
-    // alsó korlát: kis vagy még méretezetlen konténerben a sugár nem lehet negatív (negatív SVG r konzolhibát ad)
     baseR = Math.max(1, Math.min((width - 80) / (8 * rad * Math.cos(48 * rad)), (height - 340) / (4.5 * rad)));
     floorR = Math.max(1, Math.min(width - 40, height - 340) / 2);
-    if (state.fit) state.scale = floorR / baseR;
-    R = Math.max(baseR * state.scale, floorR);
-    projection.scale(R).translate([width / 2, height * 0.55]).rotate([state.rot[0] + state.dx, state.rot[1] + state.dy, 0]);
-    // az SVG-utak a képernyő szélére vágva: nagy nagyításnál a gömb, a szárazföld és a határok egyébként több tízezer
-    // pixeles, képernyőn kívüli poligonok lennének, és a böngésző raszterizálása viszi el a képkockát (S40 zoom-javítás)
-    projection.clipExtent([[-40, -40], [width + 40, height + 40]]);
+    const lat = map.getCenter().lat, zoom = map.getZoom();
+    const fitZoom = zoomForSilhouette(floorR, lat);
+    // a teljes bolygónál kisebbre nem lehet kicsinyíteni (korábban: R ≥ floorR)
+    if (!adjusting && Math.abs(map.getMinZoom() - fitZoom) > 0.01) { adjusting = true; map.setMinZoom(Math.max(-2, fitZoom - 0.001)); adjusting = false; }
+    if (state.fit && !map.isMoving() && Math.abs(zoom - fitZoom) > 0.01) { adjusting = true; map.jumpTo({ zoom: fitZoom }); adjusting = false; }
+    R = globeRadius(map.getZoom(), lat); silR = silhouette(R, cameraDist());
+    state.scale = R / baseR;
+    const cp = map.project(map.getCenter()); gcx = cp.x; gcy = cp.y;
+  }
+
+  // az SVG-elemek kulcs szerinti újrahasznosítása (kevés elem, képkockánként)
+  function keyed(parent, items, key, create) {
+    const have = new Map(); for (const n of [...parent.children]) have.set(n.dataset.k, n);
+    const out = items.map((d) => { const k = key(d); let n = have.get(k); if (n) have.delete(k); else { n = create(d); n.dataset.k = k; } parent.appendChild(n); return [n, d]; });
+    for (const n of have.values()) n.remove();
+    return out;
   }
 
   function drawGeo() {
     const k = R / baseR;
-    sphere.attr("d", path({ type: "Sphere" })); rimP.attr("d", path({ type: "Sphere" }));
-    grat.attr("d", path(graticule())); landP.attr("d", path(land)); bord.attr("d", path(borders));
-    rangesG.selectAll("circle.halo").data(RANGES.filter((r) => visible(r.ll) && r.r * k < 260 && !interacting())).join("circle").attr("class", "halo")
-      .attr("cx", (d) => projection(d.ll)[0]).attr("cy", (d) => projection(d.ll)[1]).attr("r", (d) => d.r * k)
-      .attr("fill", `rgba(251,191,36,${Math.min(.12, .08 * k)})`).attr("filter", "url(#tg-glow)");
-    rangesG.selectAll("circle.core").data(RANGES.filter((r) => visible(r.ll) && r.r * k < 1200)).join("circle").attr("class", "core")
-      .attr("cx", (d) => projection(d.ll)[0]).attr("cy", (d) => projection(d.ll)[1]).attr("r", (d) => d.r * k * .45)
-      .attr("fill", "none").attr("stroke", "rgba(251,191,36,.35)").attr("stroke-width", 1).attr("stroke-dasharray", "1 4");
+    for (const c of [sphereLight, shadeC, rimC]) { c.setAttribute("cx", String(gcx)); c.setAttribute("cy", String(gcy)); c.setAttribute("r", String(silR)); }
+    sphereLight.setAttribute("opacity", anyLoaded ? "0" : "1");
+    const moving = interacting();
+    keyed(rangesG, RANGES.filter((r) => visible(r.ll) && r.r * k < 1200), (d) => d.n, () => { const gg = document.createElementNS(SVG_NS, "g"); svgNode("circle", { class: "halo", filter: "url(#tg-glow)" }, gg); svgNode("circle", { class: "core", fill: "none", stroke: "rgba(251,191,36,.35)", "stroke-width": 1, "stroke-dasharray": "1 4" }, gg); return gg; })
+      .forEach(([gg, d]) => { const [x, y] = projection(d.ll); const [halo, core] = gg.children;
+        const showHalo = d.r * k < 260 && !moving; halo.setAttribute("display", showHalo ? "inline" : "none");
+        if (showHalo) { halo.setAttribute("cx", x); halo.setAttribute("cy", y); halo.setAttribute("r", d.r * k); halo.setAttribute("fill", `rgba(251,191,36,${Math.min(.12, .08 * k)})`); }
+        core.setAttribute("cx", x); core.setAttribute("cy", y); core.setAttribute("r", d.r * k * .45); });
     const inChip = (x, y) => chipRects.some((r) => x > r.l && x < r.r && y > r.t && y < r.b);
-    citiesG.selectAll("g").data(CITIES.filter((c) => { if (!visible(c.ll) || k <= 0.8) return false; const [x, y] = projection(c.ll); return y > 140 && y < height - bottomReserve && !inChip(x, y); })).join((enter) => { const gg = enter.append("g"); gg.append("circle"); gg.append("text"); return gg; })
-      .each(function (d) { const [x, y] = projection(d.ll); const gg = d3.select(this); gg.select("circle").attr("cx", x).attr("cy", y).attr("r", 1.8).attr("fill", "rgba(203,213,225,.6)"); gg.select("text").attr("class", "city").attr("x", x + 5).attr("y", y + 3).text(d.n); });
+    keyed(citiesG, CITIES.filter((c) => { if (!visible(c.ll) || k <= 0.8) return false; const [x, y] = projection(c.ll); return y > 140 && y < height - bottomReserve && !inChip(x, y); }), (d) => d.n, (d) => { const gg = document.createElementNS(SVG_NS, "g"); svgNode("circle", { r: 1.8, fill: "rgba(203,213,225,.6)" }, gg); const tx = svgNode("text", { class: "city" }, gg); tx.textContent = d.n; return gg; })
+      .forEach(([gg, d]) => { const [x, y] = projection(d.ll); gg.children[0].setAttribute("cx", x); gg.children[0].setAttribute("cy", y); gg.children[1].setAttribute("x", x + 5); gg.children[1].setAttribute("y", y + 3); });
     const labels = [...RANGES.filter((r) => !r.minK || k > r.minK).map((r) => ({ ...r, cls: "range", dy: r.below ? r.r * k * .5 + 12 : -r.r * k * .5 - 4 }))].filter((l) => visible(l.ll) && k > 0.6).filter((l) => { const [x, y] = projection(l.ll); const yy = y + l.dy; return yy > 140 && yy < height - bottomReserve && !inChip(x, yy); });
     labels.sort((a, b) => (b.r || 0) - (a.r || 0)); const kept = [];
     labels.forEach((l) => { const [x, y] = projection(l.ll); const yy = y + l.dy; if (!kept.some((o) => Math.abs(o.x - x) < (o.n.length + l.n.length) * 3.6 && Math.abs(o.yy - yy) < 14)) kept.push({ ...l, x, yy }); });
-    labelsG.selectAll("text").data(kept, (d) => d.n).join("text").attr("class", (d) => "geo-label " + d.cls).attr("text-anchor", "middle")
-      .attr("x", (d) => projection(d.ll)[0]).attr("y", (d) => projection(d.ll)[1] + d.dy).text((d) => d.n);
+    keyed(labelsG, kept, (d) => d.n, (d) => { const tx = svgNode("text", { class: "geo-label " + d.cls, "text-anchor": "middle" }); tx.textContent = d.n; return tx; })
+      .forEach(([tx, d]) => { tx.setAttribute("x", d.x); tx.setAttribute("y", d.yy); });
     drawRoute(k);
   }
 
@@ -287,48 +284,52 @@ export async function mountGlobe(root, opts) {
     const pts = ROUTES[tr.id];
     const cs = pts ? pts.map((p) => [p[1], p[2]]) : [tr.ll];
     const lons = cs.map((c) => c[0]), lats = cs.map((c) => c[1]);
-    state.rot = [-(Math.min(...lons) + Math.max(...lons)) / 2, -(Math.min(...lats) + Math.max(...lats)) / 2, 0];
-    if (pts && pts.length > 1) {
-      const clat2 = (Math.min(...lats) + Math.max(...lats)) / 2;
-      const spanX = (Math.max(...lons) - Math.min(...lons)) * Math.cos(clat2 * Math.PI / 180), spanY = Math.max(...lats) - Math.min(...lats);
-      const narrow = width <= 720;
-      // szabad terület: széles nézetben a kártya melletti sáv, szűkben a lap fölötti sáv — a kártya valós méretéből
-      const hostR = app.getBoundingClientRect(), cr = cardEl.getBoundingClientRect();
-      const sheetTop = cr.height ? cr.top - hostR.top : height - bottomReserve - Math.min(height * .45, Math.max(0, height - 340));
-      const freeTop = 150;
-      const availX = narrow ? Math.max(200, width - 60) : Math.max(240, width - 120 - 340);
-      const availY = narrow ? Math.max(90, sheetTop - freeTop) : Math.max(200, height - 320);
-      const spanDeg = Math.max(spanX / Math.max(.2, availX / availY), spanY, 0.05);
-      const want = availY * (narrow ? .70 : .62);
-      state.fit = false; state.scale = Math.max(.12, Math.min(80, (want / (spanDeg * Math.PI / 180)) / baseR));
-      const Rn = Math.max(baseR * state.scale, floorR);
-      const clon2 = (Math.min(...lons) + Math.max(...lons)) / 2;
-      if (narrow) {
-        const dLat = ((height * 0.55) - (freeTop + sheetTop) / 2) / Rn * 180 / Math.PI;
-        state.rot = [-clon2, -(clat2 - dLat), 0];
-      } else {
-        const dLon = (170 / Rn) * 180 / Math.PI / Math.max(.2, Math.cos(clat2 * Math.PI / 180));
-        state.rot = [-(clon2 + dLon), -clat2, 0];
-      }
-    }
+    const minLon = Math.min(...lons), maxLon = Math.max(...lons), minLat = Math.min(...lats), maxLat = Math.max(...lats);
+    const duration = matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 450;
+    if (!(pts && pts.length > 1)) { map.easeTo({ center: [(minLon + maxLon) / 2, (minLat + maxLat) / 2], duration }); return; }
+    const narrow = width <= 720;
+    // szabad terület: széles nézetben a kártya melletti sáv, szűkben a lap fölötti sáv — a kártya valós méretéből
+    const hostR = app.getBoundingClientRect(), cr = cardEl.getBoundingClientRect();
+    const sheetTop = cr.height ? cr.top - hostR.top : height - bottomReserve - Math.min(height * .45, Math.max(0, height - 340));
+    const freeTop = 150;
+    const box = narrow
+      ? { top: freeTop, bottom: Math.max(freeTop + 90, sheetTop), left: 30, right: width - 30 }
+      : { top: freeTop, bottom: Math.max(freeTop + 200, height - 170), left: 60, right: Math.max(300, width - 60 - 340) };
+    // a nyomvonal a szabad terület ~62–70%-át töltse ki (mint korábban)
+    const fill = narrow ? .70 : .62, bw = box.right - box.left, bh = box.bottom - box.top;
+    const padding = { top: box.top + bh * (1 - fill) / 2, bottom: height - box.bottom + bh * (1 - fill) / 2, left: box.left + bw * (1 - fill) / 2, right: width - box.right + bw * (1 - fill) / 2 };
+    padding.top -= padTop; // a térkép saját felső kitöltése már eltolja a középpontot
+    const cam = map.cameraForBounds([[minLon, minLat], [maxLon, maxLat]], { padding, maxZoom: MAX_VIEW_Z });
+    state.fit = false;
+    if (cam) map.easeTo({ center: cam.center, zoom: cam.zoom, bearing: 0, duration });
+  }
+
+  function zoomToCluster(cl) {
+    state.fit = false;
+    const lat = cl.ll[1], want = Math.max(map.getZoom() + 1, zoomForScale(2, lat));
+    map.easeTo({ center: cl.ll, zoom: Math.min(MAX_VIEW_Z, want), duration: matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 450 });
   }
 
   function drawRoute(k) {
     const tr = TRIPS.find((t) => t.id === state.selected);
     const pts = tr && ROUTES[tr.id];
-    if (!pts) { routeG.selectAll("*").remove(); return; }
+    if (!pts) { routeG.replaceChildren(); return; }
     const col = catOf(tr.cat).color;
-    const line = { type: "LineString", coordinates: pts.map((p) => [p[1], p[2]]) };
-    const sel = routeG.selectAll("g.route").data([tr.id]).join((enter) => {
-      const gg = enter.append("g").attr("class", "route");
-      gg.append("path").attr("class", "halo"); gg.append("path").attr("class", "core"); gg.append("g").attr("class", "stops");
-      return gg;
-    });
-    sel.select("path.halo").attr("d", path(line)).attr("fill", "none").attr("stroke", col).attr("stroke-opacity", .22)
-      .attr("stroke-width", Math.max(4, Math.min(14, 8 * k))).attr("stroke-linecap", "round").attr("stroke-linejoin", "round").attr("filter", "url(#tg-glow)");
-    sel.select("path.core").attr("d", path(line)).attr("fill", "none").attr("stroke", col)
-      .attr("stroke-width", Math.max(1.6, Math.min(4.5, 2.6 * k))).attr("stroke-linecap", "round").attr("stroke-linejoin", "round")
-      .attr("stroke-dasharray", `${Math.max(7, 11 * k)} ${Math.max(5, 7 * k)}`);
+    if (routeG.dataset.trip !== tr.id) {
+      routeG.replaceChildren(); routeG.dataset.trip = tr.id;
+      svgNode("path", { class: "halo", fill: "none", stroke: col, "stroke-opacity": .22, "stroke-linecap": "round", "stroke-linejoin": "round", filter: "url(#tg-glow)" }, routeG);
+      svgNode("path", { class: "core", fill: "none", stroke: col, "stroke-linecap": "round", "stroke-linejoin": "round" }, routeG);
+      svgNode("g", { class: "stops" }, routeG);
+    }
+    const [haloP, coreP, stopsG] = routeG.children;
+    // a vonal a horizontnál megszakad (a takart pontok között nincs szakasz)
+    let d = "", pen = false;
+    for (const p of pts) { const ll = [p[1], p[2]]; if (!visible(ll)) { pen = false; continue; } const [x, y] = projection(ll); d += (pen ? "L" : "M") + x.toFixed(1) + " " + y.toFixed(1); pen = true; }
+    haloP.setAttribute("d", d); coreP.setAttribute("d", d);
+    haloP.setAttribute("stroke-width", Math.max(4, Math.min(14, 8 * k)));
+    coreP.setAttribute("stroke-width", Math.max(1.6, Math.min(4.5, 2.6 * k)));
+    // a szaggatás mérete felül korlátos: nagy nagyításnál különben egy-egy szakasz több száz pixel lenne, és a vonal „félbeszakadtnak” látszana
+    coreP.setAttribute("stroke-dasharray", `${Math.min(22, Math.max(7, 11 * k))} ${Math.min(14, Math.max(5, 7 * k))}`);
     const seen = new Set();
     const all = pts.map((p, i) => ({ n: p[0], ll: [p[1], p[2]], i, last: i === pts.length - 1 }))
       .filter((s) => visible(s.ll)).map((s) => { const [x, y] = projection(s.ll); return { ...s, x, y }; });
@@ -343,20 +344,16 @@ export async function mountGlobe(root, opts) {
       if (!labelled.some((o) => Math.abs(o.x - s.x) < half + o.n.length * fs * .3 && Math.abs(o.y - s.y) < fs + 5)) labelled.push(s); });
     else if (stops.length) labelled.push(stops[0]);
     const lset = new Set(labelled.map((s) => s.i));
-    sel.select("g.stops").selectAll("g.stop").data(stops, (d) => d.i).join((enter) => {
-      const gg = enter.append("g").attr("class", "stop");
-      gg.append("circle").attr("class", "ring"); gg.append("circle").attr("class", "dot"); gg.append("text").attr("class", "sl");
-      return gg;
-    }).each(function (d) {
-      const gg = d3.select(this), first = d.i === 0;
-      const r = first || d.last ? rBase * 1.35 : rBase;
-      gg.select("circle.ring").attr("cx", d.x).attr("cy", d.y).attr("r", r + Math.max(2.5, rBase * .7)).attr("fill", "none").attr("stroke", col).attr("stroke-opacity", first ? .85 : .4).attr("stroke-width", 1.2);
-      gg.select("circle.dot").attr("cx", d.x).attr("cy", d.y).attr("r", r).attr("fill", first ? col : COL.stopInk).attr("stroke", col).attr("stroke-width", 1.6);
-      gg.select("text.sl").attr("x", d.x).attr("y", d.y - r - Math.max(6, fs * .62)).attr("text-anchor", "middle")
-        .attr("font-family", "IBM Plex Mono, monospace").attr("font-size", fs)
-        .attr("fill", COL.label).attr("stroke", "rgba(6,11,22,.85)").attr("stroke-width", Math.max(2.5, fs * .28)).attr("paint-order", "stroke")
-        .attr("opacity", lset.has(d.i) ? 1 : 0).text(d.n);
-    });
+    keyed(stopsG, stops, (s) => String(s.i), () => { const gg = document.createElementNS(SVG_NS, "g"); svgNode("circle", { class: "ring", fill: "none" }, gg); svgNode("circle", { class: "dot" }, gg); svgNode("text", { class: "sl", "text-anchor": "middle", "font-family": "IBM Plex Mono, monospace", "paint-order": "stroke" }, gg); return gg; })
+      .forEach(([gg, s]) => {
+        const first = s.i === 0, r = first || s.last ? rBase * 1.35 : rBase;
+        const [ring, dot, text] = gg.children;
+        ring.setAttribute("cx", s.x); ring.setAttribute("cy", s.y); ring.setAttribute("r", r + Math.max(2.5, rBase * .7)); ring.setAttribute("stroke", col); ring.setAttribute("stroke-opacity", first ? .85 : .4); ring.setAttribute("stroke-width", 1.2);
+        dot.setAttribute("cx", s.x); dot.setAttribute("cy", s.y); dot.setAttribute("r", r); dot.setAttribute("fill", first ? col : COL.stopInk); dot.setAttribute("stroke", col); dot.setAttribute("stroke-width", 1.6);
+        text.setAttribute("x", s.x); text.setAttribute("y", s.y - r - Math.max(6, fs * .62)); text.setAttribute("font-size", fs);
+        text.setAttribute("fill", COL.label); text.setAttribute("stroke", "rgba(6,11,22,.85)"); text.setAttribute("stroke-width", Math.max(2.5, fs * .28));
+        text.setAttribute("opacity", lset.has(s.i) ? 1 : 0); text.textContent = s.n;
+      });
   }
 
   // csak http(s) kép-URL mehet a kártyába (a borítókép a túra adatából jön)
@@ -396,11 +393,11 @@ export async function mountGlobe(root, opts) {
       const a = vis[i], b = vis[j]; if (!(a.mid && b.mid)) continue;
       if (Math.abs(a.x - b.x) < 220 && Math.abs(a.y - b.y) < 46) { if (!a.side) a.side = b.side === 1 ? -1 : 1; else if (a.stem < 90) a.stem = Math.min(90, a.stem + 44); }
     }
-    vis.forEach((p) => { p.stem = Math.min(90, p.stem); const top = p.y - p.stem - 38; if (top < 140) p.stem = Math.max(12, p.y - 178); const edge = Math.min(300, width * .3); if (p.x < 40) p.hideLabel = true; else if (p.x < edge) p.side = 1; else if (p.x > width - edge) p.side = -1; p.hideLabel = p.hideLabel || p.y - p.stem - 38 > height - bottomReserve - 30 || p.y > height - bottomReserve || (state.scale < .45 && !p.near && !p.sel && d3.geoDistance(p.tr.ll, [-state.rot[0], -state.rot[1]]) < 0.35); });
+    vis.forEach((p) => { p.stem = Math.min(90, p.stem); const top = p.y - p.stem - 38; if (top < 140) p.stem = Math.max(12, p.y - 178); const edge = Math.min(300, width * .3); if (p.x < 40) p.hideLabel = true; else if (p.x < edge) p.side = 1; else if (p.x > width - edge) p.side = -1; p.hideLabel = p.hideLabel || p.y - p.stem - 38 > height - bottomReserve - 30 || p.y > height - bottomReserve || (state.scale < .45 && !p.near && !p.sel && geoDistance(p.tr.ll, centerLL()) < 0.35); });
     const clusterEls = clusters.map((grp) => {
-      const cx = d3.mean(grp, (q) => q.x), cy = d3.mean(grp, (q) => q.y), near = grp.some((q) => q.near);
+      const cx = mean(grp, (q) => q.x), cy = mean(grp, (q) => q.y), near = grp.some((q) => q.near);
       const uniq = [...new Set(grp.map((q) => q.tr.place.split(",")[0]))]; const names = uniq.slice(0, 2).join(" · ") + (grp.length > 2 ? " · +" + (grp.length - 2) : "");
-      const ll = [d3.mean(grp, (q) => q.tr.ll[0]), d3.mean(grp, (q) => q.tr.ll[1])];
+      const ll = [mean(grp, (q) => q.tr.ll[0]), mean(grp, (q) => q.tr.ll[1])];
       return { cx, cy, near, names, n: grp.length, ll, colors: grp.map((q) => q.c.color), stem: 40, side: 0 };
     });
     clusterEls.sort((a, b) => a.cy - b.cy);
@@ -451,7 +448,7 @@ export async function mountGlobe(root, opts) {
       const label = T.tripsCount.replace("{count}", String(cl.n));
       el.innerHTML = `<div class="stem" style="height:${cl.stem}px;left:${cl.side === 1 ? "8%" : cl.side === -1 ? "92%" : "50%"};background:linear-gradient(180deg,var(--dark-primary),transparent)"></div>
         <div class="lbl tg-cluster" style="margin-bottom:${cl.stem}px;border-color:var(--dark-primary)"><span class="tg-cluster-dots">${cl.colors.slice(0, 4).map((c) => `<span class="dot" style="background:${c}"></span>`).join("")}</span><b>${esc(label)}</b><small class="mono tg-cluster-names">${esc(cl.names)}</small><small class="mono tg-cluster-zoom">⤢</small></div>`;
-      pinBtn(el.querySelector(".lbl"), `${label} — ${cl.names}`, () => { state.rot = [-cl.ll[0], -cl.ll[1], 0]; state.fit = false; state.scale = Math.max(state.scale * 2, 2); render(); });
+      pinBtn(el.querySelector(".lbl"), `${label} — ${cl.names}`, () => zoomToCluster(cl));
       pinsEl.appendChild(el);
     });
     const host = app.getBoundingClientRect();
@@ -524,39 +521,32 @@ export async function mountGlobe(root, opts) {
     seasonsEl.querySelectorAll(".chip").forEach((el) => { const on = Math.abs(state.t - +el.dataset.t) < 3; el.classList.toggle("on", on); el.setAttribute("aria-pressed", on ? "true" : "false"); });
   }
 
-  // ── gesztusok: forgatás / csippentés / görgetés ──────────────────────────
-  const ptrs = new Map(); let pan = null, pinch = null;
-  const globeEl = $("globe");
-  globeEl.addEventListener("pointerdown", (e) => { ptrs.set(e.pointerId, [e.clientX, e.clientY]); globeEl.setPointerCapture(e.pointerId); globeEl.classList.add("drag"); state.dragging = true;
-    if (ptrs.size === 1) pan = { x: e.clientX, y: e.clientY, rot: [...state.rot], moved: false };
-    if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), s: state.scale }; } });
-  globeEl.addEventListener("pointermove", (e) => { if (!ptrs.has(e.pointerId)) return; ptrs.set(e.pointerId, [e.clientX, e.clientY]);
-    if (ptrs.size === 2 && pinch) { const [a, b] = [...ptrs.values()]; markZooming(); state.fit = false; state.scale = Math.max(.12, Math.min(80, pinch.s * Math.hypot(a[0] - b[0], a[1] - b[1]) / pinch.d)); render(); }
-    else if (ptrs.size === 1 && pan) { const k = 90 / R; const dx = e.clientX - pan.x, dy = e.clientY - pan.y; if (Math.hypot(dx, dy) > 4) pan.moved = true;
-      state.rot = [pan.rot[0] + dx * k, Math.max(-85, Math.min(85, pan.rot[1] - dy * k)), 0]; render(); } });
-  const up = (e) => { ptrs.delete(e.pointerId); if (ptrs.size < 2) pinch = null; if (ptrs.size === 0) { if (pan && !pan.moved && state.selected) { state.selected = null; render(); } pan = null; state.dragging = false; globeEl.classList.remove("drag"); render(); } };
-  globeEl.addEventListener("pointerup", up); globeEl.addEventListener("pointercancel", up);
-  globeEl.addEventListener("wheel", (e) => { e.preventDefault(); markZooming(); state.fit = false; const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY; state.scale = Math.max(.12, Math.min(80, state.scale * Math.exp(-Math.max(-120, Math.min(120, dy)) * 0.0016))); /* a görgetés mértékével arányos: trackpadon finom, egérgörgőn ~17%/kattanás */ render(); }, { passive: false });
-  // gyro (telefonon a készülék döntése)
-  const onOrient = (e) => { if (e.gamma == null) return; state.dx = Math.max(-8, Math.min(8, e.gamma / 4)); state.dy = Math.max(-6, Math.min(6, (e.beta - 45) / 8)); render(); };
+  // ── gesztusok: a forgatás, csippentés és görgetés a MapLibre-é ───────────
+  let userMoving = false;
+  map.on("movestart", (e) => { if (e.originalEvent) { userMoving = true; mapEl.classList.add("drag"); } });
+  map.on("zoomstart", (e) => { if (e.originalEvent) state.fit = false; });
+  map.on("moveend", () => { if (userMoving) { userMoving = false; mapEl.classList.remove("drag"); if (state.gyro) gyroBase = centerLL(); } render(); });
+  map.on("move", () => { if (!adjusting) render(); });
+  // üres gömbfelületre koppintás: a kiválasztás megszűnik (húzás után nincs click esemény)
+  map.on("click", () => { if (state.selected) { state.selected = null; render(); } });
+  // gyro (telefonon a készülék döntése) — a nézet a bekapcsoláskori középpont körül billen
+  let gyroBase = null;
+  const onOrient = (e) => { if (e.gamma == null || !gyroBase || userMoving) return; const dx = Math.max(-8, Math.min(8, e.gamma / 4)), dy = Math.max(-6, Math.min(6, (e.beta - 45) / 8)); map.jumpTo({ center: [gyroBase[0] - dx, Math.max(-85, Math.min(85, gyroBase[1] - dy))] }); };
   const gyroBtn = $("gyro");
   gyroBtn.addEventListener("click", async function () {
-    if (state.gyro) { window.removeEventListener("deviceorientation", onOrient); state.gyro = false; state.dx = state.dy = 0; this.classList.remove("on"); this.setAttribute("aria-pressed", "false"); render(); return; }
+    if (state.gyro) { window.removeEventListener("deviceorientation", onOrient); state.gyro = false; if (gyroBase) map.jumpTo({ center: gyroBase }); gyroBase = null; this.classList.remove("on"); this.setAttribute("aria-pressed", "false"); render(); return; }
     try { if (typeof DeviceOrientationEvent !== "undefined" && DeviceOrientationEvent.requestPermission) { if (await DeviceOrientationEvent.requestPermission() !== "granted") return; } } catch (_) {}
-    window.addEventListener("deviceorientation", onOrient); state.gyro = true; this.classList.add("on"); this.setAttribute("aria-pressed", "true");
+    gyroBase = centerLL(); window.addEventListener("deviceorientation", onOrient); state.gyro = true; this.classList.add("on"); this.setAttribute("aria-pressed", "true");
   });
-  $("world").addEventListener("click", () => { state.rot = WORLD_ROT.slice(); state.selected = null; state.fit = true; render(); });
-  $("reset").addEventListener("click", () => { state.rot = WORLD_ROT.slice(); state.fit = true; state.selected = null; state.t = 3; render(); }); // vissza a kezdőnézetre
+  const worldView = () => { state.fit = true; map.jumpTo({ center: WORLD_CENTER, zoom: zoomForSilhouette(floorR, WORLD_CENTER[1]) }); if (state.gyro) gyroBase = centerLL(); };
+  $("world").addEventListener("click", () => { state.selected = null; worldView(); render(); });
+  $("reset").addEventListener("click", () => { state.selected = null; state.t = 3; worldView(); render(); }); // vissza a kezdőnézetre
 
-  // Rajzolás képkockánként legfeljebb egyszer (requestAnimationFrame); interakció közben durva felszín,
-  // megállás után 160 ms-mal éles felszín és csempekérés.
-  let reliefTimer = null, painted = false, zooming = false, zoomTO = null, rafId = 0;
-  function interacting() { return state.dragging || scrubbing || zooming; }
-  function markZooming() { zooming = true; clearTimeout(zoomTO); zoomTO = setTimeout(() => { zooming = false; render(); }, 160); }
+  // Rajzolás képkockánként legfeljebb egyszer (requestAnimationFrame): a DOM/SVG réteg a térkép mozgását követi.
+  let painted = false, rafId = 0;
+  function interacting() { return scrubbing || map.isMoving(); }
   function renderNow() {
     rafId = 0; if (destroyed || app.clientWidth === 0 || app.clientHeight === 0) return; painted = true; layout();
-    const fast = interacting(); projection.precision(fast ? 2.5 : 0.7); drawRelief(fast);
-    if (fast && !zooming) { clearTimeout(reliefTimer); reliefTimer = setTimeout(() => { if (!interacting()) render(); }, 160); }
     drawPins(); drawGeo(); renderTime();
   }
   function render() { if (destroyed || rafId) return; rafId = requestAnimationFrame(renderNow); }
@@ -564,9 +554,12 @@ export async function mountGlobe(root, opts) {
   window.addEventListener("resize", render);
   const ro = new ResizeObserver(() => render()); ro.observe(app);
   renderTokens();
+  map.once("load", () => { const loadingEl = $("loading"); if (loadingEl) loadingEl.remove(); render(); });
   let tickTO = null; const tick = () => { if (!painted) { render(); tickTO = setTimeout(tick, 100); } }; tick();
   window.addEventListener("load", render); window.addEventListener("pageshow", render); document.addEventListener("visibilitychange", onVisibility);
   const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) render(); }); io.observe(app);
+  // a kezdőnézet a konténer méretéből (a teljes bolygó)
+  if (app.clientWidth && app.clientHeight) { layout(); worldView(); }
 
   return {
     /** A szűrt túrakészlet cseréje újramountolás nélkül (a Discover szűrői, nyelvváltás). */
@@ -577,11 +570,12 @@ export async function mountGlobe(root, opts) {
     },
     frameTrip(id) { const tr = TRIPS.find((t) => t.id === id); if (!tr) return; state.selected = tr.id; state.t = tw(tr); frameRoute(tr); render(); },
     destroy() {
-      destroyed = true; tileQueue = []; if (rafId) cancelAnimationFrame(rafId); clearTimeout(zoomTO);
-      clearTimeout(tickTO); clearTimeout(reliefTimer); if (reliefTO) clearTimeout(reliefTO);
+      destroyed = true; if (rafId) cancelAnimationFrame(rafId);
+      clearTimeout(tickTO);
       ro.disconnect(); io.disconnect();
       window.removeEventListener("resize", render); window.removeEventListener("load", render); window.removeEventListener("pageshow", render);
       window.removeEventListener("deviceorientation", onOrient); document.removeEventListener("visibilitychange", onVisibility);
+      map.remove();
     },
   };
 }

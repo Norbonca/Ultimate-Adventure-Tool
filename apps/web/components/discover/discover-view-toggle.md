@@ -140,7 +140,7 @@ tokenek (PLAN-011).
 ## Teljesítmény
 
 A `GlobeDiscover` dinamikus importtal töltődik, `ssr: false` mellett, és a
-renderert (`terepgomb.js`, d3-geo + topojson) csak akkor tölti be, amikor a
+renderert (`terepgomb.js`, MapLibre GL JS + topojson) csak akkor tölti be, amikor a
 gömb nézet aktív — a lista nézet nem fizet érte. A renderelés
 eseményvezérelt: nincs animációs hurok; a gömb húzásra, görgetésre,
 méretváltásra és a lap előtérbe kerülésekor rajzol újra, kigörgetve
@@ -150,6 +150,8 @@ Automatikus forgás nincs; a gyro (eszköz-tájolás) csak kérésre kapcsol be.
 **Oldalháttér gömb nézetben** (Norbert, 2026-09-15): a Felfedezés oldal a gömb éjszakai hátterét veszi fel (`--globe-space-bottom`), a gömb a fejléc alatt szélétől szélig fut, lekerekítés és világos keret nélkül; a találatszám és a nézetváltó sötét változatot kap. Lista és lista nézetben az oldal világos marad.
 
 **Kezdőnézet: a teljes bolygó** (Norbert, 2026-09-15): a gömb a teljes földgolyóval indul (Európa–Afrika középpel), mert a közép-európai ráközelítés induláskor nem érthető. A „Teljes bolygó” és a „Nézet vissza” gomb is ide tér vissza; a „Nézet vissza” a kiválasztást és az idővonalat is alaphelyzetbe teszi.
+
+**Motor: MapLibre GL JS 5, gömbvetítés (2026-09-15, Norbert: „az engine változik, a design nem”).** A felszínt (csempék), a szárazföldet, a partvonalat, a határokat és a fokhálózatot a GPU rajzolja; a csempék éjszakai tónusa csempénként egyszer, betöltéskor készül (`addProtocol`). Fölötte változatlan DOM/SVG-réteg: zászlók, klaszterek, kártya, tokenek, idővonal, hegység- és városfeliratok, útvonal és a gömb árnyéka/pereme; ezek a `map.project` szerint követik a gömböt. A forgatás, a csippentés és a görgetés a MapLibre kezelőié (forgatás a függőleges tengely körül és döntés kikapcsolva). A korábbi CPU-s renderer (pixelenkénti inverz vetítés) alább, történeti leírásként.
 
 A felszín Web Mercator csempékből épül (`lib/globe-tiles.ts`,
 `NEXT_PUBLIC_GLOBE_TILES=eox|gibs`; alap: **EOX Sentinel-2 cloudless**, max.

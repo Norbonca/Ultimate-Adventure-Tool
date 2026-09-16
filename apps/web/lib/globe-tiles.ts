@@ -1,8 +1,8 @@
 /**
  * Surface tiles for the Terepgömb (3D globe) — provider table.
  *
- * The renderer inverse-projects every screen pixel onto Web Mercator tiles, so
- * any XYZ/WMTS source in EPSG:3857 works. Which one is used is a licence
+ * The renderer (MapLibre GL JS, globe projection) draws Web Mercator tiles on
+ * the GPU, so any XYZ/WMTS source in EPSG:3857 with CORS enabled works. Which one is used is a licence
  * question, not a rendering one, and that is why it lives here and not in the
  * renderer:
  *
