@@ -5,18 +5,22 @@
  * Contract: components/discover/discover-view-toggle.md
  */
 
-export const DISCOVER_VIEW_COOKIE = 'trevu-discover-view';
+/**
+ * v2 (2026-09-16): a csempés nézet visszakerült és ez az alapértelmezés. A cookie neve új,
+ * hogy a 1b-s átállás alatt mentett `list`/`globe` választás ne takarja el a csempéket.
+ */
+export const DISCOVER_VIEW_COOKIE = 'trevu-discover-view-v2';
 
 /**
- * 2026-09-15 (Brand Guide v2 „Éjszakai túra”): a kártyarács megszűnt, a lista
- * borítós sávokból áll — a nézetváltó „3D gömb | Lista” (design/D02_Trip_Management.pen#H1rRQE).
+ * Nézetek: csempe (rács) — alapértelmezés, 3D gömb, lista (borítós sávok).
+ * Norbert döntése 2026-09-16: „legyen az eredeti csempés a nyitónézet, választható a 3D és a lista”.
  */
-export const DISCOVER_VIEWS = ['globe', 'list'] as const;
+export const DISCOVER_VIEWS = ['grid', 'globe', 'list'] as const;
 
 export type DiscoverView = (typeof DISCOVER_VIEWS)[number];
 
-/** The globe is the default entry point to Discover. */
-export const DEFAULT_DISCOVER_VIEW: DiscoverView = 'globe';
+/** A csempés nézet a Discover belépő nézete. */
+export const DEFAULT_DISCOVER_VIEW: DiscoverView = 'grid';
 
 /** One year — the choice is a lasting preference, not a session detail. */
 export const DISCOVER_VIEW_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
@@ -25,12 +29,8 @@ export function isDiscoverView(value: unknown): value is DiscoverView {
   return typeof value === 'string' && (DISCOVER_VIEWS as readonly string[]).includes(value);
 }
 
-/**
- * A cookie értékéből a megjelenítendő nézet. A korábbi `grid` választás a lista
- * nézetre esik (az a rács utódja), minden más ismeretlen érték az alapértelmezésre.
- */
+/** A cookie értékéből a megjelenítendő nézet; ismeretlen érték az alapértelmezésre esik. */
 export function parseDiscoverView(value: unknown): DiscoverView {
-  if (value === 'grid') return 'list';
   return isDiscoverView(value) ? value : DEFAULT_DISCOVER_VIEW;
 }
 

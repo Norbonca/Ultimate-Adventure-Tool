@@ -1116,6 +1116,7 @@ const hu = {
     allTrips: "Összes túra",
     tripsAvailable: "{count} túra elérhető",
     noTripsYet: "Még nincsenek túrák",
+    gridView: "Csempék",
     listView: "Lista nézet",
     globeView: "Gömb nézet",
     viewToggleLabel: "Nézet kiválasztása",

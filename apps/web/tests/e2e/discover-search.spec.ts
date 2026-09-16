@@ -13,7 +13,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Discover — hero search', () => {
   test.beforeEach(async ({ page, context, baseURL }) => {
     await context.addCookies([
-      { name: 'trevu-discover-view', value: 'list', url: baseURL ?? 'http://localhost:3000' },
+      { name: 'trevu-discover-view-v2', value: 'list', url: baseURL ?? 'http://localhost:3000' },
     ]);
     await page.goto('/');
     await expect(page.getByTestId('discover-hero-search')).toBeVisible();
