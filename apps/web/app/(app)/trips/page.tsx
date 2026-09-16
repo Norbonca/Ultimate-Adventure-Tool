@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { fetchMyTrips } from "./actions";
+import { fetchMyDeletedTrips } from "./deletion-actions";
+import { DeletedTripsList } from "@/components/trip-forms/DeletedTripsList";
 import { CATEGORY_DISPLAY } from "@/lib/categories";
 import { getServerT, getServerLocale } from "@/lib/i18n/server";
 import type { TranslationKey } from "@uat/i18n";
@@ -28,7 +30,7 @@ export default async function MyTripsPage({
   }
 
   const { tab: tabParam, q } = await searchParams;
-  const trips = await fetchMyTrips();
+  const [trips, deletedTrips] = await Promise.all([fetchMyTrips(), fetchMyDeletedTrips()]);
   const { t } = await getServerT();
   const locale = await getServerLocale();
   const dateLocale = locale === "en" ? "en-US" : "hu-HU";
@@ -218,6 +220,7 @@ export default async function MyTripsPage({
                 );
               })
             )}
+            <DeletedTripsList trips={deletedTrips} />
           </div>
 
           {/* ── Jobb sáv ── */}

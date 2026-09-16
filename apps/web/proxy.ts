@@ -53,6 +53,18 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // US-M01-017: a törlésre váró fiók a türelmi időben először a visszaállító oldalt kapja
+  // (D01 `RbzSn` C). Csak védett oldalon kérdezzük, hogy a publikus oldalak ne lassuljanak.
+  if (user && isProtected && !isPublicAdmin) {
+    const { data } = await supabase.rpc("account_deletion_status").maybeSingle();
+    if ((data as { pending_deletion?: boolean } | null)?.pending_deletion) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/account-restore";
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
+  }
+
   return supabaseResponse;
 }
 

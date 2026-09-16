@@ -22,3 +22,5 @@ export { OptionChip } from "./OptionChip";
 export type { OptionChipProps } from "./OptionChip";
 export { FilterSheet } from "./FilterSheet";
 export type { FilterSheetProps } from "./FilterSheet";
+export { Dialog } from "./Dialog";
+export type { DialogProps, DialogTone } from "./Dialog";

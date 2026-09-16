@@ -33,6 +33,7 @@ export default function LoginPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [deletionScheduled, setDeletionScheduled] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
@@ -47,6 +48,8 @@ export default function LoginPage() {
         if (d?.authenticated) {
           router.push("/dashboard");
         } else {
+          // US-M01-017: a fiók törlésének kérése után ide érkezik a kijelentkeztetett felhasználó.
+          setDeletionScheduled(new URLSearchParams(window.location.search).get("account") === "deletion-scheduled");
           setCheckingAuth(false);
         }
       })
@@ -124,6 +127,12 @@ export default function LoginPage() {
             <h2 className="text-2xl font-bold text-navy-900">{t('auth.loginTitle')}</h2>
             <LanguageSwitcher />
           </div>
+
+          {deletionScheduled && (
+            <div role="status" className="p-3 rounded-xl bg-trevu-50 border border-trevu-200 text-trevu-800 text-sm">
+              {t("account.restore.scheduledNotice")}
+            </div>
+          )}
 
           {error && (
             <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
