@@ -106,7 +106,6 @@ export default async function DiscoverPage() {
       difficultyLevels={DIFFICULTY_LEVELS}
       currentUser={currentUser}
       initialView={initialView}
-      today={new Date().toISOString().slice(0, 10)}
     />
   );
 }
