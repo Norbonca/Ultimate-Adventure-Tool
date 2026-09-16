@@ -8,6 +8,8 @@ import { getServerT, getServerLocale } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
 import { BackButton } from "@/components/BackButton";
 import { ApplyButton } from "@/components/ApplyButton";
+import { TripCancelledBanner } from "@/components/trip-forms/TripCancelledBanner";
+import { CANCELLATION_REASON_LABEL, type CancellationReason } from "@/lib/trip-deletion";
 import { Icon } from "@/components/Icon";
 import { formatParameterValue, type ParameterDisplayOption } from "@/lib/i18n/localized";
 import { formatLocalDate } from "@/lib/timezone";
@@ -146,6 +148,24 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
 
   const spotsLeft = trip.max_participants - (trip.current_participants || 0);
 
+  // BR-M02-009: a lemondott túra az okkal és a szervező üzenetével jelenik meg, jelentkezni nem lehet.
+  const isCancelled = trip.status === "cancelled";
+  const cancelledReason = trip.cancelled_reason as CancellationReason | null;
+  const cancelledMeta = isCancelled
+    ? [
+        trip.cancelled_at
+          ? t("trips.deletion.cancelledOn", {
+              date: new Date(trip.cancelled_at).toLocaleDateString(dateLocale, { year: "numeric", month: "long", day: "numeric" }),
+            })
+          : null,
+        cancelledReason && CANCELLATION_REASON_LABEL[cancelledReason]
+          ? t("trips.deletion.cancelledReason", { reason: t(CANCELLATION_REASON_LABEL[cancelledReason]) })
+          : null,
+      ]
+        .filter(Boolean)
+        .join(" · ")
+    : "";
+
   return (
     <main className="min-h-screen bg-slate-50">
       <AppHeader
@@ -191,6 +211,12 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                     / {subDiscName}
                   </span>
                 )}
+                {isCancelled && (
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-md bg-[var(--color-warning-subtle)] text-[var(--color-warning-text)]">
+                    <Icon name="calendar" size={12} />
+                    {t("trips.status.cancelled")}
+                  </span>
+                )}
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-white drop-shadow-md">
                 {trip.title}
@@ -205,6 +231,15 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* ── Main Content (2 cols) ── */}
           <div className="lg:col-span-2 space-y-6">
+            {isCancelled && (
+              <TripCancelledBanner
+                title={t("trips.deletion.cancelledTitle")}
+                meta={cancelledMeta}
+                message={(trip.cancellation_message as string | null) ?? null}
+                organizerName={organizer?.display_name ?? null}
+                note={t("trips.deletion.cancelledNote")}
+              />
+            )}
             {/* Quick Info Bar */}
             <div className="flex flex-wrap gap-3 text-sm">
               {startDate && (
@@ -353,6 +388,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                 </div>
               )}
 
+              {!isCancelled && (
               <div className="text-center text-sm text-navy-500">
                 <span
                   className={`font-bold ${spotsLeft > 0 ? "text-trevu-600" : "text-red-500"}`}
@@ -363,8 +399,16 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                 </span>
                 <span className="text-navy-300"> / {trip.max_participants}</span>
               </div>
+              )}
 
-              {!isOrganizer && (
+              {!isOrganizer && isCancelled && (
+                <p className="flex items-center justify-center gap-2 w-full min-h-[48px] rounded-trevu bg-slate-100 px-4 text-[15px] font-semibold text-navy-500">
+                  <Icon name="lock" size={18} />
+                  {t("trips.deletion.applyClosed")}
+                </p>
+              )}
+
+              {!isOrganizer && !isCancelled && (
                 <ApplyButton
                   tripId={trip.id}
                   requireApproval={trip.require_approval}
@@ -458,7 +502,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                   })}
                 </ul>
 
-                {!isOrganizer && crewPositions.some((p: { spots: number; filled_spots: number }) => (p.filled_spots ?? 0) < (p.spots ?? 0)) && (
+                {!isOrganizer && !isCancelled && crewPositions.some((p: { spots: number; filled_spots: number }) => (p.filled_spots ?? 0) < (p.spots ?? 0)) && (
                   <div className="pt-1 text-sm font-semibold text-emerald-600">
                     {t("trips.detail.applyForPosition")}
                   </div>

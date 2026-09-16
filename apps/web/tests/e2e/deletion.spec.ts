@@ -79,6 +79,23 @@ test("organiser deletes a draft, soft-deletes and restores a trip, cancels one w
     expect(cancelled).toEqual({ status: "cancelled", cancelled_reason: "weather", cancellation_message: "Viharriasztás" });
     const { data: participation } = await admin.from("trip_participants").select("status").eq("trip_id", busy.id).single();
     expect(participation!.status).toBe("cancelled");
+
+    // D02 `u1GfEE`: a lemondott túra részletoldala az okkal és az üzenettel, jelentkezés nélkül.
+    const banner = page.getByRole("status").filter({ hasText: /lemondta ezt a túrát|cancelled this trip/i });
+    await expect(banner).toContainText(/időjárás|weather/i);
+    await expect(banner).toContainText("Viharriasztás");
+
+    const guestContext = await page.context().browser()!.newContext();
+    try {
+      const guestPage = await guestContext.newPage();
+      await login(guestPage, guest.email, guest.password);
+      await guestPage.goto(`/trips/${busy.slug}`);
+      await expect(guestPage.getByRole("status").filter({ hasText: /lemondta ezt a túrát|cancelled this trip/i })).toContainText("Viharriasztás");
+      await expect(guestPage.getByText(/jelentkezés lezárva|applications closed/i)).toBeVisible();
+      await expect(guestPage.getByRole("button", { name: /jelentkezem|apply/i })).toHaveCount(0);
+    } finally {
+      await guestContext.close();
+    }
   } finally {
     await deleteTestUser(guest.id);
     await deleteTestUser(organizer.id);
