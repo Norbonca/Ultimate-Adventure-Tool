@@ -6,7 +6,7 @@ import { fetchTripBySlug, fetchCategoryParametersForDisplay, fetchMyParticipatio
 import { CATEGORY_DISPLAY, DIFFICULTY_LEVELS } from "@/lib/categories";
 import { getServerT, getServerLocale } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
-import { BackButton } from "@/components/BackButton";
+import { BackButtonNight } from "@/components/BackButton";
 import { ApplyButton } from "@/components/ApplyButton";
 import { TripCancelledBanner } from "@/components/trip-forms/TripCancelledBanner";
 import { CANCELLATION_REASON_LABEL, type CancellationReason } from "@/lib/trip-deletion";
@@ -167,64 +167,80 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
     : "";
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <AppHeader
-        user={user ? { email: user.email ?? "", displayName: user.user_metadata?.full_name } : null}
-      />
+    <main className="min-h-screen bg-slate-50 pb-20 lg:pb-0">
+      <div data-surface="night" className="contents">
+        <AppHeader
+          user={user ? { email: user.email ?? "", displayName: user.user_metadata?.full_name } : null}
+        />
+      </div>
 
-      <BackButton fallback="/" label={t('common.back')} />
-
-      {/* Hero Section */}
-      <div
-        className="h-64 sm:h-80 relative"
-        style={{
-          background: trip.cover_image_url
-            ? `url(${trip.cover_image_url}) center/cover`
-            : `linear-gradient(135deg, ${catDisplay?.colorHex || "#0D9488"}22, ${catDisplay?.colorHex || "#0D9488"}44)`,
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+      {/* HERO — Brand Guide v2 §5, Night régió a túra saját borítóképével.
+          Terv: design/D02_Trip_Management.pen#KpgDv (1440), #M0RLZp (390, StickyActionBar). */}
+      <section data-surface="night" className="relative overflow-hidden bg-canvas text-ink" data-testid="trip-hero">
+        {trip.cover_image_url ? (
+          // A borítókép külső tárhelyről jön (Supabase Storage, Unsplash).
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={trip.cover_image_url} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        ) : (
+          <div aria-hidden className="absolute inset-0 [background:radial-gradient(60%_80%_at_0%_0%,rgba(45,212,191,.12),transparent_70%)]" />
+        )}
+        <div aria-hidden className="absolute inset-0 bg-hero-scrim-mobile md:bg-hero-scrim" />
         {trip.cover_image_source === "user_upload" && (
-          <span className="absolute top-4 right-4 text-[11px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-tl-lg">
-            <Icon name="camera" size={12} className="inline -mt-0.5 mr-1" />{t("imagePicker.ownPhoto")}
+          <span className="absolute right-4 top-16 z-10 rounded-full bg-glass px-2.5 py-1 text-[11px] font-semibold text-ink backdrop-blur">
+            <Icon name="camera" size={12} className="-mt-0.5 mr-1 inline" />{t("imagePicker.ownPhoto")}
           </span>
         )}
-        <div className="absolute bottom-6 left-6 right-6 max-w-6xl mx-auto">
-          <div className="flex items-end gap-4">
-            {catDisplay && (
-              <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-white/90 backdrop-blur-sm shadow-lg" style={{ color: catDisplay.colorHex }}>
-                <Icon name={catDisplay.icon} size={28} strokeWidth={1.5} />
-              </div>
-            )}
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                {category && (
-                  <span
-                    className="text-xs font-bold px-2 py-0.5 rounded-full text-white"
-                    style={{ backgroundColor: category.color_hex }}
-                  >
-                    {categoryName}
-                  </span>
-                )}
-                {subDisc && (
-                  <span className="text-xs font-medium text-white/80">
-                    / {subDiscName}
-                  </span>
-                )}
-                {isCancelled && (
-                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-md bg-[var(--color-warning-subtle)] text-[var(--color-warning-text)]">
-                    <Icon name="calendar" size={12} />
-                    {t("trips.status.cancelled")}
-                  </span>
-                )}
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white drop-shadow-md">
-                {trip.title}
-              </h1>
+        <div className="relative mx-auto max-w-7xl px-5 pt-3 md:px-[120px]">
+          <BackButtonNight fallback="/" label={t('common.back')} />
+        </div>
+        <div className="relative mx-auto flex min-h-[300px] max-w-7xl flex-col justify-end gap-6 px-5 pb-8 pt-6 md:min-h-[460px] md:flex-row md:items-end md:justify-between md:px-[120px] md:pb-12">
+          <div className="flex max-w-[760px] flex-col gap-3.5">
+            <div className="flex flex-wrap items-center gap-2">
+              {category && (
+                <span className="inline-flex w-fit items-center gap-1.5 rounded-chip bg-glass px-2.5 py-1 text-xs font-semibold text-ink backdrop-blur">
+                  {catDisplay && <span style={{ color: catDisplay.colorHex }} className="inline-flex"><Icon name={catDisplay.icon} size={14} /></span>}
+                  {categoryName}{subDisc ? ` · ${subDiscName}` : ""}
+                </span>
+              )}
+              {isCancelled && (
+                <span className="inline-flex items-center gap-1.5 rounded-chip bg-[var(--color-warning-subtle)] px-2.5 py-1 text-xs font-semibold text-[var(--color-warning-text)]">
+                  <Icon name="calendar" size={12} />
+                  {t("trips.status.cancelled")}
+                </span>
+              )}
             </div>
+            <h1 className="text-[30px] font-extrabold leading-[1.1] tracking-[-0.02em] text-ink [text-wrap:balance] md:text-hero-display">{trip.title}</h1>
+            <p className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm font-medium text-ink-body">
+              <span className="inline-flex items-center gap-1.5">
+                <Icon name="map-pin" size={16} className="text-ink-secondary" />
+                {[trip.location_city, trip.location_country].filter(Boolean).join(", ")}
+              </span>
+              {startDate && (
+                <span className="inline-flex items-center gap-1.5">
+                  <Icon name="calendar" size={16} className="text-ink-secondary" />
+                  {startDate}{endDate && startDate !== endDate ? ` – ${endDate}` : ""}
+                </span>
+              )}
+              {!isCancelled && (
+                <span className="inline-flex items-center gap-1.5">
+                  <Icon name="users" size={16} className="text-ink-secondary" />
+                  {spotsLeft > 0 ? `${spotsLeft} ${t("trips.detail.spotsLeft")}` : t("trips.detail.full")}
+                </span>
+              )}
+            </p>
+          </div>
+          <div className="hidden flex-col items-end gap-2.5 md:flex">
+            <span className="text-2xl font-semibold text-ink">
+              {trip.price_amount ? `${Number(trip.price_amount).toFixed(0)} ${trip.price_currency} / ${t("trips.detail.perPerson")}` : t("trips.detail.free")}
+            </span>
+            {!isCancelled && (
+              <a href="#trip-apply" className="inline-flex h-12 items-center rounded-trevu bg-accent px-6 text-base font-semibold text-accent-on hover:bg-accent-hover focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]">
+                {isOrganizer ? t("trips.detail.edit") : t("trips.detail.apply")}
+              </a>
+            )}
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-6 py-8">
@@ -367,7 +383,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
           {/* ── Sidebar (1 col) ── */}
           <div className="space-y-4">
             {/* CTA Card */}
-            <div className="bg-white rounded-2xl border border-navy-200 p-6 space-y-4">
+            <div id="trip-apply" className="scroll-mt-24 bg-white rounded-2xl border border-navy-200 p-6 space-y-4">
               {trip.price_amount ? (
                 <div className="text-center">
                   <span className="text-3xl font-extrabold text-navy-900">
@@ -558,6 +574,21 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
           </div>
         </div>
       </div>
+
+      {/* StickyActionBar — Night, csak mobilon (Brand Guide v2 §6, UX-004; terv: #M0RLZp) */}
+      {!isCancelled && (
+        <div data-surface="night" className="fixed inset-x-0 bottom-0 z-40 flex h-16 items-center justify-between gap-3 border-t border-line bg-[rgba(15,23,42,.92)] px-4 pb-[env(safe-area-inset-bottom)] backdrop-blur-[10px] lg:hidden" data-testid="trip-sticky-bar">
+          <div className="flex flex-col">
+            <span className="text-base font-semibold text-ink">
+              {trip.price_amount ? `${Number(trip.price_amount).toFixed(0)} ${trip.price_currency} / ${t("trips.detail.perPerson")}` : t("trips.detail.free")}
+            </span>
+            <span className="text-xs text-ink-muted">{spotsLeft > 0 ? `${spotsLeft} ${t("trips.detail.spotsLeft")}` : t("trips.detail.full")}</span>
+          </div>
+          <a href="#trip-apply" className="inline-flex h-11 items-center rounded-trevu bg-accent px-5 text-sm font-semibold text-accent-on">
+            {isOrganizer ? t("trips.detail.edit") : t("trips.detail.apply")}
+          </a>
+        </div>
+      )}
     </main>
   );
 }

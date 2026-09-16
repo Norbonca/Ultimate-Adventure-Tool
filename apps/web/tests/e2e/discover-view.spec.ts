@@ -91,13 +91,14 @@ test.describe('Discover — view toggle', () => {
     await expect(page.getByTestId('view-toggle-grid')).toHaveAttribute('aria-pressed', 'true');
   });
 
-  test('DISCOVER-VIEW-3c: the Discover page is a Night surface with a single Day CTA band at the bottom', async ({ page, context, baseURL }) => {
+  test('DISCOVER-VIEW-3c: the Discover page is a Night surface end to end — no light band at the bottom', async ({ page, context, baseURL }) => {
     await context.addCookies([{ name: COOKIE, value: 'list', url: baseURL ?? 'http://localhost:3000' }]);
     await page.goto('/');
     const root = page.locator('[data-surface="night"]').first();
     await expect(root).toBeVisible();
     await expect(root).toHaveCSS('background-color', 'rgb(15, 23, 42)');
-    await expect(page.locator('[data-surface="day"]')).toHaveCount(1);
+    await expect(page.locator('[data-surface="day"]')).toHaveCount(0);
+    await expect(page.getByTestId('discover-cta')).toHaveCSS('background-color', 'rgb(15, 23, 42)');
   });
 
   test('DISCOVER-VIEW-4: an unknown cookie value falls back to the tile grid', async ({ page, context }) => {
