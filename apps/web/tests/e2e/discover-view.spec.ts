@@ -1,11 +1,11 @@
 import { test, expect, type Page } from '@playwright/test';
 
 /**
- * Discover view toggle — globe / list (Brand Guide v2: the card grid became the band list).
+ * Discover view toggle — grid (tiles, default) / globe / list (Norbert, 2026-09-16).
  *
  * Contract: components/discover/discover-view-toggle.md
- *  - the globe is the default view for a visitor with no cookie;
- *  - switching writes `trevu-discover-view` and survives a reload;
+ *  - the tile grid is the default view for a visitor with no cookie;
+ *  - switching writes `trevu-discover-view-v2` and survives a reload;
  *  - the server renders the remembered view, so there is no flash of the
  *    wrong layout on first paint;
  *  - the globe never becomes a dead end: without WebGL it falls back to a
@@ -15,7 +15,7 @@ import { test, expect, type Page } from '@playwright/test';
  * accept either a live canvas or the documented fallback message.
  */
 
-const COOKIE = 'trevu-discover-view';
+const COOKIE = 'trevu-discover-view-v2';
 
 async function readViewCookie(page: Page): Promise<string | undefined> {
   const cookies = await page.context().cookies();
@@ -30,16 +30,17 @@ async function expectGlobePresent(page: Page) {
 }
 
 test.describe('Discover — view toggle', () => {
-  test('DISCOVER-VIEW-1: globe is the default view without a cookie', async ({ page }) => {
+  test('DISCOVER-VIEW-1: the tile grid is the default view without a cookie', async ({ page }) => {
     await page.goto('/');
 
-    const globeButton = page.getByTestId('view-toggle-globe');
-    await expect(globeButton).toBeVisible();
-    await expect(globeButton).toHaveAttribute('aria-pressed', 'true');
-    await expectGlobePresent(page);
-
-    // No trip list while the globe is showing.
+    const gridButton = page.getByTestId('view-toggle-grid');
+    await expect(gridButton).toBeVisible();
+    await expect(gridButton).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('view-toggle-globe')).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.getByTestId('view-toggle-list')).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.getByTestId('discover-trip-grid').or(page.getByTestId('discover-empty')).first()).toBeVisible();
     await expect(page.getByTestId('discover-trip-list')).toHaveCount(0);
+    await expect(page.getByTestId('globe-discover')).toHaveCount(0);
   });
 
   test('DISCOVER-VIEW-2: switching to the list writes the cookie and shows trip bands', async ({ page }) => {
@@ -48,12 +49,27 @@ test.describe('Discover — view toggle', () => {
     await page.getByTestId('view-toggle-list').click();
 
     await expect(page.getByTestId('view-toggle-list')).toHaveAttribute('aria-pressed', 'true');
-    await expect(page.getByTestId('view-toggle-globe')).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.getByTestId('view-toggle-grid')).toHaveAttribute('aria-pressed', 'false');
     await expect(page.getByTestId('discover-trip-list').or(page.getByTestId('discover-empty')).first()).toBeVisible();
-    await expect(page.getByTestId('globe-discover')).toHaveCount(0);
-    await expect(page.getByTestId('view-toggle-grid')).toHaveCount(0);
-
+    await expect(page.getByTestId('discover-trip-grid')).toHaveCount(0);
     expect(await readViewCookie(page)).toBe('list');
+
+    await page.getByTestId('view-toggle-globe').click();
+    await expect(page.getByTestId('view-toggle-globe')).toHaveAttribute('aria-pressed', 'true');
+    await expectGlobePresent(page);
+    expect(await readViewCookie(page)).toBe('globe');
+
+    await page.getByTestId('view-toggle-grid').click();
+    await expect(page.getByTestId('discover-trip-grid').or(page.getByTestId('discover-empty')).first()).toBeVisible();
+    expect(await readViewCookie(page)).toBe('grid');
+  });
+
+  test('DISCOVER-VIEW-2b: a grid tile links to its trip', async ({ page }) => {
+    await page.goto('/');
+    const tile = page.getByTestId('trip-tile').first();
+    test.skip((await tile.count()) === 0, 'no trips in the data');
+    await expect(tile).toHaveAttribute('href', /^\/trips\//);
+    await expect(tile.getByTestId('trip-tile-title')).not.toBeEmpty();
   });
 
   test('DISCOVER-VIEW-3: the remembered view is server-rendered after reload', async ({ page }) => {
@@ -69,10 +85,10 @@ test.describe('Discover — view toggle', () => {
     await expect(page.getByTestId('discover-hero-search')).toBeVisible();
   });
 
-  test('DISCOVER-VIEW-3b: a remembered legacy "grid" choice opens the list', async ({ page, context, baseURL }) => {
-    await context.addCookies([{ name: COOKIE, value: 'grid', url: baseURL ?? 'http://localhost:3000' }]);
+  test('DISCOVER-VIEW-3b: a choice saved under the old cookie name does not hide the tiles', async ({ page, context, baseURL }) => {
+    await context.addCookies([{ name: 'trevu-discover-view', value: 'list', url: baseURL ?? 'http://localhost:3000' }]);
     await page.goto('/');
-    await expect(page.getByTestId('view-toggle-list')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('view-toggle-grid')).toHaveAttribute('aria-pressed', 'true');
   });
 
   test('DISCOVER-VIEW-3c: the Discover page is a Night surface with a single Day CTA band at the bottom', async ({ page, context, baseURL }) => {
@@ -84,15 +100,14 @@ test.describe('Discover — view toggle', () => {
     await expect(page.locator('[data-surface="day"]')).toHaveCount(1);
   });
 
-  test('DISCOVER-VIEW-4: an unknown cookie value falls back to the globe', async ({ page, context }) => {
+  test('DISCOVER-VIEW-4: an unknown cookie value falls back to the tile grid', async ({ page, context }) => {
     await context.addCookies([
       { name: COOKIE, value: 'definitely-not-a-view', url: 'http://localhost:3000' },
     ]);
 
     await page.goto('/');
 
-    await expect(page.getByTestId('view-toggle-globe')).toHaveAttribute('aria-pressed', 'true');
-    await expectGlobePresent(page);
+    await expect(page.getByTestId('view-toggle-grid')).toHaveAttribute('aria-pressed', 'true');
   });
 
   test('DISCOVER-VIEW-5: globe markers come from /api/v1/trips/globe', async ({ page }) => {
@@ -114,6 +129,7 @@ test.describe('Discover — view toggle', () => {
 
   test('DISCOVER-VIEW-6: every globe trip stays reachable without WebGL', async ({ page }) => {
     await page.goto('/');
+    await page.getByTestId('view-toggle-globe').click();
     await expectGlobePresent(page);
 
     // The accessible list mirrors the markers, so keyboard and screen-reader
@@ -157,6 +173,7 @@ test.describe('Discover — view toggle', () => {
     test.skip(!trip, 'no trip with an image in the local data');
 
     await page.goto('/');
+    await page.getByTestId('view-toggle-globe').click();
     await expect(page.locator('#tg-track')).toBeVisible({ timeout: 20_000 });
     // dev-only handle (GlobeDiscover.tsx) — aims at a trip without guessing pixel positions
     await page.waitForFunction(() => Boolean((window as Window & { __trevuGlobe?: unknown }).__trevuGlobe));

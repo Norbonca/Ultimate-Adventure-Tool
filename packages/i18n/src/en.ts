@@ -1088,6 +1088,7 @@ const en: TranslationKeys = {
     allTrips: "All Trips",
     tripsAvailable: "{count} trips available",
     noTripsYet: "No trips yet",
+    gridView: "Tiles",
     listView: "List view",
     globeView: "Globe view",
     viewToggleLabel: "Select view",

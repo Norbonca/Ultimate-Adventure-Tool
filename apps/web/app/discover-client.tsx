@@ -32,12 +32,14 @@ import {
   Snowflake,
   Sparkles,
   Globe,
+  LayoutGrid,
   List,
   SlidersHorizontal,
 } from '@/lib/icons';
 import type { LucideIcon } from '@/lib/icons';
 import { SearchPill, OptionChip, FilterSheet } from '@/components/ui';
 import { TripBand, CATEGORY_TEXT, type CategoryToken } from '@/components/discover/TripBand';
+import { TripTile } from '@/components/discover/TripTile';
 import {
   DEFAULT_DISCOVER_VIEW,
   rememberDiscoverView,
@@ -127,7 +129,7 @@ interface DiscoverClientProps {
   categoryDisplay: CategoryDisplay;
   difficultyLevels: DifficultyLevel[];
   currentUser: CurrentUser | null;
-  /** View remembered in the `trevu-discover-view` cookie; globe by default. */
+  /** A `trevu-discover-view-v2` cookie-ban megjegyzett nézet; alapból csempe. */
   initialView?: DiscoverView;
 }
 
@@ -422,6 +424,7 @@ export default function DiscoverClient({
       className="flex shrink-0 gap-1 rounded-trevu border border-line bg-surface p-1"
     >
       {([
+        ['grid', LayoutGrid, t('discover.gridView')],
         ['globe', Globe, t('discover.globeView')],
         ['list', List, t('discover.listView')],
       ] as const).map(([view, Icon, label]) => {
@@ -442,7 +445,7 @@ export default function DiscoverClient({
             ].join(' ')}
           >
             <Icon size={16} aria-hidden className={active ? 'text-accent' : undefined} />
-            <span className="hidden md:inline">{view === 'globe' ? t('discover.globeView') : t('discover.listView')}</span>
+            <span className="hidden md:inline">{label}</span>
           </button>
         );
       })}
@@ -488,7 +491,7 @@ export default function DiscoverClient({
             />
             <div aria-hidden className="absolute inset-0 bg-hero-scrim-mobile md:bg-hero-scrim" />
             <div className="relative mx-auto flex min-h-[380px] max-w-7xl flex-col justify-end gap-3 px-5 pb-8 pt-16 md:min-h-[480px] md:gap-4 md:px-[120px] md:pb-12">
-              <p className="text-sm font-medium text-ink-secondary">
+              <p className="text-sm font-semibold text-ink">
                 {t('discover.heroStats')
                   .replace('{trips}', String(trips.length))
                   .replace('{countries}', String(countryCount))}
@@ -640,6 +643,33 @@ export default function DiscoverClient({
               </section>
             ) : (
               <>
+                {viewMode === 'grid' ? (
+                  <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6" data-testid="discover-trip-grid">
+                    {visibleTrips.map((trip) => {
+                      const category = resolveJoin(trip.categories);
+                      const meta = category ? categoryMeta(category.name) : null;
+                      const spotsLeft = trip.max_participants - (trip.current_participants || 0);
+                      const level = difficultyLevels.find((d) => d.value === trip.difficulty);
+                      return (
+                        <li key={trip.id}>
+                          <TripTile
+                            href={`/trips/${trip.slug}`}
+                            title={trip.title}
+                            imageUrl={trip.card_image_url || trip.cover_image_url}
+                            place={formatPlace(trip)}
+                            dates={formatDates(trip)}
+                            spots={t('discover.spotsLeft').replace('{count}', String(spotsLeft))}
+                            host={resolveJoin(trip.profiles)?.display_name ?? null}
+                            difficulty={level ? (locale === 'en' ? level.labelEn : level.label) : null}
+                            category={category && meta ? { label: categoryLabel(category.name), token: meta.token, icon: meta.icon } : null}
+                            price={formatPrice(trip)}
+                            priceCaption={t('discover.perPerson')}
+                          />
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
                 <ul className="flex flex-col gap-3 md:gap-4" data-testid="discover-trip-list">
                   {visibleTrips.map((trip) => {
                     const category = resolveJoin(trip.categories);
@@ -662,6 +692,7 @@ export default function DiscoverClient({
                     );
                   })}
                 </ul>
+                )}
 
                 {remaining > 0 && (
                   <div className="flex justify-center pt-6">
