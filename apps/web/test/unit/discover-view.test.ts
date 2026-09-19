@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_DISCOVER_VIEW, DISCOVER_VIEWS, DISCOVER_VIEW_COOKIE, parseDiscoverView } from '@/lib/discover-view';
 
 describe('discover view', () => {
-  it('a csempés nézet az alapértelmezés, a 3D gömb és a lista választható', () => {
+  it('a csempés nézet az alapértelmezés, a 3D térkép és a lista választható', () => {
     expect(DEFAULT_DISCOVER_VIEW).toBe('grid');
     expect([...DISCOVER_VIEWS]).toEqual(['grid', 'globe', 'list']);
   });
