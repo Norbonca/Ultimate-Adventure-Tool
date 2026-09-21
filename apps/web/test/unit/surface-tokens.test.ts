@@ -14,7 +14,8 @@ import tailwindConfig from "../../tailwind.config";
 const css = readFileSync(resolve(__dirname, "../../styles/globals.css"), "utf8");
 
 function block(selector: string): string {
-  const start = css.indexOf(selector);
+  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const start = css.search(new RegExp(`${escaped}\\s*\\{`));
   if (start < 0) return "";
   const open = css.indexOf("{", start);
   const close = css.indexOf("}", open);
