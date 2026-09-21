@@ -262,6 +262,13 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display-family);
+    letter-spacing: -0.02em;
+  }
+
   ::selection {
     background: rgba(228, 83, 30, 0.20);
     color: var(--deep-navy);
@@ -335,6 +342,6 @@
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
   background: var(--border-subtle);
-  border-radius: 9999px;
+  border-radius: 0;
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }

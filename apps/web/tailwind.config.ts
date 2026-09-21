@@ -10,6 +10,34 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        white: "#F7F8F5",
+        black: "#151916",
+        slate: {
+          50: "#EDEFEA",
+          100: "#E3E7E1",
+          200: "#CBD1CB",
+          300: "#B7BEB8",
+          400: "#9EA69F",
+          500: "#737B75",
+          600: "#4B524D",
+          700: "#303631",
+          800: "#1B1F1C",
+          900: "#151916",
+          950: "#121513",
+        },
+        teal: {
+          50: "#FFF4EF",
+          100: "#FBE7DF",
+          200: "#F8C8B6",
+          300: "#F58C62",
+          400: "#F0693A",
+          500: "#EA5A27",
+          600: "#E4531E",
+          700: "#C94718",
+          800: "#A93A10",
+          900: "#7D2C0D",
+          950: "#4D1907",
+        },
         /* ── Overhaul signal orange ── */
         trevu: {
           50:  "#FFF4EF",
@@ -119,6 +147,13 @@ const config: Config = {
         "hero-scrim-mobile": "var(--hero-scrim-mobile)",
       },
       borderRadius: {
+        sm: "0",
+        DEFAULT: "0",
+        md: "0",
+        lg: "0",
+        xl: "0",
+        "2xl": "0",
+        "3xl": "0",
         "trevu":  "0",
         "trevu-lg": "0",
         "trevu-xl": "0",
@@ -127,6 +162,13 @@ const config: Config = {
         "chip": "0",
       },
       boxShadow: {
+        sm: "none",
+        DEFAULT: "none",
+        md: "none",
+        lg: "none",
+        xl: "none",
+        "2xl": "none",
+        inner: "none",
         "trevu": "none",
         "trevu-sm": "none",
         "trevu-lg": "none",
