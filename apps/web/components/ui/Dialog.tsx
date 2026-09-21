@@ -17,7 +17,7 @@ export type DialogTone = "danger" | "warning" | "primary";
 const TONE: Record<DialogTone, string> = {
   danger: "bg-[var(--color-danger-subtle)] text-coral",
   warning: "bg-[var(--color-warning-subtle)] text-[var(--color-warning)]",
-  primary: "bg-trevu-50 text-trevu-700",
+  primary: "bg-[var(--color-primary-subtle)] text-accent",
 };
 
 export interface DialogProps {
@@ -56,7 +56,7 @@ export function Dialog({ open, onClose, icon, tone = "danger", title, descriptio
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-navy-900/50"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-scrim sm:items-center"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget && !busy) onClose();
       }}
@@ -67,20 +67,20 @@ export function Dialog({ open, onClose, icon, tone = "danger", title, descriptio
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className="w-full sm:max-w-[520px] bg-white rounded-t-[20px] sm:rounded-2xl shadow-2xl px-5 pt-3 pb-7 sm:p-8 max-h-[92vh] overflow-y-auto outline-none"
+        className="max-h-[92vh] w-full overflow-y-auto border border-line-strong bg-surface px-5 pb-7 pt-3 outline-none sm:max-w-[520px] sm:p-8"
       >
         <div className="flex justify-center mb-3 sm:hidden" aria-hidden="true">
-          <span className="w-10 h-1 rounded-full bg-navy-200" />
+          <span className="h-1 w-10 bg-line-strong" />
         </div>
         <div className="flex gap-3.5">
           <span className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 ${TONE[tone]}`}>
             <Icon name={icon} size={22} />
           </span>
           <div className="min-w-0 flex-1">
-            <h2 id={titleId} className="text-[22px] leading-tight font-semibold text-navy-900">
+            <h2 id={titleId} className="font-display text-[28px] font-semibold leading-none text-ink">
               {title}
             </h2>
-            {description && <div className="mt-1.5 text-sm leading-relaxed text-navy-600">{description}</div>}
+            {description && <div className="mt-1.5 text-sm leading-relaxed text-ink-secondary">{description}</div>}
           </div>
         </div>
         {children && <div className="mt-5 space-y-5">{children}</div>}
