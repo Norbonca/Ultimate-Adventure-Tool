@@ -15,14 +15,14 @@ export default function GetStartedPage() {
   const { t } = useTranslation();
 
   const categories = [
-    { name: t("categories.hiking"), label: t("landing.categoryHikingLabel"), image: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=900&q=85&fit=crop&auto=format" },
-    { name: t("categories.mountaineering"), label: t("landing.categoryMountainLabel"), image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=900&q=85&fit=crop&auto=format" },
-    { name: t("categories.waterSports"), label: t("landing.categoryWaterLabel"), image: "https://images.unsplash.com/photo-1530053969600-caed2596d242?w=900&q=85&fit=crop&auto=format" },
-    { name: t("categories.cycling"), label: t("landing.categoryCyclingLabel"), image: "https://images.unsplash.com/photo-1541625602330-2277a4c46182?w=900&q=85&fit=crop&auto=format" },
-    { name: t("categories.motorsport"), label: t("landing.categoryMotorsportLabel"), image: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=900&q=85&fit=crop&auto=format" },
-    { name: t("categories.running"), label: t("landing.categoryRunningLabel"), image: "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=900&q=85&fit=crop&auto=format" },
-    { name: t("categories.winterSports"), label: t("landing.categoryWinterLabel"), image: "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=900&q=85&fit=crop&auto=format" },
-    { name: t("categories.expedition"), label: t("landing.categoryExpeditionLabel"), image: "https://images.unsplash.com/photo-1486911278844-a81c5267e227?w=900&q=85&fit=crop&auto=format" },
+    { name: t("categories.hiking"), label: t("landing.categoryHikingLabel"), image: "/overhaul/azori.jpg" },
+    { name: t("categories.mountaineering"), label: t("landing.categoryMountainLabel"), image: "/overhaul/montblanc.jpg" },
+    { name: t("categories.waterSports"), label: t("landing.categoryWaterLabel"), image: "/overhaul/windsurf.jpg" },
+    { name: t("categories.cycling"), label: t("landing.categoryCyclingLabel"), image: "/overhaul/tokaj.jpg" },
+    { name: t("categories.motorsport"), label: t("landing.categoryMotorsportLabel"), image: "/overhaul/karting.jpg" },
+    { name: t("categories.running"), label: t("landing.categoryRunningLabel"), image: "/overhaul/bakony.jpg" },
+    { name: t("categories.winterSports"), label: t("landing.categoryWinterLabel"), image: "/overhaul/matra-snow.jpg" },
+    { name: t("categories.expedition"), label: t("landing.categoryExpeditionLabel"), image: "/overhaul/nepal.jpg" },
   ];
 
   const primaryFeatures = [
@@ -61,7 +61,7 @@ export default function GetStartedPage() {
             </div>
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=1200&q=90&fit=crop&auto=format" alt="" className="h-[420px] w-full object-cover sm:h-[520px] lg:h-[580px]" />
+          <img src="/overhaul/tatra-ski.jpg" alt="" className="h-[420px] w-full object-cover sm:h-[520px] lg:h-[580px]" />
         </div>
       </section>
 
@@ -95,7 +95,7 @@ export default function GetStartedPage() {
           <div className="mt-12 grid gap-5 lg:grid-cols-[1.65fr_0.9fr]">
             <article>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=1400&q=90&fit=crop&auto=format" alt="" className="h-[380px] w-full object-cover sm:h-[520px]" />
+              <img src="/overhaul/dolomit.jpg" alt="" className="h-[380px] w-full object-cover sm:h-[520px]" />
               <h3 className="mt-5 font-display text-3xl font-bold text-ink">{primaryFeatures[0].title}</h3>
               <p className="mt-3 max-w-3xl leading-relaxed text-ink-secondary">{primaryFeatures[0].description}</p>
             </article>
