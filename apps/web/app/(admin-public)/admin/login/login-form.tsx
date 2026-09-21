@@ -7,7 +7,7 @@ export function AdminLoginForm({ adminEmail }: { adminEmail: string }) {
   const [state, formAction, pending] = useActionState(adminLogin, null);
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
+    <div data-design="legacy-admin" className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-8">

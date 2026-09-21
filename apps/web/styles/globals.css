@@ -3,34 +3,105 @@
 @tailwind utilities;
 
 /* ============================================================
-   TREVU DESIGN SYSTEM — Global Styles
-   Font: DM Sans (Google Fonts)
-   Primary: #0D9488 (Trevu Teal)
+   TREVU OVERHAUL DESIGN SYSTEM — Global Styles
+   Font: Sofia Sans / Sofia Sans Extra Condensed
+   Primary: #E4531E (signal orange)
    ============================================================ */
 
 @layer base {
   :root {
+    /* Legacy utility bridge: Overhaul by default, original Tailwind values in admin. */
+    --legacy-white: 247 248 245;
+    --legacy-black: 21 25 22;
+    --legacy-slate-50: 237 239 234;
+    --legacy-slate-100: 227 231 225;
+    --legacy-slate-200: 203 209 203;
+    --legacy-slate-300: 183 190 184;
+    --legacy-slate-400: 115 123 117;
+    --legacy-slate-500: 89 97 91;
+    --legacy-slate-600: 75 82 77;
+    --legacy-slate-700: 48 54 49;
+    --legacy-slate-800: 27 31 28;
+    --legacy-slate-900: 21 25 22;
+    --legacy-slate-950: 18 21 19;
+    --legacy-teal-50: 255 244 239;
+    --legacy-teal-100: 251 231 223;
+    --legacy-teal-200: 248 200 182;
+    --legacy-teal-300: 245 140 98;
+    --legacy-teal-400: 209 74 25;
+    --legacy-teal-500: 184 68 22;
+    --legacy-teal-600: 169 58 16;
+    --legacy-teal-700: 125 44 13;
+    --legacy-teal-800: 104 35 9;
+    --legacy-teal-900: 77 25 7;
+    --legacy-teal-950: 50 16 4;
+    --legacy-trevu-50: var(--legacy-teal-50);
+    --legacy-trevu-100: var(--legacy-teal-100);
+    --legacy-trevu-200: var(--legacy-teal-200);
+    --legacy-trevu-300: var(--legacy-teal-300);
+    --legacy-trevu-400: var(--legacy-teal-400);
+    --legacy-trevu-500: var(--legacy-teal-500);
+    --legacy-trevu-600: var(--legacy-teal-600);
+    --legacy-trevu-700: var(--legacy-teal-700);
+    --legacy-trevu-800: var(--legacy-teal-800);
+    --legacy-trevu-900: var(--legacy-teal-900);
+    --legacy-navy-50: 247 248 245;
+    --legacy-navy-100: 237 239 234;
+    --legacy-navy-200: 203 209 203;
+    --legacy-navy-300: 183 190 184;
+    --legacy-navy-400: 115 123 117;
+    --legacy-navy-500: 89 97 91;
+    --legacy-navy-600: 75 82 77;
+    --legacy-navy-700: 48 54 49;
+    --legacy-navy-800: 27 31 28;
+    --legacy-navy-900: 21 25 22;
+    --legacy-radius-sm: 0;
+    --legacy-radius-default: 0;
+    --legacy-radius-md: 0;
+    --legacy-radius-lg: 0;
+    --legacy-radius-xl: 0;
+    --legacy-radius-2xl: 0;
+    --legacy-radius-3xl: 0;
+    --legacy-radius-trevu: 0;
+    --legacy-radius-trevu-lg: 0;
+    --legacy-radius-trevu-xl: 0;
+    --legacy-radius-trevu-2xl: 0;
+    --legacy-radius-trevu-3xl: 0;
+    --legacy-radius-chip: 0;
+    --legacy-shadow-sm: none;
+    --legacy-shadow-default: none;
+    --legacy-shadow-md: none;
+    --legacy-shadow-lg: none;
+    --legacy-shadow-xl: none;
+    --legacy-shadow-2xl: none;
+    --legacy-shadow-inner: none;
+    --legacy-shadow-trevu: none;
+    --legacy-shadow-trevu-sm: none;
+    --legacy-shadow-trevu-lg: none;
+    --legacy-shadow-trevu-xl: none;
+    --legacy-shadow-trevu-glow: none;
+
     /* Primary */
-    --trevu-teal: #0D9488;
-    --trevu-teal-light: #14B8A6;
-    --trevu-teal-dark: #0F766E;
-    --trevu-teal-bg: rgba(13, 148, 136, 0.08);
+    --trevu-teal: #E4531E;
+    --trevu-teal-light: #F0693A;
+    --trevu-teal-dark: #C94718;
+    --trevu-teal-bg: rgba(228, 83, 30, 0.10);
 
     /* Navy */
-    --deep-navy: #0F172A;
-    --navy-800: #1E293B;
+    --deep-navy: #151916;
+    --navy-800: #1B1F1C;
 
     /* Neutral */
-    --arctic-white: #F8FAFC;
-    --card-bg: #F1F5F9;
-    --border-subtle: #E2E8F0;
-    --border-medium: #CBD5E1;
+    --arctic-white: #EDEFEA;
+    --card-bg: #F7F8F5;
+    --border-subtle: #CBD1CB;
+    --border-medium: #9EA69F;
 
     /* Text */
-    --text-primary: #0F172A;
-    --text-secondary: #475569;
-    --text-muted: #94A3B8;
-    --text-slate: #64748B;
+    --text-primary: #151916;
+    --text-secondary: #4B524D;
+    --text-muted: #737B75;
+    --text-slate: #4B524D;
 
     /* Accent */
     --sunrise-coral: #F97066;
@@ -47,15 +118,15 @@
     /* Colors (alias to actual Trevu palette) */
     --color-primary: var(--trevu-teal);
     --color-bg: var(--arctic-white);
-    --color-surface: #FFFFFF;
+    --color-surface: #F7F8F5;
     --color-border: var(--border-subtle);
     --color-text: var(--text-primary);
     --color-text-muted: var(--text-slate);
 
     /* Radius */
-    --radius-s: 6px;
-    --radius-m: 10px;
-    --radius-l: 16px;
+    --radius-s: 0;
+    --radius-m: 0;
+    --radius-l: 0;
 
     /* Spacing */
     --space-1: 4px;
@@ -79,7 +150,9 @@
        Source: .skills/trevu-brand/references/brand-kivonat.md
        ---------------------------------------------------------- */
 
-    /* Brand type scale (DM Sans) — §4 */
+    /* Overhaul editorial type scale */
+    --font-body-family: "Sofia Sans", system-ui, sans-serif;
+    --font-display-family: "Sofia Sans Extra Condensed", "Sofia Sans", system-ui, sans-serif;
     --font-h1: 36px;   /* 700 */
     --font-h2: 28px;   /* 600 */
     --font-h3: 22px;   /* 600 */
@@ -91,7 +164,7 @@
     --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 
     /* Semantic colors — §3 */
-    --color-primary-hover: var(--trevu-teal-dark);
+    --color-primary-hover: var(--trevu-teal-light);
     --color-primary-light: var(--trevu-teal-light);
     --color-navy: var(--deep-navy);
     --color-frost: var(--card-bg);
@@ -101,31 +174,31 @@
     --color-rating: var(--golden-hour);
     --color-special: var(--dusk-violet);
     /* Semantic subtle/text variants — S34, a Pencil-fájlok tokenjeivel azonos */
-    --color-success-subtle: #ECFDF5;
+    --color-success-subtle: #E6F1EA;
     --color-success-text: #047857;
-    --color-danger-subtle: #FEF0EE;
-    --color-warning-subtle: #FEF3C7;
-    --color-info-subtle: #DBEAFE;
-    --color-special-subtle: #EDE9FE;
-    --color-navy-800: #1E293B;
-    --color-text-secondary: #475569;
-    --color-primary-subtle: #F0FDFA;
-    --color-text-body: #334155;
-    --color-text-subtle: #94A3B8;
-    --color-border-strong: #CBD5E1;
+    --color-danger-subtle: #F9E6E1;
+    --color-warning-subtle: #F5EDD5;
+    --color-info-subtle: #E4EBF1;
+    --color-special-subtle: #ECE7F2;
+    --color-navy-800: #1B1F1C;
+    --color-text-secondary: #4B524D;
+    --color-primary-subtle: #FBE7DF;
+    --color-text-body: #303631;
+    --color-text-subtle: #737B75;
+    --color-border-strong: #151916;
     --color-info: #3B82F6;
     --color-warning: #F59E0B;
 
     /* Gradients — §3 */
-    --gradient-trevu: linear-gradient(135deg, #0D9488 0%, #06B6D4 100%);
+    --gradient-trevu: linear-gradient(135deg, #E4531E 0%, #F0693A 100%);
     --gradient-dawn: linear-gradient(135deg, #F97066 0%, #FBBF24 100%);
 
     /* Shadows & motion — §5, §6, §9 */
-    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.08);
-    --shadow-primary: 0 2px 8px rgba(13, 148, 136, 0.25);
-    --focus-ring: 0 0 0 3px rgba(13, 148, 136, 0.12);
-    --radius-chip: 6px;
+    --shadow-card: none;
+    --shadow-card-hover: none;
+    --shadow-primary: none;
+    --focus-ring: 0 0 0 3px rgba(228, 83, 30, 0.18);
+    --radius-chip: 0;
     --motion-duration: 300ms;
     --motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -140,14 +213,14 @@
     --cat-motorsport: #B91C1C;
 
     /* Dark mode ("éjszakai túra") — §7 */
-    --dark-bg: #0F172A;
-    --dark-surface: #1E293B;
-    --dark-border: #334155;
-    --dark-text: #F1F5F9;
-    --dark-text-muted: #94A3B8;
-    --dark-primary: #2DD4BF;
+    --dark-bg: #121513;
+    --dark-surface: #1B1F1C;
+    --dark-border: #2E3430;
+    --dark-text: #EBEEE9;
+    --dark-text-muted: #A2AAA4;
+    --dark-primary: #F0693A;
     --dark-danger: #FCA5A1;
-    --dark-primary-hover: #5EEAD4;
+    --dark-primary-hover: #F58C62;
     --color-warning-text: #B45309;
 
     /* Terepgömb — éjszakai gömb (Claude Design handoff 2026-09-14; Pencil-visszavezetés nyitott) */
@@ -164,44 +237,124 @@
     /* Felület-mód tokenek — Brand Guide v2 „Éjszakai túra” (1b), Day értékek.
        Ugyanezek a nevek a [data-surface="night"] scope-ban Night értéket kapnak.
        Terv: design/D00_Core_Components.pen#LdX4S, design/D99_Reference.pen#pixZn */
-    --color-on-primary: #FFFFFF;
-    --color-ghost: #F1F5F9;
-    --color-glass: rgba(255, 255, 255, 0.85);
-    --color-input-bg: #FFFFFF;
-    --hero-scrim: linear-gradient(to top, rgba(15, 23, 42, 0.92) 0%, rgba(15, 23, 42, 0.65) 35%, rgba(15, 23, 42, 0) 70%);
+    --color-on-primary: #151916;
+    --color-ghost: #E3E7E1;
+    --color-glass: rgba(247, 248, 245, 0.90);
+    --color-input-bg: #F7F8F5;
+    --hero-scrim: linear-gradient(to top, rgba(18, 21, 19, 0.92) 0%, rgba(18, 21, 19, 0.65) 35%, rgba(18, 21, 19, 0) 70%);
     /* Mobilon a hero szövegblokkja a kép felső feléig ér — erősebb, magasabbra nyúló scrim kell (v2 §7 kontraszt) */
-    --hero-scrim-mobile: linear-gradient(to top, rgba(15, 23, 42, 0.94) 0%, rgba(15, 23, 42, 0.8) 45%, rgba(15, 23, 42, 0.35) 80%, rgba(15, 23, 42, 0.15) 100%);
+    --hero-scrim-mobile: linear-gradient(to top, rgba(18, 21, 19, 0.94) 0%, rgba(18, 21, 19, 0.8) 45%, rgba(18, 21, 19, 0.35) 80%, rgba(18, 21, 19, 0.15) 100%);
     --font-hero-display: 48px;
     --font-hero-display-mobile: 38px;
     /* Kategória-chip háttérárnyalata: Day 10 %, Night 18 % (v2 §6) */
     --chip-tint: 10%;
     /* Lap/dialógus mögötti sötétítés (FilterSheet) — mindkét módban azonos */
-    --color-scrim: rgba(15, 23, 42, 0.65);
+    --color-scrim: rgba(18, 21, 19, 0.65);
+  }
+
+  [data-design="legacy-admin"] {
+    font-family: "DM Sans", system-ui, sans-serif;
+    --legacy-white: 255 255 255;
+    --legacy-black: 0 0 0;
+    --legacy-slate-50: 248 250 252;
+    --legacy-slate-100: 241 245 249;
+    --legacy-slate-200: 226 232 240;
+    --legacy-slate-300: 203 213 225;
+    --legacy-slate-400: 148 163 184;
+    --legacy-slate-500: 100 116 139;
+    --legacy-slate-600: 71 85 105;
+    --legacy-slate-700: 51 65 85;
+    --legacy-slate-800: 30 41 59;
+    --legacy-slate-900: 15 23 42;
+    --legacy-slate-950: 2 6 23;
+    --legacy-teal-50: 240 253 250;
+    --legacy-teal-100: 204 251 241;
+    --legacy-teal-200: 153 246 228;
+    --legacy-teal-300: 94 234 212;
+    --legacy-teal-400: 45 212 191;
+    --legacy-teal-500: 20 184 166;
+    --legacy-teal-600: 13 148 136;
+    --legacy-teal-700: 15 118 110;
+    --legacy-teal-800: 17 94 89;
+    --legacy-teal-900: 19 78 74;
+    --legacy-teal-950: 4 47 46;
+    --legacy-trevu-50: 240 253 250;
+    --legacy-trevu-100: 204 251 241;
+    --legacy-trevu-200: 153 246 228;
+    --legacy-trevu-300: 94 234 212;
+    --legacy-trevu-400: 45 212 191;
+    --legacy-trevu-500: 20 184 166;
+    --legacy-trevu-600: 13 148 136;
+    --legacy-trevu-700: 15 118 110;
+    --legacy-trevu-800: 17 94 89;
+    --legacy-trevu-900: 19 78 74;
+    --legacy-navy-50: 248 250 252;
+    --legacy-navy-100: 241 245 249;
+    --legacy-navy-200: 226 232 240;
+    --legacy-navy-300: 203 213 225;
+    --legacy-navy-400: 148 163 184;
+    --legacy-navy-500: 100 116 139;
+    --legacy-navy-600: 71 85 105;
+    --legacy-navy-700: 51 65 85;
+    --legacy-navy-800: 30 41 59;
+    --legacy-navy-900: 15 23 42;
+    --legacy-radius-sm: 0.125rem;
+    --legacy-radius-default: 0.25rem;
+    --legacy-radius-md: 0.375rem;
+    --legacy-radius-lg: 0.5rem;
+    --legacy-radius-xl: 0.75rem;
+    --legacy-radius-2xl: 1rem;
+    --legacy-radius-3xl: 1.5rem;
+    --legacy-radius-trevu: 10px;
+    --legacy-radius-trevu-lg: 12px;
+    --legacy-radius-trevu-xl: 14px;
+    --legacy-radius-trevu-2xl: 16px;
+    --legacy-radius-trevu-3xl: 20px;
+    --legacy-radius-chip: 6px;
+    --legacy-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --legacy-shadow-default: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --legacy-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --legacy-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --legacy-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --legacy-shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+    --legacy-shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+    --legacy-shadow-trevu: 0 2px 8px rgba(13, 148, 136, 0.25);
+    --legacy-shadow-trevu-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --legacy-shadow-trevu-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+    --legacy-shadow-trevu-xl: 0 24px 80px rgba(15, 23, 42, 0.18);
+    --legacy-shadow-trevu-glow: 0 2px 12px rgba(13, 148, 136, 0.12);
+  }
+
+  [data-design="legacy-admin"] h1,
+  [data-design="legacy-admin"] h2,
+  [data-design="legacy-admin"] h3 {
+    font-family: "DM Sans", system-ui, sans-serif;
+    letter-spacing: normal;
   }
 
   /* Night felület — Brand Guide v2 §2, §6, §8. Nem dark mode és nem felhasználói
      kapcsoló: az útvonal teszi a Night-régió gyökerére (data-surface="night").
      A .dark osztály a későbbi, teljes felületű dark mode-é marad. */
   [data-surface="night"] {
-    --color-bg: #0F172A;
-    --color-surface: #1E293B;
-    --color-border: #334155;
-    --color-border-strong: #475569;
-    --color-text: #F1F5F9;
-    --color-text-muted: #94A3B8;
-    --color-text-secondary: #CBD5E1;
-    --color-text-body: #E2E8F0;
-    --color-text-subtle: #94A3B8;
-    --color-primary: #2DD4BF;
-    --color-primary-hover: #5EEAD4;
-    --color-on-primary: #0F172A;
+    --color-bg: #121513;
+    --color-surface: #1B1F1C;
+    --color-border: #2E3430;
+    --color-border-strong: #EBEEE9;
+    --color-text: #EBEEE9;
+    --color-text-muted: #A2AAA4;
+    --color-text-secondary: #B7BEB8;
+    --color-text-body: #D7DCD7;
+    --color-text-subtle: #828B84;
+    --color-primary: #F0693A;
+    --color-primary-hover: #F58C62;
+    --color-on-primary: #151916;
     --color-danger: #FCA5A1;
     --color-success: #6EE7B7;
     --color-rating: #FCD34D;
-    --color-ghost: rgba(255, 255, 255, 0.08);
-    --color-glass: rgba(30, 41, 59, 0.85);
-    --color-input-bg: rgba(255, 255, 255, 0.06);
-    --focus-ring: 0 0 0 3px rgba(45, 212, 191, 0.35);
+    --color-ghost: #252A26;
+    --color-glass: rgba(27, 31, 28, 0.90);
+    --color-input-bg: #1B1F1C;
+    --focus-ring: 0 0 0 3px rgba(240, 105, 58, 0.30);
     --cat-hiking: #34D399;
     --cat-climbing: #D9A05B;
     --cat-water: #2DD4BF;
@@ -218,24 +371,24 @@
      hero alatti tartalma) — a :root értékeit állítja vissza (Brand Guide v2 §2/2). */
   [data-surface="day"] {
     --color-bg: var(--arctic-white);
-    --color-surface: #FFFFFF;
+    --color-surface: #F7F8F5;
     --color-border: var(--border-subtle);
-    --color-border-strong: #CBD5E1;
+    --color-border-strong: #151916;
     --color-text: var(--text-primary);
     --color-text-muted: var(--text-slate);
-    --color-text-secondary: #475569;
-    --color-text-body: #334155;
-    --color-text-subtle: #94A3B8;
+    --color-text-secondary: #4B524D;
+    --color-text-body: #303631;
+    --color-text-subtle: #737B75;
     --color-primary: var(--trevu-teal);
-    --color-primary-hover: var(--trevu-teal-dark);
-    --color-on-primary: #FFFFFF;
+    --color-primary-hover: var(--trevu-teal-light);
+    --color-on-primary: #151916;
     --color-danger: var(--sunrise-coral);
     --color-success: var(--trail-sage);
     --color-rating: var(--golden-hour);
-    --color-ghost: #F1F5F9;
-    --color-glass: rgba(255, 255, 255, 0.85);
-    --color-input-bg: #FFFFFF;
-    --focus-ring: 0 0 0 3px rgba(13, 148, 136, 0.12);
+    --color-ghost: #E3E7E1;
+    --color-glass: rgba(247, 248, 245, 0.90);
+    --color-input-bg: #F7F8F5;
+    --focus-ring: 0 0 0 3px rgba(228, 83, 30, 0.18);
     --cat-hiking: #059669;
     --cat-climbing: #92400E;
     --cat-water: #0D9488;
@@ -253,15 +406,22 @@
   }
 
   body {
-    font-family: "DM Sans", system-ui, sans-serif;
+    font-family: var(--font-body-family);
     color: var(--text-primary);
     background: var(--arctic-white);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display-family);
+    letter-spacing: -0.02em;
+  }
+
   ::selection {
-    background: rgba(13, 148, 136, 0.15);
+    background: rgba(228, 83, 30, 0.20);
     color: var(--deep-navy);
   }
 }
@@ -270,14 +430,14 @@
   /* ── Buttons ── */
   .btn-trevu {
     @apply inline-flex items-center justify-center gap-2 text-[15px] min-h-[48px]
-           font-semibold rounded-trevu transition-all duration-200
+           font-semibold rounded-none transition-colors duration-150
            focus:outline-none focus:ring-2 focus:ring-offset-2;
   }
 
   .btn-trevu-primary {
     @apply btn-trevu px-7 py-3.5
-           bg-trevu-600 text-white shadow-trevu
-           hover:bg-trevu-700 active:scale-[0.97];
+           bg-trevu-600 text-navy-900
+           hover:bg-trevu-700;
   }
 
   .btn-trevu-secondary {
@@ -300,32 +460,35 @@
 
   /* ── Cards ── */
   .card-trevu {
-    @apply bg-white border border-navy-200 rounded-2xl p-6
-           transition-all duration-300
-           hover:shadow-trevu-lg hover:-translate-y-0.5;
+    @apply bg-white border border-navy-200 rounded-none p-6
+           transition-colors duration-150 hover:border-navy-900;
   }
 
   .card-trevu-flat {
-    @apply bg-navy-100 rounded-2xl p-6;
+    @apply bg-navy-100 rounded-none p-6;
   }
 
   .card-trevu-dark {
-    @apply bg-navy-800 rounded-2xl p-7;
+    @apply bg-navy-800 rounded-none p-7;
   }
 
   /* ── Inputs ── */
   .input-trevu {
-    @apply w-full min-h-[48px] rounded-trevu border-[1.5px] border-navy-300
+    @apply w-full min-h-[48px] rounded-none border border-navy-300
            px-4 py-3 text-[15px] text-navy-900
            bg-white outline-none transition-all duration-200
            placeholder:text-navy-500
-           focus:border-trevu-600 focus:ring-[3px] focus:ring-trevu-600/10;
+           focus:border-trevu-600 focus:ring-0;
+  }
+
+  .input-trevu:focus {
+    box-shadow: var(--focus-ring);
   }
 
   /* ── Badges ── */
   .badge-trevu {
     @apply inline-flex items-center gap-1.5 px-2.5 py-1
-           rounded-md text-xs font-medium;
+           rounded-none text-xs font-medium;
   }
 }
 
@@ -334,6 +497,6 @@
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
   background: var(--border-subtle);
-  border-radius: 9999px;
+  border-radius: 0;
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
