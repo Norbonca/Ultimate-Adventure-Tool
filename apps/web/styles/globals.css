@@ -164,7 +164,7 @@
     --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 
     /* Semantic colors — §3 */
-    --color-primary-hover: var(--trevu-teal-dark);
+    --color-primary-hover: var(--trevu-teal-light);
     --color-primary-light: var(--trevu-teal-light);
     --color-navy: var(--deep-navy);
     --color-frost: var(--card-bg);
@@ -380,7 +380,7 @@
     --color-text-body: #303631;
     --color-text-subtle: #737B75;
     --color-primary: var(--trevu-teal);
-    --color-primary-hover: var(--trevu-teal-dark);
+    --color-primary-hover: var(--trevu-teal-light);
     --color-on-primary: #151916;
     --color-danger: var(--sunrise-coral);
     --color-success: var(--trail-sage);
