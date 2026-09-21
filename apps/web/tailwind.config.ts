@@ -10,30 +10,30 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        /* ── TREVU Primary ── */
+        /* ── Overhaul signal orange ── */
         trevu: {
-          50:  "#F0FDFA",
-          100: "#CCFBF1",
-          200: "#99F6E4",
-          300: "#5EEAD4",
-          400: "#2DD4BF",
-          500: "#14B8A6",  /* teal-light */
-          600: "#0D9488",  /* ★ primary teal */
-          700: "#0F766E",  /* teal-dark */
-          800: "#115E59",
-          900: "#134E4A",
+          50:  "#FFF4EF",
+          100: "#FBE7DF",
+          200: "#F8C8B6",
+          300: "#F58C62",
+          400: "#F0693A",
+          500: "#EA5A27",
+          600: "#E4531E",
+          700: "#C94718",
+          800: "#A93A10",
+          900: "#7D2C0D",
         },
         navy: {
-          50:  "#F8FAFC",
-          100: "#F1F5F9",
-          200: "#E2E8F0",
-          300: "#CBD5E1",
-          400: "#94A3B8",
-          500: "#64748B",
-          600: "#475569",
-          700: "#334155",
-          800: "#1E293B",
-          900: "#0F172A",  /* ★ deep-navy */
+          50:  "#F7F8F5",
+          100: "#EDEFEA",
+          200: "#CBD1CB",
+          300: "#B7BEB8",
+          400: "#9EA69F",
+          500: "#737B75",
+          600: "#4B524D",
+          700: "#303631",
+          800: "#1B1F1C",
+          900: "#151916",
         },
 
         /* ── Accent Colors ── */
@@ -92,21 +92,21 @@ const config: Config = {
 
         /* ── Semantic Aliases ── */
         brand: {
-          50:  "#F0FDFA",
-          100: "#CCFBF1",
-          200: "#99F6E4",
-          300: "#5EEAD4",
-          400: "#2DD4BF",
-          500: "#14B8A6",
-          600: "#0D9488",
-          700: "#0F766E",
-          800: "#115E59",
-          900: "#134E4A",
+          50:  "#FFF4EF",
+          100: "#FBE7DF",
+          200: "#F8C8B6",
+          300: "#F58C62",
+          400: "#F0693A",
+          500: "#EA5A27",
+          600: "#E4531E",
+          700: "#C94718",
+          800: "#A93A10",
+          900: "#7D2C0D",
         },
       },
       fontFamily: {
-        sans: ['"DM Sans"', "system-ui", "sans-serif"],
-        display: ['"DM Sans"', "system-ui", "sans-serif"],
+        sans: ['"Sofia Sans"', "system-ui", "sans-serif"],
+        display: ['"Sofia Sans Extra Condensed"', '"Sofia Sans"', "system-ui", "sans-serif"],
       },
       fontSize: {
         /* Hero Display — csak Night hero (Brand Guide v2 §4) */
@@ -119,19 +119,19 @@ const config: Config = {
         "hero-scrim-mobile": "var(--hero-scrim-mobile)",
       },
       borderRadius: {
-        "trevu":  "10px",
-        "trevu-lg": "12px",
-        "trevu-xl": "14px",
-        "trevu-2xl": "16px",
-        "trevu-3xl": "20px",
-        "chip": "6px",       /* brand §3 — kategória/státusz chip */
+        "trevu":  "0",
+        "trevu-lg": "0",
+        "trevu-xl": "0",
+        "trevu-2xl": "0",
+        "trevu-3xl": "0",
+        "chip": "0",
       },
       boxShadow: {
-        "trevu":    "0 2px 8px rgba(13, 148, 136, 0.25)",
-        "trevu-sm": "0 1px 3px rgba(0, 0, 0, 0.06)",
-        "trevu-lg": "0 8px 24px rgba(0, 0, 0, 0.08)",
-        "trevu-xl": "0 24px 80px rgba(15, 23, 42, 0.18)",
-        "trevu-glow": "0 2px 12px rgba(13, 148, 136, 0.12)",
+        "trevu": "none",
+        "trevu-sm": "none",
+        "trevu-lg": "none",
+        "trevu-xl": "none",
+        "trevu-glow": "none",
       },
       animation: {
         "shimmer": "shimmer 1.5s infinite",
