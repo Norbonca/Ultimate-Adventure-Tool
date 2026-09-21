@@ -25,7 +25,7 @@ async function readViewCookie(page: Page): Promise<string | undefined> {
 /** The globe is "present" either as a canvas or as its documented fallback. */
 async function expectGlobePresent(page: Page) {
   const globe = page.getByTestId('globe-discover');
-  const fallback = page.getByText(/nem tudja megjeleníteni a gömböt|cannot render the globe/i);
+  const fallback = page.getByText(/nem tudja megjeleníteni a 3D térképet|cannot render the 3D map/i);
   await expect(globe.or(fallback).first()).toBeVisible({ timeout: 15_000 });
 }
 
@@ -192,5 +192,38 @@ test.describe('Discover — view toggle', () => {
     await page.evaluate(() => window.dispatchEvent(new Event('resize')));
     await page.mouse.up();
     await expect(page).toHaveURL(new RegExp(`/trips/${trip!.slug}$`), { timeout: 15_000 });
+  });
+
+  test('DISCOVER-VIEW-9: scrolling over the 3D map never scrolls the page — the layers zoom the map instead', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/');
+    await page.getByTestId('view-toggle-globe').click();
+    await expect(page.locator('#tg-track')).toBeVisible({ timeout: 20_000 });
+    await expect(page.locator('#tg-map canvas')).toBeVisible({ timeout: 20_000 });
+    await page.locator('.terepgomb').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(300);
+    const scrollY = () => page.evaluate(() => window.scrollY);
+    const start = await scrollY();
+
+    // the silhouette radius of the sphere (SVG overlay) grows when the map zooms in
+    const sphereRadius = () => page.evaluate(() => Number(document.querySelector('#tg-globe circle')?.getAttribute('r') ?? 0));
+    const radiusBefore = await sphereRadius();
+    // every layer on top of the map: timeline, buttons, attribution
+    for (const selector of ['#tg-track', '#tg-world', '.tg-attrib', '.tg-timehead']) {
+      const box = await page.locator(selector).first().boundingBox();
+      if (!box) continue;
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.wheel(0, -300);
+      await page.waitForTimeout(250);
+      expect(await scrollY(), `wheel over ${selector} scrolled the page`).toBe(start);
+    }
+    // the wheel over the layers reached the map: it zoomed in
+    await expect.poll(sphereRadius).toBeGreaterThan(radiusBefore + 2);
+    // and over the map itself the page stays put, too (zooming back out)
+    const mapBox = (await page.locator('#tg-map').boundingBox())!;
+    await page.mouse.move(mapBox.x + mapBox.width / 2, mapBox.y + mapBox.height / 2);
+    await page.mouse.wheel(0, 600);
+    await page.waitForTimeout(250);
+    expect(await scrollY(), 'wheel over the map scrolled the page').toBe(start);
   });
 });

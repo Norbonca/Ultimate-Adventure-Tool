@@ -525,6 +525,9 @@ export async function mountGlobe(root, opts) {
   let userMoving = false;
   map.on("movestart", (e) => { if (e.originalEvent) { userMoving = true; mapEl.classList.add("drag"); } });
   map.on("zoomstart", (e) => { if (e.originalEvent) state.fit = false; });
+  // a görgős nagyítás zoomstart-ja a MapLibre 5-ben originalEvent nélkül jön (renderFrame hajtja), ezért a teljes
+  // bolygó nézet a nagyítást azonnal visszaugrasztotta — a befelé görgetés maga kapcsolja ki az illesztést (2026-09-19)
+  mapEl.addEventListener("wheel", (e) => { if (e.deltaY < 0) state.fit = false; }, { capture: true, passive: true });
   map.on("moveend", () => { if (userMoving) { userMoving = false; mapEl.classList.remove("drag"); if (state.gyro) gyroBase = centerLL(); } render(); });
   map.on("move", () => { if (!adjusting) render(); });
   // üres gömbfelületre koppintás: a kiválasztás megszűnik (húzás után nincs click esemény)

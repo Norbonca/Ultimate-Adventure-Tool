@@ -19,6 +19,7 @@ import { useTranslation } from '@/lib/i18n/useTranslation';
 import { StateTemplate } from '@/components/ui';
 import { GLOBE_ATLAS_ATTRIBUTION, GLOBE_ATLAS_URL, getGlobeTileProvider } from '@/lib/globe-tiles';
 import { buildGlobeMarkup } from './globe-markup';
+import { containGlobeWheel } from './globe-wheel';
 import type { GlobeCategory, GlobeMarker, GlobePayload, GlobeRoutes, GlobeStrings, GlobeTrip, TerepgombInstance } from './terepgomb';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './globe.css';
@@ -191,6 +192,14 @@ export default function GlobeDiscover() {
   );
 
   const routes: GlobeRoutes = payload?.routes ?? {};
+
+  // ── a görgetés a kereten belül marad (a betöltés alatt is) ──────────────
+  // Lásd globe-wheel.ts: a rétegek fölötti görgetés korábban az oldalt vitte el.
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    return containGlobeWheel(container);
+  }, [state]);
 
   // ── renderer lifecycle ──────────────────────────────────────────────────
   // Re-mounted on locale change: the container markup carries translated

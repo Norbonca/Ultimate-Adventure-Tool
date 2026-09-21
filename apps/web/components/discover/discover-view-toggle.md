@@ -127,8 +127,18 @@ fázisában áll át.
    `.globe-fallback-list` listán keresztül elérhetők.
 
 6. A gömb pontosan a lista túráit mutatja (láthatósági szerződés, fent).
+7. **A 3D térképen a görgetés sosem viszi el az oldalt** (2026-09-19, Norbert). A keret
+   (`.terepgomb`) nem passzív, capture fázisú görgetésfigyelője (`globe-wheel.ts`) minden
+   görgetést elkap, a betöltés alatt is; a rétegek (zászló, klaszter, idősáv, gombok,
+   attribúció) fölötti görgetést a MapLibre vásznára küldi, így az is nagyít. Kivétel a
+   görgethető belső elem, amíg van hová görgetnie (a kártya szövege, a tokensor); a
+   kártya nem nagyít. A befelé görgetés kikapcsolja a teljes bolygó illesztést — enélkül
+   a görgős nagyítás a teljes bolygó nézetből visszaugrott (a MapLibre 5 görgős
+   `zoomstart`-ja `originalEvent` nélkül jön).
 
-Ezt a hat garanciát a `tests/e2e/discover-view.spec.ts` hét tesztje fedi (DISCOVER-VIEW-1…7).
+A felületen a nézet neve **3D térkép** (EN: 3D map); a kódbeli `globe` / `terepgomb` azonosítók maradnak.
+
+Ezeket a garanciákat a `tests/e2e/discover-view.spec.ts` fedi (DISCOVER-VIEW-1…9; a 7. pontot a DISCOVER-VIEW-9).
 
 **Mobil (≤ 720 px):** a gömb a telefonon a lap szélétől szélig fut; a fejsor gombjai
 és az évszak-chipek vízszintesen görgethetők, a tokensor a keretben görget, minden
