@@ -95,7 +95,7 @@ export default function GetStartedPage() {
           <div className="mt-12 grid gap-5 lg:grid-cols-[1.65fr_0.9fr]">
             <article>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=1400&q=90&fit=crop&auto=format" alt="" loading="lazy" className="h-[380px] w-full object-cover sm:h-[520px]" />
+              <img src="https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=1400&q=90&fit=crop&auto=format" alt="" className="h-[380px] w-full object-cover sm:h-[520px]" />
               <h3 className="mt-5 font-display text-3xl font-bold text-ink">{primaryFeatures[0].title}</h3>
               <p className="mt-3 max-w-3xl leading-relaxed text-ink-secondary">{primaryFeatures[0].description}</p>
             </article>
@@ -125,7 +125,7 @@ export default function GetStartedPage() {
             {categories.map((category) => (
               <article key={category.name}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={category.image} alt={category.name} loading="lazy" className="aspect-[4/3] w-full object-cover" />
+                <img src={category.image} alt={category.name} className="aspect-[4/3] w-full object-cover" />
                 <h3 className="mt-4 font-display text-2xl font-bold text-ink">{category.name}</h3>
                 <p className="mt-1 text-xs leading-relaxed text-ink-muted">{category.label}</p>
               </article>
