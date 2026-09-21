@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import {
   CloudSun, Compass, Facebook, Instagram, Languages, Package, Plane, Shield,
   Twitter, Users, Wallet, WifiOff, Youtube, Zap,
@@ -60,8 +61,7 @@ export default function GetStartedPage() {
               <Link href="/" className="inline-flex min-h-12 items-center justify-center border border-line-strong px-7 font-semibold text-ink transition-colors hover:border-accent hover:text-accent">{t("landing.heroCtaSecondary")}</Link>
             </div>
           </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/overhaul/tatra-ski.jpg" alt="" className="h-[420px] w-full object-cover sm:h-[520px] lg:h-[580px]" />
+          <Image src="/overhaul/tatra-ski.jpg" alt="" width={480} height={580} priority sizes="(min-width: 1024px) 40vw, 100vw" className="h-[420px] w-full object-cover sm:h-[520px] lg:h-[580px]" />
         </div>
       </section>
 
@@ -94,8 +94,7 @@ export default function GetStartedPage() {
           <p className="mt-5 max-w-2xl leading-relaxed text-ink-secondary">{t("landing.featuresDescription")}</p>
           <div className="mt-12 grid gap-5 lg:grid-cols-[1.65fr_0.9fr]">
             <article>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/overhaul/dolomit.jpg" alt="" className="h-[380px] w-full object-cover sm:h-[520px]" />
+              <Image src="/overhaul/dolomit.jpg" alt="" width={840} height={520} sizes="(min-width: 1024px) 60vw, 100vw" className="h-[380px] w-full object-cover sm:h-[520px]" />
               <h3 className="mt-5 font-display text-3xl font-bold text-ink">{primaryFeatures[0].title}</h3>
               <p className="mt-3 max-w-3xl leading-relaxed text-ink-secondary">{primaryFeatures[0].description}</p>
             </article>
@@ -124,8 +123,7 @@ export default function GetStartedPage() {
           <div className="mt-12 grid grid-cols-2 gap-x-5 gap-y-10 lg:grid-cols-4">
             {categories.map((category) => (
               <article key={category.name}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={category.image} alt={category.name} className="aspect-[4/3] w-full object-cover" />
+                <Image src={category.image} alt={category.name} width={318} height={240} sizes="(min-width: 1024px) 25vw, 50vw" className="aspect-[4/3] w-full object-cover" />
                 <h3 className="mt-4 font-display text-2xl font-bold text-ink">{category.name}</h3>
                 <p className="mt-1 text-xs leading-relaxed text-ink-muted">{category.label}</p>
               </article>
