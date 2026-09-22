@@ -89,16 +89,16 @@ export default function LoginPage() {
     <>
     <main className="flex min-h-[calc(100vh-56px)]">
       {/* Left: Brand Panel */}
-      <div data-surface="night" className="hidden w-[560px] shrink-0 flex-col justify-between bg-canvas p-12 text-ink lg:flex">
+      <div className="hidden lg:flex flex-col justify-between w-[560px] shrink-0 bg-gradient-to-b from-slate-900 to-[#134E4A] p-12 text-white">
         <div>
-          <Link href="/" className="text-2xl font-extrabold tracking-tight text-accent transition-colors hover:text-accent-hover">trevu</Link>
+          <Link href="/" className="text-2xl font-extrabold tracking-tight text-trevu-400 hover:text-trevu-300 transition-colors">trevu</Link>
         </div>
 
         <div className="space-y-4">
           <h1 className="text-[40px] font-extrabold leading-[1.1] tracking-tight">
             {t('auth.loginBrandTitle')}
           </h1>
-          <p className="max-w-[420px] text-base leading-relaxed text-ink-secondary">
+          <p className="text-base text-slate-400 leading-relaxed max-w-[420px]">
             {t('auth.loginBrandDesc')}
           </p>
         </div>
@@ -110,18 +110,18 @@ export default function LoginPage() {
             t('auth.loginFeature3'),
           ].map((feat, i) => (
             <div key={i} className="flex items-center gap-3">
-              <svg className="h-5 w-5 shrink-0 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="h-5 w-5 text-trevu-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span className="text-sm text-ink-body">{feat}</span>
+              <span className="text-sm text-slate-300">{feat}</span>
             </div>
           ))}
-          <p className="pt-4 text-xs text-ink-muted">{t('auth.freeForever')}</p>
+          <p className="text-xs text-slate-500 pt-4">{t('auth.freeForever')}</p>
         </div>
       </div>
 
       {/* Right: Form Panel */}
-      <div className="flex flex-1 items-center justify-center bg-surface p-8 lg:p-16">
+      <div className="flex-1 flex items-center justify-center p-8 lg:p-16 bg-white">
         <div className="w-full max-w-[420px] space-y-8">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-navy-900">{t('auth.loginTitle')}</h2>

@@ -14,8 +14,7 @@ import tailwindConfig from "../../tailwind.config";
 const css = readFileSync(resolve(__dirname, "../../styles/globals.css"), "utf8");
 
 function block(selector: string): string {
-  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const start = css.search(new RegExp(`${escaped}\\s*\\{`));
+  const start = css.indexOf(selector);
   if (start < 0) return "";
   const open = css.indexOf("{", start);
   const close = css.indexOf("}", open);
@@ -28,15 +27,15 @@ function value(scope: string, token: string): string | undefined {
 }
 
 const NIGHT: Record<string, string> = {
-  "--color-bg": "#121513",
-  "--color-surface": "#1B1F1C",
-  "--color-border": "#2E3430",
-  "--color-border-strong": "#EBEEE9",
-  "--color-text": "#EBEEE9",
-  "--color-text-muted": "#A2AAA4",
-  "--color-primary": "#F0693A",
-  "--color-primary-hover": "#F58C62",
-  "--color-on-primary": "#151916",
+  "--color-bg": "#0F172A",
+  "--color-surface": "#1E293B",
+  "--color-border": "#334155",
+  "--color-border-strong": "#475569",
+  "--color-text": "#F1F5F9",
+  "--color-text-muted": "#94A3B8",
+  "--color-primary": "#2DD4BF",
+  "--color-primary-hover": "#5EEAD4",
+  "--color-on-primary": "#0F172A",
   "--color-danger": "#FCA5A1",
   "--color-success": "#6EE7B7",
   "--color-rating": "#FCD34D",

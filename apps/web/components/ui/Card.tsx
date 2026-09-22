@@ -1,7 +1,8 @@
 /**
  * Card — surface container + 3:2 image slot for trip / content cards.
  *
- * Overhaul: sharp surface, 1 px line, no elevation; image 3:2.
+ * Brand: Trevu_Brand_Guide.docx §3 — white, 1 px Cloud border, radius 16 (`rounded-trevu-2xl`),
+ * shadow 0 1px 2px, hover lift + 0 8px 24px; image 3:2.
  * Design: design/D02_Trip_Management.pen#NCfEW (Trip Card), design/D00_Core_Components.pen#5YqJY
  * (CategoryCard). No hooks; `href` renders the whole card as a link.
  */
@@ -11,7 +12,7 @@ import Link from "next/link";
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   href?: string;
-  /** Adds a stronger border affordance (default true when `href` is set). */
+  /** Adds hover lift + shadow (default true when `href` is set). */
   interactive?: boolean;
   padding?: "none" | "sm" | "md" | "lg";
   children: ReactNode;
@@ -22,9 +23,9 @@ const PAD = { none: "", sm: "p-4", md: "p-5", lg: "p-6" } as const;
 export function Card({ href, interactive, padding = "none", className, children, ...rest }: CardProps) {
   const hover = interactive ?? Boolean(href);
   const cls = [
-    "block overflow-hidden rounded-none border border-line bg-surface",
-    "transition-colors duration-150",
-    hover ? "hover:border-line-strong" : "",
+    "block overflow-hidden rounded-trevu-2xl border border-navy-200 bg-white shadow-trevu-sm",
+    "transition-all duration-300",
+    hover ? "hover:-translate-y-0.5 hover:shadow-trevu-lg" : "",
     PAD[padding],
     className ?? "",
   ]
