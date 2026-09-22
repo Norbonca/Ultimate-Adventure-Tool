@@ -52,11 +52,11 @@ export default async function TripManagePage({ params }: ManagePageProps) {
   const openSpots = trip.max_participants - approvedCount;
 
   const statusConfig: Record<string, { label: string; bg: string; text: string }> = {
-    draft: { label: t("trips.status.draft"), bg: "bg-navy-100", text: "text-navy-600" },
+    draft: { label: t("trips.status.draft"), bg: "bg-line", text: "text-ink-muted" },
     published: { label: t("trips.status.published"), bg: "bg-blue-50", text: "text-blue-700" },
     registration_open: { label: t("trips.status.registrationOpen"), bg: "bg-green-50", text: "text-green-700" },
-    active: { label: t("trips.status.active"), bg: "bg-trevu-50", text: "text-trevu-700" },
-    completed: { label: t("trips.status.completed"), bg: "bg-navy-100", text: "text-navy-500" },
+    active: { label: t("trips.status.active"), bg: "bg-[var(--color-primary-subtle)]", text: "text-accent" },
+    completed: { label: t("trips.status.completed"), bg: "bg-line", text: "text-ink-muted" },
     cancelled: { label: t("trips.status.cancelled"), bg: "bg-red-50", text: "text-red-600" },
   };
   const sc = statusConfig[trip.status] || statusConfig.draft;
@@ -67,7 +67,7 @@ export default async function TripManagePage({ params }: ManagePageProps) {
   const netProfit = revenue - expenses;
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-[100dvh] bg-canvas text-ink">
       <AppHeader
        
         user={{ email: user.email ?? "", displayName: user.user_metadata?.full_name }}
@@ -75,24 +75,24 @@ export default async function TripManagePage({ params }: ManagePageProps) {
 
       <BackButton fallback={`/trips/${slug}`} label={t('common.back')} />
 
-      <div className="max-w-7xl mx-auto flex">
+      <div className="mx-auto flex max-w-[1440px] flex-col lg:flex-row">
         {/* ── Sidebar ── */}
-        <aside className="w-72 border-r border-navy-200 bg-white min-h-[calc(100vh-64px)] p-5 space-y-6">
+        <aside className="w-full space-y-6 border-b border-line bg-surface p-5 lg:min-h-[calc(100vh-64px)] lg:w-72 lg:border-b-0 lg:border-r">
           {/* Status Badge */}
-          <span className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full ${sc.bg} ${sc.text}`}>
+          <span className={`inline-block px-2.5 py-1 text-xs font-bold uppercase tracking-wide ${sc.bg} ${sc.text}`}>
             {sc.label}
           </span>
 
           {/* Trip Name + Meta */}
           <div className="space-y-2">
-            <h2 className="text-lg font-bold text-navy-900 leading-tight">
+            <h2 className="font-display text-2xl font-extrabold leading-tight text-ink">
               {trip.title}
             </h2>
-            <div className="text-sm text-navy-500 space-y-1">
+            <div className="space-y-1 text-sm text-ink-muted">
               {trip.start_date && (
                 <p>
                   {new Date(trip.start_date).toLocaleDateString(dateLocale, { month: "short", day: "numeric" })}
-                  {trip.end_date && ` – ${new Date(trip.end_date).toLocaleDateString(dateLocale, { month: "short", day: "numeric", year: "numeric" })}`}
+                  {trip.end_date && ` - ${new Date(trip.end_date).toLocaleDateString(dateLocale, { month: "short", day: "numeric", year: "numeric" })}`}
                 </p>
               )}
               <p>{[trip.location_city, trip.location_country].filter(Boolean).join(", ")}</p>
@@ -101,14 +101,14 @@ export default async function TripManagePage({ params }: ManagePageProps) {
 
           {/* Crew Progress */}
           <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-navy-700">{t("trips.manage.crewProgress")}</h3>
-            <div className="w-full h-2.5 rounded-full bg-navy-100">
+            <h3 className="text-sm font-semibold text-ink">{t("trips.manage.crewProgress")}</h3>
+            <div className="h-1 w-full bg-line">
               <div
-                className="h-2.5 rounded-full bg-trevu-500 transition-all"
+                className="h-1 bg-accent transition-all"
                 style={{ width: `${Math.min(100, (approvedCount / trip.max_participants) * 100)}%` }}
               />
             </div>
-            <p className="text-sm text-navy-500">
+            <p className="text-sm text-ink-muted">
               {openSpots}/{trip.max_participants} {t("trips.manage.openSpots")}
             </p>
             {pendingCount > 0 && (
@@ -120,7 +120,7 @@ export default async function TripManagePage({ params }: ManagePageProps) {
 
           {/* Crew Members */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-navy-700">{t("trips.manage.crewMembers")}</h3>
+            <h3 className="text-sm font-semibold text-ink">{t("trips.manage.crewMembers")}</h3>
             <div className="space-y-2.5">
               {participants
                 .filter((p) => ["approved", "participant"].includes(p.status))
@@ -136,14 +136,14 @@ export default async function TripManagePage({ params }: ManagePageProps) {
 
                   return (
                     <div key={p.id} className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-trevu-500 text-white flex items-center justify-center text-xs font-bold shrink-0">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-on">
                         {(profile?.display_name || "?").charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <span className="text-sm font-medium text-navy-800 truncate block">
-                          {profile?.display_name || "—"}
+                        <span className="block truncate text-sm font-medium text-ink">
+                          {profile?.display_name || "-"}
                         </span>
-                        <span className="text-xs text-navy-400">
+                        <span className="text-xs text-ink-muted">
                           {isOrganizer
                             ? t("trips.detail.organizer")
                             : crew?.role_name || t("trips.participantStatus.participant")}
@@ -156,22 +156,22 @@ export default async function TripManagePage({ params }: ManagePageProps) {
           </div>
 
           {/* Sidebar Actions */}
-          <div className="space-y-2 pt-2 border-t border-navy-100">
+          <div className="space-y-2 border-t border-line pt-2">
             <Link
               href={`/trips/${slug}/edit`}
-              className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm font-semibold text-white bg-trevu-600 rounded-xl hover:bg-trevu-700 transition-colors"
+              className="flex w-full items-center justify-center gap-2 bg-accent px-4 py-2.5 text-sm font-bold text-accent-on transition-colors hover:bg-accent-hover"
             >
               <Icon name="pencil" size={15} /> {t("trips.manage.editTrip")}
             </Link>
             <button
               onClick={undefined}
-              className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm font-medium text-navy-600 bg-white border border-navy-200 rounded-xl hover:bg-navy-50 transition-colors"
+              className="flex w-full items-center justify-center gap-2 border border-line-strong bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:border-accent hover:text-accent"
             >
               <Icon name="share-2" size={15} /> {t("trips.manage.shareLink")}
             </button>
             <Link
               href={`/trips/${slug}`}
-              className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm font-medium text-navy-600 bg-white border border-navy-200 rounded-xl hover:bg-navy-50 transition-colors"
+              className="flex w-full items-center justify-center gap-2 border border-line-strong bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:border-accent hover:text-accent"
             >
               <Icon name="eye" size={15} /> {t("trips.manage.viewPublic")}
             </Link>
@@ -185,27 +185,27 @@ export default async function TripManagePage({ params }: ManagePageProps) {
 
           {/* Crew Positions */}
           {crewPositions.length > 0 && (
-            <div className="bg-white rounded-2xl border border-navy-200 p-6">
-              <h2 className="text-lg font-bold text-navy-900 mb-4">{t("trips.manage.crewPositions")}</h2>
+            <div className="border border-line bg-surface p-6">
+              <h2 className="mb-4 font-display text-2xl font-extrabold text-ink">{t("trips.manage.crewPositions")}</h2>
               <div className="space-y-3">
                 {crewPositions.map((pos) => (
                   <div key={pos.id} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <span className="text-sm font-semibold text-navy-800 bg-trevu-50 px-3 py-1 rounded-lg">
+                      <span className="bg-[var(--color-primary-subtle)] px-3 py-1 text-sm font-semibold text-ink">
                         {pos.role_name}
                       </span>
-                      <span className="text-xs text-navy-400 capitalize">
+                      <span className="text-xs capitalize text-ink-muted">
                         {pos.required_skill_level}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-24 h-2 rounded-full bg-navy-100">
+                      <div className="h-1 w-24 bg-line">
                         <div
-                          className="h-2 rounded-full bg-trevu-500"
+                          className="h-1 bg-accent"
                           style={{ width: `${Math.min(100, ((pos.filled_spots || 0) / pos.spots) * 100)}%` }}
                         />
                       </div>
-                      <span className="text-xs text-navy-500">
+                      <span className="text-xs text-ink-muted">
                         {pos.filled_spots || 0}/{pos.spots}
                       </span>
                     </div>
@@ -216,45 +216,45 @@ export default async function TripManagePage({ params }: ManagePageProps) {
           )}
 
           {/* Quick Actions */}
-          <div className="bg-white rounded-2xl border border-navy-200 p-6">
-            <h2 className="text-lg font-bold text-navy-900 mb-4">{t("trips.manage.quickActions")}</h2>
+          <div className="border border-line bg-surface p-6">
+            <h2 className="mb-4 font-display text-2xl font-extrabold text-ink">{t("trips.manage.quickActions")}</h2>
             <div className="grid grid-cols-2 gap-3">
               <Link
                 href={`/trips/${slug}/edit`}
-                className="flex items-center gap-3 p-4 rounded-xl border border-navy-200 hover:border-trevu-300 hover:bg-trevu-50/50 transition-all"
+                className="flex items-center gap-3 border border-line p-4 transition-colors hover:border-accent"
               >
-                <Icon name="pencil" size={18} className="text-navy-500" />
-                <span className="text-sm font-medium text-navy-700">{t("trips.manage.editTrip")}</span>
+                <Icon name="pencil" size={18} className="text-ink-muted" />
+                <span className="text-sm font-medium text-ink">{t("trips.manage.editTrip")}</span>
               </Link>
               <Link
                 href={`/trips/${slug}`}
-                className="flex items-center gap-3 p-4 rounded-xl border border-navy-200 hover:border-trevu-300 hover:bg-trevu-50/50 transition-all"
+                className="flex items-center gap-3 border border-line p-4 transition-colors hover:border-accent"
               >
-                <Icon name="eye" size={18} className="text-navy-500" />
-                <span className="text-sm font-medium text-navy-700">{t("trips.manage.viewPublic")}</span>
+                <Icon name="eye" size={18} className="text-ink-muted" />
+                <span className="text-sm font-medium text-ink">{t("trips.manage.viewPublic")}</span>
               </Link>
             </div>
           </div>
 
           {/* Financial Summary */}
-          <div className="bg-white rounded-2xl border border-navy-200 p-6">
-            <h2 className="text-lg font-bold text-navy-900 mb-4">{t("trips.manage.financialSummary")}</h2>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="bg-navy-50 rounded-xl p-4">
-                <span className="text-xs text-navy-400 block mb-1">{t("trips.manage.totalRevenue")}</span>
-                <span className="text-xl font-bold text-navy-900">
+          <div className="border border-line bg-surface p-6">
+            <h2 className="mb-4 font-display text-2xl font-extrabold text-ink">{t("trips.manage.financialSummary")}</h2>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="border border-line bg-canvas p-4">
+                <span className="mb-1 block text-xs text-ink-muted">{t("trips.manage.totalRevenue")}</span>
+                <span className="font-display text-2xl font-extrabold text-ink">
                   €{revenue.toLocaleString(dateLocale)}
                 </span>
               </div>
-              <div className="bg-navy-50 rounded-xl p-4">
-                <span className="text-xs text-navy-400 block mb-1">{t("trips.manage.expenses")}</span>
-                <span className="text-xl font-bold text-navy-900">
+              <div className="border border-line bg-canvas p-4">
+                <span className="mb-1 block text-xs text-ink-muted">{t("trips.manage.expenses")}</span>
+                <span className="font-display text-2xl font-extrabold text-ink">
                   €{expenses.toLocaleString(dateLocale)}
                 </span>
               </div>
-              <div className="bg-navy-50 rounded-xl p-4">
-                <span className="text-xs text-navy-400 block mb-1">{t("trips.manage.netProfit")}</span>
-                <span className="text-xl font-bold text-green-600">
+              <div className="border border-line bg-canvas p-4">
+                <span className="mb-1 block text-xs text-ink-muted">{t("trips.manage.netProfit")}</span>
+                <span className="font-display text-2xl font-extrabold text-[var(--color-success-text)]">
                   €{netProfit.toLocaleString(dateLocale)}
                 </span>
               </div>
@@ -263,8 +263,8 @@ export default async function TripManagePage({ params }: ManagePageProps) {
 
           {/* Pending Applications */}
           {pendingCount > 0 && (
-            <div className="bg-white rounded-2xl border border-amber-200 p-6">
-              <h2 className="text-lg font-bold text-navy-900 mb-4">
+            <div className="border border-[var(--color-warning)] bg-surface p-6">
+              <h2 className="mb-4 font-display text-2xl font-extrabold text-ink">
                 {t("trips.manage.pendingApplications")} ({pendingCount})
               </h2>
               <ApplicationsManager tripId={trip.id} initial={participants as ParticipantRow[]} />
