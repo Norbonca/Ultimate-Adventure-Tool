@@ -15,73 +15,79 @@ export default async function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-[100dvh] bg-canvas text-ink">
       <AppHeader
         user={{ email: user.email ?? "", displayName: user.user_metadata?.full_name }}
       />
 
-      {/* Dashboard Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <h2 className="text-2xl font-bold text-navy-900 mb-6">
+      <div className="mx-auto max-w-[1440px] px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
+        <div className="mb-8 border-l-4 border-accent pl-5">
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-ink-muted">
+            {t('dashboard.systemStatus')}
+          </p>
+          <h1 className="max-w-4xl font-display text-4xl font-extrabold leading-none tracking-tight text-ink sm:text-5xl">
           {t('dashboard.welcomeMessage', { name: user.user_metadata?.full_name || t('dashboard.welcomeDefault') })}
-        </h2>
+          </h1>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {/* Quick Action Cards */}
+        <div className="mb-8 grid grid-cols-1 gap-px bg-line lg:grid-cols-12">
           <Link
             href="/trips"
-            className="p-6 bg-white rounded-2xl border border-navy-200 hover:border-trevu-400 hover:shadow-trevu-lg transition-all group"
+            className="group flex min-h-64 flex-col justify-between bg-surface p-7 transition-colors hover:bg-[var(--color-primary-subtle)] lg:col-span-7 lg:p-9"
           >
-            <div className="w-12 h-12 rounded-xl bg-trevu-50 flex items-center justify-center mb-4">
-              <Icon name="backpack" size={24} className="text-trevu-600" />
+            <div className="flex h-12 w-12 items-center justify-center border border-accent text-accent">
+              <Icon name="backpack" size={24} />
             </div>
-            <h3 className="font-semibold text-navy-900 group-hover:text-trevu-600 transition-colors">
-              {t('dashboard.myTrips')}
-            </h3>
-            <p className="text-sm text-navy-500 mt-1">
-              {t('dashboard.myTripsDescription')}
-            </p>
+            <div>
+              <h2 className="font-display text-4xl font-extrabold leading-none text-ink transition-colors group-hover:text-accent">
+                {t('dashboard.myTrips')}
+              </h2>
+              <p className="mt-3 max-w-xl text-sm leading-6 text-ink-muted">
+                {t('dashboard.myTripsDescription')}
+              </p>
+            </div>
           </Link>
 
           <Link
             href="/trips/new"
-            className="p-6 bg-white rounded-2xl border border-navy-200 hover:border-trevu-400 hover:shadow-trevu-lg transition-all group"
+            className="group flex min-h-64 flex-col justify-between bg-ink p-7 text-canvas transition-colors hover:bg-accent hover:text-accent-on lg:col-span-5 lg:p-9"
           >
-            <div className="w-12 h-12 rounded-xl bg-trevu-50 flex items-center justify-center mb-4">
-              <Icon name="plus" size={24} className="text-trevu-600" />
+            <div className="flex h-12 w-12 items-center justify-center border border-current">
+              <Icon name="plus" size={24} />
             </div>
-            <h3 className="font-semibold text-navy-900 group-hover:text-trevu-600 transition-colors">
-              {t('dashboard.newTrip')}
-            </h3>
-            <p className="text-sm text-navy-500 mt-1">
-              {t('dashboard.newTripDescription')}
-            </p>
+            <div>
+              <h2 className="font-display text-4xl font-extrabold leading-none">
+                {t('dashboard.newTrip')}
+              </h2>
+              <p className="mt-3 max-w-md text-sm leading-6 opacity-75">
+                {t('dashboard.newTripDescription')}
+              </p>
+            </div>
           </Link>
 
-          <div className="p-6 bg-white rounded-2xl border border-navy-200 opacity-60">
-            <div className="w-12 h-12 rounded-xl bg-navy-100 flex items-center justify-center mb-4">
-              <Icon name="wallet" size={24} className="text-navy-500" />
+          <div className="bg-surface p-7 opacity-60 lg:col-span-6">
+            <div className="mb-8 flex h-10 w-10 items-center justify-center border border-line-strong text-ink-muted">
+              <Icon name="wallet" size={20} />
             </div>
-            <h3 className="font-semibold text-navy-900">{t('dashboard.expenses')}</h3>
-            <p className="text-sm text-navy-500 mt-1">
+            <h3 className="font-display text-2xl font-extrabold text-ink">{t('dashboard.expenses')}</h3>
+            <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-ink-muted">
               {t('common.comingSoon')}
             </p>
           </div>
 
-          <div className="p-6 bg-white rounded-2xl border border-navy-200 opacity-60">
-            <div className="w-12 h-12 rounded-xl bg-navy-100 flex items-center justify-center mb-4">
-              <Icon name="compass" size={24} className="text-navy-500" />
+          <div className="bg-surface p-7 opacity-60 lg:col-span-6">
+            <div className="mb-8 flex h-10 w-10 items-center justify-center border border-line-strong text-ink-muted">
+              <Icon name="compass" size={20} />
             </div>
-            <h3 className="font-semibold text-navy-900">{t('dashboard.guides')}</h3>
-            <p className="text-sm text-navy-500 mt-1">
+            <h3 className="font-display text-2xl font-extrabold text-ink">{t('dashboard.guides')}</h3>
+            <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-ink-muted">
               {t('common.comingSoon')}
             </p>
           </div>
         </div>
 
-        {/* Status */}
-        <div className="p-4 rounded-xl bg-trevu-50 border border-trevu-200">
-          <p className="text-sm text-trevu-800">
+        <div className="border-l-4 border-accent bg-[var(--color-primary-subtle)] px-5 py-4">
+          <p className="text-sm text-ink">
             <span className="font-semibold">{t('dashboard.systemStatus')}:</span>{" "}
             {t('dashboard.systemStatusText')}
           </p>

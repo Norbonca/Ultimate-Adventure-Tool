@@ -36,7 +36,7 @@ function PersonRow({
   followBack?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-3">
+    <div className="flex items-center gap-3 border border-line bg-surface px-4 py-3">
       {person.avatar_url ? (
         // eslint-disable-next-line @next/next/no-img-element -- avatar CDN-ről, next/image adopció külön kör (nyitott kérdés)
         <img
@@ -45,16 +45,16 @@ function PersonRow({
           className="w-10 h-10 rounded-full object-cover"
         />
       ) : (
-        <div className="w-10 h-10 rounded-full bg-teal-600 text-white flex items-center justify-center text-sm font-bold">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-sm font-bold text-accent-on">
           {initials(person.display_name)}
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold text-navy-900 truncate">
-          {person.display_name ?? "—"}
+        <p className="truncate text-sm font-semibold text-ink">
+          {person.display_name ?? "-"}
         </p>
         {person.slug && (
-          <p className="text-xs text-navy-400 truncate">@{person.slug}</p>
+          <p className="truncate text-xs text-ink-muted">@{person.slug}</p>
         )}
       </div>
       <FollowToggle
@@ -113,7 +113,7 @@ export default async function CommunityPage() {
   const profile = profileRes.data;
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-[100dvh] bg-canvas text-ink">
       <AppHeader
         user={{
           email: user.email ?? "",
@@ -121,8 +121,8 @@ export default async function CommunityPage() {
         }}
       />
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <h1 className="text-2xl font-extrabold text-navy-900 mb-6">
+      <div className="mx-auto max-w-[1440px] px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
+        <h1 className="mb-8 font-display text-4xl font-extrabold leading-none tracking-tight text-ink sm:text-5xl">
           {t("community.title")}
         </h1>
 
@@ -132,7 +132,7 @@ export default async function CommunityPage() {
             <FindFriends />
 
             <section>
-              <h2 className="text-base font-bold text-navy-900 mb-3">
+              <h2 className="mb-3 text-base font-bold uppercase tracking-[0.1em] text-ink">
                 {t("community.following")} ({following.length})
               </h2>
               {following.length > 0 ? (
@@ -142,14 +142,14 @@ export default async function CommunityPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-navy-500 bg-white border border-slate-200 rounded-xl px-4 py-6 text-center">
+                <p className="border border-line bg-surface px-4 py-6 text-center text-sm text-ink-muted">
                   {t("community.noFollowing")}
                 </p>
               )}
             </section>
 
             <section>
-              <h2 className="text-base font-bold text-navy-900 mb-3">
+              <h2 className="mb-3 text-base font-bold uppercase tracking-[0.1em] text-ink">
                 {t("community.followers")} ({followers.length})
               </h2>
               {followers.length > 0 ? (
@@ -164,7 +164,7 @@ export default async function CommunityPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-navy-500 bg-white border border-slate-200 rounded-xl px-4 py-6 text-center">
+                <p className="border border-line bg-surface px-4 py-6 text-center text-sm text-ink-muted">
                   {t("community.noFollowers")}
                 </p>
               )}
@@ -173,8 +173,8 @@ export default async function CommunityPage() {
 
           {/* ── Jobb sáv: amit mások látnak ── */}
           <aside className="w-full lg:w-[400px] shrink-0 space-y-6">
-            <section className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
-              <h2 className="text-base font-bold text-navy-900">
+            <section className="space-y-4 border border-line bg-surface p-5">
+              <h2 className="text-base font-bold uppercase tracking-[0.1em] text-ink">
                 {t("community.whatOthersSee")}
               </h2>
               <div className="flex items-center gap-3">
@@ -186,16 +186,16 @@ export default async function CommunityPage() {
                     className="w-12 h-12 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent font-bold text-accent-on">
                     {initials(profile?.display_name ?? null)}
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className="font-bold text-navy-900 truncate">
-                    {profile?.display_name ?? "—"}
+                  <p className="truncate font-bold text-ink">
+                    {profile?.display_name ?? "-"}
                   </p>
                   {profile?.slug && (
-                    <p className="text-xs text-navy-400 truncate">@{profile.slug}</p>
+                    <p className="truncate text-xs text-ink-muted">@{profile.slug}</p>
                   )}
                 </div>
               </div>
@@ -204,8 +204,8 @@ export default async function CommunityPage() {
               </Button>
             </section>
 
-            <section className="bg-white border border-slate-200 rounded-2xl p-5 space-y-3">
-              <h2 className="text-base font-bold text-navy-900">
+            <section className="space-y-3 border border-line bg-surface p-5">
+              <h2 className="text-base font-bold uppercase tracking-[0.1em] text-ink">
                 {t("community.myPublishedTrips")} ({myTrips.length})
               </h2>
               {myTrips.length > 0 ? (
@@ -214,14 +214,14 @@ export default async function CommunityPage() {
                     <Link
                       key={trip.id}
                       href={`/trips/${trip.slug}`}
-                      className="flex items-center gap-3 rounded-lg px-2 py-1.5 -mx-2 hover:bg-slate-50 transition-colors"
+                      className="-mx-2 flex items-center gap-3 px-2 py-2 transition-colors hover:bg-canvas"
                     >
-                      <div className="w-11 h-8 rounded-md bg-teal-50 shrink-0" />
+                      <div className="h-8 w-11 shrink-0 border-l-4 border-accent bg-[var(--color-primary-subtle)]" />
                       <div className="min-w-0">
-                        <p className="text-[13px] font-semibold text-navy-900 truncate">
+                        <p className="truncate text-[13px] font-semibold text-ink">
                           {trip.title}
                         </p>
-                        <p className="text-[11px] text-navy-400">
+                        <p className="text-[11px] text-ink-muted">
                           {trip.start_date}
                         </p>
                       </div>
@@ -229,11 +229,11 @@ export default async function CommunityPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-navy-500">
+                <p className="text-sm text-ink-muted">
                   {t("community.noPublishedTrips")}
                 </p>
               )}
-              <p className="text-xs text-navy-300">{t("community.blogComingSoon")}</p>
+              <p className="text-xs text-ink-muted">{t("community.blogComingSoon")}</p>
             </section>
           </aside>
         </div>
