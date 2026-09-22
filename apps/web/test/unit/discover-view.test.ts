@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { getTranslations } from '@uat/i18n';
 import { DEFAULT_DISCOVER_VIEW, DISCOVER_VIEWS, DISCOVER_VIEW_COOKIE, parseDiscoverView } from '@/lib/discover-view';
 
 describe('discover view', () => {
@@ -17,5 +18,11 @@ describe('discover view', () => {
 
   it('új cookie-név, hogy a korábbi választás ne takarja el a csempéket', () => {
     expect(DISCOVER_VIEW_COOKIE).toBe('trevu-discover-view-v2');
+  });
+
+  it('a magyar szervezői CTA természetes mondatot használ', () => {
+    expect(getTranslations('hu').discover.ctaTitle).toBe(
+      'Készen állsz a saját kalandod megszervezésére?'
+    );
   });
 });
