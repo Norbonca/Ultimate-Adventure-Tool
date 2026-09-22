@@ -167,7 +167,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
     : "";
 
   return (
-    <main className="min-h-screen bg-slate-50 pb-20 lg:pb-0">
+    <main className="min-h-[100dvh] bg-canvas pb-20 text-ink lg:pb-0">
       <div data-surface="night" className="contents">
         <AppHeader
           user={user ? { email: user.email ?? "", displayName: user.user_metadata?.full_name } : null}
@@ -186,7 +186,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
         )}
         <div aria-hidden className="absolute inset-0 bg-hero-scrim-mobile md:bg-hero-scrim" />
         {trip.cover_image_source === "user_upload" && (
-          <span className="absolute right-4 top-16 z-10 rounded-full bg-glass px-2.5 py-1 text-[11px] font-semibold text-ink backdrop-blur">
+          <span className="absolute right-4 top-16 z-10 bg-glass px-2.5 py-1 text-[11px] font-semibold text-ink backdrop-blur">
             <Icon name="camera" size={12} className="-mt-0.5 mr-1 inline" />{t("imagePicker.ownPhoto")}
           </span>
         )}
@@ -197,19 +197,19 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
           <div className="flex max-w-[760px] flex-col gap-3.5">
             <div className="flex flex-wrap items-center gap-2">
               {category && (
-                <span className="inline-flex w-fit items-center gap-1.5 rounded-chip bg-glass px-2.5 py-1 text-xs font-semibold text-ink backdrop-blur">
+                <span className="inline-flex w-fit items-center gap-1.5 bg-glass px-2.5 py-1 text-xs font-semibold text-ink backdrop-blur">
                   {catDisplay && <span style={{ color: catDisplay.colorHex }} className="inline-flex"><Icon name={catDisplay.icon} size={14} /></span>}
                   {categoryName}{subDisc ? ` · ${subDiscName}` : ""}
                 </span>
               )}
               {isCancelled && (
-                <span className="inline-flex items-center gap-1.5 rounded-chip bg-[var(--color-warning-subtle)] px-2.5 py-1 text-xs font-semibold text-[var(--color-warning-text)]">
+                <span className="inline-flex items-center gap-1.5 bg-[var(--color-warning-subtle)] px-2.5 py-1 text-xs font-semibold text-[var(--color-warning-text)]">
                   <Icon name="calendar" size={12} />
                   {t("trips.status.cancelled")}
                 </span>
               )}
             </div>
-            <h1 className="text-[30px] font-extrabold leading-[1.1] tracking-[-0.02em] text-ink [text-wrap:balance] md:text-hero-display">{trip.title}</h1>
+            <h1 className="font-display text-[42px] font-extrabold leading-[0.95] tracking-[-0.02em] text-ink [text-wrap:balance] md:text-hero-display">{trip.title}</h1>
             <p className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm font-medium text-ink-body">
               <span className="inline-flex items-center gap-1.5">
                 <Icon name="map-pin" size={16} className="text-ink-secondary" />
@@ -218,7 +218,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
               {startDate && (
                 <span className="inline-flex items-center gap-1.5">
                   <Icon name="calendar" size={16} className="text-ink-secondary" />
-                  {startDate}{endDate && startDate !== endDate ? ` – ${endDate}` : ""}
+                  {startDate}{endDate && startDate !== endDate ? ` - ${endDate}` : ""}
                 </span>
               )}
               {!isCancelled && (
@@ -234,7 +234,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
               {trip.price_amount ? `${Number(trip.price_amount).toFixed(0)} ${trip.price_currency} / ${t("trips.detail.perPerson")}` : t("trips.detail.free")}
             </span>
             {!isCancelled && (
-              <a href="#trip-apply" className="inline-flex h-12 items-center rounded-trevu bg-accent px-6 text-base font-semibold text-accent-on hover:bg-accent-hover focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]">
+              <a href="#trip-apply" className="inline-flex h-12 items-center bg-accent px-6 text-base font-bold text-accent-on hover:bg-accent-hover focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]">
                 {isOrganizer ? t("trips.detail.edit") : t("trips.detail.apply")}
               </a>
             )}
@@ -243,7 +243,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
       </section>
 
       {/* Content */}
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className="mx-auto max-w-6xl px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* ── Main Content (2 cols) ── */}
           <div className="lg:col-span-2 space-y-6">
@@ -259,22 +259,22 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
             {/* Quick Info Bar */}
             <div className="flex flex-wrap gap-3 text-sm">
               {startDate && (
-                <span className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-navy-200">
-                  <Icon name="calendar" size={15} className="text-navy-400" />
-                  <span className="font-medium text-navy-700">
+                <span className="flex items-center gap-1.5 border border-line bg-surface px-3 py-1.5">
+                  <Icon name="calendar" size={15} className="text-ink-muted" />
+                  <span className="font-medium text-ink">
                     {startDate}
-                    {endDate && startDate !== endDate ? ` → ${endDate}` : ""}
+                    {endDate && startDate !== endDate ? ` - ${endDate}` : ""}
                   </span>
                   {dayCount && (
-                    <span className="text-navy-400">
+                    <span className="text-ink-muted">
                       ({dayCount} {t("trips.detail.days")})
                     </span>
                   )}
                 </span>
               )}
-              <span className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-navy-200">
-                <Icon name="map-pin" size={15} className="text-navy-400" />
-                <span className="font-medium text-navy-700">
+              <span className="flex items-center gap-1.5 border border-line bg-surface px-3 py-1.5">
+                <Icon name="map-pin" size={15} className="text-ink-muted" />
+                <span className="font-medium text-ink">
                   {[trip.location_city, trip.location_region, trip.location_country]
                     .filter(Boolean)
                     .join(", ")}
@@ -282,7 +282,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
               </span>
               {diffLevel && (
                 <span
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border"
+                  className="flex items-center gap-1.5 border px-3 py-1.5"
                   style={{
                     borderColor: diffLevel.color,
                     color: diffLevel.color,
@@ -293,15 +293,15 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                   <span className="opacity-60">({trip.difficulty}/5)</span>
                 </span>
               )}
-              <span className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-navy-200">
-                <Icon name="users" size={15} className="text-navy-400" />
-                <span className="font-medium text-navy-700">
+              <span className="flex items-center gap-1.5 border border-line bg-surface px-3 py-1.5">
+                <Icon name="users" size={15} className="text-ink-muted" />
+                <span className="font-medium text-ink">
                   {trip.current_participants || 0}/{trip.max_participants} {t("trips.detail.guestsLabel")}
                 </span>
                 {totalStaff > 0 && (
                   <>
-                    <span className="text-navy-300 mx-1">·</span>
-                    <span className="font-medium text-emerald-700">
+                    <span className="mx-1 text-ink-muted">·</span>
+                    <span className="font-medium text-[var(--color-success-text)]">
                       {filledStaff}/{totalStaff} {t("trips.detail.staffLabel")}
                     </span>
                   </>
@@ -310,16 +310,16 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
             </div>
 
             {/* Description */}
-            <div className="bg-white rounded-2xl border border-navy-200 p-6">
-              <h2 className="text-lg font-bold text-navy-900 mb-3">
+            <div className="border border-line bg-surface p-6">
+              <h2 className="mb-3 font-display text-3xl font-extrabold text-ink">
                 {t("trips.detail.description")}
               </h2>
               {trip.short_description && (
-                <p className="text-trevu-700 font-medium mb-3">
+                <p className="mb-3 font-medium text-accent">
                   {trip.short_description}
                 </p>
               )}
-              <div className="text-navy-600 leading-relaxed whitespace-pre-wrap">
+              <div className="whitespace-pre-wrap leading-relaxed text-ink-muted">
                 {trip.description}
               </div>
             </div>
@@ -327,8 +327,8 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
             {/* Category-Specific Details */}
             {paramDefs.length > 0 &&
               Object.keys(categoryDetails).length > 0 && (
-                <div className="bg-white rounded-2xl border border-navy-200 p-6">
-                  <h2 className="text-lg font-bold text-navy-900 mb-4">
+                <div className="border border-line bg-surface p-6">
+                  <h2 className="mb-4 font-display text-3xl font-extrabold text-ink">
                     {categoryName} {t("trips.detail.details")}
                   </h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -344,18 +344,19 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                       return (
                         <div
                           key={param.parameter_key}
-                          className="bg-navy-50 rounded-xl p-3"
+                          className="border border-line bg-canvas p-3"
                         >
-                          <span className="text-xs text-navy-400 block mb-0.5">
+                          <span className="mb-0.5 block text-xs text-ink-muted">
                             {paramLabel}
                           </span>
-                          <span className="text-sm font-semibold text-navy-800">
+                          <span className="text-sm font-semibold text-ink">
                             <DetailValue
                               value={val}
                               fieldType={param.field_type}
                               unit={param.unit}
                               options={param.options}
                               locale={locale}
+                              t={t}
                             />
                           </span>
                         </div>
@@ -371,7 +372,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                 {trip.tags.map((tag: string) => (
                   <span
                     key={tag}
-                    className="px-3 py-1 rounded-full bg-navy-100 text-navy-600 text-xs font-medium"
+                    className="border border-line bg-surface px-3 py-1 text-xs font-medium text-ink-muted"
                   >
                     #{tag}
                   </span>
@@ -383,21 +384,21 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
           {/* ── Sidebar (1 col) ── */}
           <div className="space-y-4">
             {/* CTA Card */}
-            <div id="trip-apply" className="scroll-mt-24 bg-white rounded-2xl border border-navy-200 p-6 space-y-4">
+            <div id="trip-apply" className="scroll-mt-24 space-y-4 border border-line bg-surface p-6">
               {trip.price_amount ? (
                 <div className="text-center">
-                  <span className="text-3xl font-extrabold text-navy-900">
+                  <span className="font-display text-4xl font-extrabold text-ink">
                     {trip.price_currency} {Number(trip.price_amount).toFixed(0)}
                   </span>
-                  <span className="text-navy-400 text-sm"> / {t("trips.detail.perPerson")}</span>
+                  <span className="text-sm text-ink-muted"> / {t("trips.detail.perPerson")}</span>
                 </div>
               ) : (
                 <div className="text-center">
-                  <span className="text-xl font-bold text-trevu-600">
+                  <span className="font-display text-3xl font-extrabold text-accent">
                     {t("trips.detail.free")}
                   </span>
                   {trip.is_cost_sharing && (
-                    <span className="block text-xs text-navy-400 mt-1">
+                    <span className="mt-1 block text-xs text-ink-muted">
                       {t("trips.detail.withCostSharing")}
                     </span>
                   )}
@@ -405,20 +406,20 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
               )}
 
               {!isCancelled && (
-              <div className="text-center text-sm text-navy-500">
+              <div className="text-center text-sm text-ink-muted">
                 <span
-                  className={`font-bold ${spotsLeft > 0 ? "text-trevu-600" : "text-red-500"}`}
+                  className={`font-bold ${spotsLeft > 0 ? "text-accent" : "text-[var(--color-danger)]"}`}
                 >
                   {spotsLeft > 0
                     ? `${spotsLeft} ${t("trips.detail.spotsLeft")}`
                     : t("trips.detail.full")}
                 </span>
-                <span className="text-navy-300"> / {trip.max_participants}</span>
+                <span className="text-ink-muted"> / {trip.max_participants}</span>
               </div>
               )}
 
               {!isOrganizer && isCancelled && (
-                <p className="flex items-center justify-center gap-2 w-full min-h-[48px] rounded-trevu bg-slate-100 px-4 text-[15px] font-semibold text-navy-500">
+                <p className="flex min-h-[48px] w-full items-center justify-center gap-2 bg-line px-4 text-[15px] font-semibold text-ink-muted">
                   <Icon name="lock" size={18} />
                   {t("trips.deletion.applyClosed")}
                 </p>
@@ -437,7 +438,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
               {isOrganizer && (
                 <Link
                   href={`/trips/${slug}/edit`}
-                  className="block w-full py-3 text-center bg-navy-100 text-navy-700 font-bold rounded-xl hover:bg-navy-200 transition-colors"
+                  className="block w-full border border-line-strong bg-surface py-3 text-center font-bold text-ink transition-colors hover:border-accent hover:text-accent"
                 >
                   {t("trips.detail.edit")}
                 </Link>
@@ -446,26 +447,26 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
 
             {/* Organizer Card */}
             {organizer && (
-              <div className="bg-white rounded-2xl border border-navy-200 p-5">
-                <h3 className="text-xs font-semibold text-navy-400 uppercase tracking-wider mb-3">
+              <div className="border border-line bg-surface p-5">
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-muted">
                   {t("trips.detail.organizer")}
                 </h3>
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full bg-trevu-600 text-white flex items-center justify-center font-bold text-sm">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-accent text-sm font-bold text-accent-on">
                     {(organizer.display_name || "?").charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <span className="text-sm font-semibold text-navy-900">
+                    <span className="text-sm font-semibold text-ink">
                       {organizer.display_name || t("common.user")}
                     </span>
                     {organizer.subscription_tier &&
                       organizer.subscription_tier !== "free" && (
-                        <span className="ml-1.5 text-xs bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded-full font-medium">
+                        <span className="ml-1.5 bg-[var(--color-primary-subtle)] px-1.5 py-0.5 text-xs font-medium text-accent">
                           {organizer.subscription_tier}
                         </span>
                       )}
                     {organizer.slug && (
-                      <span className="block text-xs text-navy-400">
+                      <span className="block text-xs text-ink-muted">
                         @{organizer.slug}
                       </span>
                     )}
@@ -476,13 +477,13 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
 
             {/* Public Crew Card — only when there are crew positions */}
             {crewPositions.length > 0 && (
-              <div className="bg-white rounded-2xl border border-navy-200 p-5 space-y-3">
-                <h3 className="text-base font-bold text-navy-900">
+              <div className="space-y-3 border border-line bg-surface p-5">
+                <h3 className="font-display text-2xl font-extrabold text-ink">
                   {t("trips.detail.crewCardTitle")}
                 </h3>
 
                 {teamTotal > 0 && (
-                  <div className="flex items-center gap-2 rounded-md bg-emerald-50 text-emerald-700 px-3 py-2 text-xs font-semibold">
+                  <div className="flex items-center gap-2 bg-[var(--color-success-subtle)] px-3 py-2 text-xs font-semibold text-[var(--color-success-text)]">
                     <Icon name="users" size={14} />
                     <span>
                       {t("trips.detail.teamSetup")
@@ -500,16 +501,16 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                     const ratio = total > 0 ? filled / total : 0;
                     const pct = Math.min(100, Math.round(ratio * 100));
                     const barColor =
-                      ratio >= 1 ? "#10B981" : ratio > 0 ? "#EAB308" : "#CBD5E1";
+                      ratio >= 1 ? "var(--color-success)" : ratio > 0 ? "var(--color-warning)" : "var(--color-border-strong)";
                     return (
                       <li key={pos.id} className="space-y-1.5">
                         <div className="flex justify-between text-sm">
-                          <span className="font-semibold text-navy-900">{pos.role_name}</span>
-                          <span className="text-navy-400 text-xs tabular-nums">{filled}/{total}</span>
+                          <span className="font-semibold text-ink">{pos.role_name}</span>
+                          <span className="text-xs tabular-nums text-ink-muted">{filled}/{total}</span>
                         </div>
-                        <div className="h-2 rounded-full bg-navy-100 overflow-hidden">
+                        <div className="h-1 overflow-hidden bg-line">
                           <div
-                            className="h-full rounded-full transition-all"
+                            className="h-full transition-all"
                             style={{ width: `${pct}%`, backgroundColor: barColor }}
                           />
                         </div>
@@ -519,12 +520,12 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                 </ul>
 
                 {!isOrganizer && !isCancelled && crewPositions.some((p: { spots: number; filled_spots: number }) => (p.filled_spots ?? 0) < (p.spots ?? 0)) && (
-                  <div className="pt-1 text-sm font-semibold text-emerald-600">
+                  <div className="pt-1 text-sm font-semibold text-[var(--color-success-text)]">
                     {t("trips.detail.applyForPosition")}
                   </div>
                 )}
                 {crewPositions.every((p: { spots: number; filled_spots: number }) => (p.filled_spots ?? 0) >= (p.spots ?? 0)) && (
-                  <div className="pt-1 text-xs text-navy-400">
+                  <div className="pt-1 text-xs text-ink-muted">
                     {t("trips.detail.allPositionsFilled")}
                   </div>
                 )}
@@ -532,13 +533,13 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
             )}
 
             {/* Trip Meta */}
-            <div className="bg-white rounded-2xl border border-navy-200 p-5 space-y-3 text-sm">
-              <h3 className="text-xs font-semibold text-navy-400 uppercase tracking-wider">
+            <div className="space-y-3 border border-line bg-surface p-5 text-sm">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
                 {t("trips.detail.details")}
               </h3>
               <div className="flex justify-between">
-                <span className="text-navy-500">{t("trips.wizard.visibility")}</span>
-                <span className="font-medium text-navy-700">
+                <span className="text-ink-muted">{t("trips.wizard.visibility")}</span>
+                <span className="font-medium text-ink">
                   <span className="inline-flex items-center gap-1.5">
                     <Icon name={trip.visibility === "public" ? "globe" : trip.visibility === "followers_only" ? "users" : "lock"} size={14} />
                     {trip.visibility === "public"
@@ -550,8 +551,8 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-navy-500">{t("trips.detail.approval")}</span>
-                <span className="font-medium text-navy-700">
+                <span className="text-ink-muted">{t("trips.detail.approval")}</span>
+                <span className="font-medium text-ink">
                   {trip.require_approval
                     ? t("trips.detail.required")
                     : t("trips.detail.automatic")}
@@ -559,8 +560,8 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
               </div>
               {trip.registration_deadline && (
                 <div className="flex justify-between">
-                  <span className="text-navy-500">{t("trips.wizard.registrationDeadline")}</span>
-                  <span className="font-medium text-navy-700">
+                  <span className="text-ink-muted">{t("trips.wizard.registrationDeadline")}</span>
+                  <span className="font-medium text-ink">
                     {trip.registration_deadline_date
                       ? t("trips.detail.registrationDeadlineUntil", {
                           date: formatLocalDate(String(trip.registration_deadline_date), dateLocale),
@@ -577,14 +578,14 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
 
       {/* StickyActionBar — Night, csak mobilon (Brand Guide v2 §6, UX-004; terv: #M0RLZp) */}
       {!isCancelled && (
-        <div data-surface="night" className="fixed inset-x-0 bottom-0 z-40 flex h-16 items-center justify-between gap-3 border-t border-line bg-[rgba(15,23,42,.92)] px-4 pb-[env(safe-area-inset-bottom)] backdrop-blur-[10px] lg:hidden" data-testid="trip-sticky-bar">
+        <div data-surface="night" className="fixed inset-x-0 bottom-0 z-40 flex h-16 items-center justify-between gap-3 border-t border-line bg-surface px-4 pb-[env(safe-area-inset-bottom)] lg:hidden" data-testid="trip-sticky-bar">
           <div className="flex flex-col">
             <span className="text-base font-semibold text-ink">
               {trip.price_amount ? `${Number(trip.price_amount).toFixed(0)} ${trip.price_currency} / ${t("trips.detail.perPerson")}` : t("trips.detail.free")}
             </span>
             <span className="text-xs text-ink-muted">{spotsLeft > 0 ? `${spotsLeft} ${t("trips.detail.spotsLeft")}` : t("trips.detail.full")}</span>
           </div>
-          <a href="#trip-apply" className="inline-flex h-11 items-center rounded-trevu bg-accent px-5 text-sm font-semibold text-accent-on">
+          <a href="#trip-apply" className="inline-flex h-11 items-center bg-accent px-5 text-sm font-bold text-accent-on">
             {isOrganizer ? t("trips.detail.edit") : t("trips.detail.apply")}
           </a>
         </div>
@@ -595,40 +596,23 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
 
 // ── Helper Components ──
 
-// Currently unused — kept for the status column planned on this screen.
-function _TripStatusBadge({ status, t }: { status: string; t: (key: string) => string }) {
-  const config: Record<string, { bg: string; text: string; key: string }> = {
-    draft: { bg: "bg-navy-100", text: "text-navy-600", key: "trips.status.draft" },
-    published: { bg: "bg-trevu-50", text: "text-trevu-700", key: "trips.status.published" },
-    registration_open: { bg: "bg-green-50", text: "text-green-700", key: "trips.status.registrationOpen" },
-    active: { bg: "bg-blue-50", text: "text-blue-700", key: "trips.status.active" },
-    completed: { bg: "bg-navy-100", text: "text-navy-600", key: "trips.status.completed" },
-    cancelled: { bg: "bg-red-50", text: "text-red-600", key: "trips.status.cancelled" },
-    archived: { bg: "bg-navy-50", text: "text-navy-400", key: "trips.status.archived" },
-  };
-  const c = config[status] || config.draft;
-  return (
-    <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${c.bg} ${c.text}`}>
-      {t(c.key)}
-    </span>
-  );
-}
-
 function DetailValue({
   value,
   fieldType,
   unit,
   options,
   locale,
+  t,
 }: {
   value: unknown;
   fieldType: string;
   unit: string | null;
   options: ParameterDisplayOption[];
   locale: string;
+  t: (key: "common.yes" | "common.no") => string;
 }) {
   if (typeof value === "boolean") {
-    return value ? <Icon name="check-circle-2" size={16} className="text-emerald-600" label={locale === "en" ? "Yes" : "Igen"} /> : <Icon name="x-circle" size={16} className="text-red-500" label={locale === "en" ? "No" : "Nem"} />;
+    return value ? <Icon name="check-circle-2" size={16} className="text-[var(--color-success-text)]" label={t("common.yes")} /> : <Icon name="x-circle" size={16} className="text-[var(--color-danger)]" label={t("common.no")} />;
   }
   return <>{formatParameterValue(value, fieldType, unit, options, locale)}</>;
 }

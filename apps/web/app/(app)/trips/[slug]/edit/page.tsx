@@ -40,7 +40,7 @@ export default async function EditTripPage({ params }: EditPageProps) {
     : [];
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-[100dvh] bg-canvas text-ink">
       <AppHeader
         user={{ email: user.email ?? "", displayName: user.user_metadata?.full_name }}
       />
