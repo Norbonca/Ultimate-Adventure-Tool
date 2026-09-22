@@ -84,15 +84,15 @@ export default async function MyTripsPage({
   ];
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-[100dvh] bg-canvas text-ink">
       <AppHeader
         user={{ email: user.email ?? "", displayName: user.user_metadata?.full_name }}
       />
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="mx-auto max-w-[1440px] px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
         {/* ── Fejsor: cím + kereső + Új túra ── */}
         <div className="flex flex-wrap items-center gap-4 mb-6">
-          <h1 className="text-2xl font-extrabold text-navy-900 mr-auto">
+          <h1 className="mr-auto font-display text-4xl font-extrabold leading-none tracking-tight text-ink sm:text-5xl">
             {t("trips.myTripsTitle")}
           </h1>
           <form method="GET" className="relative">
@@ -100,14 +100,14 @@ export default async function MyTripsPage({
             <Icon
               name="search"
               size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-navy-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted"
             />
             <input
               type="text"
               name="q"
               defaultValue={q ?? ""}
               placeholder={t("trips.searchPlaceholder")}
-              className="input-trevu w-64 pl-9 pr-3 py-2 text-sm"
+              className="h-12 w-64 border border-line-strong bg-surface py-2 pl-9 pr-3 text-sm text-ink outline-none transition-colors placeholder:text-ink-muted focus:border-accent"
             />
           </form>
           <Button href="/trips/new" icon="plus">
@@ -116,7 +116,7 @@ export default async function MyTripsPage({
         </div>
 
         {/* ── Fülek ── */}
-        <nav className="flex gap-1 border-b border-navy-200 mb-6">
+        <nav className="mb-8 flex gap-1 border-b border-line">
           {tabs.map((item) => (
             <Link
               key={item.key}
@@ -125,8 +125,8 @@ export default async function MyTripsPage({
               }
               className={`px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors ${
                 tab === item.key
-                  ? "border-trevu-600 text-trevu-600"
-                  : "border-transparent text-navy-500 hover:text-navy-800"
+                  ? "border-accent text-accent"
+                  : "border-transparent text-ink-muted hover:text-ink"
               }`}
             >
               {item.label} ({item.count})
@@ -150,7 +150,7 @@ export default async function MyTripsPage({
                   }
                 />
               ) : (
-                <p className="text-sm text-navy-500 bg-white border border-navy-200 rounded-xl px-4 py-8 text-center">
+                <p className="border border-line bg-surface px-4 py-8 text-center text-sm text-ink-muted">
                   {t("trips.noTripsInTab")}
                 </p>
               )
@@ -166,7 +166,7 @@ export default async function MyTripsPage({
                 const fill = max > 0 ? Math.min((current / max) * 100, 100) : 0;
                 const dates =
                   trip.start_date && trip.end_date
-                    ? `${new Date(trip.start_date).toLocaleDateString(dateLocale, { month: "short", day: "numeric" })} – ${new Date(trip.end_date).toLocaleDateString(dateLocale, { month: "short", day: "numeric", year: "numeric" })}`
+                    ? `${new Date(trip.start_date).toLocaleDateString(dateLocale, { month: "short", day: "numeric" })} - ${new Date(trip.end_date).toLocaleDateString(dateLocale, { month: "short", day: "numeric", year: "numeric" })}`
                     : null;
                 const location = [trip.location_city || trip.location_region, trip.location_country]
                   .filter(Boolean)
@@ -176,10 +176,10 @@ export default async function MyTripsPage({
                   <Link
                     key={trip.id}
                     href={`/trips/${trip.slug}`}
-                    className="group flex items-center gap-4 bg-white border border-navy-200 rounded-2xl px-5 py-4 hover:border-trevu-400 hover:shadow-lg transition-all"
+                    className="group flex items-center gap-4 border border-line bg-surface px-5 py-4 transition-colors hover:border-accent"
                   >
                     <div
-                      className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+                      className="flex h-11 w-11 shrink-0 items-center justify-center"
                       style={{
                         backgroundColor: `${catDisplay?.colorHex || "#0D9488"}1f`,
                       }}
@@ -187,25 +187,25 @@ export default async function MyTripsPage({
                       <Icon
                         name={catDisplay?.icon || "compass"}
                         size={20}
-                        className="text-navy-700"
+                        className="text-ink"
                       />
                     </div>
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2.5">
-                        <h3 className="font-bold text-navy-900 truncate group-hover:text-trevu-600 transition-colors">
+                        <h3 className="truncate font-bold text-ink transition-colors group-hover:text-accent">
                           {trip.title}
                         </h3>
                         <StatusBadge status={trip.status} t={t} />
                       </div>
-                      <p className="text-xs text-navy-500 mt-1 truncate">
+                      <p className="mt-1 truncate text-xs text-ink-muted">
                         {[dates, location, t("trips.participantsOf", { current, max })]
                           .filter(Boolean)
                           .join(" · ")}
                       </p>
-                      <div className="mt-2.5 h-1.5 rounded-full bg-navy-100 overflow-hidden">
+                      <div className="mt-2.5 h-1 overflow-hidden bg-line">
                         <div
-                          className="h-full rounded-full bg-trevu-500"
+                          className="h-full bg-accent"
                           style={{ width: `${fill}%` }}
                         />
                       </div>
@@ -214,7 +214,7 @@ export default async function MyTripsPage({
                     <Icon
                       name="chevron-right"
                       size={18}
-                      className="text-navy-300 group-hover:text-trevu-500 shrink-0 transition-colors"
+                      className="shrink-0 text-ink-muted transition-colors group-hover:text-accent"
                     />
                   </Link>
                 );
@@ -225,8 +225,8 @@ export default async function MyTripsPage({
 
           {/* ── Jobb sáv ── */}
           <aside className="w-full lg:w-[320px] shrink-0 space-y-6">
-            <section className="bg-white border border-navy-200 rounded-2xl p-5">
-              <h2 className="text-sm font-bold text-navy-900 mb-3">
+            <section className="border border-line bg-surface p-5">
+              <h2 className="mb-3 text-sm font-bold uppercase tracking-[0.12em] text-ink">
                 {t("trips.recentActivity")}
               </h2>
               {recentApplications && recentApplications.length > 0 ? (
@@ -238,12 +238,12 @@ export default async function MyTripsPage({
                     const trip = app.trips as unknown as { title: string } | null;
                     return (
                       <li key={app.id} className="text-sm">
-                        <p className="text-navy-800">
+                        <p className="text-ink">
                           {t("trips.newApplication", {
-                            name: profile?.display_name ?? "—",
+                            name: profile?.display_name ?? "-",
                           })}
                         </p>
-                        <p className="text-xs text-navy-400 truncate">
+                        <p className="truncate text-xs text-ink-muted">
                           {trip?.title}
                           {app.applied_at &&
                             ` · ${new Date(app.applied_at).toLocaleDateString(dateLocale, { month: "short", day: "numeric" })}`}
@@ -253,30 +253,30 @@ export default async function MyTripsPage({
                   })}
                 </ul>
               ) : (
-                <p className="text-sm text-navy-400">{t("trips.noActivity")}</p>
+                <p className="text-sm text-ink-muted">{t("trips.noActivity")}</p>
               )}
             </section>
 
-            <section className="bg-white border border-navy-200 rounded-2xl p-5">
-              <h2 className="text-sm font-bold text-navy-900 mb-3">
+            <section className="border border-line bg-surface p-5">
+              <h2 className="mb-3 text-sm font-bold uppercase tracking-[0.12em] text-ink">
                 {t("trips.listStats.title")}
               </h2>
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div>
-                  <p className="text-xl font-extrabold text-navy-900">
+                  <p className="font-display text-2xl font-extrabold text-ink">
                     {realTrips.length}
                   </p>
-                  <p className="text-xs text-navy-400">{t("trips.listStats.trips")}</p>
+                  <p className="text-xs text-ink-muted">{t("trips.listStats.trips")}</p>
                 </div>
                 <div>
-                  <p className="text-xl font-extrabold text-navy-900">
+                  <p className="font-display text-2xl font-extrabold text-ink">
                     {Math.round(totalDays)}
                   </p>
-                  <p className="text-xs text-navy-400">{t("trips.listStats.days")}</p>
+                  <p className="text-xs text-ink-muted">{t("trips.listStats.days")}</p>
                 </div>
                 <div>
-                  <p className="text-xl font-extrabold text-navy-900">{countries}</p>
-                  <p className="text-xs text-navy-400">
+                  <p className="font-display text-2xl font-extrabold text-ink">{countries}</p>
+                  <p className="text-xs text-ink-muted">
                     {t("trips.listStats.countries")}
                   </p>
                 </div>
@@ -297,13 +297,13 @@ function StatusBadge({
   t: (key: TranslationKey, params?: Record<string, string | number>) => string;
 }) {
   const styles: Record<string, string> = {
-    draft: "bg-navy-100 text-navy-600",
-    published: "bg-trevu-50 text-trevu-700",
+    draft: "bg-line text-ink-muted",
+    published: "bg-[var(--color-primary-subtle)] text-accent",
     registration_open: "bg-green-50 text-green-700",
     active: "bg-blue-50 text-blue-700",
-    completed: "bg-navy-100 text-navy-500",
+    completed: "bg-line text-ink-muted",
     cancelled: "bg-red-50 text-red-600",
-    archived: "bg-navy-100 text-navy-400",
+    archived: "bg-line text-ink-muted",
   };
 
   const statusKeyMap: Record<string, TranslationKey> = {
@@ -318,7 +318,7 @@ function StatusBadge({
 
   return (
     <span
-      className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${styles[status] || styles.draft}`}
+      className={`shrink-0 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${styles[status] || styles.draft}`}
     >
       {t(statusKeyMap[status] || "trips.status.draft")}
     </span>

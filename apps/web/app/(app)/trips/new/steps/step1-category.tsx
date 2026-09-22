@@ -26,10 +26,10 @@ export function Step1Category({
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-navy-900 mb-2">
+      <h2 className="mb-2 font-display text-4xl font-extrabold leading-none text-ink">
         {t("trips.wizard.categoryPrompt")}
       </h2>
-      <p className="text-navy-500 mb-8">
+      <p className="mb-8 text-ink-muted">
         {t("trips.wizard.categoryDescription")}
       </p>
 
@@ -40,29 +40,30 @@ export function Step1Category({
           const isSelected = selectedCategoryId === cat.id;
           const localName =
             (cat.name_localized as Record<string, string>)?.[locale] || cat.name;
+          const categoryColor = cat.color_hex || "var(--color-primary)";
 
           return (
             <button
               key={cat.id}
               onClick={() => onSelect(cat.id, cat.name)}
               disabled={isLoading}
-              className={`relative flex flex-col items-center justify-center p-5 rounded-2xl border-2 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 ${
+              className={`relative flex flex-col items-center justify-center border-2 p-5 transition-colors disabled:opacity-70 ${
                 isSelected
-                  ? "border-trevu-500 bg-trevu-50 shadow-lg shadow-trevu-600/10"
-                  : "border-navy-200 bg-white hover:border-navy-300 hover:shadow-md"
+                  ? "border-accent bg-[var(--color-primary-subtle)]"
+                  : "border-line bg-surface hover:border-line-strong"
               }`}
             >
               <div
-                className="w-14 h-14 rounded-xl flex items-center justify-center mb-3"
-                style={{ backgroundColor: `${cat.color_hex}15`, color: cat.color_hex }}
+                className="mb-3 flex h-14 w-14 items-center justify-center"
+                style={{ backgroundColor: `color-mix(in srgb, ${categoryColor} 12%, transparent)`, color: categoryColor }}
               >
                 <Icon name={display?.icon || cat.icon_name || "compass"} size={28} strokeWidth={1.5} />
               </div>
-              <span className="text-sm font-semibold text-navy-900">
+              <span className="text-sm font-semibold text-ink">
                 {localName}
               </span>
               {(display?.descriptionHu || cat.description) && (
-                <span className="text-xs text-navy-400 mt-1 text-center line-clamp-2">
+                <span className="mt-1 line-clamp-2 text-center text-xs text-ink-muted">
                   {locale === "hu"
                     ? (display?.descriptionHu || (cat.description as string))
                     : (cat.description as string)
@@ -70,10 +71,8 @@ export function Step1Category({
                 </span>
               )}
               {isSelected && (
-                <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-trevu-600 text-white flex items-center justify-center">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
+                <div className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center bg-accent text-accent-on">
+                  <Icon name="check" size={14} strokeWidth={3} />
                 </div>
               )}
             </button>
@@ -82,33 +81,33 @@ export function Step1Category({
       </div>
 
       {isLoading && (
-        <div className="mt-6 text-center text-sm text-navy-400 animate-pulse">
+        <div className="mt-6 animate-pulse text-center text-sm text-ink-muted">
           {t("trips.wizard.loadingSubcategories")}
         </div>
       )}
 
       {/* Trip Type Selector */}
       <div className="mt-10">
-        <h3 className="text-lg font-bold text-navy-900 text-center mb-4">
+        <h3 className="mb-4 text-center font-display text-2xl font-extrabold text-ink">
           {t("trips.wizard.whoIsThisFor")}
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
           {/* Private Trip */}
           <button
             onClick={() => onTripTypeChange("private")}
-            className={`text-left p-5 rounded-xl border-2 transition-all ${
+            className={`border-2 p-5 text-left transition-colors ${
               tripType === "private"
-                ? "border-trevu-500 bg-trevu-50/50"
-                : "border-navy-200 bg-white hover:border-navy-300"
+                ? "border-accent bg-[var(--color-primary-subtle)]"
+                : "border-line bg-surface hover:border-line-strong"
             }`}
           >
             <div className="flex items-center gap-3 mb-2">
-              <Icon name="lock" size={18} className="text-navy-500" />
-              <h4 className="font-semibold text-navy-900">
+              <Icon name="lock" size={18} className="text-ink-muted" />
+              <h4 className="font-semibold text-ink">
                 {t("trips.wizard.tripTypePrivate")}
               </h4>
             </div>
-            <p className="text-xs text-navy-500 leading-relaxed">
+            <p className="text-xs leading-relaxed text-ink-muted">
               {t("trips.wizard.tripTypePrivateDesc")}
             </p>
           </button>
@@ -116,19 +115,19 @@ export function Step1Category({
           {/* Public Event */}
           <button
             onClick={() => onTripTypeChange("public")}
-            className={`text-left p-5 rounded-xl border-2 transition-all ${
+            className={`border-2 p-5 text-left transition-colors ${
               tripType === "public"
-                ? "border-trevu-500 bg-trevu-50/50"
-                : "border-navy-200 bg-white hover:border-navy-300"
+                ? "border-accent bg-[var(--color-primary-subtle)]"
+                : "border-line bg-surface hover:border-line-strong"
             }`}
           >
             <div className="flex items-center gap-3 mb-2">
-              <Icon name="globe" size={18} className="text-navy-500" />
-              <h4 className="font-semibold text-navy-900">
+              <Icon name="globe" size={18} className="text-ink-muted" />
+              <h4 className="font-semibold text-ink">
                 {t("trips.wizard.tripTypePublic")}
               </h4>
             </div>
-            <p className="text-xs text-navy-500 leading-relaxed">
+            <p className="text-xs leading-relaxed text-ink-muted">
               {t("trips.wizard.tripTypePublicDesc")}
             </p>
           </button>

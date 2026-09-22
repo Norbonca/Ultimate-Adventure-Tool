@@ -21,14 +21,13 @@ export default async function NewTripPage() {
   ]);
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-[100dvh] bg-canvas text-ink">
       <AppHeader
        
         user={{ email: user.email ?? "", displayName: user.user_metadata?.full_name }}
       />
 
-      {/* Wizard Content */}
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="mx-auto max-w-5xl px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
         <WizardForm
           categories={categories}
           countries={countries}

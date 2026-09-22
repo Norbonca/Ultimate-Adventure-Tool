@@ -263,7 +263,7 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
   return (
     <div>
       {/* ── Stepper ── */}
-      <div className="flex items-center justify-center mb-10">
+      <div className="mb-10 flex items-center justify-center overflow-x-auto pb-2">
         {STEP_KEYS.map((step, i) => {
           const isActive = currentStep === step.num;
           const isCompleted = currentStep > step.num;
@@ -273,12 +273,12 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
             <div key={step.num} className="flex items-center">
               <div className="flex flex-col items-center">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
+                  className={`flex h-10 w-10 items-center justify-center border text-sm font-bold transition-colors ${
                     isActive
-                      ? "bg-trevu-600 text-white shadow-lg shadow-trevu-600/30"
+                      ? "border-accent bg-accent text-accent-on"
                       : isCompleted
-                        ? "bg-trevu-100 text-trevu-700"
-                        : "bg-navy-100 text-navy-400"
+                        ? "border-accent bg-[var(--color-primary-subtle)] text-accent"
+                        : "border-line bg-surface text-ink-muted"
                   }`}
                 >
                   {isCompleted ? <Icon name="check" size={16} strokeWidth={2.5} /> : step.num}
@@ -286,10 +286,10 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
                 <span
                   className={`text-xs mt-1.5 font-medium ${
                     isActive
-                      ? "text-trevu-700"
+                      ? "text-accent"
                       : isCompleted
-                        ? "text-trevu-600"
-                        : "text-navy-400"
+                        ? "text-accent"
+                        : "text-ink-muted"
                   }`}
                 >
                   {label}
@@ -298,7 +298,7 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
               {i < STEP_KEYS.length - 1 && (
                 <div
                   className={`w-16 sm:w-24 h-0.5 mx-2 mt-[-16px] ${
-                    currentStep > step.num ? "bg-trevu-400" : "bg-navy-200"
+                    currentStep > step.num ? "bg-accent" : "bg-line"
                   }`}
                 />
               )}
@@ -308,7 +308,7 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
       </div>
 
       {/* ── Step Content ── */}
-      <div className="bg-white rounded-2xl border border-navy-200 shadow-sm p-6 sm:p-8">
+      <div className="border border-line bg-surface p-6 sm:p-8">
         {currentStep === 0 && (
           <Step0Template
             selectedMode={planningMode}
@@ -370,13 +370,13 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
         <div className="flex items-center gap-3">
           {/* Save status */}
           {saveStatus === "saving" && (
-            <span className="text-xs text-navy-400 animate-pulse">{t("common.saving")}</span>
+            <span className="animate-pulse text-xs text-ink-muted">{t("common.saving")}</span>
           )}
           {saveStatus === "saved" && (
-            <span className="text-xs text-green-600 flex items-center gap-1"><Icon name="check" size={12} strokeWidth={2.5} /> {t("trips.wizard.saved")}</span>
+            <span className="flex items-center gap-1 text-xs text-[var(--color-success-text)]"><Icon name="check" size={12} strokeWidth={2.5} /> {t("trips.wizard.saved")}</span>
           )}
           {saveStatus === "error" && (
-            <span role="alert" className="text-xs text-red-500">{errorMsg}</span>
+            <span role="alert" className="text-xs text-[var(--color-danger)]">{errorMsg}</span>
           )}
 
           {/* Draft save button (visible from step 2) */}

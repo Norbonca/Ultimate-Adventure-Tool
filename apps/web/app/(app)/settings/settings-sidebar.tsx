@@ -18,18 +18,18 @@ export function SettingsSidebar() {
   const { t } = useTranslation();
 
   return (
-    <aside className="w-[260px] shrink-0">
-      <nav className="rounded-2xl border border-navy-200 bg-white py-2">
+    <aside className="w-full shrink-0 lg:w-[260px]">
+      <nav className="border border-line bg-surface p-1">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 rounded-xl mx-1 px-5 py-3 text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 border-l-4 px-5 py-3 text-sm font-medium transition-colors ${
                 isActive
-                  ? "bg-trevu-50 text-trevu-700 font-semibold"
-                  : "text-navy-500 hover:bg-navy-50 hover:text-navy-700"
+                  ? "border-accent bg-[var(--color-primary-subtle)] font-semibold text-ink"
+                  : "border-transparent text-ink-muted hover:bg-canvas hover:text-ink"
               }`}
             >
               <Icon name={item.icon} size={18} />

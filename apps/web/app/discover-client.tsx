@@ -421,7 +421,7 @@ export default function DiscoverClient({
     <div
       role="group"
       aria-label={t('discover.viewToggleLabel')}
-      className="flex shrink-0 gap-1 rounded-trevu border border-line bg-surface p-1"
+      className="flex shrink-0 gap-1 border border-line bg-surface p-1"
     >
       {([
         ['grid', LayoutGrid, t('discover.gridView')],
@@ -439,7 +439,7 @@ export default function DiscoverClient({
             title={label}
             data-testid={`view-toggle-${view}`}
             className={[
-              'inline-flex h-9 min-w-10 items-center justify-center gap-2 rounded-lg px-2.5 text-sm font-semibold transition-colors md:px-3.5',
+              'inline-flex h-9 min-w-10 items-center justify-center gap-2 px-2.5 text-sm font-semibold transition-colors md:px-3.5',
               'focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]',
               active ? 'bg-ghost text-ink' : 'text-ink-muted hover:text-ink',
             ].join(' ')}
@@ -531,7 +531,7 @@ export default function DiscoverClient({
                   aria-haspopup="dialog"
                   aria-expanded={filtersOpen}
                   data-testid="discover-filters-open"
-                  className="inline-flex h-11 items-center gap-2 rounded-trevu border border-line bg-ghost px-4 text-sm font-semibold text-ink hover:border-line-strong focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+                  className="inline-flex h-11 items-center gap-2 border border-line bg-ghost px-4 text-sm font-semibold text-ink hover:border-line-strong focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
                 >
                   <SlidersHorizontal size={16} aria-hidden />
                   <span className="md:hidden">
@@ -616,7 +616,7 @@ export default function DiscoverClient({
                   value={sortBy}
                   onChange={(event) => setSortBy(event.target.value)}
                   data-testid="discover-sort"
-                  className="h-10 rounded-trevu border border-line bg-surface px-3 text-sm text-ink focus:border-accent focus:outline-none focus:shadow-[var(--focus-ring)]"
+                  className="h-10 border border-line bg-surface px-3 text-sm text-ink focus:border-accent focus:outline-none focus:shadow-[var(--focus-ring)]"
                 >
                   {sortOptions.map(([value, label]) => (
                     <option key={value} value={value}>
@@ -631,7 +631,7 @@ export default function DiscoverClient({
               <section
                 role="status"
                 data-testid="discover-empty"
-                className="flex flex-col items-center gap-3.5 rounded-trevu-2xl border border-line bg-surface px-6 py-14 text-center"
+                className="flex flex-col items-center gap-3.5 border border-line bg-surface px-6 py-14 text-center"
               >
                 <div className="flex h-20 w-20 items-center justify-center rounded-full bg-ghost">
                   <Compass size={36} aria-hidden className="text-ink-muted" />
@@ -700,7 +700,7 @@ export default function DiscoverClient({
                       type="button"
                       onClick={() => setPage({ key: pageKey, count: visibleCount + PAGE_SIZE })}
                       data-testid="discover-load-more"
-                      className="h-12 rounded-trevu bg-ghost px-6 text-base font-semibold text-ink hover:bg-line focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+                      className="h-12 border border-line bg-ghost px-6 text-base font-semibold text-ink hover:border-accent focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
                     >
                       {t('discover.loadMoreCount').replace('{count}', String(Math.min(PAGE_SIZE, remaining)))}
                     </button>
@@ -716,12 +716,12 @@ export default function DiscoverClient({
       <section className="border-t border-line bg-canvas text-ink" data-testid="discover-cta">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 md:flex-row md:items-center md:justify-between md:px-[120px] md:py-14">
           <div className="flex flex-col gap-2">
-            <h2 className="text-[22px] font-semibold text-ink md:text-[28px]">{t('discover.ctaTitle')}</h2>
+            <h2 className="font-display text-3xl font-extrabold leading-none text-ink md:text-5xl">{t('discover.ctaTitle')}</h2>
             <p className="text-sm text-ink-secondary md:text-base">{t('discover.ctaSubtitle')}</p>
           </div>
           <Link
             href="/trips/new"
-            className="inline-flex h-12 items-center justify-center rounded-trevu px-6 text-base font-semibold text-accent-on [background:var(--gradient-dawn)] hover:opacity-95 focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+            className="inline-flex h-12 items-center justify-center bg-accent px-6 text-base font-bold text-accent-on hover:bg-accent-hover focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
           >
             {t('discover.createTrip')}
           </Link>

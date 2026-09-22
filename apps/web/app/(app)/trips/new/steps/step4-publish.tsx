@@ -37,30 +37,30 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
     <div className="space-y-8">
       {/* ── Summary Card ── */}
       <div>
-        <h2 className="text-2xl font-bold text-navy-900 mb-2">
+        <h2 className="mb-2 font-display text-4xl font-extrabold leading-none text-ink">
           {t("trips.wizard.step4Title")}
         </h2>
-        <p className="text-navy-500">
+        <p className="text-ink-muted">
           {t("trips.wizard.step4Subtitle")}
         </p>
       </div>
 
-      <div className="bg-navy-50 rounded-2xl p-6 space-y-4">
+      <div className="space-y-4 border border-line bg-canvas p-6">
         <div className="flex items-start gap-4">
           {categoryDisplay && (
             <div
-              className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
+              className="flex h-12 w-12 shrink-0 items-center justify-center text-2xl"
               style={{ backgroundColor: `${categoryDisplay.colorHex}15` }}
             >
-              <Icon name={categoryDisplay.icon} size={24} className="text-navy-700" />
+              <Icon name={categoryDisplay.icon} size={24} className="text-ink" />
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-bold text-navy-900 truncate">
+            <h3 className="truncate font-display text-2xl font-extrabold text-ink">
               {formData.title || t("trips.wizard.untitledTrip")}
             </h3>
             {formData.short_description && (
-              <p className="text-sm text-navy-500 mt-0.5">
+              <p className="mt-0.5 text-sm text-ink-muted">
                 {formData.short_description}
               </p>
             )}
@@ -68,32 +68,32 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-          <div className="bg-white rounded-xl p-3">
-            <span className="text-navy-400 block text-xs">{t("trips.wizard.category")}</span>
-            <span className="font-medium text-navy-800">
+          <div className="border border-line bg-surface p-3">
+            <span className="block text-xs text-ink-muted">{t("trips.wizard.category")}</span>
+            <span className="font-medium text-ink">
               {categoryDisplay
                 ? locale === "en" ? categoryDisplay.nameEn : categoryDisplay.nameHu
                 : formData.category_name}
             </span>
           </div>
-          <div className="bg-white rounded-xl p-3">
-            <span className="text-navy-400 block text-xs">{t("trips.wizard.date")}</span>
-            <span className="font-medium text-navy-800">
+          <div className="border border-line bg-surface p-3">
+            <span className="block text-xs text-ink-muted">{t("trips.wizard.date")}</span>
+            <span className="font-medium text-ink">
               {formData.start_date
-                ? `${formData.start_date} → ${formData.end_date}`
+                ? `${formData.start_date} - ${formData.end_date}`
                 : t("trips.wizard.notSet")}
             </span>
           </div>
-          <div className="bg-white rounded-xl p-3">
-            <span className="text-navy-400 block text-xs">{t("trips.wizard.location")}</span>
-            <span className="font-medium text-navy-800">
+          <div className="border border-line bg-surface p-3">
+            <span className="block text-xs text-ink-muted">{t("trips.wizard.location")}</span>
+            <span className="font-medium text-ink">
               {[formData.location_city, formData.location_region, formData.location_country]
                 .filter(Boolean)
                 .join(", ") || t("trips.wizard.notSet")}
             </span>
           </div>
-          <div className="bg-white rounded-xl p-3">
-            <span className="text-navy-400 block text-xs">{t("trips.wizard.difficulty")}</span>
+          <div className="border border-line bg-surface p-3">
+            <span className="block text-xs text-ink-muted">{t("trips.wizard.difficulty")}</span>
             <span
               className="font-medium"
               style={{ color: diffLabel?.color }}
@@ -106,7 +106,7 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
 
       {/* ── Cover Image ── */}
       <div>
-        <label className="block text-sm font-semibold text-navy-700 mb-3">
+        <label className="mb-3 block text-sm font-semibold text-ink">
           {t("trips.wizard.coverImage")} <span className="text-coral">*</span>
         </label>
         <ImagePicker
@@ -125,10 +125,10 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
 
       {/* ── Card Image (Discover kártyákhoz) ── */}
       <div>
-        <label className="block text-sm font-semibold text-navy-700 mb-1">
+        <label className="mb-1 block text-sm font-semibold text-ink">
           {t("imagePicker.card.title")}
         </label>
-        <p className="text-xs text-navy-400 mb-3">
+        <p className="mb-3 text-xs text-ink-muted">
           {t("imagePicker.card.subtitle")}
         </p>
         <ImagePicker
@@ -147,10 +147,10 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
 
       {/* ── Visibility ── */}
       <div>
-        <label className="block text-sm font-semibold text-navy-700 mb-3">
+        <label className="mb-3 block text-sm font-semibold text-ink">
           {t("trips.wizard.visibility")}
         </label>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {([
             { value: "public" as const, icon: "globe", labelKey: "trips.wizard.visPublic", descKey: "trips.wizard.visPublicDesc" },
             { value: "followers_only" as const, icon: "users", labelKey: "trips.wizard.visFollowers", descKey: "trips.wizard.visFollowersDesc" },
@@ -159,17 +159,17 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
             <button
               key={opt.value}
               onClick={() => onChange({ visibility: opt.value })}
-              className={`p-4 rounded-xl border-2 text-left transition-all ${
+              className={`border-2 p-4 text-left transition-colors ${
                 formData.visibility === opt.value
-                  ? "border-trevu-500 bg-trevu-50"
-                  : "border-navy-200 hover:border-navy-300"
+                  ? "border-accent bg-[var(--color-primary-subtle)]"
+                  : "border-line bg-surface hover:border-line-strong"
               }`}
             >
-              <Icon name={opt.icon} size={20} className="text-navy-600" />
-              <span className="block text-sm font-semibold text-navy-800 mt-2">
+              <Icon name={opt.icon} size={20} className="text-ink-muted" />
+              <span className="mt-2 block text-sm font-semibold text-ink">
                 {t(opt.labelKey as TranslationKey)}
               </span>
-              <span className="block text-xs text-navy-400 mt-0.5">
+              <span className="mt-0.5 block text-xs text-ink-muted">
                 {t(opt.descKey as TranslationKey)}
               </span>
             </button>
@@ -179,14 +179,14 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
 
       {/* ── Crew Positions ── */}
       <div>
-        <label className="block text-sm font-semibold text-navy-700 mb-3">
+        <label className="mb-3 block text-sm font-semibold text-ink">
           {t("trips.wizard.crewPositions")}
         </label>
         <div className="flex flex-wrap gap-2 mb-3">
           {formData.crew_positions.map((pos) => (
             <span
               key={pos}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-trevu-50 text-trevu-700 rounded-lg text-sm font-medium border border-trevu-200"
+              className="inline-flex items-center gap-1.5 border border-accent bg-[var(--color-primary-subtle)] px-3 py-1.5 text-sm font-medium text-ink"
             >
               {pos}
               <button
@@ -195,7 +195,7 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
                     crew_positions: formData.crew_positions.filter((p) => p !== pos),
                   })
                 }
-                className="text-trevu-400 hover:text-trevu-600 text-xs ml-0.5"
+                className="ml-0.5 text-xs text-accent hover:text-accent-hover"
                 aria-label={t("common.cancel")}
               >
                 <Icon name="x" size={12} />
@@ -219,7 +219,7 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
                 }
               }}
               placeholder={t("trips.wizard.crewPositionPlaceholder")}
-              className="px-3 py-1.5 rounded-lg border border-navy-200 text-sm text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none w-48"
+              className="w-48 border border-line-strong bg-surface px-3 py-1.5 text-sm text-ink outline-none focus:border-accent"
             />
             <button
               onClick={() => {
@@ -230,7 +230,7 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
                   setNewPosition("");
                 }
               }}
-              className="text-sm font-medium text-trevu-600 hover:text-trevu-700 whitespace-nowrap"
+              className="whitespace-nowrap text-sm font-bold text-accent hover:underline"
             >
               {t("trips.wizard.addPosition")}
             </button>
@@ -267,14 +267,14 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
           placeholder="0.00"
         />
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="trip-currency" className="text-sm font-semibold text-navy-900">
+          <label htmlFor="trip-currency" className="text-sm font-semibold text-ink">
             {t("trips.wizard.currency")}
           </label>
           <select
             id="trip-currency"
             value={formData.price_currency}
             onChange={(e) => onChange({ price_currency: e.target.value })}
-            className="w-full min-h-[48px] px-4 py-3 rounded-trevu border-[1.5px] border-navy-300 text-[15px] text-navy-900 bg-white focus:ring-[3px] focus:ring-trevu-600/10 focus:border-trevu-600 outline-none transition-all duration-200"
+            className="min-h-[48px] w-full border border-line-strong bg-surface px-4 py-3 text-[15px] text-ink outline-none transition-colors focus:border-accent"
           >
             <option value="EUR">EUR (€)</option>
             <option value="HUF">HUF (Ft)</option>
@@ -300,7 +300,7 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
         />
       </div>
       {formData.registration_deadline && (
-        <p className="-mt-2 text-sm text-navy-600">
+        <p className="-mt-2 text-sm text-ink-muted">
           {t("trips.wizard.registrationDeadlineHint", {
             date: formatLocalDate(formData.registration_deadline, locale === "en" ? "en-US" : "hu-HU"),
             timezone: formData.timezone || "UTC",
@@ -315,7 +315,7 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
         label={t("trips.wizard.showOnLanding")}
         description={t("trips.wizard.showOnLandingDesc")}
         trailing
-        className="justify-between py-4 border-t border-navy-100"
+        className="justify-between border-t border-line py-4"
       />
     </div>
   );

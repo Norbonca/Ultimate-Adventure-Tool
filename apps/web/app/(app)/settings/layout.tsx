@@ -16,14 +16,13 @@ export default async function SettingsLayout({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-[100dvh] bg-canvas text-ink">
       <AppHeader
        
         user={{ email: user.email ?? "", displayName: user.user_metadata?.full_name }}
       />
 
-      {/* Body */}
-      <div className="flex gap-8 px-6 py-8 max-w-7xl mx-auto">
+      <div className="mx-auto flex max-w-[1440px] flex-col gap-8 px-5 py-10 sm:px-8 lg:flex-row lg:px-10 lg:py-14">
         <SettingsSidebar />
         <main className="flex-1 min-w-0">{children}</main>
       </div>

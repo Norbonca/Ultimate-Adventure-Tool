@@ -39,11 +39,11 @@ export function Step3Details({
       const key = param.group_key || "_default";
       if (!groups[key]) {
         groups[key] = {
-          label: param.group_label || "Egyéb",
+          label: param.group_label || "",
           labelHu:
             (param.group_label_localized as Record<string, string>)?.hu ||
             param.group_label ||
-            "Egyéb",
+            "",
           params: [],
         };
       }
@@ -82,10 +82,10 @@ export function Step3Details({
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold text-navy-900 mb-2">
+        <h2 className="mb-2 font-display text-4xl font-extrabold leading-none text-ink">
           {t('trips.wizard.step3Title')}
         </h2>
-        <p className="text-navy-500">{t('trips.wizard.step3Description')}</p>
+        <p className="text-ink-muted">{t('trips.wizard.step3Description')}</p>
       </div>
 
       {Object.entries(grouped).map(([groupKey, group]) => {
@@ -94,10 +94,10 @@ export function Step3Details({
           : (group.labelHu || t('trips.wizard.otherGroup'));
         return (
         <div key={groupKey}>
-          <h3 className="text-sm font-semibold text-navy-700 uppercase tracking-wider mb-4 flex items-center gap-2">
-            <div className="h-px flex-1 bg-navy-100" />
+          <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-ink">
+            <div className="h-px flex-1 bg-line" />
             <span>{groupLabel}</span>
-            <div className="h-px flex-1 bg-navy-100" />
+            <div className="h-px flex-1 bg-line" />
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -144,14 +144,14 @@ function ParameterField({
       : (param.label_localized as Record<string, string>)?.hu || param.label;
 
   const inputClasses =
-    "w-full min-h-[48px] px-4 py-3 rounded-trevu border-[1.5px] border-navy-300 text-[15px] text-navy-900 placeholder:text-navy-500 bg-white focus:ring-[3px] focus:ring-trevu-600/10 focus:border-trevu-600 outline-none transition-all duration-200";
+    "min-h-[48px] w-full border border-line-strong bg-surface px-4 py-3 text-[15px] text-ink outline-none transition-colors placeholder:text-ink-muted focus:border-accent";
 
   const fieldId = `param-${param.parameter_key}`;
   const labelNode = (
     <>
       {label}
       {param.field_type === "number" && param.unit && (
-        <span className="text-navy-400 font-normal"> ({param.unit})</span>
+        <span className="font-normal text-ink-muted"> ({param.unit})</span>
       )}
       {param.is_required && <span className="text-coral"> *</span>}
     </>
@@ -190,7 +190,7 @@ function ParameterField({
     case "textarea":
       return (
         <div className="sm:col-span-2">
-          <label htmlFor={fieldId} className="block text-sm font-semibold text-navy-900 mb-1.5">
+          <label htmlFor={fieldId} className="mb-1.5 block text-sm font-semibold text-ink">
             {labelNode}
           </label>
           <textarea
@@ -216,7 +216,7 @@ function ParameterField({
     case "select":
       return (
         <div>
-          <label htmlFor={fieldId} className="block text-sm font-semibold text-navy-900 mb-1.5">
+          <label htmlFor={fieldId} className="mb-1.5 block text-sm font-semibold text-ink">
             {labelNode}
           </label>
           <select
@@ -241,7 +241,7 @@ function ParameterField({
       const selectedValues = (value as string[]) || [];
       return (
         <div className="sm:col-span-2">
-          <label className="block text-sm font-semibold text-navy-900 mb-1.5">
+          <label className="mb-1.5 block text-sm font-semibold text-ink">
             {labelNode}
           </label>
           <div className="flex flex-wrap gap-2">
@@ -258,10 +258,10 @@ function ParameterField({
                       onChange([...selectedValues, opt.value]);
                     }
                   }}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  className={`border px-3 py-1.5 text-sm font-medium transition-colors ${
                     isSelected
-                      ? "bg-trevu-600 text-white shadow-sm"
-                      : "bg-navy-50 text-navy-600 hover:bg-navy-100 border border-navy-200"
+                      ? "border-accent bg-accent text-accent-on"
+                      : "border-line bg-canvas text-ink-muted hover:border-line-strong hover:text-ink"
                   }`}
                 >
                   {locale === 'en'
@@ -271,7 +271,7 @@ function ParameterField({
               );
             })}
             {options.length === 0 && (
-              <span className="text-xs text-navy-400">
+              <span className="text-xs text-ink-muted">
                 {t('trips.wizard.noOptions')}
               </span>
             )}

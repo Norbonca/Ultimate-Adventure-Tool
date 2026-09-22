@@ -38,10 +38,10 @@ interface UserSkill {
 }
 
 const SKILL_LEVELS = [
-  { key: "beginner", color: "#64748B", bg: "#F1F5F9" },
-  { key: "intermediate", color: "#D97706", bg: "#FEF3C7" },
-  { key: "advanced", color: "#3B82F6", bg: "#DBEAFE" },
-  { key: "expert", color: "#8B5CF6", bg: "#EDE9FE" },
+  { key: "beginner", color: "var(--color-text-muted)", bg: "var(--color-border)" },
+  { key: "intermediate", color: "var(--color-warning)", bg: "var(--color-warning-subtle)" },
+  { key: "advanced", color: "var(--color-info)", bg: "var(--color-info-subtle)" },
+  { key: "expert", color: "var(--color-primary)", bg: "var(--color-primary-subtle)" },
 ] as const;
 
 interface Props {
@@ -103,43 +103,44 @@ export function SkillsForm({ categories, subDisciplines, userInterests, initialS
 
   if (activeCategories.length === 0) {
     return (
-      <div className="rounded-2xl border border-navy-200 bg-white p-8 text-center">
-        <h1 className="text-[22px] font-bold text-navy-900 mb-4">
+      <div className="border border-line bg-surface p-8 text-center">
+        <h1 className="mb-4 font-display text-4xl font-extrabold leading-none text-ink">
           {t('settings.skills.title')}
         </h1>
-        <p className="text-sm text-navy-500 mb-6">
+        <p className="mb-6 text-sm text-ink-muted">
           {t('settings.interests.description')}
         </p>
         <Link
           href="/settings/interests"
-          className="inline-flex rounded-xl bg-trevu-600 px-6 py-3 text-sm font-semibold text-white hover:bg-trevu-700 transition-colors"
+          className="inline-flex min-h-12 items-center gap-2 bg-accent px-6 py-3 text-sm font-bold text-accent-on transition-colors hover:bg-accent-hover"
         >
-          {t('settings.nav.adventureInterests')} →
+          {t('settings.nav.adventureInterests')}
+          <Icon name="arrow-right" size={14} />
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-navy-200 bg-white p-8">
-      <h1 className="text-[22px] font-bold text-navy-900 mb-2">
+    <div className="border border-line bg-surface p-6 sm:p-8">
+      <h1 className="mb-2 font-display text-4xl font-extrabold leading-none text-ink">
         {t('settings.skills.title')}
       </h1>
-      <p className="text-sm text-navy-500 leading-relaxed mb-6">
+      <p className="mb-6 text-sm leading-relaxed text-ink-muted">
         {t('settings.skills.description')}
       </p>
 
       {/* Level legend */}
-      <div className="flex gap-3 rounded-xl bg-slate-50 p-4 mb-8">
+      <div className="mb-8 grid grid-cols-2 gap-px bg-line p-px sm:grid-cols-4">
         {SKILL_LEVELS.map((level) => (
           <div key={level.key} className="flex-1 text-center">
             <span
-              className="inline-block rounded-md px-3 py-1 text-xs font-semibold mb-1"
+              className="mb-1 inline-block px-3 py-1 text-xs font-semibold"
               style={{ backgroundColor: level.bg, color: level.color }}
             >
               {t(`settings.skills.${level.key}` as Parameters<typeof t>[0])}
             </span>
-            <p className="text-[11px] text-navy-400 leading-tight">
+            <p className="text-[11px] leading-tight text-ink-muted">
               {t(`settings.skills.${level.key}Desc` as Parameters<typeof t>[0])}
             </p>
           </div>
@@ -154,14 +155,14 @@ export function SkillsForm({ categories, subDisciplines, userInterests, initialS
           const subs = subsByCategory[cat.id] ?? [];
           const catName = display ? getCategoryName(display, locale) : getLocalized(cat.name_localized, locale, cat.name);
           const iconName = display?.icon ?? "compass";
-          const colorHex = display?.colorHex ?? cat.color_hex ?? "#0D9488";
+          const colorHex = display?.colorHex ?? cat.color_hex ?? "var(--color-primary)";
           const currentLevel = skills[cat.id];
           const currentLevelDef = SKILL_LEVELS.find((l) => l.key === currentLevel);
 
           return (
             <div
               key={cat.id}
-              className="rounded-xl border-2 overflow-hidden"
+              className="overflow-hidden border-2"
               style={{ borderColor: colorHex }}
             >
               {/* Category header */}
@@ -173,18 +174,18 @@ export function SkillsForm({ categories, subDisciplines, userInterests, initialS
                 style={{ backgroundColor: `${colorHex}10` }}
               >
                 <span
-                  className="flex h-10 w-10 items-center justify-center rounded-lg text-xl"
+                  className="flex h-10 w-10 items-center justify-center text-xl"
                   style={{ backgroundColor: colorHex }}
                 >
                   <Icon name={iconName} size={20} />
                 </span>
                 <div className="flex-1 min-w-0">
-                  <div className="text-[15px] font-bold text-navy-900">{catName}</div>
-                  <div className="text-xs text-navy-500">
+                  <div className="text-[15px] font-bold text-ink">{catName}</div>
+                  <div className="text-xs text-ink-muted">
                     {subs.length} {t('settings.interests.subDisciplines')}
                     {currentLevel && (
                       <span
-                        className="ml-2 inline-block rounded px-2 py-0.5 text-[11px] font-semibold"
+                        className="ml-2 inline-block px-2 py-0.5 text-[11px] font-semibold"
                         style={{ backgroundColor: currentLevelDef?.bg, color: currentLevelDef?.color }}
                       >
                         {t(`settings.skills.${currentLevel}` as Parameters<typeof t>[0])}
@@ -192,12 +193,7 @@ export function SkillsForm({ categories, subDisciplines, userInterests, initialS
                     )}
                   </div>
                 </div>
-                <svg
-                  className={`h-5 w-5 text-navy-400 transition-transform ${isExpanded ? "rotate-180" : ""}`}
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                </svg>
+                <Icon name="chevron-down" size={20} className={`text-ink-muted transition-transform ${isExpanded ? "rotate-180" : ""}`} />
               </button>
 
               {/* Expanded: skill level selector */}
@@ -206,12 +202,12 @@ export function SkillsForm({ categories, subDisciplines, userInterests, initialS
                   {/* Overall category level */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-navy-800">
+                      <span className="text-sm font-semibold text-ink">
                         {t('settings.skills.title')}
                       </span>
                       {currentLevelDef && (
                         <span
-                          className="rounded-md px-3 py-1 text-xs font-semibold"
+                          className="px-3 py-1 text-xs font-semibold"
                           style={{ backgroundColor: currentLevelDef.bg, color: currentLevelDef.color }}
                         >
                           {t(`settings.skills.${currentLevel}` as Parameters<typeof t>[0])}
@@ -226,10 +222,10 @@ export function SkillsForm({ categories, subDisciplines, userInterests, initialS
                           <button
                             key={level.key}
                             onClick={() => setSkillLevel(cat.id, level.key)}
-                            className="flex-1 rounded-lg py-2 text-xs font-semibold transition-colors"
+                            className="flex-1 py-2 text-xs font-semibold transition-colors"
                             style={{
                               backgroundColor: isActive ? level.color : level.bg,
-                              color: isActive ? "#FFFFFF" : level.color,
+                              color: isActive ? "var(--color-surface)" : level.color,
                             }}
                           >
                             {t(`settings.skills.${level.key}` as Parameters<typeof t>[0])}
@@ -242,7 +238,7 @@ export function SkillsForm({ categories, subDisciplines, userInterests, initialS
                   {/* Sub-disciplines list (info only, skill is per-category) */}
                   {subs.length > 0 && (
                     <div className="pt-2 border-t" style={{ borderColor: `${colorHex}20` }}>
-                      <p className="text-xs text-navy-400 mb-2">
+                      <p className="mb-2 text-xs text-ink-muted">
                         {t('settings.interests.subDisciplines')}:
                       </p>
                       <div className="flex flex-wrap gap-2">
@@ -251,7 +247,7 @@ export function SkillsForm({ categories, subDisciplines, userInterests, initialS
                           return (
                             <span
                               key={sd.id}
-                              className="rounded-full px-3 py-1 text-xs font-medium"
+                              className="px-3 py-1 text-xs font-medium"
                               style={{ backgroundColor: `${colorHex}12`, color: colorHex }}
                             >
                               {sdName}
@@ -269,34 +265,34 @@ export function SkillsForm({ categories, subDisciplines, userInterests, initialS
       </div>
 
       {/* Future enhancement note */}
-      <div className="mt-6 flex gap-3 rounded-xl border border-trevu-200 bg-trevu-50 p-4">
-        <Icon name="sparkles" size={16} className="text-trevu-600 mt-0.5 shrink-0" />
+      <div className="mt-6 flex gap-3 border-l-4 border-accent bg-[var(--color-primary-subtle)] p-4">
+        <Icon name="sparkles" size={16} className="mt-0.5 shrink-0 text-accent" />
         <div>
-          <p className="text-[13px] font-semibold text-trevu-700">
+          <p className="text-[13px] font-semibold text-ink">
             {t('settings.skills.futureTitle')}
           </p>
-          <p className="text-xs text-navy-500 leading-relaxed mt-1">
+          <p className="mt-1 text-xs leading-relaxed text-ink-muted">
             {t('settings.skills.futureDesc')}
           </p>
         </div>
       </div>
 
       {/* Summary + actions */}
-      <div className="mt-8 pt-6 border-t border-navy-200">
-        <p className="text-sm text-navy-500 mb-6">
+      <div className="mt-8 border-t border-line pt-6">
+        <p className="mb-6 text-sm text-ink-muted">
           {ratedCount} {t('settings.skills.rated')}
         </p>
         <div className="flex gap-3">
           <a
             href="/profile"
-            className="rounded-xl border border-navy-200 bg-white px-7 py-3 text-sm font-semibold text-navy-700 hover:bg-navy-50 transition-colors"
+            className="inline-flex min-h-12 items-center justify-center border border-line-strong bg-surface px-7 py-3 text-sm font-bold text-ink transition-colors hover:border-accent hover:text-accent"
           >
             {t('common.cancel')}
           </a>
           <button
             onClick={handleSave}
             disabled={isPending}
-            className="rounded-xl bg-trevu-600 px-7 py-3 text-sm font-semibold text-white hover:bg-trevu-700 transition-colors disabled:opacity-50"
+            className="min-h-12 bg-accent px-7 py-3 text-sm font-bold text-accent-on transition-colors hover:bg-accent-hover disabled:opacity-50"
           >
             {isPending ? t('common.loading') : saved ? t('common.saved') : t('common.saveChanges')}
           </button>
