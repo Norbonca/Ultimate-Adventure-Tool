@@ -23,23 +23,23 @@ export default async function AccountRestorePage() {
   );
 
   return (
-    <main className="flex min-h-[100dvh] items-end justify-center bg-canvas sm:items-center sm:p-6">
+    <main className="min-h-screen bg-slate-50 flex items-end sm:items-center justify-center sm:p-6">
       <section
         aria-labelledby="restore-title"
-        className="w-full border border-line border-t-4 border-t-accent bg-surface px-5 pb-7 pt-6 sm:max-w-[520px] sm:p-8"
+        className="w-full sm:max-w-[520px] bg-white rounded-t-[20px] sm:rounded-2xl shadow-2xl px-5 pt-6 pb-7 sm:p-8"
       >
         <div className="flex gap-3.5">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-accent text-accent-on">
+          <span className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 bg-trevu-50 text-trevu-700">
             <Icon name="refresh-cw" size={22} />
           </span>
           <div className="min-w-0 flex-1">
-            <h1 id="restore-title" className="font-display text-[28px] font-semibold leading-tight text-ink">
+            <h1 id="restore-title" className="text-[22px] leading-tight font-semibold text-navy-900">
               {t("account.restore.title")}
             </h1>
-            <p className="mt-1.5 text-sm leading-relaxed text-ink-body">{t("account.restore.body", { date })}</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-navy-600">{t("account.restore.body", { date })}</p>
           </div>
         </div>
-        <p className="mt-5 text-[13px] leading-relaxed text-ink-muted">{t("account.restore.note")}</p>
+        <p className="mt-5 text-[13px] leading-relaxed text-navy-600">{t("account.restore.note")}</p>
         <RestoreAccountActions />
       </section>
     </main>

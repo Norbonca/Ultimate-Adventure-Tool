@@ -2,8 +2,8 @@
  * Button — Trevu UI primitive.
  *
  * Design: design/D00_Core_Components.pen#uxEji (Primary), #UzuFj (Outline), #n85yk (Social)
- * Overhaul: square geometry, Sofia Sans 600, signal-orange primary, no elevation.
- * Tokens only (semantic canvas/surface/ink/line/accent aliases).
+ * Brand: Trevu_Brand_Guide.docx §3 — radius 10, padding 14×28, DM Sans 600, primary shadow.
+ * Tokens only (tailwind theme: trevu-*, navy-*, coral, rounded-trevu, shadow-trevu).
  * No hooks — usable in Server and Client Components. Renders <a> (next/link) when `href` is set.
  */
 
@@ -16,15 +16,15 @@ export type ButtonSize = "sm" | "md" | "lg";
 
 const VARIANT: Record<ButtonVariant, string> = {
   primary:
-    "bg-accent text-accent-on hover:bg-accent-hover focus-visible:ring-accent/30",
+    "bg-trevu-600 text-white shadow-trevu hover:bg-trevu-700 focus-visible:ring-trevu-600/30",
   outline:
-    "bg-surface text-ink border border-line-strong hover:bg-ghost hover:text-accent focus-visible:ring-accent/20",
+    "bg-white text-navy-900 border border-navy-200 hover:border-trevu-600 hover:text-trevu-700 focus-visible:ring-trevu-600/20",
   ghost:
-    "bg-ghost text-ink hover:bg-line focus-visible:ring-line-strong",
+    "bg-navy-100 text-navy-900 hover:bg-navy-200 focus-visible:ring-navy-300",
   danger:
     "bg-coral text-white hover:bg-coral/90 focus-visible:ring-coral/30",
   social:
-    "bg-surface text-ink border border-line hover:border-line-strong focus-visible:ring-accent/20 font-medium",
+    "bg-white text-navy-900 border border-navy-200 hover:bg-navy-50 focus-visible:ring-trevu-600/20 font-medium",
 };
 
 const SIZE: Record<ButtonSize, string> = {
@@ -53,8 +53,8 @@ function classes(
   extra: string | undefined,
 ) {
   return [
-    "inline-flex items-center justify-center rounded-none font-semibold",
-    "transition-colors duration-150 select-none",
+    "inline-flex items-center justify-center rounded-trevu font-semibold",
+    "transition-all duration-200 select-none",
     "focus:outline-none focus-visible:ring-[3px]",
     "disabled:opacity-50 disabled:pointer-events-none",
     VARIANT[variant],

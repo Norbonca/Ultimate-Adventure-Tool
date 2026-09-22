@@ -1,8 +1,6 @@
 import type { Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
 
-const legacyColor = (token: string) => `rgb(var(--legacy-${token}) / <alpha-value>)`;
-
 const config: Config = {
   content: [
     "./app/**/*.{ts,tsx}",
@@ -12,58 +10,30 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        white: legacyColor("white"),
-        black: legacyColor("black"),
-        slate: {
-          50: legacyColor("slate-50"),
-          100: legacyColor("slate-100"),
-          200: legacyColor("slate-200"),
-          300: legacyColor("slate-300"),
-          400: legacyColor("slate-400"),
-          500: legacyColor("slate-500"),
-          600: legacyColor("slate-600"),
-          700: legacyColor("slate-700"),
-          800: legacyColor("slate-800"),
-          900: legacyColor("slate-900"),
-          950: legacyColor("slate-950"),
-        },
-        teal: {
-          50: legacyColor("teal-50"),
-          100: legacyColor("teal-100"),
-          200: legacyColor("teal-200"),
-          300: legacyColor("teal-300"),
-          400: legacyColor("teal-400"),
-          500: legacyColor("teal-500"),
-          600: legacyColor("teal-600"),
-          700: legacyColor("teal-700"),
-          800: legacyColor("teal-800"),
-          900: legacyColor("teal-900"),
-          950: legacyColor("teal-950"),
-        },
-        /* ── Overhaul signal orange ── */
+        /* ── TREVU Primary ── */
         trevu: {
-          50: legacyColor("trevu-50"),
-          100: legacyColor("trevu-100"),
-          200: legacyColor("trevu-200"),
-          300: legacyColor("trevu-300"),
-          400: legacyColor("trevu-400"),
-          500: legacyColor("trevu-500"),
-          600: legacyColor("trevu-600"),
-          700: legacyColor("trevu-700"),
-          800: legacyColor("trevu-800"),
-          900: legacyColor("trevu-900"),
+          50:  "#F0FDFA",
+          100: "#CCFBF1",
+          200: "#99F6E4",
+          300: "#5EEAD4",
+          400: "#2DD4BF",
+          500: "#14B8A6",  /* teal-light */
+          600: "#0D9488",  /* ★ primary teal */
+          700: "#0F766E",  /* teal-dark */
+          800: "#115E59",
+          900: "#134E4A",
         },
         navy: {
-          50: legacyColor("navy-50"),
-          100: legacyColor("navy-100"),
-          200: legacyColor("navy-200"),
-          300: legacyColor("navy-300"),
-          400: legacyColor("navy-400"),
-          500: legacyColor("navy-500"),
-          600: legacyColor("navy-600"),
-          700: legacyColor("navy-700"),
-          800: legacyColor("navy-800"),
-          900: legacyColor("navy-900"),
+          50:  "#F8FAFC",
+          100: "#F1F5F9",
+          200: "#E2E8F0",
+          300: "#CBD5E1",
+          400: "#94A3B8",
+          500: "#64748B",
+          600: "#475569",
+          700: "#334155",
+          800: "#1E293B",
+          900: "#0F172A",  /* ★ deep-navy */
         },
 
         /* ── Accent Colors ── */
@@ -122,21 +92,21 @@ const config: Config = {
 
         /* ── Semantic Aliases ── */
         brand: {
-          50:  "#FFF4EF",
-          100: "#FBE7DF",
-          200: "#F8C8B6",
-          300: "#F58C62",
-          400: "#F0693A",
-          500: "#EA5A27",
-          600: "#E4531E",
-          700: "#C94718",
-          800: "#A93A10",
-          900: "#7D2C0D",
+          50:  "#F0FDFA",
+          100: "#CCFBF1",
+          200: "#99F6E4",
+          300: "#5EEAD4",
+          400: "#2DD4BF",
+          500: "#14B8A6",
+          600: "#0D9488",
+          700: "#0F766E",
+          800: "#115E59",
+          900: "#134E4A",
         },
       },
       fontFamily: {
-        sans: ['"Sofia Sans"', "system-ui", "sans-serif"],
-        display: ['"Sofia Sans Extra Condensed"', '"Sofia Sans"', "system-ui", "sans-serif"],
+        sans: ['"DM Sans"', "system-ui", "sans-serif"],
+        display: ['"DM Sans"', "system-ui", "sans-serif"],
       },
       fontSize: {
         /* Hero Display — csak Night hero (Brand Guide v2 §4) */
@@ -149,33 +119,19 @@ const config: Config = {
         "hero-scrim-mobile": "var(--hero-scrim-mobile)",
       },
       borderRadius: {
-        sm: "var(--legacy-radius-sm)",
-        DEFAULT: "var(--legacy-radius-default)",
-        md: "var(--legacy-radius-md)",
-        lg: "var(--legacy-radius-lg)",
-        xl: "var(--legacy-radius-xl)",
-        "2xl": "var(--legacy-radius-2xl)",
-        "3xl": "var(--legacy-radius-3xl)",
-        "trevu": "var(--legacy-radius-trevu)",
-        "trevu-lg": "var(--legacy-radius-trevu-lg)",
-        "trevu-xl": "var(--legacy-radius-trevu-xl)",
-        "trevu-2xl": "var(--legacy-radius-trevu-2xl)",
-        "trevu-3xl": "var(--legacy-radius-trevu-3xl)",
-        "chip": "var(--legacy-radius-chip)",
+        "trevu":  "10px",
+        "trevu-lg": "12px",
+        "trevu-xl": "14px",
+        "trevu-2xl": "16px",
+        "trevu-3xl": "20px",
+        "chip": "6px",       /* brand §3 — kategória/státusz chip */
       },
       boxShadow: {
-        sm: "var(--legacy-shadow-sm)",
-        DEFAULT: "var(--legacy-shadow-default)",
-        md: "var(--legacy-shadow-md)",
-        lg: "var(--legacy-shadow-lg)",
-        xl: "var(--legacy-shadow-xl)",
-        "2xl": "var(--legacy-shadow-2xl)",
-        inner: "var(--legacy-shadow-inner)",
-        "trevu": "var(--legacy-shadow-trevu)",
-        "trevu-sm": "var(--legacy-shadow-trevu-sm)",
-        "trevu-lg": "var(--legacy-shadow-trevu-lg)",
-        "trevu-xl": "var(--legacy-shadow-trevu-xl)",
-        "trevu-glow": "var(--legacy-shadow-trevu-glow)",
+        "trevu":    "0 2px 8px rgba(13, 148, 136, 0.25)",
+        "trevu-sm": "0 1px 3px rgba(0, 0, 0, 0.06)",
+        "trevu-lg": "0 8px 24px rgba(0, 0, 0, 0.08)",
+        "trevu-xl": "0 24px 80px rgba(15, 23, 42, 0.18)",
+        "trevu-glow": "0 2px 12px rgba(13, 148, 136, 0.12)",
       },
       animation: {
         "shimmer": "shimmer 1.5s infinite",

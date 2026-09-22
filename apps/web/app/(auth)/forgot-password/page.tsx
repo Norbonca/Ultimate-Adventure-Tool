@@ -38,37 +38,37 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <main className="flex min-h-[100dvh] flex-col bg-canvas">
+    <main className="flex min-h-screen flex-col bg-slate-50">
 
       {/* Body */}
       <div className="flex flex-1 items-center justify-center px-4 py-12">
-        <div className="w-full max-w-[440px] border border-line border-t-4 border-t-accent bg-surface p-7 sm:p-10">
+        <div className="w-full max-w-[440px] rounded-2xl border border-navy-200 bg-white p-10 shadow-sm">
           {/* Icon */}
-          <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center bg-accent text-accent-on">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-trevu-50 text-trevu-600">
             <Icon name="key-round" size={28} />
           </div>
 
           {/* Title */}
-          <h1 className="mb-2 text-center font-display text-3xl font-bold text-ink">
+          <h1 className="mb-2 text-center text-2xl font-bold text-navy-900">
             {t('auth.forgotPassword')}
           </h1>
-          <p className="mb-8 text-center text-sm leading-relaxed text-ink-muted">
+          <p className="mb-8 text-center text-sm text-navy-500 leading-relaxed">
             {t('auth.forgotPasswordDesc')}
           </p>
 
           {success ? (
             <div className="space-y-6">
-              <div className="border border-accent bg-[var(--color-primary-subtle)] p-4 text-center">
-                <p className="text-sm font-medium text-[var(--color-primary-text)]">
+              <div className="rounded-xl bg-trevu-50 border border-trevu-200 p-4 text-center">
+                <p className="text-sm font-medium text-trevu-700">
                   {t('auth.resetPasswordSent')}
                 </p>
-                <p className="mt-1 text-xs text-[var(--color-primary-text)]">
+                <p className="mt-1 text-xs text-trevu-600">
                   {t('auth.checkEmailForReset')}
                 </p>
               </div>
               <Link
                 href="/login"
-                className="flex items-center justify-center gap-2 text-sm font-medium text-ink-muted hover:text-accent"
+                className="flex items-center justify-center gap-2 text-sm font-medium text-navy-500 hover:text-navy-700"
               >
                 <Icon name="arrow-left" size={16} />
                 {t('auth.backToLogin')}
@@ -77,7 +77,7 @@ export default function ForgotPasswordPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div className="border border-coral bg-[var(--color-danger-subtle)] p-3 text-sm text-coral">
+                <div className="rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-700">
                   {error}
                 </div>
               )}
@@ -100,7 +100,7 @@ export default function ForgotPasswordPage() {
 
               <Link
                 href="/login"
-                className="flex items-center justify-center gap-2 text-sm font-medium text-ink-muted hover:text-accent"
+                className="flex items-center justify-center gap-2 text-sm font-medium text-navy-500 hover:text-navy-700"
               >
                 <Icon name="arrow-left" size={16} />
                 {t('auth.backToLogin')}

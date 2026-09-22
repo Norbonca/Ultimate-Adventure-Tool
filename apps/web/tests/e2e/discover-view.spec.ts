@@ -96,9 +96,9 @@ test.describe('Discover — view toggle', () => {
     await page.goto('/');
     const root = page.locator('[data-surface="night"]').first();
     await expect(root).toBeVisible();
-    await expect(root).toHaveCSS('background-color', 'rgb(18, 21, 19)');
+    await expect(root).toHaveCSS('background-color', 'rgb(15, 23, 42)');
     await expect(page.locator('[data-surface="day"]')).toHaveCount(0);
-    await expect(page.getByTestId('discover-cta')).toHaveCSS('background-color', 'rgb(18, 21, 19)');
+    await expect(page.getByTestId('discover-cta')).toHaveCSS('background-color', 'rgb(15, 23, 42)');
   });
 
   test('DISCOVER-VIEW-4: an unknown cookie value falls back to the tile grid', async ({ page, context }) => {

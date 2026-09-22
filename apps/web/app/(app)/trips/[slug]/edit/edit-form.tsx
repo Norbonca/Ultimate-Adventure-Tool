@@ -216,33 +216,33 @@ export function EditTripForm({
   }, [activeTab, formData, updateForm, countries, categoryParameters, parameterOptions, trip.id, trip.title, trip.status, slug]);
 
   return (
-    <div className="bg-canvas text-ink">
+    <div className="bg-slate-50">
       {/* ── Title Section ── */}
       <section className="px-6 sm:px-12 lg:px-[120px] pt-8">
         <Link
           href={`/trips/${slug}`}
-          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-ink-muted transition-colors hover:text-accent"
+          className="inline-flex items-center gap-2 text-sm font-medium text-navy-500 hover:text-navy-700 transition-colors mb-4"
         >
-          <Icon name="arrow-left" size={14} />
+          <span>←</span>
           <span>{t("trips.edit.backToTrip")}</span>
         </Link>
 
         <div className="flex items-center gap-3 mb-3">
           {categoryDisplay && (
-            <span className="inline-flex items-center gap-2 bg-[var(--color-primary-subtle)] px-3.5 py-1.5 text-xs font-semibold text-accent">
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
               <Icon name={categoryDisplay.icon ?? "compass"} size={13} />
               <span>{categoryName}</span>
             </span>
           )}
           <span
-            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold ${
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold ${
               isPublished
                 ? "bg-emerald-50 text-emerald-700"
                 : "bg-amber-50 text-amber-700"
             }`}
           >
             <span
-              className={`h-2 w-2 ${
+              className={`w-2 h-2 rounded-full ${
                 isPublished ? "bg-emerald-500" : "bg-amber-500"
               }`}
             />
@@ -250,14 +250,14 @@ export function EditTripForm({
           </span>
         </div>
 
-        <h1 className="font-display text-4xl font-extrabold leading-none text-ink sm:text-5xl">
+        <h1 className="text-2xl sm:text-3xl font-bold text-navy-900">
           {t("trips.edit.pageTitle")}
         </h1>
-        <p className="mt-2 text-sm text-ink-muted">{trip.title}</p>
+        <p className="text-sm text-navy-500 mt-1">{trip.title}</p>
       </section>
 
       {/* ── Tab Bar ── */}
-      <nav className="overflow-x-auto border-b border-line px-6 pt-6 sm:px-12 lg:px-[120px]">
+      <nav className="px-6 sm:px-12 lg:px-[120px] pt-6 border-b border-navy-200 overflow-x-auto">
         <div className="flex gap-1 min-w-max">
           {TAB_DEFS.map((tab) => {
             const isActive = activeTab === tab.key;
@@ -268,14 +268,14 @@ export function EditTripForm({
                 onClick={() => setActiveTab(tab.key)}
                 className={`flex items-center gap-2 px-4 pb-3 text-sm transition-colors relative ${
                   isActive
-                    ? "font-semibold text-accent"
-                    : "font-medium text-ink-muted hover:text-ink"
+                    ? "text-trevu-600 font-semibold"
+                    : "text-navy-500 hover:text-navy-700 font-medium"
                 }`}
               >
                 <Icon name={tab.icon} size={15} />
                 <span>{t(tab.labelKey as Parameters<typeof t>[0])}</span>
                 {isActive && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-t bg-trevu-500" />
                 )}
               </button>
             );
@@ -285,25 +285,25 @@ export function EditTripForm({
 
       {/* ── Form area ── */}
       <section className="px-6 sm:px-12 lg:px-[120px] py-8 pb-32">
-        <div className="border border-line bg-surface p-6 sm:p-8">
+        <div className="bg-white rounded-2xl border border-navy-200 shadow-sm p-6 sm:p-8">
           {tabContent}
         </div>
       </section>
 
       {/* ── Sticky Footer ── */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-line bg-surface">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-navy-200 z-30">
         <div className="px-6 sm:px-12 lg:px-[120px] py-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-h-[20px]">
             {saveStatus === "saved" && (
               <>
-                <Icon name="check" size={14} strokeWidth={2.5} className="text-[var(--color-success-text)]" />
-                <span className="text-sm text-ink-muted">
+                <Icon name="check" size={14} strokeWidth={2.5} className="text-trevu-600" />
+                <span className="text-sm text-navy-500">
                   {t("trips.edit.draftSaved")}
                 </span>
               </>
             )}
             {saveStatus === "error" && (
-              <span className="text-sm text-[var(--color-danger)]">
+              <span className="text-sm text-red-500">
                 {errorMsg || t("trips.edit.errorSaving")}
               </span>
             )}
@@ -311,7 +311,7 @@ export function EditTripForm({
           <div className="flex items-center gap-3">
             <Link
               href={`/trips/${slug}`}
-              className="border border-line-strong bg-surface px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:border-accent hover:text-accent"
+              className="px-5 py-2.5 text-sm font-semibold text-navy-700 bg-white border border-navy-300 rounded-xl hover:bg-navy-50 transition-colors"
             >
               {t("trips.wizard.cancel")}
             </Link>
@@ -319,7 +319,7 @@ export function EditTripForm({
               type="button"
               onClick={handleSave}
               disabled={saveStatus === "saving"}
-              className="inline-flex items-center gap-2 bg-accent px-5 py-2.5 text-sm font-bold text-accent-on transition-colors hover:bg-accent-hover disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-trevu-600 rounded-xl hover:bg-trevu-700 transition-colors disabled:opacity-50"
             >
               <Icon name="save" size={15} />
               <span>

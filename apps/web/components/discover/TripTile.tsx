@@ -33,7 +33,7 @@ export function TripTile({ href, title, imageUrl, place, dates, spots, host, dif
     <Link
       href={href}
       data-testid="trip-tile"
-      className="group flex h-full flex-col overflow-hidden border border-line bg-surface transition-colors duration-150 hover:border-accent focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+      className="group flex h-full flex-col overflow-hidden rounded-trevu-2xl border border-line bg-surface transition duration-150 hover:-translate-y-px hover:border-line-strong focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
     >
       <div className="relative h-[200px] shrink-0 bg-line">
         {imageUrl && (
@@ -43,14 +43,14 @@ export function TripTile({ href, title, imageUrl, place, dates, spots, host, dif
         )}
         <div className="absolute inset-x-3 top-3 flex items-center justify-between gap-2">
           {category && CatIcon ? (
-            <span className={`inline-flex items-center gap-1.5 bg-glass px-2.5 py-1 text-xs font-semibold backdrop-blur ${CATEGORY_TEXT[category.token]}`}>
+            <span className={`inline-flex items-center gap-1.5 rounded-chip bg-glass px-2.5 py-1 text-xs font-semibold backdrop-blur ${CATEGORY_TEXT[category.token]}`}>
               <CatIcon size={14} aria-hidden />
               {category.label}
             </span>
           ) : (
             <span />
           )}
-          <span className="inline-flex items-center gap-1.5 bg-glass px-2.5 py-1 text-xs font-semibold text-ink backdrop-blur">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-glass px-2.5 py-1 text-xs font-semibold text-ink backdrop-blur">
             <Users size={12} aria-hidden />
             {spots}
           </span>
@@ -58,7 +58,7 @@ export function TripTile({ href, title, imageUrl, place, dates, spots, host, dif
       </div>
 
       <div className="flex flex-1 flex-col gap-2.5 px-[18px] pb-[18px] pt-4">
-        <h3 data-testid="trip-tile-title" className="line-clamp-2 font-display text-2xl font-extrabold leading-none text-ink">
+        <h3 data-testid="trip-tile-title" className="line-clamp-2 text-lg font-semibold leading-tight text-ink">
           {title}
         </h3>
         <p className="flex items-center gap-2 text-sm text-ink-muted">
@@ -81,7 +81,7 @@ export function TripTile({ href, title, imageUrl, place, dates, spots, host, dif
 
       <div className="flex items-center justify-between gap-3 border-t border-line px-[18px] py-3.5">
         {difficulty ? (
-          <span className="bg-ghost px-2.5 py-1 text-xs font-semibold text-ink-secondary">{difficulty}</span>
+          <span className="rounded-chip bg-ghost px-2.5 py-1 text-xs font-semibold text-ink-secondary">{difficulty}</span>
         ) : (
           <span />
         )}
