@@ -91,35 +91,35 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col bg-slate-50">
+    <main className="flex min-h-[100dvh] flex-col bg-canvas">
 
       {/* Body */}
       <div className="flex flex-1 items-center justify-center px-4 py-12">
-        <div className="w-full max-w-[440px] rounded-2xl border border-navy-200 bg-white p-10 shadow-sm">
+        <div className="w-full max-w-[440px] border border-line border-t-4 border-t-accent bg-surface p-7 sm:p-10">
           {/* Icon */}
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-trevu-50 text-trevu-600">
+          <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center bg-accent text-accent-on">
             <Icon name="shield-check" size={28} />
           </div>
 
           {/* Title */}
-          <h1 className="mb-2 text-center text-2xl font-bold text-navy-900">
+          <h1 className="mb-2 text-center font-display text-3xl font-bold text-ink">
             {t('auth.setNewPassword')}
           </h1>
-          <p className="mb-8 text-center text-sm text-navy-500 leading-relaxed">
+          <p className="mb-8 text-center text-sm leading-relaxed text-ink-muted">
             {t('auth.setNewPasswordDesc')}
           </p>
 
           {!sessionReady ? (
-            <div className="text-center text-sm text-navy-500">
+            <div className="text-center text-sm text-ink-muted">
               <p>{t('auth.verifyingResetLink')}</p>
-              <div className="mt-4 h-1 w-24 mx-auto rounded bg-navy-200 overflow-hidden">
-                <div className="h-full w-1/2 bg-trevu-600 animate-pulse rounded" />
+              <div className="mx-auto mt-4 h-1 w-24 overflow-hidden bg-line">
+                <div className="h-full w-1/2 animate-pulse bg-accent" />
               </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
-                <div className="rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+                <div className="border border-coral bg-[var(--color-danger-subtle)] p-3 text-sm text-coral">
                   {error}
                 </div>
               )}
@@ -177,7 +177,7 @@ export default function ResetPasswordPage() {
 
               <Link
                 href="/login"
-                className="flex items-center justify-center gap-2 text-sm font-medium text-navy-500 hover:text-navy-700"
+                className="flex items-center justify-center gap-2 text-sm font-medium text-ink-muted hover:text-accent"
               >
                 <Icon name="arrow-left" size={16} />
                 {t('auth.backToLogin')}
