@@ -4,6 +4,7 @@ import { useState, useEffect, useTransition } from "react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { fetchPrivacySettings, savePrivacySettings } from "../actions";
 import { DeleteAccountButton } from "@/components/account/DeleteAccountButton";
+import { Icon } from "@/components/Icon";
 
 const PROFILE_VIS_OPTIONS = ["public", "registered", "private"] as const;
 
@@ -51,7 +52,7 @@ export default function PrivacyPage() {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-navy-200 bg-white p-8 text-center text-navy-500">
+      <div className="border border-line bg-surface p-8 text-center text-ink-muted">
         {t('common.loading')}
       </div>
     );
@@ -60,18 +61,18 @@ export default function PrivacyPage() {
   return (
     <div className="space-y-6">
       {/* Privacy Settings Card */}
-      <div className="rounded-2xl border border-navy-200 bg-white p-8">
-        <h1 className="text-[22px] font-bold text-navy-900 mb-2">
+      <div className="border border-line bg-surface p-6 sm:p-8">
+        <h1 className="mb-2 font-display text-4xl font-extrabold leading-none text-ink">
           {t('profile.privacy.title')}
         </h1>
-        <p className="text-sm text-navy-500 leading-relaxed mb-8">
+        <p className="mb-8 text-sm leading-relaxed text-ink-muted">
           {t('settings.privacy.description')}
         </p>
 
         <div className="space-y-6">
           {/* Profile visibility — segmented */}
           <div>
-            <label className="block text-sm font-semibold text-navy-700 mb-3">
+            <label className="mb-3 block text-sm font-semibold text-ink">
               {t('profile.privacy.profileVisibility')}
             </label>
             <div className="flex gap-2">
@@ -79,10 +80,10 @@ export default function PrivacyPage() {
                 <button
                   key={opt}
                   onClick={() => updateField("profile_visibility", opt)}
-                  className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-colors ${
+                  className={`flex-1 border py-2.5 text-sm font-semibold transition-colors ${
                     settings.profile_visibility === opt
-                      ? "bg-trevu-600 text-white"
-                      : "bg-navy-50 text-navy-600 hover:bg-navy-100"
+                      ? "border-accent bg-accent text-accent-on"
+                      : "border-line bg-canvas text-ink-muted hover:border-line-strong hover:text-ink"
                   }`}
                 >
                   {t(`profile.privacy.options.${opt}` as Parameters<typeof t>[0])}
@@ -91,7 +92,7 @@ export default function PrivacyPage() {
             </div>
           </div>
 
-          <hr className="border-navy-200" />
+          <hr className="border-line" />
 
           {/* Toggle rows */}
           {([
@@ -106,9 +107,9 @@ export default function PrivacyPage() {
               <div key={item.field}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-sm font-medium text-navy-700">{item.label}</span>
+                    <span className="text-sm font-medium text-ink">{item.label}</span>
                     {"hint" in item && item.hint && (
-                      <p className="text-xs text-navy-400 mt-0.5">{item.hint}</p>
+                      <p className="mt-0.5 text-xs text-ink-muted">{item.hint}</p>
                     )}
                   </div>
                   <button
@@ -116,11 +117,11 @@ export default function PrivacyPage() {
                     aria-label={item.label}
                     aria-pressed={isOn}
                     className={`relative h-6 w-11 rounded-full transition-colors ${
-                      isOn ? "bg-trevu-600" : "bg-navy-300"
+                      isOn ? "bg-accent" : "bg-line-strong"
                     }`}
                   >
                     <span
-                      className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                      className={`absolute top-0.5 h-5 w-5 rounded-full bg-surface transition-transform ${
                         isOn ? "left-[22px]" : "left-0.5"
                       }`}
                     />
@@ -131,14 +132,14 @@ export default function PrivacyPage() {
           })}
         </div>
 
-        <div className="mt-8 pt-6 border-t border-navy-200 flex gap-3">
-          <a href="/profile" className="rounded-xl border border-navy-200 bg-white px-7 py-3 text-sm font-semibold text-navy-700 hover:bg-navy-50 transition-colors">
+        <div className="mt-8 flex gap-3 border-t border-line pt-6">
+          <a href="/profile" className="inline-flex min-h-12 items-center justify-center border border-line-strong bg-surface px-7 py-3 text-sm font-bold text-ink transition-colors hover:border-accent hover:text-accent">
             {t('common.cancel')}
           </a>
           <button
             onClick={handleSave}
             disabled={isPending}
-            className="rounded-xl bg-trevu-600 px-7 py-3 text-sm font-semibold text-white hover:bg-trevu-700 transition-colors disabled:opacity-50"
+            className="min-h-12 bg-accent px-7 py-3 text-sm font-bold text-accent-on transition-colors hover:bg-accent-hover disabled:opacity-50"
           >
             {isPending ? t('common.loading') : saved ? t('common.saved') : t('common.saveChanges')}
           </button>
@@ -146,32 +147,30 @@ export default function PrivacyPage() {
       </div>
 
       {/* GDPR Card */}
-      <div className="rounded-2xl border border-navy-200 bg-white p-8">
-        <h2 className="text-xl font-bold text-navy-900 mb-6">
+      <div className="border border-line bg-surface p-6 sm:p-8">
+        <h2 className="mb-6 font-display text-3xl font-extrabold text-ink">
           {t('settings.privacy.gdprTitle')}
         </h2>
 
         {/* Export data */}
         <div className="flex items-center justify-between py-4">
           <div>
-            <p className="text-sm font-semibold text-navy-700">{t('settings.privacy.exportTitle')}</p>
-            <p className="text-xs text-navy-500 mt-0.5">{t('settings.privacy.exportDesc')}</p>
+            <p className="text-sm font-semibold text-ink">{t('settings.privacy.exportTitle')}</p>
+            <p className="mt-0.5 text-xs text-ink-muted">{t('settings.privacy.exportDesc')}</p>
           </div>
-          <button className="flex items-center gap-2 rounded-xl border border-navy-200 bg-white px-5 py-2.5 text-sm font-semibold text-navy-700 hover:bg-navy-50 transition-colors">
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-            </svg>
+          <button className="flex min-h-11 items-center gap-2 border border-line-strong bg-surface px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:border-accent hover:text-accent">
+            <Icon name="download" size={16} />
             {t('settings.privacy.exportBtn')}
           </button>
         </div>
 
-        <hr className="border-navy-200" />
+        <hr className="border-line" />
 
         {/* Delete account */}
         <div className="flex items-center justify-between py-4">
           <div>
-            <p className="text-sm font-semibold text-red-600">{t('settings.privacy.deleteTitle')}</p>
-            <p className="text-xs text-navy-500 mt-0.5">{t('settings.privacy.deleteDesc')}</p>
+            <p className="text-sm font-semibold text-[var(--color-danger)]">{t('settings.privacy.deleteTitle')}</p>
+            <p className="mt-0.5 text-xs text-ink-muted">{t('settings.privacy.deleteDesc')}</p>
           </div>
           <DeleteAccountButton />
         </div>
