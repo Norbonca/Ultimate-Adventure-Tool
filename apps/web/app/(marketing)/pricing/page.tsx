@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { getServerT } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
@@ -10,121 +9,142 @@ interface Tier {
   ctaHref: string;
 }
 
-const PRIMARY_TIERS: Tier[] = [
-  { key: "free", ctaHref: "/get-started" },
-  { key: "pro", ctaHref: "/get-started?tier=pro", popular: true },
-  { key: "business", ctaHref: "/get-started?tier=business" },
+const TIERS: Tier[] = [
+  { key: "free",       ctaHref: "/get-started" },
+  { key: "pro",        ctaHref: "/get-started?tier=pro", popular: true },
+  { key: "business",   ctaHref: "/get-started?tier=business" },
+  { key: "enterprise", ctaHref: "mailto:hello@ttvk.hu" },
 ];
-
-const ENTERPRISE_TIER: Tier = { key: "enterprise", ctaHref: "mailto:hello@ttvk.hu" };
 
 export default async function PricingPage() {
   const { t } = await getServerT();
 
   const featuresByTier: Record<Tier["key"], string[]> = {
-    free: [t("pricing.tiers.free.feature1"), t("pricing.tiers.free.feature2"), t("pricing.tiers.free.feature3"), t("pricing.tiers.free.feature4"), t("pricing.tiers.free.feature5")],
-    pro: [t("pricing.tiers.pro.feature1"), t("pricing.tiers.pro.feature2"), t("pricing.tiers.pro.feature3"), t("pricing.tiers.pro.feature4"), t("pricing.tiers.pro.feature5"), t("pricing.tiers.pro.feature6")],
-    business: [t("pricing.tiers.business.feature1"), t("pricing.tiers.business.feature2"), t("pricing.tiers.business.feature3"), t("pricing.tiers.business.feature4"), t("pricing.tiers.business.feature5"), t("pricing.tiers.business.feature6")],
-    enterprise: [t("pricing.tiers.enterprise.feature1"), t("pricing.tiers.enterprise.feature2"), t("pricing.tiers.enterprise.feature3"), t("pricing.tiers.enterprise.feature4"), t("pricing.tiers.enterprise.feature5"), t("pricing.tiers.enterprise.feature6")],
+    free: [
+      t("pricing.tiers.free.feature1"),
+      t("pricing.tiers.free.feature2"),
+      t("pricing.tiers.free.feature3"),
+      t("pricing.tiers.free.feature4"),
+      t("pricing.tiers.free.feature5"),
+    ],
+    pro: [
+      t("pricing.tiers.pro.feature1"),
+      t("pricing.tiers.pro.feature2"),
+      t("pricing.tiers.pro.feature3"),
+      t("pricing.tiers.pro.feature4"),
+      t("pricing.tiers.pro.feature5"),
+      t("pricing.tiers.pro.feature6"),
+    ],
+    business: [
+      t("pricing.tiers.business.feature1"),
+      t("pricing.tiers.business.feature2"),
+      t("pricing.tiers.business.feature3"),
+      t("pricing.tiers.business.feature4"),
+      t("pricing.tiers.business.feature5"),
+      t("pricing.tiers.business.feature6"),
+    ],
+    enterprise: [
+      t("pricing.tiers.enterprise.feature1"),
+      t("pricing.tiers.enterprise.feature2"),
+      t("pricing.tiers.enterprise.feature3"),
+      t("pricing.tiers.enterprise.feature4"),
+      t("pricing.tiers.enterprise.feature5"),
+      t("pricing.tiers.enterprise.feature6"),
+    ],
   };
 
   return (
-    <main className="min-h-[100dvh] bg-canvas text-ink">
+    <main className="min-h-screen bg-slate-50">
       <AppHeader anchors={[
-        { label: t("nav.discover"), href: "/" },
-        { label: t("nav.pricing"), href: "/pricing" },
-        { label: t("nav.community"), href: "/community" },
+        { label: t('nav.discover'), href: '/' },
+        { label: t('nav.pricing'), href: '/pricing' },
+        { label: t('nav.community'), href: '/community' },
       ]} />
 
-      <section className="mx-auto max-w-[1440px] px-5 pb-10 pt-14 sm:px-8 lg:px-10 lg:pt-20">
-        <h1 className="max-w-4xl font-display text-5xl font-bold leading-[0.95] tracking-tight text-ink sm:text-6xl lg:text-7xl">
+      <section className="max-w-6xl mx-auto px-6 pt-16 pb-10 text-center">
+        <h1 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">
           {t("pricing.title")}
         </h1>
-        <p className="mt-5 max-w-2xl text-base leading-relaxed text-ink-muted sm:text-lg">
+        <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
           {t("pricing.subtitle")}
         </p>
       </section>
 
-      <section className="mx-auto max-w-[1440px] px-5 pb-12 sm:px-8 lg:px-10">
-        <div className="grid border-t border-line-strong lg:grid-cols-3">
-          {PRIMARY_TIERS.map((tier) => {
-            const yearly = tier.key === "pro" || tier.key === "business"
-              ? t(`pricing.tiers.${tier.key}.yearlyPrice`)
-              : null;
+      <section className="max-w-6xl mx-auto px-6 pb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {TIERS.map((tier) => {
+            const name = t(`pricing.tiers.${tier.key}.name`);
+            const tagline = t(`pricing.tiers.${tier.key}.tagline`);
+            const price = t(`pricing.tiers.${tier.key}.price`);
+            const cta = t(`pricing.tiers.${tier.key}.cta`);
+            const yearly =
+              tier.key === "pro" || tier.key === "business"
+                ? t(`pricing.tiers.${tier.key}.yearlyPrice`)
+                : null;
+            const features = featuresByTier[tier.key];
+
             return (
-              <article
+              <div
                 key={tier.key}
-                className={`relative flex min-h-[580px] flex-col border-b border-line-strong p-6 sm:p-8 lg:border-b-0 lg:border-r lg:last:border-r-0 ${tier.popular ? "bg-surface" : "bg-transparent"}`}
+                className={`relative flex flex-col rounded-2xl border bg-white p-6 transition-all ${
+                  tier.popular
+                    ? "border-trevu-600 shadow-lg ring-1 ring-trevu-600/20"
+                    : "border-slate-200 hover:border-slate-300"
+                }`}
               >
                 {tier.popular && (
-                  <span className="mb-5 w-fit bg-accent px-3 py-1 text-xs font-semibold text-accent-on">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-white bg-trevu-600 rounded-full">
                     {t("pricing.popularBadge")}
                   </span>
                 )}
-                <h2 className="font-display text-3xl font-semibold text-ink">
-                  {t(`pricing.tiers.${tier.key}.name`)}
-                </h2>
-                <p className="mt-2 min-h-[48px] max-w-[36ch] text-sm leading-relaxed text-ink-muted">
-                  {t(`pricing.tiers.${tier.key}.tagline`)}
-                </p>
-                <div className="my-7 flex items-end gap-2">
-                  <span className="font-display text-5xl font-bold leading-none text-ink">
-                    {t(`pricing.tiers.${tier.key}.price`)}
-                  </span>
-                  {tier.key !== "free" && <span className="pb-1 text-sm text-ink-muted">{t("pricing.perMonth")}</span>}
+
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900">{name}</h2>
+                  <p className="mt-1 text-sm text-slate-500 min-h-[40px]">{tagline}</p>
                 </div>
-                {yearly && (
-                  <p className="-mt-5 mb-5 text-xs text-ink-muted">
-                    {t("pricing.yearlyHint").replace("{price}", yearly)}
-                  </p>
-                )}
-                <Button href={tier.ctaHref} variant={tier.popular ? "primary" : "outline"} fullWidth>
-                  {t(`pricing.tiers.${tier.key}.cta`)}
-                </Button>
-                <ul className="mt-7 flex-1 space-y-3 text-sm text-ink-body">
-                  {featuresByTier[tier.key].map((feature) => (
-                    <li key={feature} className="flex gap-2.5">
-                      <Icon name="check" size={16} className="mt-0.5 shrink-0 text-accent" strokeWidth={2.5} />
-                      <span>{feature}</span>
+
+                <div className="mt-5 mb-5">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-3xl font-bold text-slate-900">{price}</span>
+                    {tier.key !== "free" && tier.key !== "enterprise" && (
+                      <span className="text-sm text-slate-500">{t("pricing.perMonth")}</span>
+                    )}
+                  </div>
+                  {yearly && (
+                    <p className="mt-1 text-xs text-slate-400">
+                      {t("pricing.yearlyHint").replace("{price}", yearly)}
+                    </p>
+                  )}
+                </div>
+
+                <ul className="flex-1 space-y-2.5 text-sm text-slate-700">
+                  {features.map((feat, i) => (
+                    <li key={i} className="flex gap-2">
+                      <span className="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full bg-trevu-50 text-trevu-700 flex items-center justify-center">
+                        <Icon name="check" size={10} strokeWidth={3} />
+                      </span>
+                      <span>{feat}</span>
                     </li>
                   ))}
                 </ul>
-              </article>
+
+                <Button
+                  href={tier.ctaHref}
+                  variant={tier.popular ? "primary" : "outline"}
+                  fullWidth
+                  className="mt-6"
+                >
+                  {cta}
+                </Button>
+              </div>
             );
           })}
         </div>
-      </section>
 
-      <section className="mx-auto grid max-w-[1440px] border-y border-line-strong bg-surface lg:grid-cols-[3fr_2fr]">
-        <div className="flex flex-col justify-center px-5 py-12 sm:px-8 lg:px-10 lg:py-16">
-          <h2 className="font-display text-4xl font-semibold text-ink sm:text-5xl">{t("pricing.tiers.enterprise.name")}</h2>
-          <p className="mt-3 max-w-xl text-base leading-relaxed text-ink-muted">{t("pricing.tiers.enterprise.tagline")}</p>
-          <ul className="mt-7 grid gap-3 text-sm text-ink-body sm:grid-cols-2">
-            {featuresByTier[ENTERPRISE_TIER.key].map((feature) => (
-              <li key={feature} className="flex gap-2.5">
-                <Icon name="check" size={16} className="mt-0.5 shrink-0 text-accent" strokeWidth={2.5} />
-                <span>{feature}</span>
-              </li>
-            ))}
-          </ul>
-          <Button href={ENTERPRISE_TIER.ctaHref} variant="outline" className="mt-8 w-fit">
-            {t("pricing.tiers.enterprise.cta")}
-          </Button>
-        </div>
-        <div className="relative min-h-[300px] lg:min-h-[420px]">
-          <Image
-            src="https://images.unsplash.com/photo-1486911278844-a81c5267e227?w=1600&q=82&fit=crop&auto=format"
-            alt=""
-            fill
-            sizes="(min-width: 1024px) 40vw, 100vw"
-            className="object-cover"
-          />
-        </div>
+        <p className="mt-12 text-center text-xs text-slate-400">
+          {t("pricing.footnote")}
+        </p>
       </section>
-
-      <p className="mx-auto max-w-[1440px] px-5 py-6 text-xs text-ink-muted sm:px-8 lg:px-10">
-        {t("pricing.footnote")}
-      </p>
     </main>
   );
 }

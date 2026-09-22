@@ -87,11 +87,11 @@ const SKILL_LEVEL_KEYS: Record<string, string> = {
 };
 
 const SKILL_LEVEL_COLORS: Record<string, string> = {
-  none: "var(--color-danger)",
-  beginner: "var(--color-success)",
-  intermediate: "var(--color-warning)",
-  advanced: "var(--color-info)",
-  expert: "var(--color-primary)",
+  none: "#DC2626",
+  beginner: "#16A34A",
+  intermediate: "#D97706",
+  advanced: "#3B82F6",
+  expert: "#8B5CF6",
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────
@@ -266,10 +266,10 @@ export default function ProfilePage() {
   // ─── Loading / Error ─────────────────────────────────────
   if (isLoading) {
     return (
-      <main className="min-h-[100dvh] bg-canvas text-ink">
+      <main className="min-h-screen bg-slate-50">
         <AppHeader />
-        <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-10">
-          <div className="border border-line bg-surface p-8 text-center text-ink-muted">
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center text-slate-500">
             {t("common.loading")}
           </div>
         </div>
@@ -279,10 +279,10 @@ export default function ProfilePage() {
 
   if (!profile || !user) {
     return (
-      <main className="min-h-[100dvh] bg-canvas text-ink">
+      <main className="min-h-screen bg-slate-50">
         <AppHeader />
-        <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:px-10">
-          <div className="border border-[var(--color-danger)] bg-surface p-8 text-center text-[var(--color-danger)]">
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center text-red-600">
             {t("profile.overview.notFound")}
           </div>
         </div>
@@ -320,7 +320,7 @@ export default function ProfilePage() {
   });
 
   return (
-    <main className="min-h-[100dvh] bg-canvas text-ink">
+    <main className="min-h-screen bg-slate-50">
       <AppHeader
         user={{
           email: user.email ?? "",
@@ -330,11 +330,12 @@ export default function ProfilePage() {
         }}
       />
 
-      <div className="mx-auto max-w-[1440px] px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
-        <div className="flex flex-col gap-8 lg:flex-row">
+      {/* Body — S07 layout: sidebar + main content */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="flex gap-8">
           {/* ─── LEFT SIDEBAR ─── */}
-          <aside className="w-full flex-shrink-0 lg:w-[320px]">
-            <div className="border border-line bg-surface p-7 lg:sticky lg:top-24">
+          <aside className="w-[320px] flex-shrink-0">
+            <div className="bg-white rounded-2xl border border-slate-200 p-8 sticky top-24">
               {/* Avatar */}
               <div className="flex flex-col items-center gap-4">
                 <div className="relative">
@@ -345,7 +346,7 @@ export default function ProfilePage() {
                       className="rounded-full object-cover w-24 h-24"
                     />
                   ) : (
-                    <div className="flex h-24 w-24 items-center justify-center rounded-full bg-accent font-display text-3xl font-bold text-accent-on">
+                    <div className="h-24 w-24 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-3xl">
                       {initials}
                     </div>
                   )}
@@ -353,11 +354,11 @@ export default function ProfilePage() {
 
                 {/* Name & Handle */}
                 <div className="text-center">
-                  <h1 className="font-display text-3xl font-extrabold leading-none text-ink">
+                  <h1 className="text-[22px] font-bold text-slate-900">
                     {displayName}
                   </h1>
                   {profile.slug && (
-                    <p className="mt-2 text-sm text-ink-muted">
+                    <p className="text-sm text-slate-400 mt-1">
                       @{profile.slug}
                     </p>
                   )}
@@ -365,7 +366,7 @@ export default function ProfilePage() {
 
                 {/* Bio */}
                 {profile.bio && (
-                  <p className="text-center text-sm leading-relaxed text-ink-muted">
+                  <p className="text-sm text-slate-500 text-center leading-relaxed">
                     {profile.bio}
                   </p>
                 )}
@@ -373,54 +374,84 @@ export default function ProfilePage() {
                 {/* Edit Profile Button */}
                 <Link
                   href="/settings/profile"
-                  className="mt-2 flex min-h-12 w-full items-center justify-center gap-2 border border-line-strong px-4 py-2.5 text-sm font-bold uppercase tracking-[0.08em] text-ink transition-colors hover:border-accent hover:text-accent"
+                  className="w-full mt-2 flex items-center justify-center gap-2 px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
                 >
-                  <Icon name="pencil" size={16} />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                    />
+                  </svg>
                   {t("profile.editProfile")}
                 </Link>
               </div>
 
               {/* Divider */}
-              <div className="my-6 h-px bg-line" />
+              <div className="h-px bg-slate-200 my-6" />
 
               {/* Stats Row */}
               <div className="flex justify-around">
                 <div className="text-center">
-                  <p className="font-display text-2xl font-extrabold text-ink">
+                  <p className="text-xl font-bold text-slate-900">
                     {followCounts.trips}
                   </p>
-                  <p className="text-xs text-ink-muted">
+                  <p className="text-xs text-slate-400">
                     {t("profile.overview.trips")}
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="font-display text-2xl font-extrabold text-ink">
+                  <p className="text-xl font-bold text-slate-900">
                     {followCounts.followers}
                   </p>
-                  <p className="text-xs text-ink-muted">
+                  <p className="text-xs text-slate-400">
                     {t("profile.overview.followers")}
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="font-display text-2xl font-extrabold text-ink">
+                  <p className="text-xl font-bold text-slate-900">
                     {followCounts.following}
                   </p>
-                  <p className="text-xs text-ink-muted">
+                  <p className="text-xs text-slate-400">
                     {t("profile.overview.following")}
                   </p>
                 </div>
               </div>
 
               {/* Divider */}
-              <div className="my-6 h-px bg-line" />
+              <div className="h-px bg-slate-200 my-6" />
 
               {/* Info Section */}
               <div className="space-y-3.5">
                 {/* Location */}
                 {(profile.location_city || profile.country_code) && (
                   <div className="flex items-center gap-2.5">
-                    <Icon name="map-pin" size={16} className="flex-shrink-0 text-ink-muted" />
-                    <span className="text-[13px] text-ink-muted">
+                    <svg
+                      className="w-4 h-4 text-slate-400 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
+                    <span className="text-[13px] text-slate-500">
                       {[profile.location_city, profile.country_code]
                         .filter(Boolean)
                         .join(", ")}
@@ -431,8 +462,20 @@ export default function ProfilePage() {
                 {/* Member Since */}
                 {memberSinceDate && (
                   <div className="flex items-center gap-2.5">
-                    <Icon name="calendar-days" size={16} className="flex-shrink-0 text-ink-muted" />
-                    <span className="text-[13px] text-ink-muted">
+                    <svg
+                      className="w-4 h-4 text-slate-400 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <span className="text-[13px] text-slate-500">
                       {t("profile.overview.memberSince").replace(
                         "{date}",
                         memberSinceDate
@@ -444,8 +487,20 @@ export default function ProfilePage() {
                 {/* Verified Organizer */}
                 {profile.verified_organizer && (
                   <div className="flex items-center gap-2.5">
-                    <Icon name="badge-check" size={16} className="flex-shrink-0 text-accent" />
-                    <span className="text-[13px] font-semibold text-accent">
+                    <svg
+                      className="w-4 h-4 text-teal-600 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                      />
+                    </svg>
+                    <span className="text-[13px] font-semibold text-teal-600">
                       {t("profile.overview.verifiedOrganizer")}
                     </span>
                   </div>
@@ -459,12 +514,12 @@ export default function ProfilePage() {
             {/* Adventure Interests */}
             <section id="overview">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-display text-2xl font-extrabold text-ink">
+                <h2 className="text-lg font-bold text-slate-900">
                   {t("profile.overview.adventureInterests")}
                 </h2>
                 <Link
                   href="/settings/interests"
-                  className="text-sm font-bold uppercase tracking-[0.08em] text-accent hover:underline"
+                  className="text-sm font-medium text-teal-600 hover:text-teal-700"
                 >
                   {t("profile.skills.editInterests")}
                 </Link>
@@ -479,17 +534,15 @@ export default function ProfilePage() {
                     return (
                       <div
                         key={interest.id}
-                        className="flex min-w-[100px] flex-col items-center justify-center gap-2 border border-line px-5 py-4"
+                        className="flex flex-col items-center justify-center gap-1.5 rounded-xl px-5 py-4 min-w-[100px]"
                         style={{
-                          backgroundColor: interest.color_hex
-                            ? `color-mix(in srgb, ${interest.color_hex} 12%, transparent)`
-                            : "var(--color-primary-subtle)",
+                          backgroundColor: `${interest.color_hex || "#e5e7eb"}20`,
                         }}
                       >
                         <span className="text-2xl">
                           <Icon name={CATEGORY_ICONS[iconKey] || "star"} size={18} />
                         </span>
-                        <span className="text-xs font-medium text-ink">
+                        <span className="text-xs font-medium text-slate-700">
                           {getLocalizedName(
                             interest.name_localized,
                             interest.name,
@@ -501,16 +554,15 @@ export default function ProfilePage() {
                   })}
                 </div>
               ) : (
-                <div className="border border-line bg-surface p-6 text-center">
-                  <p className="text-sm text-ink-muted">
+                <div className="bg-slate-50 rounded-xl p-6 text-center">
+                  <p className="text-sm text-slate-500">
                     {t("profile.overview.noInterests")}
                   </p>
                   <Link
                     href="/settings/interests"
-                    className="mt-3 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-[0.08em] text-accent hover:underline"
+                    className="inline-block mt-3 text-sm font-medium text-teal-600 hover:text-teal-700"
                   >
-                    {t("profile.skills.editInterests")}
-                    <Icon name="arrow-right" size={14} />
+                    {t("profile.skills.editInterests")} →
                   </Link>
                 </div>
               )}
@@ -519,15 +571,15 @@ export default function ProfilePage() {
             {/* Experience Level */}
             <section
               id="skills"
-              className="border border-line bg-surface p-6"
+              className="bg-white rounded-2xl border border-slate-200 p-6"
             >
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-display text-2xl font-extrabold text-ink">
+                <h2 className="text-lg font-bold text-slate-900">
                   {t("profile.overview.levelShort")}
                 </h2>
                 <Link
                   href="/settings/interests"
-                  className="text-sm font-bold uppercase tracking-[0.08em] text-accent hover:underline"
+                  className="text-sm font-medium text-teal-600 hover:text-teal-700"
                 >
                   {t("profile.skills.editInterests")}
                 </Link>
@@ -536,7 +588,7 @@ export default function ProfilePage() {
               {/* XP Progress Bar */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-semibold text-accent">
+                  <span className="text-sm font-semibold text-teal-600">
                     {t(
                       SKILL_LEVEL_KEYS[
                         (profile.reputation_level || 1) <= 1
@@ -549,13 +601,13 @@ export default function ProfilePage() {
                       ] as Parameters<typeof t>[0]
                     )}
                   </span>
-                  <span className="text-xs text-ink-muted">
+                  <span className="text-xs text-slate-400">
                     {(profile.reputation_points || 0).toLocaleString()} XP
                   </span>
                 </div>
-                <div className="h-1 w-full bg-line">
+                <div className="w-full bg-slate-200 rounded-full h-2">
                   <div
-                    className="h-1 bg-accent transition-all"
+                    className="bg-teal-500 h-2 rounded-full transition-all"
                     style={{
                       width: `${Math.min(
                         ((profile.reputation_level || 1) / 5) * 100,
@@ -568,21 +620,21 @@ export default function ProfilePage() {
 
               {/* Activity Stats (3 cards) */}
               <div className="grid grid-cols-3 gap-4">
-                <div className="border border-line bg-canvas p-4 text-center">
-                  <p className="font-display text-2xl font-extrabold text-ink">0 km</p>
-                  <p className="mt-1 text-xs text-ink-muted">
+                <div className="bg-slate-50 rounded-xl p-4 text-center">
+                  <p className="text-xl font-bold text-slate-900">0 km</p>
+                  <p className="text-xs text-slate-500 mt-1">
                     {t("profile.overview.distanceCovered")}
                   </p>
                 </div>
-                <div className="border border-line bg-canvas p-4 text-center">
-                  <p className="font-display text-2xl font-extrabold text-ink">0 m</p>
-                  <p className="mt-1 text-xs text-ink-muted">
+                <div className="bg-slate-50 rounded-xl p-4 text-center">
+                  <p className="text-xl font-bold text-slate-900">0 m</p>
+                  <p className="text-xs text-slate-500 mt-1">
                     {t("profile.overview.elevationGain")}
                   </p>
                 </div>
-                <div className="border border-line bg-canvas p-4 text-center">
-                  <p className="font-display text-2xl font-extrabold text-ink">0 h</p>
-                  <p className="mt-1 text-xs text-ink-muted">
+                <div className="bg-slate-50 rounded-xl p-4 text-center">
+                  <p className="text-xl font-bold text-slate-900">0 h</p>
+                  <p className="text-xs text-slate-500 mt-1">
                     {t("profile.overview.activeTime")}
                   </p>
                 </div>
@@ -591,7 +643,7 @@ export default function ProfilePage() {
               {/* Skills per category */}
               {skillsByCategory.length > 0 &&
                 skillsByCategory.some((s) => s.bestLevel) && (
-                  <div className="mt-6 border-t border-line pt-6">
+                  <div className="mt-6 pt-6 border-t border-slate-100">
                     <div className="grid grid-cols-2 gap-3">
                       {skillsByCategory
                         .filter((s) => s.bestLevel)
@@ -603,13 +655,13 @@ export default function ProfilePage() {
                           return (
                             <div
                               key={s.category.id}
-                              className="flex items-center gap-3 border border-line px-4 py-3"
+                              className="flex items-center gap-3 rounded-xl border border-slate-100 px-4 py-3"
                             >
                               <span className="text-lg">
                                 <Icon name={CATEGORY_ICONS[iconKey] || "star"} size={18} />
                               </span>
                               <div className="flex-1 min-w-0">
-                                <p className="truncate text-sm font-medium text-ink">
+                                <p className="text-sm font-medium text-slate-900 truncate">
                                   {getLocalizedName(
                                     s.category.name_localized,
                                     s.category.name,
@@ -643,16 +695,15 @@ export default function ProfilePage() {
             {/* Recent Trips */}
             <section>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-display text-2xl font-extrabold text-ink">
+                <h2 className="text-lg font-bold text-slate-900">
                   {t("profile.overview.recentTrips")}
                 </h2>
                 {followCounts.trips > 0 && (
                   <Link
                     href="/trips"
-                    className="flex items-center gap-2 text-sm font-bold uppercase tracking-[0.08em] text-accent hover:underline"
+                    className="text-sm font-medium text-teal-600 hover:text-teal-700"
                   >
-                    {t("common.viewAll")}
-                    <Icon name="arrow-right" size={14} />
+                    {t("common.viewAll")} →
                   </Link>
                 )}
               </div>
@@ -663,7 +714,7 @@ export default function ProfilePage() {
                     <Link
                       key={trip.id}
                       href={`/trips/${trip.slug}`}
-                      className="group overflow-hidden border border-line bg-surface transition-colors hover:border-accent"
+                      className="rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow bg-white"
                     >
                       <div
                         className="h-32"
@@ -673,14 +724,14 @@ export default function ProfilePage() {
                               ? `url(${
                                   trip.card_image_url || trip.cover_image_url
                                 }) center/cover`
-                              : "var(--gradient-trevu)",
+                              : "linear-gradient(135deg, #0D9488, #0F766E)",
                         }}
                       />
                       <div className="p-3">
-                        <p className="truncate text-sm font-semibold text-ink transition-colors group-hover:text-accent">
+                        <p className="text-sm font-semibold text-slate-900 truncate">
                           {trip.title}
                         </p>
-                        <p className="mt-1 text-xs text-ink-muted">
+                        <p className="text-xs text-slate-500 mt-1">
                           {trip.location_city || trip.location_country}
                         </p>
                       </div>
@@ -688,16 +739,15 @@ export default function ProfilePage() {
                   ))}
                 </div>
               ) : (
-                <div className="border border-line bg-surface p-8 text-center">
-                  <p className="text-sm text-ink-muted">
+                <div className="bg-slate-50 rounded-xl p-8 text-center">
+                  <p className="text-sm text-slate-500">
                     {t("profile.overview.noTripsYet")}
                   </p>
                   <Link
                     href="/trips/new"
-                    className="mt-3 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-[0.08em] text-accent hover:underline"
+                    className="inline-block mt-3 text-sm font-medium text-teal-600 hover:text-teal-700"
                   >
-                    {t("trips.createTrip")}
-                    <Icon name="arrow-right" size={14} />
+                    {t("trips.createTrip")} →
                   </Link>
                 </div>
               )}

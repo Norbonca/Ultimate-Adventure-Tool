@@ -171,28 +171,28 @@ export default function ProfileSettingsPage() {
 
   if (loading) {
     return (
-      <div className="border border-line bg-surface p-8 text-center text-ink-muted">
+      <div className="rounded-2xl border border-navy-200 bg-white p-8 text-center text-navy-500">
         {t('common.loading')}
       </div>
     );
   }
 
   return (
-    <div className="border border-line bg-surface p-6 sm:p-8">
-      <h1 className="mb-2 font-display text-4xl font-extrabold leading-none text-ink">
+    <div className="rounded-2xl border border-navy-200 bg-white p-8">
+      <h1 className="text-[22px] font-bold text-navy-900 mb-2">
         {t('profile.editProfile')}
       </h1>
-      <p className="mb-8 text-sm text-ink-muted">
+      <p className="text-sm text-navy-500 mb-8">
         {t('profile.settings.personalInfo')}
       </p>
 
       <div className="space-y-6">
         {/* Avatar Picker */}
         <div>
-          <label className="mb-3 block text-sm font-semibold text-ink">
+          <label className="block text-sm font-semibold text-navy-700 mb-3">
             {t('imagePicker.avatar.title')}
           </label>
-          <p className="mb-3 text-xs text-ink-muted">
+          <p className="text-xs text-navy-400 mb-3">
             {t('imagePicker.avatar.subtitle')}
           </p>
           <ImagePicker
@@ -208,12 +208,12 @@ export default function ProfileSettingsPage() {
           />
         </div>
 
-        <hr className="border-line" />
+        <hr className="border-navy-100" />
 
         {/* Name row */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="first-name" className="mb-1.5 block text-sm font-semibold text-ink">
+            <label htmlFor="first-name" className="block text-sm font-semibold text-navy-700 mb-1.5">
               {t('profile.settings.firstName')}
             </label>
             <input
@@ -226,7 +226,7 @@ export default function ProfileSettingsPage() {
             />
           </div>
           <div>
-            <label htmlFor="last-name" className="mb-1.5 block text-sm font-semibold text-ink">
+            <label htmlFor="last-name" className="block text-sm font-semibold text-navy-700 mb-1.5">
               {t('profile.settings.lastName')}
             </label>
             <input
@@ -242,7 +242,7 @@ export default function ProfileSettingsPage() {
 
         {/* Phone */}
         <div>
-          <label htmlFor="phone" className="mb-1.5 block text-sm font-semibold text-ink">
+          <label htmlFor="phone" className="block text-sm font-semibold text-navy-700 mb-1.5">
             {t('profile.settings.phone')}
           </label>
           <input
@@ -256,9 +256,9 @@ export default function ProfileSettingsPage() {
         </div>
 
         {/* City + Country */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="city" className="mb-1.5 block text-sm font-semibold text-ink">
+            <label htmlFor="city" className="block text-sm font-semibold text-navy-700 mb-1.5">
               {t('profile.settings.city')}
             </label>
             <input
@@ -271,7 +271,7 @@ export default function ProfileSettingsPage() {
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-semibold text-ink">
+            <label className="block text-sm font-semibold text-navy-700 mb-1.5">
               {t('profile.settings.country')}
             </label>
             <select
@@ -290,9 +290,9 @@ export default function ProfileSettingsPage() {
         </div>
 
         {/* Language + Currency */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="mb-1.5 block text-sm font-semibold text-ink">
+            <label className="block text-sm font-semibold text-navy-700 mb-1.5">
               {t('profile.settings.preferredLanguage')}
             </label>
             <select
@@ -306,7 +306,7 @@ export default function ProfileSettingsPage() {
             </select>
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-semibold text-ink">
+            <label className="block text-sm font-semibold text-navy-700 mb-1.5">
               {t('profile.settings.preferredCurrency')}
             </label>
             <select
@@ -323,7 +323,7 @@ export default function ProfileSettingsPage() {
 
         {/* Timezone */}
         <div>
-          <label className="mb-1.5 block text-sm font-semibold text-ink">
+          <label className="block text-sm font-semibold text-navy-700 mb-1.5">
             {t('profile.settings.timezone')}
           </label>
           <select
@@ -339,7 +339,7 @@ export default function ProfileSettingsPage() {
 
         {/* Bio */}
         <div>
-          <label className="mb-1.5 block text-sm font-semibold text-ink">
+          <label className="block text-sm font-semibold text-navy-700 mb-1.5">
             {t('profile.settings.bio')}
           </label>
           <textarea
@@ -348,22 +348,22 @@ export default function ProfileSettingsPage() {
             className="input-trevu min-h-[120px] resize-none"
             placeholder={t('profile.settings.bioPlaceholder')}
           />
-          <p className="mt-1 text-xs text-ink-muted">
+          <p className="text-xs text-navy-400 mt-1">
             {t('profile.settings.bioCharCount', { count: form.bio.length })}
           </p>
         </div>
 
-        <hr className="border-line" />
+        <hr className="border-navy-200" />
 
         {/* Emergency Contact */}
         <div>
-          <h2 className="mb-1 font-display text-2xl font-extrabold text-ink">{t('profile.emergency.title')}</h2>
-          <p className="mb-4 text-xs text-ink-muted">
+          <h3 className="text-lg font-bold text-navy-900 mb-1">{t('profile.emergency.title')}</h3>
+          <p className="text-xs text-navy-500 mb-4">
             {t('settings.privacy.phoneHint')}
           </p>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="emergency-name" className="mb-1.5 block text-sm font-semibold text-ink">
+              <label htmlFor="emergency-name" className="block text-sm font-semibold text-navy-700 mb-1.5">
                 {t('profile.emergency.name')}
               </label>
               <input
@@ -376,7 +376,7 @@ export default function ProfileSettingsPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-semibold text-ink">
+              <label className="block text-sm font-semibold text-navy-700 mb-1.5">
                 {t('profile.emergency.relationship')}
               </label>
               <select
@@ -394,7 +394,7 @@ export default function ProfileSettingsPage() {
             </div>
           </div>
           <div className="mt-4">
-            <label htmlFor="emergency-phone" className="mb-1.5 block text-sm font-semibold text-ink">
+            <label htmlFor="emergency-phone" className="block text-sm font-semibold text-navy-700 mb-1.5">
               {t('profile.emergency.phone')}
             </label>
             <input
@@ -408,20 +408,20 @@ export default function ProfileSettingsPage() {
           </div>
         </div>
 
-        <hr className="border-line" />
+        <hr className="border-navy-200" />
 
         {/* Actions */}
         <div className="flex gap-3">
           <a
             href="/profile"
-            className="inline-flex min-h-12 items-center justify-center border border-line-strong bg-surface px-7 py-3 text-sm font-bold text-ink transition-colors hover:border-accent hover:text-accent"
+            className="rounded-xl border border-navy-200 bg-white px-7 py-3 text-sm font-semibold text-navy-700 hover:bg-navy-50 transition-colors"
           >
             {t('common.cancel')}
           </a>
           <button
             onClick={handleSave}
             disabled={saving}
-            className="min-h-12 bg-accent px-7 py-3 text-sm font-bold text-accent-on transition-colors hover:bg-accent-hover disabled:opacity-50"
+            className="rounded-xl bg-trevu-600 px-7 py-3 text-sm font-semibold text-white hover:bg-trevu-700 transition-colors disabled:opacity-50"
           >
             {saving ? t('common.loading') : saved ? t('common.saved') : t('common.saveChanges')}
           </button>

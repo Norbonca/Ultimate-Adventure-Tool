@@ -39,7 +39,7 @@ export function StateTemplate({ variant, title, description, icon, actions, clas
       role={variant === "error" ? "alert" : "status"}
       aria-busy={variant === "loading" || undefined}
       className={[
-        "flex w-full flex-col items-center justify-center gap-4 rounded-none border border-line bg-surface px-10 py-14 text-center",
+        "flex w-full flex-col items-center justify-center gap-4 rounded-trevu-2xl bg-navy-50 px-10 py-14 text-center",
         className ?? "",
       ].join(" ")}
     >
@@ -53,8 +53,8 @@ export function StateTemplate({ variant, title, description, icon, actions, clas
       >
         <Icon name={iconName} size={40} className={variant === "loading" ? "animate-spin" : undefined} />
       </div>
-      <h2 className="font-display text-2xl font-bold text-ink">{title}</h2>
-      {description && <p className="max-w-[420px] text-sm text-ink-muted">{description}</p>}
+      <h2 className="text-lg font-bold text-navy-900">{title}</h2>
+      {description && <p className="max-w-[420px] text-sm text-navy-500">{description}</p>}
       {actions && <div className="mt-1 flex flex-wrap items-center justify-center gap-2.5">{actions}</div>}
     </section>
   );

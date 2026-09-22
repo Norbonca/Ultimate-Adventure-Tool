@@ -68,22 +68,22 @@ export default function SocialPage() {
     : list;
 
   return (
-    <div className="border border-line bg-surface p-6 sm:p-8">
-      <h1 className="mb-2 font-display text-4xl font-extrabold leading-none text-ink">
+    <div className="rounded-2xl border border-navy-200 bg-white p-8">
+      <h1 className="text-[22px] font-bold text-navy-900 mb-2">
         {t('settings.social.title')}
       </h1>
-      <p className="mb-6 text-sm text-ink-muted">
+      <p className="text-sm text-navy-500 mb-6">
         {followers.length} {t('settings.social.followers')} · {following.length} {t('settings.social.following')}
       </p>
 
       {/* Tabs */}
-      <div className="mb-6 flex border-b border-line">
+      <div className="flex border-b border-navy-200 mb-6">
         <button
           onClick={() => setActiveTab("followers")}
           className={`flex-1 pb-3 text-sm font-semibold text-center transition-colors ${
             activeTab === "followers"
-              ? "border-b-2 border-accent text-accent"
-              : "text-ink-muted hover:text-ink"
+              ? "text-trevu-600 border-b-2 border-trevu-600"
+              : "text-navy-400 hover:text-navy-600"
           }`}
         >
           {t('settings.social.followers')}
@@ -92,8 +92,8 @@ export default function SocialPage() {
           onClick={() => setActiveTab("following")}
           className={`flex-1 pb-3 text-sm font-semibold text-center transition-colors ${
             activeTab === "following"
-              ? "border-b-2 border-accent text-accent"
-              : "text-ink-muted hover:text-ink"
+              ? "text-trevu-600 border-b-2 border-trevu-600"
+              : "text-navy-400 hover:text-navy-600"
           }`}
         >
           {t('settings.social.following')}
@@ -116,7 +116,7 @@ export default function SocialPage() {
       ) : filtered.length === 0 ? (
         <StateTemplate variant="empty" icon="users" title={t('settings.social.empty')} />
       ) : (
-        <div className="divide-y divide-line">
+        <div className="divide-y divide-navy-200">
           {filtered.map((user) => {
             const initials = (user.display_name ?? "?")
               .split(" ")
@@ -128,17 +128,17 @@ export default function SocialPage() {
             return (
               <div key={user.id} className="flex items-center justify-between py-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-sm font-bold text-accent-on">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-trevu-600 text-white text-sm font-bold">
                     {initials}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-ink">{user.display_name ?? t('profile.defaultUser')}</p>
-                    <p className="text-xs text-ink-muted">@{user.slug ?? user.id.slice(0, 8)}</p>
+                    <p className="text-sm font-semibold text-navy-800">{user.display_name ?? "User"}</p>
+                    <p className="text-xs text-navy-400">@{user.slug ?? user.id.slice(0, 8)}</p>
                   </div>
                 </div>
                 <a
                   href={`/u/${user.slug ?? user.id}`}
-                  className="border border-line-strong px-4 py-2 text-xs font-bold uppercase tracking-[0.06em] text-ink transition-colors hover:border-accent hover:text-accent"
+                  className="rounded-lg border border-navy-200 px-4 py-1.5 text-xs font-semibold text-navy-600 hover:bg-navy-50 transition-colors"
                 >
                   {t('settings.social.viewProfile')}
                 </a>

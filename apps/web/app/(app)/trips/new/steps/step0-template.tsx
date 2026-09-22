@@ -68,9 +68,9 @@ export const SAMPLE_TEMPLATES: TemplateData[] = [
 ];
 
 const TEMPLATE_GRADIENTS = [
-  "bg-accent",
-  "bg-ink",
-  "bg-[var(--color-info)]",
+  "from-orange-400 via-rose-400 to-purple-500",
+  "from-cyan-400 via-blue-500 to-indigo-500",
+  "from-sky-300 via-blue-400 to-indigo-400",
 ];
 
 interface Step0TemplateProps {
@@ -92,11 +92,11 @@ export function Step0Template({
   return (
     <div>
       {/* Title */}
-      <div className="mb-8 border-l-4 border-accent pl-5">
-        <h2 className="mb-2 font-display text-4xl font-extrabold leading-none text-ink sm:text-5xl">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl sm:text-3xl font-bold text-navy-900 mb-2">
           {t("trips.wizard.templateTitle")}
         </h2>
-        <p className="max-w-2xl text-sm text-ink-muted">
+        <p className="text-navy-500 text-sm">
           {t("trips.wizard.templateSubtitle")}
         </p>
       </div>
@@ -109,23 +109,23 @@ export function Step0Template({
             onSelectMode("template");
             setShowTemplates(true);
           }}
-          className={`text-left p-6 border-2 transition-colors ${
+          className={`text-left p-6 rounded-xl border-2 transition-all hover:shadow-md ${
             selectedMode === "template"
-              ? "border-accent bg-[var(--color-primary-subtle)]"
-              : "border-line bg-surface hover:border-line-strong"
+              ? "border-trevu-500 bg-trevu-50/50 shadow-sm"
+              : "border-navy-200 bg-white hover:border-navy-300"
           }`}
         >
-          <div className="mb-4 flex h-10 w-10 items-center justify-center border border-line-strong text-ink">
+          <div className="w-10 h-10 rounded-lg bg-navy-100 flex items-center justify-center text-navy-600 mb-4">
             <Icon name="clipboard-list" size={20} />
           </div>
-          <h3 className="mb-2 font-display text-2xl font-extrabold text-ink">
+          <h3 className="font-semibold text-navy-900 mb-2">
             {t("trips.wizard.useTemplate")}
           </h3>
-          <p className="mb-4 text-sm leading-relaxed text-ink-muted">
+          <p className="text-sm text-navy-500 leading-relaxed mb-4">
             {t("trips.wizard.useTemplateDesc")}
           </p>
-          <span className="inline-flex items-center gap-2 text-sm font-bold text-accent">
-            {t("trips.wizard.browseTemplates")} <Icon name="arrow-right" size={14} />
+          <span className="text-sm font-medium text-trevu-600">
+            {t("trips.wizard.browseTemplates")} →
           </span>
         </button>
 
@@ -133,22 +133,22 @@ export function Step0Template({
         <button
           disabled
           aria-disabled="true"
-          className={`text-left p-6 border-2 transition-colors ${
+          className={`text-left p-6 rounded-xl border-2 transition-all hover:shadow-md ${
             selectedMode === "ai"
-              ? "border-accent bg-[var(--color-primary-subtle)]"
-              : "border-line bg-surface"
+              ? "border-trevu-500 bg-trevu-50/50 shadow-sm"
+              : "border-navy-200 bg-white hover:border-navy-300"
           }`}
         >
-          <div className="mb-4 flex h-10 w-10 items-center justify-center border border-accent text-accent">
+          <div className="w-10 h-10 rounded-lg bg-trevu-100 flex items-center justify-center text-trevu-600 mb-4">
             <Icon name="sparkles" size={20} />
           </div>
-          <h3 className="mb-2 font-display text-2xl font-extrabold text-ink">
+          <h3 className="font-semibold text-navy-900 mb-2">
             {t("trips.wizard.aiAssistant")}
           </h3>
-          <p className="mb-4 text-sm leading-relaxed text-ink-muted">
+          <p className="text-sm text-navy-500 leading-relaxed mb-4">
             {t("trips.wizard.aiAssistantDesc")}
           </p>
-          <span className="inline-flex items-center bg-line px-4 py-1.5 text-sm font-medium text-ink-muted">
+          <span className="inline-flex items-center px-4 py-1.5 bg-trevu-600 text-white text-sm font-medium rounded-lg">
             {t("common.comingSoon")}
           </span>
         </button>
@@ -156,23 +156,23 @@ export function Step0Template({
         {/* Start from Scratch */}
         <button
           onClick={() => onSelectMode("scratch")}
-          className={`text-left p-6 border-2 transition-colors ${
+          className={`text-left p-6 rounded-xl border-2 transition-all hover:shadow-md ${
             selectedMode === "scratch"
-              ? "border-accent bg-[var(--color-primary-subtle)]"
-              : "border-line bg-surface hover:border-line-strong"
+              ? "border-trevu-500 bg-trevu-50/50 shadow-sm"
+              : "border-navy-200 bg-white hover:border-navy-300"
           }`}
         >
-          <div className="mb-4 flex h-10 w-10 items-center justify-center border border-line-strong text-ink">
+          <div className="w-10 h-10 rounded-lg bg-navy-100 flex items-center justify-center text-navy-600 mb-4">
             <Icon name="pencil" size={20} />
           </div>
-          <h3 className="mb-2 font-display text-2xl font-extrabold text-ink">
+          <h3 className="font-semibold text-navy-900 mb-2">
             {t("trips.wizard.startFromScratch")}
           </h3>
-          <p className="mb-4 text-sm leading-relaxed text-ink-muted">
+          <p className="text-sm text-navy-500 leading-relaxed mb-4">
             {t("trips.wizard.startFromScratchDesc")}
           </p>
-          <span className="inline-flex items-center gap-2 text-sm font-bold text-accent">
-            {t("trips.wizard.startFromScratchLink")} <Icon name="arrow-right" size={14} />
+          <span className="text-sm font-medium text-trevu-600">
+            {t("trips.wizard.startFromScratchLink")} →
           </span>
         </button>
       </div>
@@ -181,7 +181,7 @@ export function Step0Template({
       {(isTemplateMode || showTemplates) && (
         <div className="mt-2">
           <div className="flex items-center justify-between mb-5">
-            <h3 className="font-display text-2xl font-extrabold text-ink">
+            <h3 className="text-lg font-bold text-navy-900">
               {t("trips.wizard.popularTemplates")}
             </h3>
 
@@ -191,7 +191,7 @@ export function Step0Template({
             {SAMPLE_TEMPLATES.map((tmpl, idx) => (
               <div
                 key={tmpl.id}
-                className="group cursor-pointer overflow-hidden border border-line bg-surface transition-colors hover:border-accent"
+                className="bg-white rounded-xl border border-navy-200 overflow-hidden hover:shadow-md transition-all group cursor-pointer"
                 role="button"
                 tabIndex={0}
                 onKeyDown={(event) => {
@@ -204,30 +204,30 @@ export function Step0Template({
               >
                 {/* Image / gradient placeholder */}
                 <div
-                  className={`relative h-40 ${TEMPLATE_GRADIENTS[idx]}`}
+                  className={`h-40 bg-gradient-to-br ${TEMPLATE_GRADIENTS[idx]} relative`}
                 >
-                  <div className="absolute left-3 top-3 flex items-center gap-1 bg-surface/90 px-2 py-1 text-xs font-medium text-ink backdrop-blur-sm">
+                  <div className="absolute top-3 left-3 px-2 py-0.5 bg-white/90 backdrop-blur-sm rounded-md text-xs font-medium text-navy-700">
                     <Icon name={tmpl.categoryIcon} size={13} /> {t(`categories.${tmpl.categoryKey}` as TranslationKey)}
                   </div>
                 </div>
 
                 <div className="p-4">
-                  <h4 className="mb-1 font-semibold text-ink transition-colors group-hover:text-accent">
+                  <h4 className="font-semibold text-navy-900 mb-1 group-hover:text-trevu-700 transition-colors">
                     {locale === "en" ? tmpl.title : tmpl.titleHu}
                   </h4>
-                  <p className="mb-3 line-clamp-2 text-xs text-ink-muted">
+                  <p className="text-xs text-navy-500 mb-3 line-clamp-2">
                     {locale === "en" ? tmpl.descriptionEn : tmpl.descriptionHu}
                   </p>
 
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-xs text-ink-muted">
+                    <div className="flex items-center gap-2 text-xs text-navy-400">
                       <span className="inline-flex items-center gap-1"><Icon name="user-check" size={12} /> {tmpl.organizerName}</span>
                       <span>·</span>
                       <span>
                         {tmpl.duration} {t("trips.detail.days")}
                       </span>
                     </div>
-                    <span className="text-xs font-bold text-accent">
+                    <span className="text-xs font-medium text-trevu-600">
                       {t("trips.wizard.useThisTemplate")}
                     </span>
                   </div>

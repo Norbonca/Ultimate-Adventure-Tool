@@ -11,10 +11,10 @@ function getPasswordStrength(password: string): { level: number; label: string; 
   if (/[A-Z]/.test(password)) types++;
   if (/[0-9]/.test(password)) types++;
   if (/[^a-zA-Z0-9]/.test(password)) types++;
-  if (password.length < 8) return { level: 1, label: "weak", color: "var(--color-danger)" };
-  if (types >= 3) return { level: 3, label: "strong", color: "var(--color-success)" };
-  if (types >= 2) return { level: 2, label: "medium", color: "var(--color-warning)" };
-  return { level: 1, label: "weak", color: "var(--color-danger)" };
+  if (password.length < 8) return { level: 1, label: "weak", color: "#DC2626" };
+  if (types >= 3) return { level: 3, label: "strong", color: "#059669" };
+  if (types >= 2) return { level: 2, label: "medium", color: "#D97706" };
+  return { level: 1, label: "weak", color: "#DC2626" };
 }
 
 export default function ChangePasswordPage() {
@@ -48,7 +48,7 @@ export default function ChangePasswordPage() {
     // Verify current password by signing in
     const { data: { user } } = await supabase.auth.getUser();
     if (!user?.email) {
-      setError(t('settings.password.currentIncorrect'));
+      setError("Cannot verify current password");
       setLoading(false);
       return;
     }
@@ -79,28 +79,28 @@ export default function ChangePasswordPage() {
   };
 
   return (
-    <div className="border border-line bg-surface p-6 sm:p-8">
-      <h1 className="mb-2 font-display text-4xl font-extrabold leading-none text-ink">
+    <div className="rounded-2xl border border-navy-200 bg-white p-8">
+      <h1 className="text-[22px] font-bold text-navy-900 mb-2">
         {t('settings.password.title')}
       </h1>
-      <p className="mb-8 text-sm text-ink-muted">
+      <p className="text-sm text-navy-500 mb-8">
         {t('settings.password.description')}
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
-          <div className="border border-[var(--color-danger)] bg-[var(--color-danger-subtle)] p-3 text-sm text-[var(--color-danger)]">
+          <div className="rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-700">
             {error}
           </div>
         )}
         {success && (
-          <div className="border border-[var(--color-success)] bg-[var(--color-success-subtle)] p-3 text-sm text-[var(--color-success-text)]">
+          <div className="rounded-xl bg-trevu-50 border border-trevu-200 p-3 text-sm text-trevu-700">
             {t('settings.password.success')}
           </div>
         )}
 
         <div>
-          <label htmlFor="current-password" className="mb-1.5 block text-sm font-semibold text-ink">
+          <label htmlFor="current-password" className="block text-sm font-semibold text-navy-700 mb-1.5">
             {t('settings.password.current')}
           </label>
           <input
@@ -114,10 +114,10 @@ export default function ChangePasswordPage() {
           />
         </div>
 
-        <hr className="border-line" />
+        <hr className="border-navy-200" />
 
         <div>
-          <label htmlFor="new-password" className="mb-1.5 block text-sm font-semibold text-ink">
+          <label htmlFor="new-password" className="block text-sm font-semibold text-navy-700 mb-1.5">
             {t('auth.newPassword')}
           </label>
           <input
@@ -138,8 +138,8 @@ export default function ChangePasswordPage() {
               {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="h-1 flex-1 transition-colors"
-                  style={{ backgroundColor: i <= strength.level ? strength.color : "var(--color-border)" }}
+                  className="h-1 flex-1 rounded-full transition-colors"
+                  style={{ backgroundColor: i <= strength.level ? strength.color : "#E2E8F0" }}
                 />
               ))}
             </div>
@@ -152,7 +152,7 @@ export default function ChangePasswordPage() {
         )}
 
         <div>
-          <label htmlFor="confirm-password" className="mb-1.5 block text-sm font-semibold text-ink">
+          <label htmlFor="confirm-password" className="block text-sm font-semibold text-navy-700 mb-1.5">
             {t('auth.confirmNewPassword')}
           </label>
           <input
@@ -167,16 +167,16 @@ export default function ChangePasswordPage() {
           />
         </div>
 
-        <hr className="border-line" />
+        <hr className="border-navy-200" />
 
         <div className="flex gap-3">
-          <a href="/profile" className="inline-flex min-h-12 items-center justify-center border border-line-strong bg-surface px-7 py-3 text-sm font-bold text-ink transition-colors hover:border-accent hover:text-accent">
+          <a href="/profile" className="rounded-xl border border-navy-200 bg-white px-7 py-3 text-sm font-semibold text-navy-700 hover:bg-navy-50 transition-colors">
             {t('common.cancel')}
           </a>
           <button
             type="submit"
             disabled={loading}
-            className="min-h-12 bg-accent px-7 py-3 text-sm font-bold text-accent-on transition-colors hover:bg-accent-hover disabled:opacity-50"
+            className="rounded-xl bg-trevu-600 px-7 py-3 text-sm font-semibold text-white hover:bg-trevu-700 transition-colors disabled:opacity-50"
           >
             {loading ? t('common.loading') : t('settings.password.updateBtn')}
           </button>
