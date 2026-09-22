@@ -17,14 +17,14 @@ export function Checkbox({ id, label, className, ...rest }: CheckboxProps) {
     <label
       htmlFor={id}
       className={[
-        "inline-flex min-h-[44px] cursor-pointer items-center gap-2.5 text-sm text-ink-secondary sm:min-h-0",
+        "inline-flex min-h-[44px] cursor-pointer items-center gap-2.5 text-sm text-navy-600 sm:min-h-0",
         className ?? "",
       ].join(" ")}
     >
       <input
         id={id}
         type="checkbox"
-        className="h-5 w-5 rounded-none border border-line-strong bg-surface text-accent focus:ring-accent/20"
+        className="h-5 w-5 rounded border-[1.5px] border-navy-300 text-trevu-600 focus:ring-trevu-600/20"
         {...rest}
       />
       <span>{label}</span>

@@ -1,7 +1,8 @@
 /**
  * Chip — category and status badges.
  *
- * Overhaul: category tint + full category colour, square geometry, 4×10 padding. Status: Active = Trail Sage,
+ * Brand: Trevu_Brand_Guide.docx §3 — category: 10 % category colour background + full colour
+ * text, radius 6 (`rounded-chip`), padding 4×10, DM Sans 500 12 px. Status: Active = Trail Sage,
  * Upcoming = Golden Hour, Closed = Cloud / Slate.
  * Design: design/D02_Trip_Management.pen#RNDGS (pills), #NCfEW (card category chip).
  * Category keys follow modules/00_Reference_Data/03_Icon_Bank.md §12 (`cat.*`).
@@ -44,7 +45,7 @@ export interface ChipProps extends HTMLAttributes<HTMLSpanElement> {
 export function Chip({ category, status, icon, solid, className, children, ...rest }: ChipProps) {
   const tone = category
     ? solid
-      ? "bg-accent text-accent-on"
+      ? "bg-trevu-600 text-white"
       : CATEGORY[category]
     : status
       ? STATUS[status]
@@ -52,7 +53,7 @@ export function Chip({ category, status, icon, solid, className, children, ...re
   return (
     <span
       className={[
-        "inline-flex items-center gap-1 rounded-none px-2.5 py-1 text-xs font-medium leading-4 whitespace-nowrap",
+        "inline-flex items-center gap-1 rounded-chip px-2.5 py-1 text-xs font-medium leading-4 whitespace-nowrap",
         tone,
         className ?? "",
       ].join(" ")}

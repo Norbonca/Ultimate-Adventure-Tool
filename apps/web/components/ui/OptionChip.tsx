@@ -5,7 +5,7 @@
  *
  * Design: design/D02_Trip_Management.pen#rzyEG (Component/FilterContent „Opt …”),
  * #H1rRQE „Category Pills” és „View Toggle”. 40 px magas (érintési cél a sorban
- * ≥ 40, a sheetben a gombsor 48), szögletes geometria, kiválasztva --color-primary kitöltés
+ * ≥ 40, a sheetben a gombsor 48), radius 10, kiválasztva --color-primary kitöltés
  * --color-on-primary szöveggel, egyébként --color-ghost + keret.
  */
 
@@ -47,7 +47,7 @@ export function OptionChip({
       aria-checked={mode === "radio" ? selected : undefined}
       aria-pressed={mode === "pressed" ? selected : undefined}
       className={[
-        "inline-flex h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-none px-3.5 text-sm font-semibold transition-colors",
+        "inline-flex h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-trevu px-3.5 text-sm font-semibold transition-colors",
         "focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]",
         selected
           ? "bg-accent text-accent-on"
