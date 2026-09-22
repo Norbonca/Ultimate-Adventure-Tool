@@ -39,7 +39,7 @@ test.describe('FLOW-CORE-2 — Login', () => {
     await page.goto('/login');
     await page.getByLabel(/email/i).fill('not-a-user@trevu.local');
     await page.getByLabel(/password|jelszó/i).fill('wrong-password');
-    await page.getByRole('button', { name: /log in|belépés/i }).click();
+    await page.getByRole('button', { name: /log in|bejelentkezés|belépés/i }).click();
     // accept either toast or inline error
     await expect(page.getByText(/invalid|érvénytelen|hibás/i)).toBeVisible({ timeout: 5000 });
   });
