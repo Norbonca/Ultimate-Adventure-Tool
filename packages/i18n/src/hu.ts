@@ -1108,7 +1108,7 @@ const hu = {
     duration: "Időtartam",
     availableSpots: "Elérhető helyek",
     loadMore: "További túrák betöltése",
-    ctaTitle: "Kész a saját kalandod szervezésére?",
+    ctaTitle: "Készen állsz a saját kalandod megszervezésére?",
     heroSubtitle: "Kis csoportos kalandtúrák tapasztalt szervezőkkel — válassz a 3D térképen vagy a listából.",
     searchTrips: "Túrák keresése...",
     whereTo: "Hova?",
