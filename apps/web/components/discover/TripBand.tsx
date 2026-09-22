@@ -68,7 +68,7 @@ export function TripBand({ href, title, imageUrl, place, details, category, pric
     <Link
       href={href}
       data-testid="trip-band"
-      className="group flex min-h-[120px] overflow-hidden rounded-trevu-2xl border border-line bg-surface transition duration-150 hover:-translate-y-px hover:border-line-strong focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)] md:min-h-[147px]"
+      className="group flex min-h-[120px] overflow-hidden border border-line bg-surface transition-colors duration-150 hover:border-accent focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)] md:min-h-[147px]"
     >
       <div className="relative w-28 shrink-0 bg-line md:w-[220px]">
         {imageUrl && (
@@ -79,7 +79,7 @@ export function TripBand({ href, title, imageUrl, place, details, category, pric
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col justify-between gap-1 px-3.5 py-3 md:justify-center md:gap-2 md:px-6 md:py-5">
-        <h3 data-testid="trip-band-title" className="line-clamp-2 text-base font-semibold text-ink md:text-[22px] md:leading-tight">
+        <h3 data-testid="trip-band-title" className="line-clamp-2 font-display text-xl font-extrabold leading-none text-ink md:text-3xl">
           {title}
         </h3>
         <p className="flex items-center gap-2 text-sm text-ink-muted">
@@ -87,7 +87,7 @@ export function TripBand({ href, title, imageUrl, place, details, category, pric
           <span className="line-clamp-1">{meta}</span>
         </p>
         {category && CatIcon && (
-          <span className={`hidden w-fit items-center gap-1.5 rounded-chip px-2.5 py-1 text-xs font-medium md:inline-flex ${CHIP[category.token]}`}>
+          <span className={`hidden w-fit items-center gap-1.5 px-2.5 py-1 text-xs font-medium md:inline-flex ${CHIP[category.token]}`}>
             <CatIcon size={14} aria-hidden />
             {category.label}
           </span>
