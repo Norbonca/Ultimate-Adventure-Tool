@@ -1,12 +1,12 @@
 "use client";
 
 /**
- * SearchPill — lebegő pirula-kereső (Brand Guide v2 §6, „SearchBar pill”).
+ * SearchPill — az Overhaul szögletes keresőmezője.
  *
  * Design: design/D00_Core_Components.pen#dtNrg (D02 másolat #oNfWS),
  * képernyőn: design/D02_Trip_Management.pen#H1rRQE (1440), #l87Il (390).
  * 56 px magas, keret --color-border-strong, háttér --color-glass + blur 12,
- * Keresés gomb teal pirula 40 px. Csak szemantikus tokenekből — Day és Night
+ * Keresés gomb narancs, 40 px magas. Csak szemantikus tokenekből — Day és Night
  * felületen is helyes. Szöveget nem fordít: a hívó adja át `t()`-ből.
  */
 
@@ -51,7 +51,7 @@ export function SearchPill({
       onSubmit={submit}
       data-testid={testId}
       className={[
-        "flex h-14 w-full items-center gap-3 rounded-full border border-line-strong bg-glass py-2 pl-5 pr-2 backdrop-blur-md",
+        "flex h-14 w-full items-center gap-3 rounded-none border border-line-strong bg-glass py-2 pl-5 pr-2 backdrop-blur-md",
         "focus-within:border-accent focus-within:shadow-[var(--focus-ring)]",
         className ?? "",
       ].join(" ")}
@@ -70,7 +70,7 @@ export function SearchPill({
       <button
         type="submit"
         data-testid={submitTestId}
-        className="h-10 shrink-0 rounded-full bg-accent px-5 text-sm font-semibold text-accent-on transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+        className="h-10 shrink-0 rounded-none bg-accent px-5 text-sm font-semibold text-accent-on transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
       >
         {submitLabel}
       </button>
