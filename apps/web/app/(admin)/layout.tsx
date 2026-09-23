@@ -59,7 +59,7 @@ export default async function AdminLayout({
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-900">
+    <div data-surface="day" className="flex min-h-screen bg-slate-900">
       <AdminSidebar user={sidebarUser} />
       <main className="flex-1 bg-slate-50 overflow-auto">
         {children}

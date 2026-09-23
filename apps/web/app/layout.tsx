@@ -70,7 +70,10 @@ export default async function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen bg-slate-50 text-navy-900 antialiased">
+      <body
+        data-surface="night"
+        className="min-h-screen bg-canvas text-ink antialiased"
+      >
         {children}
       </body>
     </html>
