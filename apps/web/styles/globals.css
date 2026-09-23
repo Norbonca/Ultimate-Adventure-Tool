@@ -248,6 +248,147 @@
     color-scheme: light;
   }
 
+  /* A teljes publikus és alkalmazásfelület Night. A régebbi képernyők még a
+     neutrális Tailwind-palettát használják; ez az átmeneti kompatibilitási
+     réteg ugyanarra a szemantikus Night-tokenkészletre köti őket. A külön
+     data-surface="day" adminrégiókat szándékosan kizárjuk. */
+  body[data-surface="night"] :where(
+    .bg-white
+  ):not([data-surface="day"] *) {
+    background-color: var(--color-surface);
+  }
+
+  body[data-surface="night"] :where(
+    .bg-slate-50,
+    .bg-navy-50
+  ):not([data-surface="day"] *) {
+    background-color: var(--color-ghost);
+  }
+
+  body[data-surface="night"] :where(
+    .bg-slate-100,
+    .bg-navy-100
+  ):not([data-surface="day"] *) {
+    background-color: var(--color-ghost);
+  }
+
+  body[data-surface="night"] :where(
+    .bg-slate-200,
+    .bg-navy-200
+  ):not([data-surface="day"] *) {
+    background-color: var(--color-border);
+  }
+
+  body[data-surface="night"] :where(
+    .text-slate-900,
+    .text-slate-800,
+    .text-navy-900,
+    .text-navy-800
+  ):not([data-surface="day"] *) {
+    color: var(--color-text);
+  }
+
+  body[data-surface="night"] :where(
+    .text-slate-700,
+    .text-slate-600,
+    .text-navy-700,
+    .text-navy-600
+  ):not([data-surface="day"] *) {
+    color: var(--color-text-body);
+  }
+
+  body[data-surface="night"] :where(
+    .text-slate-500,
+    .text-slate-400,
+    .text-slate-300,
+    .text-navy-500,
+    .text-navy-400,
+    .text-navy-300
+  ):not([data-surface="day"] *) {
+    color: var(--color-text-muted);
+  }
+
+  body[data-surface="night"] :where(
+    .border-slate-100,
+    .border-slate-200,
+    .border-slate-300,
+    .border-navy-100,
+    .border-navy-200,
+    .border-navy-300
+  ):not([data-surface="day"] *) {
+    border-color: var(--color-border);
+  }
+
+  body[data-surface="night"] :where(
+    .bg-trevu-50,
+    .bg-trevu-100
+  ):not([data-surface="day"] *) {
+    background-color: color-mix(in srgb, var(--color-primary) 18%, transparent);
+  }
+
+  body[data-surface="night"] :where(
+    .bg-trevu-400,
+    .bg-trevu-500,
+    .bg-trevu-600
+  ):not([data-surface="day"] *) {
+    background-color: var(--color-primary);
+  }
+
+  body[data-surface="night"] :where(
+    .text-trevu-500,
+    .text-trevu-600,
+    .text-trevu-700
+  ):not([data-surface="day"] *) {
+    color: var(--color-primary);
+  }
+
+  body[data-surface="night"] :where(
+    .border-trevu-200,
+    .border-trevu-300,
+    .border-trevu-400,
+    .border-trevu-500,
+    .border-trevu-600
+  ):not([data-surface="day"] *) {
+    border-color: var(--color-primary);
+  }
+
+  body[data-surface="night"] :where(
+    .hover\:bg-slate-50:hover,
+    .hover\:bg-slate-100:hover,
+    .hover\:bg-navy-50:hover,
+    .hover\:bg-navy-100:hover
+  ):not([data-surface="day"] *) {
+    background-color: var(--color-ghost);
+  }
+
+  body[data-surface="night"] :where(
+    .hover\:text-slate-700:hover,
+    .hover\:text-slate-900:hover,
+    .hover\:text-navy-700:hover,
+    .hover\:text-navy-800:hover,
+    .hover\:text-navy-900:hover
+  ):not([data-surface="day"] *) {
+    color: var(--color-text);
+  }
+
+  body[data-surface="night"] :where(
+    .hover\:bg-trevu-50:hover
+  ):not([data-surface="day"] *) {
+    background-color: color-mix(in srgb, var(--color-primary) 18%, transparent);
+  }
+
+  body[data-surface="night"] :where(
+    .hover\:bg-trevu-700:hover
+  ):not([data-surface="day"] *) {
+    background-color: var(--color-primary-hover);
+  }
+
+  body[data-surface="night"] :where(
+    .placeholder\:text-navy-500
+  ):not([data-surface="day"] *)::placeholder {
+    color: var(--color-text-muted);
+  }
+
   html {
     scroll-behavior: smooth;
   }
@@ -320,6 +461,41 @@
            bg-white outline-none transition-all duration-200
            placeholder:text-navy-500
            focus:border-trevu-600 focus:ring-[3px] focus:ring-trevu-600/10;
+  }
+
+  [data-surface="night"] .btn-trevu-primary:not([data-surface="day"] *),
+  [data-surface="night"] .btn-trevu-secondary:not([data-surface="day"] *),
+  [data-surface="night"] .btn-trevu-outline:not([data-surface="day"] *),
+  [data-surface="night"] .btn-trevu-ghost:not([data-surface="day"] *),
+  [data-surface="night"] .card-trevu:not([data-surface="day"] *),
+  [data-surface="night"] .card-trevu-flat:not([data-surface="day"] *),
+  [data-surface="night"] .input-trevu:not([data-surface="day"] *) {
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+
+  [data-surface="night"] .btn-trevu-primary:not([data-surface="day"] *) {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  [data-surface="night"] .btn-trevu-secondary:not([data-surface="day"] *),
+  [data-surface="night"] .btn-trevu-outline:not([data-surface="day"] *),
+  [data-surface="night"] .btn-trevu-ghost:not([data-surface="day"] *) {
+    background-color: transparent;
+    color: var(--color-text-body);
+  }
+
+  [data-surface="night"] .card-trevu:not([data-surface="day"] *) {
+    background-color: var(--color-surface);
+  }
+
+  [data-surface="night"] .card-trevu-flat:not([data-surface="day"] *) {
+    background-color: var(--color-ghost);
+  }
+
+  [data-surface="night"] .input-trevu:not([data-surface="day"] *) {
+    background-color: var(--color-input-bg);
   }
 
   /* ── Badges ── */

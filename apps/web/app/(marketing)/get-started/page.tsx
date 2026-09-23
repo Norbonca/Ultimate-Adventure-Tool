@@ -871,6 +871,111 @@ export default function HomePage() {
           color: #14B8A6;
         }
 
+        /* Teljes Night felület — a Discover oldal szemantikus tokenjeivel. */
+        body {
+          color: var(--color-text);
+          background-color: var(--color-bg);
+        }
+
+        .problem,
+        .categories,
+        .footer {
+          background: var(--color-bg);
+        }
+
+        .features,
+        .secondary-features,
+        .social-proof {
+          background: var(--color-surface);
+        }
+
+        .section-headline,
+        .card-headline,
+        .feature-headline,
+        .secondary-name,
+        .testimonial-name,
+        .trust-country {
+          color: var(--color-text);
+        }
+
+        .section-description,
+        .card-text,
+        .feature-description,
+        .secondary-desc,
+        .stat-label,
+        .testimonial-text,
+        .testimonial-role,
+        .trust-text,
+        .category-label,
+        .footer-tagline {
+          color: var(--color-text-muted);
+        }
+
+        .card,
+        .testimonial,
+        .category-card {
+          background: var(--color-surface);
+          border-color: var(--color-border);
+        }
+
+        .category-card:hover {
+          background: var(--color-ghost);
+          border-color: var(--color-border-strong);
+        }
+
+        .category-name,
+        .categories .section-headline,
+        .footer-column h3 {
+          color: var(--color-text);
+        }
+
+        .categories .section-description,
+        .footer-column a,
+        .footer-bottom,
+        .social-icon,
+        .final-subline,
+        .final-trust {
+          color: var(--color-text-secondary);
+        }
+
+        .tag-teal,
+        .tag-light {
+          background: color-mix(in srgb, var(--color-primary) 18%, transparent);
+          color: var(--color-primary);
+        }
+
+        .tag-coral {
+          background: color-mix(in srgb, var(--color-danger) 18%, transparent);
+          color: var(--color-danger);
+        }
+
+        .stat-item,
+        .testimonial,
+        .footer-divider {
+          border-color: var(--color-border);
+        }
+
+        .stat-number,
+        .footer-logo,
+        .footer-column a:hover,
+        .social-icon:hover {
+          color: var(--color-primary);
+        }
+
+        .final-cta {
+          background: linear-gradient(135deg, var(--color-bg) 0%, var(--trevu-teal-dark) 100%);
+          color: var(--color-text);
+        }
+
+        .btn-final-cta {
+          background: var(--color-primary);
+          color: var(--color-on-primary);
+        }
+
+        .btn-final-cta:hover {
+          background: var(--color-primary-hover);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
           .nav-desktop {
