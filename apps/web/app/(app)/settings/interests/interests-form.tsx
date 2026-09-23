@@ -160,8 +160,8 @@ export function InterestsForm({ categories, subDisciplines, initialInterests, in
               key={cat.id}
               className="rounded-xl border-2 transition-colors overflow-hidden"
               style={{
-                borderColor: isSelected ? colorHex : "#E2E8F0",
-                backgroundColor: isSelected ? undefined : "#FFFFFF",
+                borderColor: isSelected ? colorHex : "var(--color-border)",
+                backgroundColor: isSelected ? undefined : "var(--color-surface)",
               }}
             >
               {/* Category header */}
