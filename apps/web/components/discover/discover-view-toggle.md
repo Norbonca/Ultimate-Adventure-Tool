@@ -136,9 +136,14 @@ fázisában áll át.
    a görgős nagyítás a teljes bolygó nézetből visszaugrott (a MapLibre 5 görgős
    `zoomstart`-ja `originalEvent` nélkül jön).
 
+8. **A 3D térkép kitölti a képernyőt, és az oldal nem görgethető alatta** (2026-09-26, Norbert).
+   A keret magassága a saját helyéből jön (`--tg-frame-h`, a `GlobeDiscover` méri és méretváltáskor
+   újraszámolja; tartalék: `calc(100dvh - 128px)`), így az idősáv, a tippsor és az attribúció soha nem
+   csúszik a képernyő alá. Ebben a nézetben az alsó CTA-sáv nem jelenik meg — csempés és lista nézetben igen.
+
 A felületen a nézet neve **3D térkép** (EN: 3D map); a kódbeli `globe` / `terepgomb` azonosítók maradnak.
 
-Ezeket a garanciákat a `tests/e2e/discover-view.spec.ts` fedi (DISCOVER-VIEW-1…9; a 7. pontot a DISCOVER-VIEW-9).
+Ezeket a garanciákat a `tests/e2e/discover-view.spec.ts` fedi (DISCOVER-VIEW-1…10; a 7. pontot a DISCOVER-VIEW-9, a 8-at a DISCOVER-VIEW-10 asztali és mobil mérete).
 
 **Mobil (≤ 720 px):** a gömb a telefonon a lap szélétől szélig fut; a fejsor gombjai
 és az évszak-chipek vízszintesen görgethetők, a tokensor a keretben görget, minden

@@ -26,6 +26,9 @@ import './globe.css';
 
 type LoadState = 'loading' | 'ready' | 'error';
 
+/** A keret legkisebb magassága — nagyon alacsony ablakban inkább görgethető legyen, mint használhatatlan. */
+const MIN_FRAME_HEIGHT = 480;
+
 type Translate = ReturnType<typeof useTranslation>['t'];
 
 function formatPrice(marker: GlobeMarker, locale: string, t: Translate): string {
@@ -192,6 +195,26 @@ export default function GlobeDiscover() {
   );
 
   const routes: GlobeRoutes = payload?.routes ?? {};
+
+  // ── a keret pontosan a képernyő aljáig ér ───────────────────────────────
+  // A fejléc alatt kezdődik, ezért a magassága a saját helyéből jön: enélkül az idősáv a
+  // képernyő alá csúszott, és az oldal a térkép alatt görgethető maradt (Norbert, 2026-09-26).
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const fit = () => {
+      const top = container.getBoundingClientRect().top + window.scrollY;
+      const height = Math.max(MIN_FRAME_HEIGHT, window.innerHeight - top);
+      container.style.setProperty('--tg-frame-h', `${Math.round(height)}px`);
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    window.addEventListener('orientationchange', fit);
+    return () => {
+      window.removeEventListener('resize', fit);
+      window.removeEventListener('orientationchange', fit);
+    };
+  }, [state]);
 
   // ── a görgetés a kereten belül marad (a betöltés alatt is) ──────────────
   // Lásd globe-wheel.ts: a rétegek fölötti görgetés korábban az oldalt vitte el.

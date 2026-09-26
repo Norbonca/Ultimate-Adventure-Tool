@@ -5,7 +5,9 @@
    Színek: globals.css tokenek (PLAN-011, S40); hex literál ebben a fájlban nincs. */
 
 .terepgomb, .terepgomb * { box-sizing: border-box; }
-.terepgomb { position: relative; height: calc(100dvh - 56px); min-height: 560px; touch-action: none; user-select: none; color: var(--dark-text); background: radial-gradient(110% 70% at 50% 115%, var(--globe-space-top) 0%, var(--globe-space-bottom) 60%); border-radius: 16px; overflow: hidden; }
+/* A keret pontosan a képernyő aljáig ér: a magasságot a GlobeDiscover méri (--tg-frame-h), hogy az idősáv
+   soha ne csússzon a képernyő alá és az oldal ne legyen görgethető a térkép alatt (Norbert, 2026-09-26). */
+.terepgomb { position: relative; height: var(--tg-frame-h, calc(100dvh - 128px)); min-height: 480px; touch-action: none; user-select: none; color: var(--dark-text); background: radial-gradient(110% 70% at 50% 115%, var(--globe-space-top) 0%, var(--globe-space-bottom) 60%); border-radius: 16px; overflow: hidden; }
 .terepgomb a { color: var(--dark-primary); text-decoration: none; }
 .terepgomb a:hover { color: var(--dark-primary-hover); }
 .terepgomb .mono { font-family: "IBM Plex Mono", monospace; }
