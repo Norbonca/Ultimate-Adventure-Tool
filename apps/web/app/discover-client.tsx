@@ -712,7 +712,10 @@ export default function DiscoverClient({
         </>
       )}
 
-      {/* CTA — Night sáv, Dawn Gradient gomb. Norbert 2026-09-16: az alsó fehér (Day) sáv megszűnik. */}
+      {/* CTA — Night sáv, Dawn Gradient gomb. Norbert 2026-09-16: az alsó fehér (Day) sáv megszűnik.
+          3D térkép nézetben nincs: ott a térkép a teljes képernyőt kitölti, és az oldal nem görgethető
+          (Norbert, 2026-09-26 — „scrollozásnál kilép a térkép frameből"). */}
+      {viewMode !== 'globe' && (
       <section className="border-t border-line bg-canvas text-ink" data-testid="discover-cta">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 md:flex-row md:items-center md:justify-between md:px-[120px] md:py-14">
           <div className="flex flex-col gap-2">
@@ -727,6 +730,7 @@ export default function DiscoverClient({
           </Link>
         </div>
       </section>
+      )}
     </div>
   );
 }

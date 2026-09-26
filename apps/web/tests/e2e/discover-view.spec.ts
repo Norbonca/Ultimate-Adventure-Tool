@@ -226,4 +226,27 @@ test.describe('Discover — view toggle', () => {
     await page.waitForTimeout(250);
     expect(await scrollY(), 'wheel over the map scrolled the page').toBe(start);
   });
+
+  for (const [name, width, height] of [['asztali', 1440, 900], ['mobil', 390, 844]] as const) {
+    test(`DISCOVER-VIEW-10 (${name}): a 3D térkép kitölti a képernyőt — az oldal nem görgethető, az idősáv látszik`, async ({ page }) => {
+      await page.setViewportSize({ width, height });
+      await page.goto('/');
+      await page.getByTestId('view-toggle-globe').click();
+      await expect(page.locator('#tg-track')).toBeVisible({ timeout: 20_000 });
+      await page.waitForTimeout(500);
+
+      // a lap nem magasabb az ablaknál: nincs mit görgetni a térkép alatt
+      const overflow = await page.evaluate(() => document.documentElement.scrollHeight - window.innerHeight);
+      expect(overflow, 'az oldal görgethető a 3D térkép nézetben').toBeLessThanOrEqual(1);
+
+      // az idősáv teljes egészében a képernyőn van
+      const track = (await page.locator('#tg-track').boundingBox())!;
+      expect(track.y + track.height).toBeLessThanOrEqual(height);
+
+      // a CTA-sáv ebben a nézetben nincs kint; a csempés nézetben igen
+      await expect(page.getByTestId('discover-cta')).toHaveCount(0);
+      await page.getByTestId('view-toggle-grid').click();
+      await expect(page.getByTestId('discover-cta')).toBeVisible();
+    });
+  }
 });
