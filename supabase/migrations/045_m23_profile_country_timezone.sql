@@ -41,7 +41,11 @@ BEGIN;
 -- 1. Hiányzó zónák
 -- ============================================================================
 
-INSERT INTO public.ref_timezones (tz_id, display_name, utc_offset_minutes, utc_offset_text, has_dst, country_code, sort_order) VALUES
+-- 2026-10-29 (S48): csak olyan országhoz szúr be zónát, amely az adott adatbázis `ref_countries` törzsében megvan —
+-- az éles törzs szűkebb a helyinél (pl. CL nincs), és a korábbi sima INSERT ott FK-hibával (23503) buktatta a migrációt.
+INSERT INTO public.ref_timezones (tz_id, display_name, utc_offset_minutes, utc_offset_text, has_dst, country_code, sort_order)
+SELECT v.tz_id, v.display_name, v.utc_offset_minutes, v.utc_offset_text, v.has_dst, v.country_code, v.sort_order
+FROM (VALUES
   ('America/Phoenix',      'Phoenix (MST)',                 -420, 'UTC-07:00', false, 'US', 52),
   ('America/St_Johns',     'St. John''s (NST/NDT)',         -210, 'UTC-03:30', true,  'CA', 56),
   ('America/Halifax',      'Halifax (AST/ADT)',             -240, 'UTC-04:00', true,  'CA', 56),
@@ -59,6 +63,8 @@ INSERT INTO public.ref_timezones (tz_id, display_name, utc_offset_minutes, utc_o
   ('Pacific/Easter',       'Easter Island (EAST/EASST)',    -360, 'UTC-06:00', true,  'CL', 66),
   ('America/Punta_Arenas', 'Punta Arenas (-03)',            -180, 'UTC-03:00', false, 'CL', 66),
   ('Pacific/Chatham',      'Chatham Islands (CHAST/CHADT)', 765,  'UTC+12:45', true,  'NZ', 58)
+) AS v(tz_id, display_name, utc_offset_minutes, utc_offset_text, has_dst, country_code, sort_order)
+WHERE EXISTS (SELECT 1 FROM public.ref_countries c WHERE c.code = v.country_code)
 ON CONFLICT (tz_id) DO NOTHING;
 
 -- ============================================================================

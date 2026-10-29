@@ -62,6 +62,38 @@ INSERT INTO public.ref_timezones (tz_id, display_name, utc_offset_minutes, utc_o
   ('Europe/Samara',     'Samara (SAMT)',            240, 'UTC+04:00', false, 'RU', 53)
 ON CONFLICT (tz_id) DO NOTHING;
 
+-- 1/b. Éles–helyi törzsadat-eltérés pótlása (2026-10-29, S48). Az éles `ref_countries` 27 európai országot
+-- tartalmazott (a helyi 36-ot), ezért a 7.3 seed `ref_calendar_periods.country_code` FK-ja élesben elhasalt
+-- (Key (country_code)=(AL) is not present — CI db-push run 40914784712, a tranzakció visszagördült).
+-- A hiányzó 9 ország, a nyelvük és a fő zónájuk itt kerül be; a helyi adatbázisban mind no-op (ON CONFLICT).
+INSERT INTO public.ref_languages (code, name_en, name_hu, name_native, direction, is_app_supported, is_content_language, sort_order) VALUES
+  ('lb', 'Luxembourgish', 'Luxemburgi', 'Lëtzebuergesch', 'ltr', false, true, 62)
+ON CONFLICT (code) DO NOTHING;
+
+INSERT INTO public.ref_countries (code, alpha3, numeric_code, name_en, name_hu, name_de, name_native, continent, sub_region, phone_code, default_currency, primary_language, flag_emoji, is_eu, is_eurozone, is_schengen, market_priority, ppp_multiplier, sort_order, is_active) VALUES
+  ('AL', 'ALB', '008', 'Albania',         'Albánia',         'Albanien',       'Shqipëri',           'Europe', 'Southern Europe', '+355', 'ALL', 'sq', '🇦🇱', false, false, false, NULL, NULL, 54, true),
+  ('CY', 'CYP', '196', 'Cyprus',          'Ciprus',          'Zypern',         'Κύπρος',             'Europe', 'Southern Europe', '+357', 'EUR', 'el', '🇨🇾', true,  true,  false, NULL, NULL, 55, true),
+  ('EE', 'EST', '233', 'Estonia',         'Észtország',      'Estland',        'Eesti',              'Europe', 'Northern Europe', '+372', 'EUR', 'et', '🇪🇪', true,  true,  true,  NULL, NULL, 56, true),
+  ('LT', 'LTU', '440', 'Lithuania',       'Litvánia',        'Litauen',        'Lietuva',            'Europe', 'Northern Europe', '+370', 'EUR', 'lt', '🇱🇹', true,  true,  true,  NULL, NULL, 57, true),
+  ('LU', 'LUX', '442', 'Luxembourg',      'Luxemburg',       'Luxemburg',      'Lëtzebuerg',         'Europe', 'Western Europe',  '+352', 'EUR', 'lb', '🇱🇺', true,  true,  true,  NULL, NULL, 58, true),
+  ('LV', 'LVA', '428', 'Latvia',          'Lettország',      'Lettland',       'Latvija',            'Europe', 'Northern Europe', '+371', 'EUR', 'lv', '🇱🇻', true,  true,  true,  NULL, NULL, 59, true),
+  ('ME', 'MNE', '499', 'Montenegro',      'Montenegró',      'Montenegro',     'Crna Gora',          'Europe', 'Southern Europe', '+382', 'EUR', 'sr', '🇲🇪', false, false, false, NULL, NULL, 60, true),
+  ('MK', 'MKD', '807', 'North Macedonia', 'Észak-Macedónia', 'Nordmazedonien', 'Северна Македонија', 'Europe', 'Southern Europe', '+389', 'MKD', 'mk', '🇲🇰', false, false, false, NULL, NULL, 61, true),
+  ('MT', 'MLT', '470', 'Malta',           'Málta',           'Malta',          'Malta',              'Europe', 'Southern Europe', '+356', 'EUR', 'mt', '🇲🇹', true,  true,  true,  NULL, NULL, 62, true)
+ON CONFLICT (code) DO NOTHING;
+
+INSERT INTO public.ref_timezones (tz_id, display_name, utc_offset_minutes, utc_offset_text, has_dst, country_code, sort_order) VALUES
+  ('Europe/Tirane',     'Tirana (CET/CEST)',     60,  'UTC+01:00', true, 'AL', 54),
+  ('Asia/Nicosia',      'Nicosia (EET/EEST)',    120, 'UTC+02:00', true, 'CY', 55),
+  ('Europe/Tallinn',    'Tallinn (EET/EEST)',    120, 'UTC+02:00', true, 'EE', 56),
+  ('Europe/Vilnius',    'Vilnius (EET/EEST)',    120, 'UTC+02:00', true, 'LT', 57),
+  ('Europe/Luxembourg', 'Luxembourg (CET/CEST)', 60,  'UTC+01:00', true, 'LU', 58),
+  ('Europe/Riga',       'Riga (EET/EEST)',       120, 'UTC+02:00', true, 'LV', 59),
+  ('Europe/Podgorica',  'Podgorica (CET/CEST)',  60,  'UTC+01:00', true, 'ME', 60),
+  ('Europe/Skopje',     'Skopje (CET/CEST)',     60,  'UTC+01:00', true, 'MK', 61),
+  ('Europe/Malta',      'Malta (CET/CEST)',      60,  'UTC+01:00', true, 'MT', 62)
+ON CONFLICT (tz_id) DO NOTHING;
+
 ALTER TABLE public.ref_countries ADD COLUMN IF NOT EXISTS primary_timezone varchar(50);
 DO $$ BEGIN
   ALTER TABLE public.ref_countries
