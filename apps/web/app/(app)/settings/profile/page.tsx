@@ -1,9 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useSyncExternalStore } from "react";
+import type { TranslationKey } from "@uat/i18n";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { ImagePicker } from "@/components/ImagePicker";
+import {
+  autoTimezoneForCountry,
+  isTimezoneOfCountry,
+  suggestCountryAndTimezone,
+  timezonesForCountry,
+} from "@/lib/profile/country-timezone";
 
 interface Profile {
   first_name: string;
@@ -29,6 +36,7 @@ interface EmergencyContact {
 // only the columns this screen actually renders are declared.
 interface RefCountry {
   code: string;
+  is_active?: boolean | null;
   flag_emoji?: string | null;
   name_en?: string | null;
   name_hu?: string | null;
@@ -48,11 +56,51 @@ interface RefCurrency {
 
 interface RefTimezone {
   tz_id: string;
+  country_code: string;
   display_name?: string | null;
   utc_offset_text?: string | null;
+  sort_order?: number | null;
+  is_active?: boolean | null;
 }
 
 const RELATIONSHIP_OPTIONS = ["spouse", "parent", "sibling", "friend", "other"];
+
+// A 045-ös trigger hibakulcsai → i18n; minden más hiba általános mentési hiba (nyers üzenet nem jelenik meg).
+const PROFILE_DB_ERROR_KEYS: Record<string, TranslationKey> = {
+  profile_country_inactive: "profile.settings.errors.countryInactive",
+  profile_timezone_required: "profile.settings.errors.timezoneRequired",
+  profile_timezone_country_mismatch: "profile.settings.errors.timezoneMismatch",
+  profile_timezone_invalid: "profile.settings.errors.timezoneInvalid",
+};
+
+function profileSaveErrorKey(error: { message?: string | null } | null): TranslationKey {
+  const message = error?.message ?? "";
+  const match = Object.keys(PROFILE_DB_ERROR_KEYS).find((key) => message.includes(key));
+  return match ? PROFILE_DB_ERROR_KEYS[match] : "errors.saveFailed";
+}
+
+// Böngésző-adatok a javaslathoz: szerveren és hidratáláskor `null`/üres (nincs hydration mismatch),
+// utána a kliens valós értéke. Nem változó értékek, ezért a feliratkozás üres.
+const subscribeNoop = () => () => {};
+function readBrowserTimeZone(): string | null {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone ?? null;
+  } catch {
+    return null;
+  }
+}
+function readBrowserLanguages(): string {
+  if (typeof navigator === "undefined") return "";
+  const languages = navigator.languages?.length ? navigator.languages : [navigator.language];
+  return languages.filter(Boolean).join(",");
+}
+
+/** Betöltéskor: az ország zónája marad, ha az országé; egyzónásnál automatikus; különben üres (választani kell). */
+function normalizeTimezoneForCountry(countryCode: string, timezone: string, timezones: RefTimezone[]): string {
+  if (!countryCode) return timezone;
+  if (isTimezoneOfCountry(countryCode, timezone, timezones)) return timezone;
+  return autoTimezoneForCountry(countryCode, timezones) ?? "";
+}
 
 export default function ProfileSettingsPage() {
   const { t, locale } = useTranslation();
@@ -63,7 +111,7 @@ export default function ProfileSettingsPage() {
   const [form, setForm] = useState<Profile>({
     first_name: "", last_name: "", phone: "", bio: "",
     location_city: "", country_code: "", preferred_language: "hu",
-    preferred_currency: "HUF", timezone: "Europe/Budapest",
+    preferred_currency: "HUF", timezone: "",
     avatar_url: "", avatar_source: "system",
   });
   const [emergency, setEmergency] = useState<EmergencyContact>({ name: "", phone: "", relationship: "" });
@@ -71,6 +119,8 @@ export default function ProfileSettingsPage() {
   const [refLanguages, setRefLanguages] = useState<RefLanguage[]>([]);
   const [refCurrencies, setRefCurrencies] = useState<RefCurrency[]>([]);
   const [refTimezones, setRefTimezones] = useState<RefTimezone[]>([]);
+  const [timezoneError, setTimezoneError] = useState<TranslationKey | null>(null);
+  const [saveError, setSaveError] = useState<TranslationKey | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -86,18 +136,20 @@ export default function ProfileSettingsPage() {
         supabase.from("ref_timezones").select("*").eq("is_active", true).order("sort_order"),
       ]);
 
+      const loadedTimezones: RefTimezone[] = timezonesRes.data || [];
       if (profileRes.data) {
         const p = profileRes.data;
+        const countryCode: string = p.country_code || "";
         setForm({
           first_name: p.first_name || "",
           last_name: p.last_name || "",
           phone: p.phone || "",
           bio: p.bio || "",
           location_city: p.location_city || "",
-          country_code: p.country_code || "",
+          country_code: countryCode,
           preferred_language: p.preferred_language || "hu",
           preferred_currency: p.preferred_currency || "HUF",
-          timezone: p.timezone || "Europe/Budapest",
+          timezone: normalizeTimezoneForCountry(countryCode, p.timezone || "", loadedTimezones),
           avatar_url: p.avatar_url || "",
           avatar_source: p.avatar_source || "system",
         });
@@ -112,17 +164,73 @@ export default function ProfileSettingsPage() {
       setRefCountries(countriesRes.data || []);
       setRefLanguages(languagesRes.data || []);
       setRefCurrencies(currenciesRes.data || []);
-      setRefTimezones(timezonesRes.data || []);
+      setRefTimezones(loadedTimezones);
       setLoading(false);
     }
     load();
   }, [supabase]);
 
-  const handleSave = async () => {
-    setSaving(true);
+  // Böngésző alapú javaslat ország nélküli profilhoz — csak kliensoldalon, betöltés (hidratálás) után.
+  const browserTimeZone = useSyncExternalStore(subscribeNoop, readBrowserTimeZone, () => null);
+  const browserLanguages = useSyncExternalStore(subscribeNoop, readBrowserLanguages, () => "");
+  const suggestion = useMemo(
+    () =>
+      loading || form.country_code
+        ? null
+        : suggestCountryAndTimezone({
+            browserTimeZone,
+            browserLanguages: browserLanguages ? browserLanguages.split(",") : [],
+            countries: refCountries,
+            timezones: refTimezones,
+          }),
+    [loading, form.country_code, browserTimeZone, browserLanguages, refCountries, refTimezones],
+  );
+
+  const countryTimezones = useMemo(
+    () => timezonesForCountry(form.country_code, refTimezones),
+    [form.country_code, refTimezones],
+  );
+  const timezoneMissing = !!form.country_code && !isTimezoneOfCountry(form.country_code, form.timezone, refTimezones);
+
+  const handleCountryChange = (countryCode: string) => {
+    setTimezoneError(null);
     setSaved(false);
+    setForm((prev) => ({
+      ...prev,
+      country_code: countryCode,
+      timezone: countryCode ? autoTimezoneForCountry(countryCode, refTimezones) ?? "" : "",
+    }));
+  };
+
+  const applySuggestion = () => {
+    if (!suggestion) return;
+    setTimezoneError(null);
+    setSaved(false);
+    setForm((prev) => ({
+      ...prev,
+      country_code: suggestion.countryCode,
+      timezone: suggestion.timezone ?? autoTimezoneForCountry(suggestion.countryCode, refTimezones) ?? "",
+    }));
+  };
+
+  const suggestionCountry = suggestion ? refCountries.find((c) => c.code === suggestion.countryCode) : undefined;
+  const suggestionTimezone = suggestion?.timezone ? refTimezones.find((tz) => tz.tz_id === suggestion.timezone) : undefined;
+
+  const handleSave = async () => {
+    setSaved(false);
+    setSaveError(null);
+    if (timezoneMissing) {
+      setTimezoneError("profile.settings.errors.timezoneRequired");
+      return;
+    }
+    setTimezoneError(null);
+    setSaving(true);
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      setSaving(false);
+      setSaveError("errors.sessionExpired");
+      return;
+    }
 
     // Fetch current slug so upsert doesn't violate NOT NULL
     const { data: currentProfile } = await supabase
@@ -144,25 +252,38 @@ export default function ProfileSettingsPage() {
       country_code: form.country_code || null,
       preferred_language: form.preferred_language,
       preferred_currency: form.preferred_currency,
-      timezone: form.timezone,
+      // Ország nélkül a zónaválasztó tiltott és üres, ezért zónát sem mentünk.
+      timezone: form.country_code ? (form.timezone || null) : null,
       avatar_url: form.avatar_url || null,
       avatar_source: form.avatar_source,
     }, { onConflict: "id" });
 
     if (profileError) {
       console.error("Profile save error:", profileError);
+      const key = profileSaveErrorKey(profileError);
+      if (key === "profile.settings.errors.timezoneRequired" || key === "profile.settings.errors.timezoneMismatch" || key === "profile.settings.errors.timezoneInvalid") {
+        setTimezoneError(key);
+      } else {
+        setSaveError(key);
+      }
       setSaving(false);
       return;
     }
 
     if (emergency.name && emergency.phone) {
-      await supabase.from("emergency_contacts").upsert({
+      const { error: emergencyError } = await supabase.from("emergency_contacts").upsert({
         user_id: user.id,
         name: emergency.name,
         phone: emergency.phone,
         relationship: emergency.relationship || "other",
         is_primary: true,
       }, { onConflict: "user_id,is_primary" });
+      if (emergencyError) {
+        console.error("Emergency contact save error:", emergencyError);
+        setSaveError("errors.saveFailed");
+        setSaving(false);
+        return;
+      }
     }
 
     setSaving(false);
@@ -270,13 +391,44 @@ export default function ProfileSettingsPage() {
               placeholder={t('profile.settings.cityPlaceholder')}
             />
           </div>
+          {/*
+            A profil országa egyben az M23 naptár-ország (BR-M23-006, S4; Norbert döntése, 2026-09-15):
+            csak aktív ország választható, üresen nincs országspecifikus naptár.
+            DESIGN-FIRST kivétel: az S4 a meglévő mezőre épül, külön Pencil-terv nem készül (Norbert kérése;
+            tervhivatkozás: D01 `oeWBG`).
+            045 (Norbert döntései, 2026-09-15): országhoz kötelező az országhoz tartozó időzóna (egyzónásnál
+            automatikus, többzónásnál választani kell); ország nélkül böngésző alapú javaslat (csak kitölt,
+            nem ment). Szintén DESIGN-FIRST kivétel, a meglévő mezők és stílus bővítése.
+          */}
           <div>
-            <label className="block text-sm font-semibold text-navy-700 mb-1.5">
+            <label htmlFor="country" className="block text-sm font-semibold text-navy-700 mb-1.5">
               {t('profile.settings.country')}
             </label>
+            {suggestion && suggestionCountry && !form.country_code && (
+              <div className="mb-2 flex items-center justify-between gap-3 rounded-xl border border-trevu-200 bg-trevu-50 px-3 py-2">
+                <p className="text-xs text-navy-700">
+                  {suggestionTimezone
+                    ? t('profile.settings.suggestionLabel', {
+                        country: `${suggestionCountry.flag_emoji ?? ""} ${(locale === "en" ? suggestionCountry.name_en : suggestionCountry.name_hu) ?? suggestionCountry.code}`.trim(),
+                        timezone: suggestionTimezone.display_name ?? suggestionTimezone.tz_id,
+                      })
+                    : t('profile.settings.suggestionLabelCountryOnly', {
+                        country: `${suggestionCountry.flag_emoji ?? ""} ${(locale === "en" ? suggestionCountry.name_en : suggestionCountry.name_hu) ?? suggestionCountry.code}`.trim(),
+                      })}
+                </p>
+                <button
+                  type="button"
+                  onClick={applySuggestion}
+                  className="shrink-0 rounded-lg bg-trevu-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-trevu-700 transition-colors"
+                >
+                  {t('profile.settings.suggestionApply')}
+                </button>
+              </div>
+            )}
             <select
+              id="country"
               value={form.country_code}
-              onChange={(e) => setForm({ ...form, country_code: e.target.value })}
+              onChange={(e) => handleCountryChange(e.target.value)}
               className="input-trevu"
             >
               <option value="">{t('profile.settings.countryPlaceholder')}</option>
@@ -286,6 +438,9 @@ export default function ProfileSettingsPage() {
                 </option>
               ))}
             </select>
+            <p className="text-xs text-navy-400 mt-1">
+              {t('profile.settings.countryCalendarHint')}
+            </p>
           </div>
         </div>
 
@@ -323,18 +478,46 @@ export default function ProfileSettingsPage() {
 
         {/* Timezone */}
         <div>
-          <label className="block text-sm font-semibold text-navy-700 mb-1.5">
+          <label htmlFor="timezone" className="block text-sm font-semibold text-navy-700 mb-1.5">
             {t('profile.settings.timezone')}
           </label>
           <select
-            value={form.timezone}
-            onChange={(e) => setForm({ ...form, timezone: e.target.value })}
-            className="input-trevu"
+            id="timezone"
+            value={form.country_code ? form.timezone : ""}
+            onChange={(e) => {
+              setTimezoneError(null);
+              setSaved(false);
+              setForm({ ...form, timezone: e.target.value });
+            }}
+            disabled={!form.country_code}
+            aria-invalid={!!timezoneError || undefined}
+            aria-describedby="timezone-hint"
+            className="input-trevu disabled:opacity-50"
           >
-            {refTimezones.map((tz) => (
+            <option value="">{t('profile.settings.timezonePlaceholder')}</option>
+            {countryTimezones.map((tz) => (
               <option key={tz.tz_id} value={tz.tz_id}>{tz.display_name} ({tz.utc_offset_text})</option>
             ))}
           </select>
+          <div id="timezone-hint">
+            {timezoneError ? (
+              <p role="alert" className="text-xs text-red-600 mt-1">
+                {t(timezoneError)}
+              </p>
+            ) : !form.country_code ? (
+              <p className="text-xs text-navy-400 mt-1">
+                {t('profile.settings.timezoneSelectCountryFirst')}
+              </p>
+            ) : timezoneMissing ? (
+              <p className="text-xs text-amber-700 mt-1">
+                {t('profile.settings.timezoneChooseRequired')}
+              </p>
+            ) : (
+              <p className="text-xs text-navy-400 mt-1">
+                {t('profile.settings.timezoneHint')}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Bio */}
@@ -411,6 +594,11 @@ export default function ProfileSettingsPage() {
         <hr className="border-navy-200" />
 
         {/* Actions */}
+        {saveError && (
+          <div role="alert" className="rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+            {t(saveError)}
+          </div>
+        )}
         <div className="flex gap-3">
           <a
             href="/profile"
