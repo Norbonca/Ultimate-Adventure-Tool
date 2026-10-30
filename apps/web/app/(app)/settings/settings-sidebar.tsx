@@ -6,10 +6,15 @@ import { useTranslation } from "@/lib/i18n/useTranslation";
 import { Icon } from "@/components/Icon";
 
 
+// UX-018 (2026-10-30): a működő /settings/skills és /settings/password oldal eddig csak URL-ről volt
+// elérhető — mindkettő az oldalsávba került (Nielsen #6, WCAG 2.4.5). A sorrend a D01 beállítási
+// oldalsáv rendjét követi; a két új sor Pencil-terve utólag vezetendő át (DESIGN-FIRST kivétel, hibajavítás).
 const NAV_ITEMS = [
   { href: "/settings/profile", icon: "user-circle", key: "settings.nav.editProfile" },
   { href: "/settings/interests", icon: "compass", key: "settings.nav.adventureInterests" },
+  { href: "/settings/skills", icon: "badge-check", key: "settings.nav.skillsExperience" },
   { href: "/settings/social", icon: "users", key: "settings.nav.socialNetworks" },
+  { href: "/settings/password", icon: "key-round", key: "settings.nav.password" },
   { href: "/settings/privacy", icon: "shield", key: "settings.nav.privacy" },
 ] as const;
 
