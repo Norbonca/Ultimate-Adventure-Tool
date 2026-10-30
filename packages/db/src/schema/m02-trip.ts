@@ -61,6 +61,7 @@ export const participantStatusEnum = pgEnum('participant_status_t', [
   'rejected',
   'waitlisted',
   'cancelled',
+  'removed',
 ]);
 
 export const skillMatchEnum = pgEnum('skill_match_t', [
@@ -344,6 +345,8 @@ export const tripParticipants = pgTable(
     paidAt: timestamp('paid_at', { withTimezone: true }),
     checkedIn: boolean('checked_in').notNull().default(false),
     checkedInAt: timestamp('checked_in_at', { withTimezone: true }),
+    removedAt: timestamp('removed_at', { withTimezone: true }),
+    removalMessage: text('removal_message'),
 
     // Offline sync
     localId: uuid('local_id'),
