@@ -96,6 +96,9 @@ export {
 
   // ── Trip & timeline (§6) ──────────────────────────────────────
   Calendar,
+  CalendarDays,
+  CalendarRange,
+  CalendarX,
   CheckSquare,
   Circle,
   ClipboardCheck,

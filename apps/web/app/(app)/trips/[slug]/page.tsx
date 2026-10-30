@@ -13,6 +13,10 @@ import { CANCELLATION_REASON_LABEL, type CancellationReason } from "@/lib/trip-d
 import { Icon } from "@/components/Icon";
 import { formatParameterValue, type ParameterDisplayOption } from "@/lib/i18n/localized";
 import { formatLocalDate } from "@/lib/timezone";
+import { getTripCalendar } from "@/lib/calendar/trip-calendar";
+import { alertText, badgeText, countryName } from "@/lib/calendar/alert-text";
+import { endOfLocalDay, formatInstant } from "@/lib/calendar/time";
+import { CalendarAlerts, CalendarBadge, DualTime } from "@/components/calendar/CalendarUi";
 import { fetchTripBySlugForAdmin } from "@/lib/admin-auth";
 
 interface TripDetailPageProps {
@@ -67,7 +71,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
   } = await supabase.auth.getUser();
   const isOrganizer = user?.id === trip.organizer_id;
 
-  const [paramDefs, myParticipation, staffCountResult, crewPositions] = await Promise.all([
+  const [paramDefs, myParticipation, staffCountResult, crewPositions, tripCalendar] = await Promise.all([
     fetchCategoryParametersForDisplay(trip.category_id, trip.sub_discipline_id),
     fetchMyParticipation(trip.id),
     supabase
@@ -76,7 +80,29 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
       .eq("trip_id", trip.id)
       .eq("is_staff_seat", true),
     fetchCrewPositions(trip.id),
+    // M23 V1.1 — jelvények (S2), figyelmeztetések (S11), kettős időpont (S10); hiba esetén csendben üres
+    getTripCalendar(
+      {
+        start_date: trip.start_date,
+        end_date: trip.end_date,
+        timezone: trip.timezone,
+        location_country: trip.location_country,
+        registration_deadline_date: trip.registration_deadline_date ? String(trip.registration_deadline_date) : null,
+      },
+      locale === "en" ? "en" : "hu",
+    ).catch(() => null),
   ]);
+  const tr = t as unknown as (key: string, params?: Record<string, string | number>) => string;
+  const calendarBadges = (tripCalendar?.badges ?? []).map((b) => ({ kind: b.kind, label: badgeText(b, tr, locale) }));
+  const calendarAlerts = (tripCalendar?.alerts ?? []).map((a) => ({ id: a.id, severity: a.severity, icon: a.icon, ...alertText(a, tr, locale) }));
+  const viewerTz = tripCalendar?.viewer.timezone ?? null;
+  const deadlineInstant = trip.registration_deadline_date
+    ? formatInstant(new Date(endOfLocalDay(String(trip.registration_deadline_date), trip.timezone || "UTC").getTime() - 60_000), {
+        tripTz: trip.timezone || "UTC",
+        viewerTz,
+        locale,
+      })
+    : null;
   const filledStaff = staffCountResult.count ?? 0;
   const totalStaff = trip.staff_seats ?? 0;
   const totalGuests = trip.max_participants ?? 0;
@@ -272,6 +298,9 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                   )}
                 </span>
               )}
+              {calendarBadges.map((b, i) => (
+                <CalendarBadge key={`${b.kind}-${i}`} kind={b.kind} label={b.label} />
+              ))}
               <span className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-navy-200">
                 <Icon name="map-pin" size={15} className="text-navy-400" />
                 <span className="font-medium text-navy-700">
@@ -323,6 +352,19 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                 {trip.description}
               </div>
             </div>
+
+            {/* M23 V1.1 — Naptár és időzóna (S11; design D02 KpgDv `YWRQn`) */}
+            {calendarAlerts.length > 0 && (
+              <div className="bg-white rounded-2xl border border-navy-200 p-6" data-testid="trip-calendar-section">
+                <h2 className="text-lg font-bold text-navy-900 mb-1">{t("calendar.section.title")}</h2>
+                <p className="text-xs text-navy-400 mb-4">
+                  {tripCalendar?.viewer.country
+                    ? t("calendar.section.viewerCalendar", { country: countryName(tripCalendar.viewer.country, locale) })
+                    : t("calendar.section.noViewerCalendar")}
+                </p>
+                <CalendarAlerts items={calendarAlerts} />
+              </div>
+            )}
 
             {/* Category-Specific Details */}
             {paramDefs.length > 0 &&
@@ -560,12 +602,20 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
               {trip.registration_deadline && (
                 <div className="flex justify-between">
                   <span className="text-navy-500">{t("trips.wizard.registrationDeadline")}</span>
-                  <span className="font-medium text-navy-700">
-                    {trip.registration_deadline_date
-                      ? t("trips.detail.registrationDeadlineUntil", {
-                          date: formatLocalDate(String(trip.registration_deadline_date), dateLocale),
-                          timezone: trip.timezone || "UTC",
-                        })
+                  <span className="font-medium text-navy-700 text-right">
+                    {trip.registration_deadline_date && deadlineInstant
+                      ? (
+                        <DualTime
+                          primary={t("trips.detail.registrationDeadlineUntil", {
+                            date: formatLocalDate(String(trip.registration_deadline_date), dateLocale),
+                            timezone: trip.timezone || "UTC",
+                          })}
+                          secondary={deadlineInstant.secondary}
+                          dayShift={deadlineInstant.dayShift}
+                          viewerLabel={t("calendar.section.viewerLabel")}
+                          dayShiftLabel={deadlineInstant.dayShift ? t("calendar.section.dayShift", { shift: `${deadlineInstant.dayShift > 0 ? "+" : ""}${deadlineInstant.dayShift}` }) : undefined}
+                        />
+                      )
                       : new Date(trip.registration_deadline).toLocaleDateString(dateLocale, { timeZone: "UTC" })}
                   </span>
                 </div>

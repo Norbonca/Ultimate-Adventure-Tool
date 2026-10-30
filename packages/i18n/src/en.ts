@@ -1849,6 +1849,69 @@ const en: TranslationKeys = {
   // M23 — Calendar
   // ============================================================================
   calendar: {
+    badge: {
+      falls: "During {period}",
+      mayFall: "May fall during {period}",
+      holiday: "Public holiday: {date}",
+      longWeekend: "Long weekend",
+    },
+    section: {
+      title: "Calendar & time zone",
+      viewerCalendar: "By the calendar of {country}",
+      noViewerCalendar: "Set your country in your profile to also see school holidays and public holidays by your own calendar.",
+      deadlineLabel: "Registration deadline",
+      deadlineUntil: "until {date} 23:59 ({timezone})",
+      viewerLabel: "Your time:",
+      dayShift: "({shift} day)",
+    },
+    localTime: {
+      title: "Local time at the destination: {timezone} ({offset})",
+      source: {
+        organizer: "Source: your setting",
+        coordinates: "Source: the location’s coordinates",
+        country: "Source: the country’s main time zone",
+        organizer_profile: "Source: your profile time zone",
+        default: "Source: default (UTC)",
+      },
+      multiZone: "the country has several time zones — you can choose in step 4",
+      hint: "deadlines and times apply in this zone",
+      change: "Change",
+    },
+    alerts: {
+      organizerCalendar: "the organizer’s calendar",
+      local_holiday: {
+        title: "{period} — {date}, {country}",
+        dates: "{date} · day {dayIndex} of the trip",
+        impact: "Shops and offices may be closed and public transport less frequent — worth planning around.",
+      },
+      viewer_holiday: {
+        title: "During {period}",
+        dates: "{from} – {to} · {country} (by your calendar)",
+        impact: "The trip falls during {period} — a good time for families; accommodation may be busier.",
+      },
+      timezone_difference: {
+        titleAhead: "Clocks at the destination are {hours} hour(s) ahead of yours",
+        titleBehind: "Clocks at the destination are {hours} hour(s) behind yours",
+        dates: "{tripTz} · yours {viewerTz}",
+        impact: "All times are shown in the trip’s local time; your time appears underneath.",
+      },
+      dst_change: {
+        title: "Clock change during the trip",
+        dates: "{date} · day {dayIndex} of the trip · {tripTz}",
+        impactForward: "Clocks go forward one hour — the day is one hour shorter; that day’s meeting time is shown in the new local time.",
+        impactBack: "Clocks go back one hour — the day is one hour longer; that day’s meeting time is shown in the new local time.",
+      },
+      deadline_on_holiday: {
+        title: "The registration deadline falls on a public holiday",
+        dates: "{date} · {period} ({country})",
+        impact: "Fewer applications may arrive on a holiday. Publishing is not blocked — consider moving it a day earlier ({suggested}).",
+      },
+      no_calendar_data: {
+        title: "{country}: no holiday data available",
+        dates: "Destination: {country}",
+        impact: "Check local holidays and opening hours for the trip dates — we cannot compute the warnings.",
+      },
+    },
     types: {
       national_holiday: "National holiday",
       public_holiday: "Public holiday",
