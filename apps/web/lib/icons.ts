@@ -182,12 +182,9 @@ export {
   CloudSun,
   Languages,
   WifiOff,
-
-  // ── Social ───────────────────────────────────────────────────
-  Facebook,
-  Instagram,
-  Twitter,
-  Youtube,
 } from 'lucide-react';
+
+// Márkaikonok (Facebook, Instagram, X, YouTube, Google): a lucide 1.x nem tartalmazza őket —
+// `lib/brand-icons.tsx` (Simple Icons), Icon Bank 0.6. Nem innen exportáljuk, hogy a kapu egyértelmű maradjon.
 
 export type { LucideIcon } from 'lucide-react';
