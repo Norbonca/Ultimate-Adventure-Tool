@@ -12,7 +12,7 @@ import { TripCancelledBanner } from "@/components/trip-forms/TripCancelledBanner
 import { CANCELLATION_REASON_LABEL, type CancellationReason } from "@/lib/trip-deletion";
 import { Icon } from "@/components/Icon";
 import { formatParameterValue, type ParameterDisplayOption } from "@/lib/i18n/localized";
-import { formatLocalDate } from "@/lib/timezone";
+import { formatLocalDate, formatUtcOffset } from "@/lib/timezone";
 import { getTripCalendar } from "@/lib/calendar/trip-calendar";
 import { alertText, badgeText, countryName } from "@/lib/calendar/alert-text";
 import { endOfLocalDay, formatInstant } from "@/lib/calendar/time";
@@ -96,6 +96,9 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
   const calendarBadges = (tripCalendar?.badges ?? []).map((b) => ({ kind: b.kind, label: badgeText(b, tr, locale) }));
   const calendarAlerts = (tripCalendar?.alerts ?? []).map((a) => ({ id: a.id, severity: a.severity, icon: a.icon, ...alertText(a, tr, locale) }));
   const viewerTz = tripCalendar?.viewer.timezone ?? null;
+  // Norbert (2026-10-30): a túra helye szerinti helyi idő az alap, és ezt jól láthatóan jelezzük — chip a gyorsinfó sávban
+  const tripTz = trip.timezone && trip.timezone !== "UTC" ? trip.timezone : (tripCalendar?.tripTimezone ?? trip.timezone ?? "UTC");
+  const tripTzChip = t("calendar.section.localTimeChip", { timezone: tripTz, offset: formatUtcOffset(tripTz) });
   const deadlineInstant = trip.registration_deadline_date
     ? formatInstant(new Date(endOfLocalDay(String(trip.registration_deadline_date), trip.timezone || "UTC").getTime() - 60_000), {
         tripTz: trip.timezone || "UTC",
@@ -298,6 +301,10 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                   )}
                 </span>
               )}
+              <span className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-navy-200" data-testid="trip-timezone-chip" title={t("calendar.section.localTimeChipHint")}>
+                <Icon name="globe" size={15} className="text-trevu-700" />
+                <span className="font-medium text-navy-700">{tripTzChip}</span>
+              </span>
               {calendarBadges.map((b, i) => (
                 <CalendarBadge key={`${b.kind}-${i}`} kind={b.kind} label={b.label} />
               ))}

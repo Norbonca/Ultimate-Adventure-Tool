@@ -1,11 +1,10 @@
 "use client";
 
 /**
- * A szervezés időzónája (M23 Calendar, FR-M23-011; Norbert döntése, 2026-09-15: a szervező
- * állítja be, alapértelmezés UTC). A jelentkezési határidő ennek a zónának a napja szerint zár.
- *
- * DESIGN-FIRST kivétel: hibajavításhoz felvett mező, Pencil-terv még nincs — a D02 `Gvgnj`
- * (Wizard Step 4) és a Trip Edit Settings szekció terve utólag vezetendő át.
+ * A túra időzónája (M23 Calendar, FR-M23-011). Norbert döntése, 2026-10-30: az alap a túra helye
+ * szerinti helyi idő — a 2. lépés helyi-idő sávja előtölti, a 050-es DB-trigger 'UTC'-nél az ország fő
+ * zónáját írja; a szervező itt felülírhatja. A jelentkezési határidő ennek a zónának a napja végén zár.
+ * Design: D02 `Gvgnj` (Wizard Step 4, `su8zx` mezőpár, 2026-10-30).
  */
 
 import { useMemo } from "react";
@@ -42,7 +41,7 @@ export function TimezoneSelect({ id, value, onChange, className }: TimezoneSelec
       >
         {zones.map((zone) => (
           <option key={zone} value={zone}>
-            {zone === DEFAULT_TRIP_TIMEZONE ? "UTC" : `${zone} (${formatUtcOffset(zone)})`}
+            {zone === DEFAULT_TRIP_TIMEZONE ? t("trips.wizard.timezoneUtcOption") : `${zone} (${formatUtcOffset(zone)})`}
           </option>
         ))}
       </select>

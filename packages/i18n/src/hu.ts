@@ -817,7 +817,8 @@ const hu = {
       currency: "Valuta",
       registrationDeadline: "Jelentkezési határidő (opcionális)",
       timezone: "A szervezés időzónája",
-      timezoneHint: "A határidő és a túra időpontjai ennek az időzónának megfelelően értendők.",
+      timezoneHint: "Alapból a túra helyszínének helyi ideje. A határidő és a túra időpontjai ebben az időzónában értendők.",
+      timezoneUtcOption: "UTC (nincs helyi zóna)",
       registrationDeadlineHint: "Jelentkezni {date} 23:59-ig lehet ({timezone} szerint).",
       // Actions
       back: "Vissza",
@@ -1891,6 +1892,8 @@ const hu = {
       deadlineUntil: "{date} 23:59-ig ({timezone})",
       viewerLabel: "Nálad:",
       dayShift: "({shift} nap)",
+      localTimeChip: "Helyi idő: {timezone} ({offset})",
+      localTimeChipHint: "A túra időpontjai és a jelentkezési határidő a helyszín helyi ideje szerint értendők.",
     },
     localTime: {
       title: "Helyi idő a helyszínen: {timezone} ({offset})",
