@@ -14,6 +14,7 @@ import { ImagePicker } from "@/components/ImagePicker";
 import { Icon } from "@/components/Icon";
 import { Input, Toggle } from "@/components/ui";
 import { TimezoneSelect } from "@/components/trip-forms/TimezoneSelect";
+import { CurrencySelect } from "@/components/trip-forms/CurrencySelect";
 import { formatLocalDate } from "@/lib/timezone";
 
 interface Step4Props {
@@ -271,17 +272,12 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
           <label htmlFor="trip-currency" className="text-sm font-semibold text-navy-900">
             {t("trips.wizard.currency")}
           </label>
-          <select
+          <CurrencySelect
             id="trip-currency"
             value={formData.price_currency}
-            onChange={(e) => onChange({ price_currency: e.target.value })}
+            onChange={(code) => onChange({ price_currency: code })}
             className="w-full min-h-[48px] px-4 py-3 rounded-trevu border-[1.5px] border-navy-300 text-[15px] text-navy-900 bg-white focus:ring-[3px] focus:ring-trevu-600/10 focus:border-trevu-600 outline-none transition-all duration-200"
-          >
-            <option value="EUR">EUR (€)</option>
-            <option value="HUF">HUF (Ft)</option>
-            <option value="CZK">CZK (Kč)</option>
-            <option value="RON">RON (lei)</option>
-          </select>
+          />
         </div>
       </div>
 

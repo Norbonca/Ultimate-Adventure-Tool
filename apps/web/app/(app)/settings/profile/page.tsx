@@ -111,7 +111,7 @@ export default function ProfileSettingsPage() {
   const [form, setForm] = useState<Profile>({
     first_name: "", last_name: "", phone: "", bio: "",
     location_city: "", country_code: "", preferred_language: "hu",
-    preferred_currency: "HUF", timezone: "",
+    preferred_currency: "EUR", timezone: "",
     avatar_url: "", avatar_source: "system",
   });
   const [emergency, setEmergency] = useState<EmergencyContact>({ name: "", phone: "", relationship: "" });
@@ -148,7 +148,7 @@ export default function ProfileSettingsPage() {
           location_city: p.location_city || "",
           country_code: countryCode,
           preferred_language: p.preferred_language || "hu",
-          preferred_currency: p.preferred_currency || "HUF",
+          preferred_currency: p.preferred_currency || "EUR",
           timezone: normalizeTimezoneForCountry(countryCode, p.timezone || "", loadedTimezones),
           avatar_url: p.avatar_url || "",
           avatar_source: p.avatar_source || "system",

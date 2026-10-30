@@ -5,6 +5,7 @@ import { useTranslation } from "@/lib/i18n/useTranslation";
 import type { TranslationKey } from "@uat/i18n";
 import { Icon } from "@/components/Icon";
 import { TimezoneSelect } from "./TimezoneSelect";
+import { CurrencySelect } from "./CurrencySelect";
 
 interface SettingsSectionProps {
   data: WizardFormData;
@@ -153,18 +154,11 @@ export function SettingsSection({ data, onChange }: SettingsSectionProps) {
           <label className="block text-sm font-medium text-navy-700 mb-1.5">
             {t("trips.wizard.currency")}
           </label>
-          <select
+          <CurrencySelect
             value={data.price_currency}
-            onChange={(e) => onChange({ price_currency: e.target.value })}
+            onChange={(code) => onChange({ price_currency: code })}
             className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 bg-white focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
-          >
-            <option value="EUR">EUR (€)</option>
-            <option value="HUF">HUF (Ft)</option>
-            <option value="USD">USD ($)</option>
-            <option value="GBP">GBP (£)</option>
-            <option value="CZK">CZK (Kč)</option>
-            <option value="RON">RON (lei)</option>
-          </select>
+          />
         </div>
         <div>
           <label className="block text-sm font-medium text-navy-700 mb-1.5">

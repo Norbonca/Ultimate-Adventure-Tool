@@ -14,6 +14,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { BackButton } from "@/components/BackButton";
 import { TripTimelineClient } from "@/components/TripTimelineClient";
 import { Icon } from "@/components/Icon";
+import { formatMoney } from "@/lib/currency";
 import { ApplicationsManager, type ParticipantRow } from "@/components/trip-forms/ApplicationsManager";
 
 interface ManagePageProps {
@@ -243,19 +244,19 @@ export default async function TripManagePage({ params }: ManagePageProps) {
               <div className="bg-navy-50 rounded-xl p-4">
                 <span className="text-xs text-navy-400 block mb-1">{t("trips.manage.totalRevenue")}</span>
                 <span className="text-xl font-bold text-navy-900">
-                  €{revenue.toLocaleString(dateLocale)}
+                  {formatMoney(revenue, trip.price_currency, locale)}
                 </span>
               </div>
               <div className="bg-navy-50 rounded-xl p-4">
                 <span className="text-xs text-navy-400 block mb-1">{t("trips.manage.expenses")}</span>
                 <span className="text-xl font-bold text-navy-900">
-                  €{expenses.toLocaleString(dateLocale)}
+                  {formatMoney(expenses, trip.price_currency, locale)}
                 </span>
               </div>
               <div className="bg-navy-50 rounded-xl p-4">
                 <span className="text-xs text-navy-400 block mb-1">{t("trips.manage.netProfit")}</span>
                 <span className="text-xl font-bold text-green-600">
-                  €{netProfit.toLocaleString(dateLocale)}
+                  {formatMoney(netProfit, trip.price_currency, locale)}
                 </span>
               </div>
             </div>
