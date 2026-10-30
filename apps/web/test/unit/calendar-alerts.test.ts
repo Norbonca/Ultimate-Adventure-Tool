@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { alertsFor, badgesFor, dstTransitions, utcOffsetMinutes } from "@/lib/calendar/alerts";
 import type { CalendarPeriodItem } from "@/lib/calendar/service";
+import { effectiveTripTimezone } from "@/lib/calendar/trip-calendar";
 
 const item = (over: Partial<CalendarPeriodItem>): CalendarPeriodItem => ({
   periodKey: "x",
@@ -95,5 +96,14 @@ describe("M23 V1.1 — alertsFor (FR-M23-014)", () => {
       viewer: { country: "HU", timezone: "Europe/Budapest", items: [item({ periodKey: "hu_summer", type: "school_holiday", label: "Nyári szünet", earliest: "2027-06-19", latest: "2027-08-31", isDayOff: false })] },
     });
     expect(alerts.map((a) => a.key)).toEqual(["viewer_holiday", "timezone_difference", "no_calendar_data"]);
+  });
+});
+
+describe("M23 V1.1 — effectiveTripTimezone (a trips.timezone UTC-alapértéke nem választás)", () => {
+  it("UTC alapértéknél az ország fő zónája, szervezői választásnál az", () => {
+    expect(effectiveTripTimezone("UTC", "Europe/Budapest")).toBe("Europe/Budapest");
+    expect(effectiveTripTimezone(null, "Europe/Vienna")).toBe("Europe/Vienna");
+    expect(effectiveTripTimezone("Atlantic/Canary", "Europe/Madrid")).toBe("Atlantic/Canary");
+    expect(effectiveTripTimezone("UTC", null)).toBe("UTC");
   });
 });
