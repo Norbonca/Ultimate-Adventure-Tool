@@ -65,28 +65,36 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
   const [selectedMilestone, setSelectedMilestone] = useState<MilestoneWithTasks | null>(null);
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
 
-  // Betöltés: az első futásnál a loading már true (useState), ezért nem állítjuk szinkron az effectben;
-  // az újratöltés (reload) állítja vissza (D12, 2026-10-30).
-  const loadTimeline = useCallback(async () => {
-    const result = await fetchTripTimeline(tripId);
-    if (!result.error) {
-      setPhases(result.phases);
-      setStats(result.stats);
-      if (result.phases.length === 0 && isOrganizer) {
-        setShowTemplateSelector(true);
+  // Betöltés (D12, 2026-10-30): az effect nem állít szinkron state-et — az eredmény a válasz után érkezik;
+  // az első futásnál a loading már true (useState). Az újratöltés (felhasználói művelet után) külön.
+  const applyTimeline = useCallback(
+    (result: Awaited<ReturnType<typeof fetchTripTimeline>>) => {
+      if (!result.error) {
+        setPhases(result.phases);
+        setStats(result.stats);
+        if (result.phases.length === 0 && isOrganizer) {
+          setShowTemplateSelector(true);
+        }
       }
-    }
-    setLoading(false);
-  }, [tripId, isOrganizer]);
+      setLoading(false);
+    },
+    [isOrganizer],
+  );
+
+  useEffect(() => {
+    let alive = true;
+    fetchTripTimeline(tripId).then((result) => {
+      if (alive) applyTimeline(result);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [tripId, applyTimeline]);
 
   const reloadTimeline = useCallback(() => {
     setLoading(true);
-    void loadTimeline();
-  }, [loadTimeline]);
-
-  useEffect(() => {
-    void loadTimeline();
-  }, [loadTimeline]);
+    fetchTripTimeline(tripId).then(applyTimeline);
+  }, [tripId, applyTimeline]);
 
   if (loading) {
     return (

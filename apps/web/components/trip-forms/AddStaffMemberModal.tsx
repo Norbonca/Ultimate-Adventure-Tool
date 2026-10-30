@@ -44,8 +44,9 @@ export function AddStaffMemberModal({
   );
   const [customRoleLabel, setCustomRoleLabel] = useState("");
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [searching, setSearching] = useState(false);
+  // A találatlista a lekérdezéssel együtt tárolva: a „keresés folyamatban” állapot származtatott
+  // (a tárolt lekérdezés ≠ a beírt), nem effectben állított (D12, 2026-10-30).
+  const [loaded, setLoaded] = useState<{ query: string; results: SearchResult[] }>({ query: "", results: [] });
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,25 +60,22 @@ export function AddStaffMemberModal({
     | null
   >(null);
 
-  // Rövid lekérdezésnél nincs találatlista — származtatva, nem effectben nullázva (D12, 2026-10-30).
   const trimmedQuery = query.trim();
-  const visibleResults = trimmedQuery.length < 2 ? [] : results;
+  const visibleResults = trimmedQuery.length < 2 || loaded.query !== trimmedQuery ? [] : loaded.results;
+  const searching = trimmedQuery.length >= 2 && loaded.query !== trimmedQuery;
 
   useEffect(() => {
     const trimmed = query.trim();
     if (trimmed.length < 2) return;
     let cancelled = false;
-    setSearching(true);
     const timer = setTimeout(async () => {
       const res = await searchUsersForStaffSeat(tripId, trimmed);
       if (cancelled) return;
-      setResults(res.results);
-      setSearching(false);
+      setLoaded({ query: trimmed, results: res.results });
     }, 250);
     return () => {
       cancelled = true;
       clearTimeout(timer);
-      setSearching(false);
     };
   }, [query, tripId]);
 
