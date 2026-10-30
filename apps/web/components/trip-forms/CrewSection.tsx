@@ -98,7 +98,7 @@ export function CrewSection({ data, onChange, membersSlot, applicationsSlot, sta
             disabled={!newPosition.trim()}
             className="px-5 py-2.5 rounded-xl text-sm font-semibold text-trevu-700 border border-trevu-500 hover:bg-trevu-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            + {t("trips.wizard.addPosition")}
+            {t("trips.wizard.addPosition")}
           </button>
         </div>
       </div>

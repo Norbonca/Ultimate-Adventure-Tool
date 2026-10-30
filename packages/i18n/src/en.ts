@@ -1479,6 +1479,7 @@ const en: TranslationKeys = {
       detailPhone: "Phone",
       detailRegistered: "Registered",
       detailLastLogin: "Last login",
+      detailBannedUntil: "Banned until",
       detailNeverLoggedIn: "Never logged in",
       detailLocation: "Location",
       detailTripHistory: "Trip history",
