@@ -35,11 +35,10 @@ export function CalendarHints({ step, location_country, start_date, end_date, re
   const { t, locale } = useTranslation();
   const [data, setData] = useState<TripCalendarPreview | null>(null);
 
+  const enabled = Boolean(location_country && start_date);
+
   useEffect(() => {
-    if (!location_country || !start_date) {
-      setData(null);
-      return;
-    }
+    if (!enabled) return;
     let alive = true;
     const handle = setTimeout(() => {
       previewTripCalendar({ location_country, start_date, end_date: end_date || start_date, registration_deadline: registration_deadline || "", timezone: timezone || "", locale })
@@ -52,9 +51,9 @@ export function CalendarHints({ step, location_country, start_date, end_date, re
       alive = false;
       clearTimeout(handle);
     };
-  }, [location_country, start_date, end_date, registration_deadline, timezone, locale]);
+  }, [enabled, location_country, start_date, end_date, registration_deadline, timezone, locale]);
 
-  if (!data) return null;
+  if (!enabled || !data) return null;
   const items = data.alerts
     .filter((a) => STEP_KEYS[step].includes(a.key))
     .map((a) => ({ id: a.id, severity: a.severity, icon: a.icon, ...alertText(a, t as (k: string, p?: Record<string, string | number>) => string, locale) }));
