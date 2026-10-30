@@ -19,6 +19,10 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   "chevron-down": L.ChevronDown,
   compass: L.Compass,
   globe: L.Globe,
+  // M23 Calendar (Ikon Bank 6.5)
+  "calendar-days": L.CalendarDays,
+  "calendar-range": L.CalendarRange,
+  "calendar-x": L.CalendarX,
   home: L.Home,
   "layout-dashboard": L.LayoutDashboard,
   "log-in": L.LogIn,

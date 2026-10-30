@@ -1877,6 +1877,69 @@ const hu = {
   // M23 — Calendar (naptár)
   // ============================================================================
   calendar: {
+    badge: {
+      falls: "{period} idejére esik",
+      mayFall: "{period} idejére eshet",
+      holiday: "Munkaszüneti nap: {date}",
+      longWeekend: "Hosszú hétvége",
+    },
+    section: {
+      title: "Naptár és időzóna",
+      viewerCalendar: "{country} naptára szerint",
+      noViewerCalendar: "Add meg az országodat a profilodban, hogy a saját naptárad szerinti szüneteket és ünnepeket is lásd.",
+      deadlineLabel: "Jelentkezési határidő",
+      deadlineUntil: "{date} 23:59-ig ({timezone})",
+      viewerLabel: "Nálad:",
+      dayShift: "({shift} nap)",
+    },
+    localTime: {
+      title: "Helyi idő a helyszínen: {timezone} ({offset})",
+      source: {
+        organizer: "Forrás: a te beállításod",
+        coordinates: "Forrás: a helyszín koordinátája",
+        country: "Forrás: az ország fő időzónája",
+        organizer_profile: "Forrás: a profilod időzónája",
+        default: "Forrás: alapértelmezés (UTC)",
+      },
+      multiZone: "az országnak több időzónája van — a 4. lépésben választhatsz",
+      hint: "a határidők és az időpontok ebben a zónában érvényesek",
+      change: "Módosítás",
+    },
+    alerts: {
+      organizerCalendar: "a szervező naptára",
+      local_holiday: {
+        title: "{period} — {date}, {country}",
+        dates: "{date} · a túra {dayIndex}. napja",
+        impact: "Üzletek és hivatalok zárva lehetnek, ritkább lehet a közlekedés — érdemes a programban figyelembe venni.",
+      },
+      viewer_holiday: {
+        title: "{period} idejére esik",
+        dates: "{from} – {to} · {country} (a te naptárad szerint)",
+        impact: "A túra a(z) {period} idejére esik — családoknak jó időpont, a szállások telítettebbek lehetnek.",
+      },
+      timezone_difference: {
+        titleAhead: "A túra helyszínén {hours} órával többet mutat az óra, mint nálad",
+        titleBehind: "A túra helyszínén {hours} órával kevesebbet mutat az óra, mint nálad",
+        dates: "{tripTz} · nálad {viewerTz}",
+        impact: "Minden időpontot a túra helyi idejében mutatunk; alatta a te időd is látszik.",
+      },
+      dst_change: {
+        title: "Óraátállítás a túra ideje alatt",
+        dates: "{date} · a túra {dayIndex}. napja · {tripTz}",
+        impactForward: "Az órát egy órával előre kell állítani — a nap egy órával rövidebb; az aznapi találkozót az új helyi idő szerint mutatjuk.",
+        impactBack: "Az órát egy órával vissza kell állítani — a nap egy órával hosszabb; az aznapi találkozót az új helyi idő szerint mutatjuk.",
+      },
+      deadline_on_holiday: {
+        title: "A jelentkezési határidő munkaszüneti napra esik",
+        dates: "{date} · {period} ({country})",
+        impact: "Ünnepnapon kevesebb jelentkezés érkezhet. Nem akadályozza a publikálást — érdemes egy nappal korábbra ({suggested}) tenni.",
+      },
+      no_calendar_data: {
+        title: "{country}: nincs ünnepnap-adatunk",
+        dates: "Célország: {country}",
+        impact: "Ellenőrizd a helyi ünnepeket és nyitvatartást a túra idejére — a figyelmeztetéseket nem tudjuk kiszámolni.",
+      },
+    },
     types: {
       national_holiday: "Nemzeti ünnep",
       public_holiday: "Munkaszüneti nap",

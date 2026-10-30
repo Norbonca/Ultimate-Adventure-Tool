@@ -11,6 +11,7 @@ import { useTranslation } from "@/lib/i18n/useTranslation";
 import { Input } from "@/components/ui";
 import { Icon } from "@/components/Icon";
 import { previewGeocode } from "../../actions";
+import { CalendarHints } from "@/components/trip-forms/CalendarHints";
 
 interface Step2Props {
   formData: WizardFormData;
@@ -226,6 +227,15 @@ export function Step2Basics({
           placeholder={t('trips.wizard.cityPlaceholder')}
         />
       </div>
+
+      {/* M23 V1.1 — helyi idő a helyszínen (S9) és naptári figyelmeztetések (S11); design D02 sGfJS `T87a5` + `QTCYQ` */}
+      <CalendarHints
+        step={2}
+        location_country={formData.location_country}
+        start_date={formData.start_date}
+        end_date={formData.end_date}
+        timezone={formData.timezone}
+      />
 
       {/* Where this trip will appear on the globe */}
       <div

@@ -14,6 +14,7 @@ import { ImagePicker } from "@/components/ImagePicker";
 import { Icon } from "@/components/Icon";
 import { Input, Toggle } from "@/components/ui";
 import { TimezoneSelect } from "@/components/trip-forms/TimezoneSelect";
+import { CalendarHints } from "@/components/trip-forms/CalendarHints";
 import { CurrencySelect } from "@/components/trip-forms/CurrencySelect";
 import { formatLocalDate } from "@/lib/timezone";
 
@@ -304,6 +305,15 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
           })}
         </p>
       )}
+      {/* M23 V1.1 — határidő ünnepnapon, időzóna-eltérés (S11); design D02 Gvgnj `d2I6Tq` */}
+      <CalendarHints
+        step={4}
+        location_country={formData.location_country}
+        start_date={formData.start_date}
+        end_date={formData.end_date}
+        registration_deadline={formData.registration_deadline}
+        timezone={formData.timezone}
+      />
 
       {/* ── Show on Landing Page ── */}
       <Toggle
