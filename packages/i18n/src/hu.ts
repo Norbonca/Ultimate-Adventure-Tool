@@ -1508,6 +1508,7 @@ const hu = {
       detailPhone: "Telefon",
       detailRegistered: "Regisztráció",
       detailLastLogin: "Utolsó belépés",
+      detailBannedUntil: "Tiltás vége",
       detailNeverLoggedIn: "Még nem lépett be",
       detailLocation: "Helyszín",
       detailTripHistory: "Túratörténet",

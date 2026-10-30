@@ -79,6 +79,10 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
     { label: t("admin.users.detailLastLogin"), value: user.last_sign_in_at ? fmtDateTime(user.last_sign_in_at) : t("admin.users.detailNeverLoggedIn") },
     { label: t("admin.users.detailRegistered"), value: fmtDate(user.created_at) },
     { label: t("admin.users.detailLocation"), value: location || "—" },
+    // 051: a tiltás időtartama látszik
+    ...(user.is_banned
+      ? [{ label: t("admin.users.detailBannedUntil"), value: user.banned_until ? fmtDateTime(user.banned_until) : t("admin.users.banPermanent") }]
+      : []),
   ];
 
   return (

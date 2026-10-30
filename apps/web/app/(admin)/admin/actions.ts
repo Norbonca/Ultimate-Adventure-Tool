@@ -20,6 +20,12 @@ async function requireAdmin() {
   return { supabase: createAdminClient(), user: admin };
 }
 
+/** Tiltott-e most: deleted_at + (végleges vagy még nem járt le a banned_until). */
+function isBanned(deletedAt: string | null, bannedUntil: string | null | undefined): boolean {
+  if (!deletedAt) return false;
+  return !bannedUntil || new Date(bannedUntil).getTime() > Date.now();
+}
+
 // ─── Dashboard statisztikák ──────────────────────────────────────────────────
 
 export async function getAdminStats() {
@@ -66,6 +72,8 @@ export interface AdminUser {
   trip_count: number;
   is_banned: boolean;
   deleted_at: string | null;
+  /** 051: határozott idejű tiltás vége; null = végleges vagy nincs tiltás */
+  banned_until: string | null;
 }
 
 export async function getAdminUsers(params: {
@@ -83,7 +91,7 @@ export async function getAdminUsers(params: {
     .from("profiles")
     .select(
       `id, display_name, first_name, last_name, email, created_at,
-       subscription_tier, deleted_at`,
+       subscription_tier, deleted_at, banned_until`,
       { count: "exact" }
     )
     .order("created_at", { ascending: false })
@@ -119,8 +127,9 @@ export async function getAdminUsers(params: {
     created_at: p.created_at,
     subscription_tier: p.subscription_tier,
     trip_count: 0,
-    is_banned: p.deleted_at != null,
+    is_banned: isBanned(p.deleted_at, p.banned_until),
     deleted_at: p.deleted_at,
+    banned_until: p.banned_until ?? null,
   }));
 
   return { users, total: count ?? 0 };
@@ -133,9 +142,9 @@ export async function banUser(
 ): Promise<{ success: boolean; error?: string }> {
   const { supabase, user: adminUser } = await requireAdmin();
 
-  // TODO: banUntil is computed but never passed to the ban call — the chosen
-  // duration is currently ignored. See hubnote open questions (2026-08-29).
-  const _banUntil =
+  // 051: a választott időtartam a profiles.banned_until mezőbe kerül; a lejárt tiltást a
+  // lift_expired_bans() (pg_cron, óránként) oldja fel, az account_deletion_status() addig sem tekinti felfüggesztettnek.
+  const banUntil =
     duration === "permanent"
       ? null
       : new Date(
@@ -146,7 +155,7 @@ export async function banUser(
 
   const { error } = await supabase
     .from("profiles")
-    .update({ deleted_at: new Date().toISOString() })
+    .update({ deleted_at: new Date().toISOString(), banned_until: banUntil })
     .eq("id", userId);
 
   if (error) return { success: false, error: error.message };
@@ -159,7 +168,7 @@ export async function banUser(
       action: "user.ban",
       target_type: "user",
       target_id: userId,
-      details: { reason, duration },
+      details: { reason, duration, banned_until: banUntil },
       result: "success",
     });
   } catch {
@@ -176,7 +185,7 @@ export async function unbanUser(
 
   const { error } = await supabase
     .from("profiles")
-    .update({ deleted_at: null })
+    .update({ deleted_at: null, banned_until: null })
     .eq("id", userId);
 
   if (error) return { success: false, error: error.message };
@@ -229,7 +238,7 @@ export async function getAdminUserDetail(userId: string): Promise<AdminUserDetai
     .from("profiles")
     .select(
       `id, display_name, first_name, last_name, email, phone, location_city, country_code,
-       created_at, subscription_tier, reputation_points, deleted_at`
+       created_at, subscription_tier, reputation_points, deleted_at, banned_until`
     )
     .eq("id", userId)
     .maybeSingle();
@@ -273,8 +282,9 @@ export async function getAdminUserDetail(userId: string): Promise<AdminUserDetai
     created_at: p.created_at,
     subscription_tier: p.subscription_tier,
     trip_count: trips.length,
-    is_banned: p.deleted_at != null,
+    is_banned: isBanned(p.deleted_at, p.banned_until),
     deleted_at: p.deleted_at,
+    banned_until: p.banned_until ?? null,
     phone: p.phone,
     location_city: p.location_city,
     country_code: p.country_code,
