@@ -15,9 +15,11 @@ type Participation = {
     | "participant"
     | "rejected"
     | "waitlisted"
-    | "cancelled";
+    | "cancelled"
+    | "removed";
   application_text: string | null;
   rejection_reason: string | null;
+  removal_message?: string | null;
 } | null;
 
 interface ApplyButtonProps {
@@ -54,8 +56,8 @@ export function ApplyButton({
     );
   }
 
-  // 2) Már van jelentkezés (status !== cancelled) → státusz megjelenítés + cancel opció
-  if (participation && participation.status !== "cancelled") {
+  // 2) Már van jelentkezés (status !== cancelled/removed) → státusz megjelenítés + cancel opció
+  if (participation && participation.status !== "cancelled" && participation.status !== "removed") {
     const statusConfig: Record<
       string,
       { label: string; bg: string; text: string; border: string; canCancel: boolean }
@@ -158,7 +160,7 @@ export function ApplyButton({
     );
   }
 
-  // 3) Nincs jelentkezés (vagy cancelled) → apply form
+  // 3) Nincs jelentkezés (vagy cancelled / removed — §11.5.3: az eltávolított újra jelentkezhet) → apply form
   const handleApply = () => {
     setError(null);
     startTransition(async () => {
@@ -173,20 +175,38 @@ export function ApplyButton({
     });
   };
 
+  // Az eltávolítás ténye és a szervező üzenete az újrajelentkezés fölött látszik (D02 o4u2N6 következménye).
+  const removedNotice =
+    participation?.status === "removed" ? (
+      <div className="text-xs text-navy-600 bg-navy-50 rounded-lg p-3 space-y-1">
+        <p className="font-semibold">{t("trips.detail.removedNotice")}</p>
+        {participation.removal_message && (
+          <p className="whitespace-pre-wrap">
+            <span className="font-semibold">{t("trips.detail.removalMessage")}: </span>
+            {participation.removal_message}
+          </p>
+        )}
+      </div>
+    ) : null;
+
   if (!showForm) {
     return (
-      <button
-        onClick={() => setShowForm(true)}
-        disabled={spotsLeft <= 0 && !requireApproval}
-        className="w-full py-3 bg-trevu-600 text-white font-bold rounded-xl hover:bg-trevu-700 transition-colors shadow-lg shadow-trevu-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {t("trips.detail.apply")}
-      </button>
+      <div className="space-y-3">
+        {removedNotice}
+        <button
+          onClick={() => setShowForm(true)}
+          disabled={spotsLeft <= 0 && !requireApproval}
+          className="w-full py-3 bg-trevu-600 text-white font-bold rounded-xl hover:bg-trevu-700 transition-colors shadow-lg shadow-trevu-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {t("trips.detail.apply")}
+        </button>
+      </div>
     );
   }
 
   return (
     <div className="space-y-3">
+      {removedNotice}
       <div>
         <label className="text-xs font-semibold text-navy-600 mb-1 block">
           {t("trips.detail.applicationMessage")}

@@ -16,7 +16,7 @@ import { SettingsSection } from "@/components/trip-forms/SettingsSection";
 import { TripDangerZone } from "@/components/trip-forms/TripDangerZone";
 import { CrewSection } from "@/components/trip-forms/CrewSection";
 import { StaffSeatsManager } from "@/components/trip-forms/StaffSeatsManager";
-import { ApplicationsManager, CrewMembersRow } from "@/components/trip-forms/ApplicationsManager";
+import { ApplicationsManager, CrewMembersList } from "@/components/trip-forms/ApplicationsManager";
 import { TripTimelineClient } from "@/components/TripTimelineClient";
 import { Icon } from "@/components/Icon";
 
@@ -209,7 +209,7 @@ export function EditTripForm({
               <StaffSeatsManager tripId={trip.id} totalSeats={formData.staff_seats || 0} />
             }
             applicationsSlot={<ApplicationsManager tripId={trip.id} />}
-            membersSlot={<CrewMembersRow tripId={trip.id} />}
+            membersSlot={<CrewMembersList tripId={trip.id} />}
           />
         );
     }

@@ -10,6 +10,9 @@ import { countryCentroid, geocodeLocation } from "@/lib/geocoding";
 import { z } from "zod";
 import type { WizardFormData } from "./types";
 
+// §11.5.3: a saját visszavonás (cancelled) és a szervezői eltávolítás (removed) után újra lehet jelentkezni.
+const REAPPLICABLE_STATUSES: readonly string[] = ["cancelled", "removed"];
+
 // ============================================
 // Helper: slug generálás
 // ============================================
@@ -753,8 +756,8 @@ export async function fetchTripParticipants(tripId: string) {
     .from("trip_participants")
     .select(`
       id, trip_id, user_id, status, application_text,
-      skill_match, applied_at, approved_at, paid_at,
-      crew_position_id,
+      skill_match, applied_at, approved_at, paid_at, checked_in_at,
+      crew_position_id, is_staff_seat,
       profiles!trip_participants_user_id_fkey (id, display_name, avatar_url, slug),
       trip_crew_positions (id, role_name)
     `)
@@ -814,7 +817,7 @@ export async function fetchMyParticipation(tripId: string) {
 
   const { data, error } = await supabase
     .from("trip_participants")
-    .select("id, status, application_text, applied_at, approved_at, rejection_reason")
+    .select("id, status, application_text, applied_at, approved_at, rejection_reason, removal_message")
     .eq("trip_id", tripId)
     .eq("user_id", user.id)
     .maybeSingle();
@@ -886,7 +889,7 @@ export async function applyToTrip(
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (existing && existing.status !== "cancelled") {
+  if (existing && !REAPPLICABLE_STATUSES.includes(existing.status)) {
     return { ok: false, error: t("trips.errors.alreadyApplied") };
   }
 
@@ -1025,7 +1028,7 @@ export async function assignStaffSeat(
     .eq("user_id", targetUserId)
     .maybeSingle();
 
-  if (existing && existing.status !== "cancelled") {
+  if (existing && !REAPPLICABLE_STATUSES.includes(existing.status)) {
     return { ok: false, error: t("trips.errors.alreadyOnTrip") };
   }
 
@@ -1382,7 +1385,7 @@ export async function inviteStaffByEmail(
       .eq("user_id", targetUserId)
       .maybeSingle();
 
-    if (existing && existing.status !== "cancelled") {
+    if (existing && !REAPPLICABLE_STATUSES.includes(existing.status)) {
       return { ok: false as const, error: t("trips.errors.alreadyOnTrip") };
     }
 
@@ -1536,4 +1539,94 @@ export async function rejectApplication(
   reason?: string
 ): Promise<{ ok: boolean; error?: string }> {
   return decideApplication(tripId, participantId, "reject", reason);
+}
+
+// ============================================
+// M02 lezárás II. (spec §11.5.3, D02 lIGgE / aP0QW / o4u2N6)
+// waitlist: pending → waitlisted (telt túránál az elutasítás alternatívája; a sor Elfogad/Elutasít gombokkal marad)
+// remove:   approved/approved_pending_payment/participant → removed (a hely a számláló-triggerrel azonnal felszabadul;
+//           opcionális üzenet a résztvevőnek, aki újra jelentkezhet)
+// check-in: approved/approved_pending_payment → participant, checked_in_at = NOW()
+// Mind UPDATE a státusz-feltétellel a WHERE-ben; staff seat sorra egyik sem hat.
+// ============================================
+type MemberAction = "waitlist" | "remove" | "checkin";
+
+async function updateParticipantState(
+  tripId: string,
+  participantId: string,
+  action: MemberAction,
+  message?: string
+): Promise<{ ok: boolean; error?: string }> {
+  const { t } = await getServerT();
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { ok: false, error: t("errors.notAuthenticated") };
+  }
+  if (
+    !z.string().uuid().safeParse(tripId).success ||
+    !z.string().uuid().safeParse(participantId).success ||
+    (message !== undefined && message.length > 1000)
+  ) {
+    return { ok: false, error: t("errors.validationFailed") };
+  }
+
+  const { data: trip } = await supabase
+    .from("trips")
+    .select("organizer_id, slug")
+    .eq("id", tripId)
+    .maybeSingle();
+  if (!trip || trip.organizer_id !== user.id) {
+    return { ok: false, error: t("trips.errors.organizerOnly") };
+  }
+
+  const now = new Date().toISOString();
+  const spec = {
+    waitlist: { from: ["pending"], payload: { status: "waitlisted" as const } },
+    remove: {
+      from: ["approved", "approved_pending_payment", "participant"],
+      payload: { status: "removed" as const, removed_at: now, removal_message: message?.trim() || null },
+    },
+    checkin: {
+      from: ["approved", "approved_pending_payment"],
+      payload: { status: "participant" as const, checked_in: true, checked_in_at: now },
+    },
+  }[action];
+
+  const { data: updated, error } = await supabase
+    .from("trip_participants")
+    .update(spec.payload)
+    .eq("id", participantId)
+    .eq("trip_id", tripId)
+    .eq("is_staff_seat", false)
+    .in("status", spec.from)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    console.error(`${action}Participant error:`, error);
+    return { ok: false, error: t("errors.saveFailed") };
+  }
+  if (!updated) {
+    return { ok: false, error: t("trips.errors.participantStateChanged") };
+  }
+
+  revalidatePath("/trips");
+  revalidatePath(`/trips/${trip.slug}`);
+  revalidatePath(`/trips/${trip.slug}/manage`);
+  revalidatePath(`/trips/${trip.slug}/edit`);
+  return { ok: true };
+}
+
+export async function waitlistApplication(tripId: string, participantId: string) {
+  return updateParticipantState(tripId, participantId, "waitlist");
+}
+
+export async function removeParticipant(tripId: string, participantId: string, message?: string) {
+  return updateParticipantState(tripId, participantId, "remove", message);
+}
+
+export async function checkInParticipant(tripId: string, participantId: string) {
+  return updateParticipantState(tripId, participantId, "checkin");
 }
