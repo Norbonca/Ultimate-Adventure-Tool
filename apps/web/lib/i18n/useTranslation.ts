@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 import {
   t as translate,
   setLocale,
@@ -14,6 +14,7 @@ import {
 } from "@uat/i18n";
 
 const LOCALE_CHANGE_EVENT = "trevu-locale-change";
+const STORAGE_KEY = "trevu-locale";
 
 /**
  * Set a cookie (client-side).
@@ -31,6 +32,59 @@ function getCookie(name: string): string | null {
   return match ? match[1] : null;
 }
 
+function isSupported(value: string | null | undefined): value is Locale {
+  return !!value && (SUPPORTED_LOCALES as readonly string[]).includes(value);
+}
+
+/** A nyelv rögzítése mindenhol (modul-állapot, <html lang>, cookie, localStorage). */
+function persistLocale(locale: Locale) {
+  setLocale(locale);
+  document.documentElement.lang = locale;
+  setCookie(STORAGE_KEY, locale);
+  localStorage.setItem(STORAGE_KEY, locale);
+}
+
+// ── Külső tár (useSyncExternalStore) ───────────────────────────────────────────
+// A nyelv forrása az @uat/i18n modul-állapota (getLocale). A feliratkozók a
+// LOCALE_CHANGE_EVENT DOM-eseményre frissülnek. A kliensoldali bootstrap (cookie →
+// localStorage → böngészőnyelv) az első feliratkozáskor fut egyszer — nem effectben
+// (react-hooks/set-state-in-effect, 2026-10-30, D12).
+let bootstrapped = false;
+
+function bootstrapClientLocale() {
+  if (bootstrapped || typeof window === "undefined") return;
+  bootstrapped = true;
+  const fromCookie = getCookie(STORAGE_KEY);
+  const fromStorage = localStorage.getItem(STORAGE_KEY);
+  const stored = isSupported(fromCookie) ? fromCookie : isSupported(fromStorage) ? fromStorage : null;
+  const browserLang = navigator.language.split("-")[0];
+  const next = stored ?? (isSupported(browserLang) ? browserLang : null);
+  if (next && next !== getLocale()) {
+    persistLocale(next);
+    window.dispatchEvent(new CustomEvent(LOCALE_CHANGE_EVENT, { detail: next }));
+  } else if (next) {
+    // a szerver cookie-ból már ezt adta: csak a tárakat hozzuk szinkronba
+    persistLocale(next);
+  }
+}
+
+function subscribe(onChange: () => void) {
+  const handler = (e: Event) => {
+    const newLocale = (e as CustomEvent<Locale>).detail;
+    if (isSupported(newLocale)) {
+      setLocale(newLocale);
+      onChange();
+    }
+  };
+  window.addEventListener(LOCALE_CHANGE_EVENT, handler);
+  // Első feliratkozás után, a commit fázison kívül: a bootstrap a feliratkozókat eseménnyel értesíti.
+  queueMicrotask(bootstrapClientLocale);
+  return () => window.removeEventListener(LOCALE_CHANGE_EVENT, handler);
+}
+
+const getSnapshot = () => getLocale();
+const getServerSnapshot = () => getLocale();
+
 /**
  * React hook for i18n translations.
  *
@@ -43,54 +97,11 @@ function getCookie(name: string): string | null {
  *   <button onClick={() => switchLocale('en')}>EN</button>
  */
 export function useTranslation() {
-  const [locale, setLocaleState] = useState<Locale>(getLocale());
-
-  // Sync with stored preference on mount + listen for cross-component locale changes
-  useEffect(() => {
-    // Check cookie first (synced with server), then localStorage, then browser
-    const fromCookie = getCookie("trevu-locale") as Locale | null;
-    const fromStorage = localStorage.getItem("trevu-locale") as Locale | null;
-    const stored = fromCookie || fromStorage;
-
-    if (stored && SUPPORTED_LOCALES.includes(stored)) {
-      setLocale(stored);
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only bootstrap/sync on mount; a proper rewrite (derive-during-render / useSyncExternalStore) is tracked as an open question (2026-08-29)
-      setLocaleState(stored);
-      document.documentElement.lang = stored;
-      setCookie("trevu-locale", stored);
-      localStorage.setItem("trevu-locale", stored);
-    } else {
-      // Fall back to browser language
-      const browserLang = navigator.language.split("-")[0] as Locale;
-      if (SUPPORTED_LOCALES.includes(browserLang)) {
-        setLocale(browserLang);
-        setLocaleState(browserLang);
-        document.documentElement.lang = browserLang;
-        setCookie("trevu-locale", browserLang);
-        localStorage.setItem("trevu-locale", browserLang);
-      }
-    }
-
-    // Listen for locale changes broadcast by other hook instances
-    const handleLocaleChange = (e: Event) => {
-      const newLocale = (e as CustomEvent<Locale>).detail;
-      if (SUPPORTED_LOCALES.includes(newLocale)) {
-        setLocale(newLocale);
-        setLocaleState(newLocale);
-      }
-    };
-
-    window.addEventListener(LOCALE_CHANGE_EVENT, handleLocaleChange);
-    return () => window.removeEventListener(LOCALE_CHANGE_EVENT, handleLocaleChange);
-  }, []);
+  const locale = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   const switchLocale = useCallback((newLocale: Locale) => {
-    setLocale(newLocale);
-    setLocaleState(newLocale);
-    localStorage.setItem("trevu-locale", newLocale);
-    setCookie("trevu-locale", newLocale);
-    document.documentElement.lang = newLocale;
-    // Broadcast to all other useTranslation instances on the page
+    persistLocale(newLocale);
+    // Broadcast to all useTranslation instances on the page (including this one)
     window.dispatchEvent(new CustomEvent(LOCALE_CHANGE_EVENT, { detail: newLocale }));
   }, []);
 

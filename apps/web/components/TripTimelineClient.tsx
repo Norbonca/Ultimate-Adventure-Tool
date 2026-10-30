@@ -65,8 +65,9 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
   const [selectedMilestone, setSelectedMilestone] = useState<MilestoneWithTasks | null>(null);
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
 
+  // Betöltés: az első futásnál a loading már true (useState), ezért nem állítjuk szinkron az effectben;
+  // az újratöltés (reload) állítja vissza (D12, 2026-10-30).
   const loadTimeline = useCallback(async () => {
-    setLoading(true);
     const result = await fetchTripTimeline(tripId);
     if (!result.error) {
       setPhases(result.phases);
@@ -78,9 +79,13 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
     setLoading(false);
   }, [tripId, isOrganizer]);
 
+  const reloadTimeline = useCallback(() => {
+    setLoading(true);
+    void loadTimeline();
+  }, [loadTimeline]);
+
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only bootstrap/sync on mount; a proper rewrite (derive-during-render / useSyncExternalStore) is tracked as an open question (2026-08-29)
-    loadTimeline();
+    void loadTimeline();
   }, [loadTimeline]);
 
   if (loading) {
@@ -98,7 +103,7 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
         tripId={tripId}
         onInit={() => {
           setShowTemplateSelector(false);
-          loadTimeline();
+          reloadTimeline();
         }}
       />
     );
@@ -110,7 +115,7 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-slate-900">{t("timeline.title")}</h2>
         {isOrganizer && (
-          <AddPhaseButton tripId={tripId} onCreated={loadTimeline} />
+          <AddPhaseButton tripId={tripId} onCreated={reloadTimeline} />
         )}
       </div>
 
@@ -141,7 +146,7 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
             tripId={tripId}
             isOrganizer={isOrganizer}
             onMilestoneClick={setSelectedMilestone}
-            onRefresh={loadTimeline}
+            onRefresh={reloadTimeline}
           />
         ))}
       </div>
@@ -154,11 +159,11 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
           isOrganizer={isOrganizer}
           onClose={(changed) => {
             setSelectedMilestone(null);
-            if (changed) loadTimeline();
+            if (changed) reloadTimeline();
           }}
           onRefresh={() => {
             setSelectedMilestone(null);
-            loadTimeline();
+            reloadTimeline();
           }}
         />
       )}

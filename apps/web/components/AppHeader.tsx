@@ -52,36 +52,30 @@ export function AppHeader({ anchors, user }: AppHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Auth state
-  const [authChecked, setAuthChecked] = useState(user !== undefined);
-  const [resolvedUser, setResolvedUser] = useState(user ?? null);
-
-  // Sync user prop (client components pass it async)
-  useEffect(() => {
-    if (user !== undefined) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only bootstrap/sync on mount; a proper rewrite (derive-during-render / useSyncExternalStore) is tracked as an open question (2026-08-29)
-      setResolvedUser(user);
-      setAuthChecked(true);
-    }
-  }, [user]);
+  // Auth state — a prop az igazság, ha a szülő adta; különben a kliensoldali ellenőrzés eredménye
+  // (derive-during-render, nincs prop→state szinkron effect; D12, 2026-10-30).
+  const [fetched, setFetched] = useState<{ checked: boolean; user: AppHeaderProps["user"] }>({ checked: false, user: null });
+  const authChecked = user !== undefined || fetched.checked;
+  const resolvedUser = user !== undefined ? user : fetched.user;
 
   // Client-side auth check if no user prop
   useEffect(() => {
     if (user !== undefined) return;
+    let fetchedUser: AppHeaderProps["user"] = null;
     fetch("/api/v1/auth/check")
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (d?.authenticated && d?.email) {
-          setResolvedUser({
+          fetchedUser = {
             email: d.email,
             displayName: d.displayName ?? undefined,
             firstName: d.firstName ?? undefined,
             lastName: d.lastName ?? undefined,
-          });
+          };
         }
       })
       .catch(() => {})
-      .finally(() => setAuthChecked(true));
+      .finally(() => setFetched({ checked: true, user: fetchedUser }));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Close dropdown on outside click or ESC
