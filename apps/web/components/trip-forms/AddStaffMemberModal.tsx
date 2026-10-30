@@ -44,8 +44,9 @@ export function AddStaffMemberModal({
   );
   const [customRoleLabel, setCustomRoleLabel] = useState("");
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [searching, setSearching] = useState(false);
+  // A találatlista a lekérdezéssel együtt tárolva: a „keresés folyamatban” állapot származtatott
+  // (a tárolt lekérdezés ≠ a beírt), nem effectben állított (D12, 2026-10-30).
+  const [loaded, setLoaded] = useState<{ query: string; results: SearchResult[] }>({ query: "", results: [] });
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,25 +60,22 @@ export function AddStaffMemberModal({
     | null
   >(null);
 
+  const trimmedQuery = query.trim();
+  const visibleResults = trimmedQuery.length < 2 || loaded.query !== trimmedQuery ? [] : loaded.results;
+  const searching = trimmedQuery.length >= 2 && loaded.query !== trimmedQuery;
+
   useEffect(() => {
     const trimmed = query.trim();
-    if (trimmed.length < 2) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only bootstrap/sync on mount; a proper rewrite (derive-during-render / useSyncExternalStore) is tracked as an open question (2026-08-29)
-      setResults([]);
-      return;
-    }
+    if (trimmed.length < 2) return;
     let cancelled = false;
-    setSearching(true);
     const timer = setTimeout(async () => {
       const res = await searchUsersForStaffSeat(tripId, trimmed);
       if (cancelled) return;
-      setResults(res.results);
-      setSearching(false);
+      setLoaded({ query: trimmed, results: res.results });
     }, 250);
     return () => {
       cancelled = true;
       clearTimeout(timer);
-      setSearching(false);
     };
   }, [query, tripId]);
 
@@ -256,12 +254,12 @@ export function AddStaffMemberModal({
                   {t("common.loading")}…
                 </div>
               )}
-              {!searching && results.length === 0 && (
+              {!searching && visibleResults.length === 0 && (
                 <div className="text-sm text-navy-400 px-3 py-2">
                   {t("trips.crew.noResults")}
                 </div>
               )}
-              {results.map((u) => {
+              {visibleResults.map((u) => {
                 const isSelected = selectedUserId === u.userId;
                 const disabled = u.alreadyOnTrip;
                 return (
