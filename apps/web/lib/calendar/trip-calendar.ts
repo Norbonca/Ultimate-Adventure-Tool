@@ -41,6 +41,12 @@ export function effectiveTripTimezone(tripTimezone: string | null | undefined, c
   return resolveTripTimezone({ organizerChoice, countryPrimaryTimezone }).timezone;
 }
 
+/** Ismert-e a túra zónája (nem az UTC tartalék)? Ismeretlen zónára nem adunk zónaeltérés/óraátállítás figyelmeztetést. */
+export function isTripTimezoneKnown(tripTimezone: string | null | undefined, countryPrimaryTimezone: string | null | undefined): boolean {
+  const organizerChoice = tripTimezone && tripTimezone !== "UTC" ? tripTimezone : null;
+  return resolveTripTimezone({ organizerChoice, countryPrimaryTimezone }).source !== "default";
+}
+
 async function countryPrimaryTimezone(country: string | null): Promise<string | null> {
   if (!country || !COUNTRY_RE.test(country)) return null;
   const supabase = await createClient();
@@ -78,7 +84,8 @@ export async function getTripCalendar(trip: TripCalendarInput, locale: "hu" | "e
   const range = { earliest, latest };
   const badges = viewer.country ? badgesFor({ trip: range, viewerItems: viewerData?.items ?? [] }) : [];
   const alerts = alertsFor({
-    trip: { ...range, timezone: tripTimezone, destinationCountry, registrationDeadlineDate: deadline },
+    // ismeretlen zónánál üres string → alertsFor kihagyja a timezone_difference/dst_change kulcsokat
+    trip: { ...range, timezone: isTripTimezoneKnown(trip.timezone, primaryTz) ? tripTimezone : "", destinationCountry, registrationDeadlineDate: deadline },
     destination,
     viewer: { country: viewer.country, timezone: viewer.timezone, items: viewerData?.items ?? [] },
   });

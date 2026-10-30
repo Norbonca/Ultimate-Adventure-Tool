@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { alertsFor, badgesFor, dstTransitions, utcOffsetMinutes } from "@/lib/calendar/alerts";
 import type { CalendarPeriodItem } from "@/lib/calendar/service";
-import { effectiveTripTimezone } from "@/lib/calendar/trip-calendar";
+import { effectiveTripTimezone, isTripTimezoneKnown } from "@/lib/calendar/trip-calendar";
 
 const item = (over: Partial<CalendarPeriodItem>): CalendarPeriodItem => ({
   periodKey: "x",
@@ -105,5 +105,11 @@ describe("M23 V1.1 — effectiveTripTimezone (a trips.timezone UTC-alapértéke 
     expect(effectiveTripTimezone(null, "Europe/Vienna")).toBe("Europe/Vienna");
     expect(effectiveTripTimezone("Atlantic/Canary", "Europe/Madrid")).toBe("Atlantic/Canary");
     expect(effectiveTripTimezone("UTC", null)).toBe("UTC");
+    expect(isTripTimezoneKnown("UTC", null)).toBe(false);
+    expect(isTripTimezoneKnown("UTC", "Europe/Budapest")).toBe(true);
+  });
+  it("ismeretlen zónára (üres) nincs timezone_difference és dst_change", () => {
+    const alerts = alertsFor({ trip: { earliest: "2027-03-25", latest: "2027-03-31", timezone: "", destinationCountry: "NP", registrationDeadlineDate: null }, destination: { coverage: "none", items: [] }, viewer: { country: "HU", timezone: "Europe/Budapest", items: [] } });
+    expect(alerts.map((a) => a.key)).toEqual(["no_calendar_data"]);
   });
 });
