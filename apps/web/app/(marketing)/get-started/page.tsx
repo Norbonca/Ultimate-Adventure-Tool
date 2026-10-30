@@ -32,13 +32,10 @@ import {
   CloudSun,
   Plane,
   Languages,
-  Instagram,
-  Twitter,
-  Facebook,
-  Youtube,
 } from '@/lib/icons';
 import { useTranslation } from '@/lib/i18n/useTranslation';
 import { AppHeader } from '@/components/AppHeader';
+import { BrandIcon } from '@/lib/brand-icons';
 
 export default function HomePage() {
   const { t } = useTranslation();
@@ -1399,10 +1396,10 @@ export default function HomePage() {
           <div className="footer-bottom">
             <div>{t('landing.footerCopyright')}</div>
             <div className="social-icons">
-              <Instagram className="social-icon" />
-              <Twitter className="social-icon" />
-              <Facebook className="social-icon" />
-              <Youtube className="social-icon" />
+              <BrandIcon name="brand.instagram" className="social-icon" />
+              <BrandIcon name="brand.x" className="social-icon" />
+              <BrandIcon name="brand.facebook" className="social-icon" />
+              <BrandIcon name="brand.youtube" className="social-icon" />
             </div>
           </div>
         </div>
