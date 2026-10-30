@@ -9,6 +9,7 @@
 
 import type { HTMLAttributes, ReactNode } from "react";
 import Link from "next/link";
+import { CoverImage } from "./CoverImage";
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   href?: string;
@@ -58,8 +59,7 @@ export function CardImage({ src, alt, children, className }: CardImageProps) {
   return (
     <div className={["relative aspect-[3/2] w-full overflow-hidden bg-navy-100", className ?? ""].join(" ")}>
       {src ? (
-        // eslint-disable-next-line @next/next/no-img-element -- remote Supabase/Unsplash URLs; next/image migration is a separate DESIGN-FIRST decision
-        <img src={src} alt={alt} className="h-full w-full object-cover" loading="lazy" />
+        <CoverImage src={src} alt={alt} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" />
       ) : (
         <div aria-hidden className="h-full w-full [background-image:var(--gradient-trevu)]" />
       )}

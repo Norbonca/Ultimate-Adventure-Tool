@@ -22,6 +22,8 @@ const nextConfig: NextConfig = {
         hostname: "rpwajsbxrvypeqaalhvd.supabase.co",
         pathname: "/storage/v1/object/public/**",
       },
+      // C9 (2026-10-30): a borítóképek egy része Unsplash-URL (éles adat) — next/image optimalizálás ezekre is.
+      { protocol: "https", hostname: "images.unsplash.com" },
     ],
   },
 };

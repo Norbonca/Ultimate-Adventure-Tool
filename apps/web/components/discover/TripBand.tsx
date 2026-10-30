@@ -9,6 +9,7 @@
  */
 
 import Link from "next/link";
+import { CoverImage } from "@/components/ui/CoverImage";
 import type { LucideIcon } from "@/lib/icons";
 import { ArrowRight, MapPin } from "@/lib/icons";
 
@@ -72,9 +73,7 @@ export function TripBand({ href, title, imageUrl, place, details, category, pric
     >
       <div className="relative w-28 shrink-0 bg-line md:w-[220px]">
         {imageUrl && (
-          // A borítóképek külső tárhelyről jönnek (Supabase Storage, Unsplash) — a meglévő kártyákkal egyezően <img>.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={imageUrl} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+          <CoverImage src={imageUrl} sizes="(min-width: 768px) 220px, 112px" />
         )}
       </div>
 

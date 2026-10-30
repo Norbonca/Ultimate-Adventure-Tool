@@ -17,7 +17,7 @@ export const draftTripSchema = z.object({
   max_participants: z.number().int().min(2).max(500),
   min_participants: z.number().int().min(2).max(500),
   staff_seats: z.number().int().min(0).max(50), difficulty: z.number().int().min(1).max(5),
-  sub_discipline_id: optionalId, category_details: z.record(z.unknown()),
+  sub_discipline_id: optionalId, category_details: z.record(z.string(), z.unknown()),
   visibility: z.enum(["public", "followers_only", "private"]), require_approval: z.boolean(),
   registration_deadline: optionalDate,
   timezone: z.string().max(64).refine(isValidTimeZone, "Invalid timezone"),
