@@ -11,6 +11,7 @@ import { CATEGORY_DISPLAY } from "@/lib/categories";
 import { getServerT, getServerLocale } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
 import { Icon } from "@/components/Icon";
+import { formatMoney } from "@/lib/currency";
 
 interface ParticipantPageProps {
   params: Promise<{ slug: string }>;
@@ -207,16 +208,14 @@ export default async function ParticipantDashboardPage({ params }: ParticipantPa
                 <span className="text-navy-500">{t("trips.participant.yourCost")}</span>
                 <span className="font-bold text-navy-900">
                   {trip.price_amount
-                    ? `€${Number(trip.price_amount).toLocaleString(dateLocale)}`
+                    ? formatMoney(trip.price_amount, trip.price_currency, locale)
                     : t("trips.detail.free")}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-navy-500">{t("trips.participant.paid")}</span>
                 <span className="font-medium text-navy-700">
-                  {myParticipation?.paid_at
-                    ? `€${Number(trip.price_amount || 0).toLocaleString(dateLocale)}`
-                    : "€0"}
+                  {formatMoney(myParticipation?.paid_at ? trip.price_amount || 0 : 0, trip.price_currency, locale)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
@@ -224,9 +223,7 @@ export default async function ParticipantDashboardPage({ params }: ParticipantPa
                 <span className={`font-bold ${
                   myParticipation?.paid_at ? "text-green-600" : "text-red-500"
                 }`}>
-                  {myParticipation?.paid_at
-                    ? "€0"
-                    : `-€${Number(trip.price_amount || 0).toLocaleString(dateLocale)}`}
+                  {formatMoney(myParticipation?.paid_at ? 0 : -Number(trip.price_amount || 0), trip.price_currency, locale)}
                 </span>
               </div>
             </div>
