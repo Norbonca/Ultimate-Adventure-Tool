@@ -225,9 +225,9 @@ export default function RegisterPage() {
               label={
                 <span className="text-sm text-navy-500">
                   {t('auth.termsAgreement')}{" "}
-                  <a href="#" className="text-trevu-600 font-medium hover:underline">{t('auth.termsOfService')}</a>
+                  <a aria-disabled="true" className="text-trevu-600 font-medium hover:underline">{t('auth.termsOfService')}</a>
                   {" "}{t('common.and')}{" "}
-                  <a href="#" className="text-trevu-600 font-medium hover:underline">{t('auth.privacyPolicy')}</a>
+                  <a aria-disabled="true" className="text-trevu-600 font-medium hover:underline">{t('auth.privacyPolicy')}</a>
                 </span>
               }
             />

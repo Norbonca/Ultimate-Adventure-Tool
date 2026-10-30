@@ -19,6 +19,7 @@ interface AdminUsersClientProps {
   // Pre-translated strings (server passes these to avoid client-side t() on server data)
   t_users_title: string;
   t_search_placeholder: string;
+  t_search_button: string;
   t_filter_status: string;
   t_filter_plan: string;
   t_col_user: string;
@@ -156,12 +157,13 @@ export function AdminUsersClient({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t.t_search_placeholder}
+            aria-label={t.t_search_placeholder}
             className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-emerald-400 bg-slate-50"
           />
           <button
             type="submit"
             className="px-3 py-1.5 bg-emerald-500 text-white text-sm rounded-lg hover:bg-emerald-600 transition-colors"
-            aria-label="Search"
+            aria-label={t.t_search_button}
           >
             <Icon name="search" size={16} />
           </button>
@@ -170,6 +172,7 @@ export function AdminUsersClient({
         <select
           defaultValue={initialStatus}
           onChange={(e) => applyFilter("status", e.target.value)}
+          aria-label={t.t_filter_status}
           className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 bg-slate-50 focus:outline-none focus:border-emerald-400"
         >
           <option value="">{t.t_filter_status}</option>
@@ -180,6 +183,7 @@ export function AdminUsersClient({
         <select
           defaultValue={initialPlan}
           onChange={(e) => applyFilter("plan", e.target.value)}
+          aria-label={t.t_filter_plan}
           className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 bg-slate-50 focus:outline-none focus:border-emerald-400"
         >
           <option value="">{t.t_filter_plan}</option>

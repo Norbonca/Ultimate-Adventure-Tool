@@ -22,6 +22,7 @@ interface AdminTripsClientProps {
   locale: string;
   tabLabels: TabLabel[];
   t_search_placeholder: string;
+  t_search_button: string;
   t_col_trip: string;
   t_col_organizer: string;
   t_col_category: string;
@@ -155,12 +156,13 @@ export function AdminTripsClient({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t.t_search_placeholder}
+            aria-label={t.t_search_placeholder}
             className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-emerald-400 bg-slate-50"
           />
           <button
             type="submit"
             className="px-3 py-1.5 bg-emerald-500 text-white text-sm rounded-lg hover:bg-emerald-600 transition-colors"
-            aria-label="Search"
+            aria-label={t.t_search_button}
           >
             <Icon name="search" size={16} />
           </button>
@@ -224,7 +226,7 @@ export function AdminTripsClient({
 
                   {/* Category */}
                   <td className="px-4 py-3 text-slate-500 text-xs">
-                    {trip.category_id ?? "—"}
+                    {trip.category_name_localized?.[locale] || trip.category_name || "—"}
                   </td>
 
                   {/* Status */}
