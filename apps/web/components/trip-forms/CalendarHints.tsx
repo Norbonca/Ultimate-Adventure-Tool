@@ -24,6 +24,11 @@ interface CalendarHintsProps {
   timezone?: string;
   /** S9 sáv „Módosítás” linkje — a 4. lépés időzóna-választójára visz */
   onChangeTimezone?: () => void;
+  /**
+   * Alapérték-javaslat (Norbert, 2026-10-30: a túra helye szerinti helyi idő az alap): ha a szervező még nem
+   * választott zónát (üres/UTC), a helyszínből feloldott zónát átadjuk a varázsló űrlapjának.
+   */
+  onLocalTimezone?: (timezone: string) => void;
 }
 
 const STEP_KEYS: Record<2 | 4, AlertKey[]> = {
@@ -31,7 +36,7 @@ const STEP_KEYS: Record<2 | 4, AlertKey[]> = {
   4: ["deadline_on_holiday", "timezone_difference"],
 };
 
-export function CalendarHints({ step, location_country, start_date, end_date, registration_deadline, timezone, onChangeTimezone }: CalendarHintsProps) {
+export function CalendarHints({ step, location_country, start_date, end_date, registration_deadline, timezone, onChangeTimezone, onLocalTimezone }: CalendarHintsProps) {
   const { t, locale } = useTranslation();
   const [data, setData] = useState<TripCalendarPreview | null>(null);
 
@@ -43,7 +48,12 @@ export function CalendarHints({ step, location_country, start_date, end_date, re
     const handle = setTimeout(() => {
       previewTripCalendar({ location_country, start_date, end_date: end_date || start_date, registration_deadline: registration_deadline || "", timezone: timezone || "", locale })
         .then((res) => {
-          if (alive) setData(res.ok ? res : null);
+          if (!alive) return;
+          setData(res.ok ? res : null);
+          const lt = res.ok ? res.localTime : null;
+          if (lt && onLocalTimezone && (!timezone || timezone === "UTC") && (lt.source === "country" || lt.source === "coordinates")) {
+            onLocalTimezone(lt.timezone);
+          }
         })
         .catch(() => alive && setData(null));
     }, 400);
@@ -51,7 +61,7 @@ export function CalendarHints({ step, location_country, start_date, end_date, re
       alive = false;
       clearTimeout(handle);
     };
-  }, [enabled, location_country, start_date, end_date, registration_deadline, timezone, locale]);
+  }, [enabled, location_country, start_date, end_date, registration_deadline, timezone, locale, onLocalTimezone]);
 
   if (!enabled || !data) return null;
   const items = data.alerts

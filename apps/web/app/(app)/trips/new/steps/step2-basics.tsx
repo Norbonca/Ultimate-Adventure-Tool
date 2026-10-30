@@ -235,6 +235,7 @@ export function Step2Basics({
         start_date={formData.start_date}
         end_date={formData.end_date}
         timezone={formData.timezone}
+        onLocalTimezone={(timezone) => onChange({ timezone })}
       />
 
       {/* Where this trip will appear on the globe */}

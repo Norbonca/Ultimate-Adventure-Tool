@@ -799,7 +799,8 @@ const en: TranslationKeys = {
       currency: "Currency",
       registrationDeadline: "Registration Deadline (optional)",
       timezone: "Trip time zone",
-      timezoneHint: "The deadline and the trip times follow this time zone.",
+      timezoneHint: "Defaults to the local time at the trip location. The deadline and trip times are in this time zone.",
+      timezoneUtcOption: "UTC (no local zone)",
       registrationDeadlineHint: "Registration is open until 23:59 on {date} ({timezone}).",
       back: "Back",
       next: "Next",
@@ -1863,6 +1864,8 @@ const en: TranslationKeys = {
       deadlineUntil: "until {date} 23:59 ({timezone})",
       viewerLabel: "Your time:",
       dayShift: "({shift} day)",
+      localTimeChip: "Local time: {timezone} ({offset})",
+      localTimeChipHint: "Trip times and the registration deadline follow the local time at the destination.",
     },
     localTime: {
       title: "Local time at the destination: {timezone} ({offset})",
