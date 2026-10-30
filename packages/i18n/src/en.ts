@@ -367,6 +367,7 @@ const en: TranslationKeys = {
       adventureInterests: "Adventure Interests",
       skillsExperience: "Skills & Experience",
       socialNetworks: "Social Networks",
+      password: "Password",
       privacy: "Privacy",
     },
     interests: {

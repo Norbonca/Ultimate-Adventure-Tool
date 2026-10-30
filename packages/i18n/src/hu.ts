@@ -368,6 +368,7 @@ const hu = {
       adventureInterests: "Kaland érdeklődések",
       skillsExperience: "Készségek & Tapasztalat",
       socialNetworks: "Közösségi hálózat",
+      password: "Jelszó",
       privacy: "Adatvédelem",
     },
     interests: {
