@@ -42,7 +42,7 @@ export const periodInputSchema = z
     subdivisionCode: z.string().trim().regex(/^[A-Z]{2}-[A-Z0-9]{1,3}$/).nullable(),
     hemisphere: z.enum(["north", "south"]).nullable(),
     ruleKind: z.enum(RULE_KINDS as [RuleKind, ...RuleKind[]]),
-    ruleParams: z.record(z.unknown()),
+    ruleParams: z.record(z.string(), z.unknown()),
     durationDays: z.number().int().min(1).max(366).nullable(),
     isDayOff: z.boolean(),
     sourceText: z.string().trim().min(1).max(1000),

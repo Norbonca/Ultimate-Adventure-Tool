@@ -109,7 +109,7 @@ describe('createTripSchema', () => {
 
 describe('createExpenseSchema', () => {
   const validPayload = {
-    tripId: '00000000-0000-0000-0000-000000000001',
+    tripId: '2f9d2c5a-7b3e-4c1d-9a6f-1e2b3c4d5e6f', // zod 4: RFC 4122 v4 formátum kell
     amount: 15000,
     currency: 'HUF',
     description: 'Bejárati díj',

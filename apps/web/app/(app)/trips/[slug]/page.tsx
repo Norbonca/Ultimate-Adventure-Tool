@@ -17,6 +17,7 @@ import { getTripCalendar } from "@/lib/calendar/trip-calendar";
 import { alertText, badgeText, countryName } from "@/lib/calendar/alert-text";
 import { endOfLocalDay, formatInstant } from "@/lib/calendar/time";
 import { CalendarAlerts, CalendarBadge, DualTime } from "@/components/calendar/CalendarUi";
+import { CoverImage } from "@/components/ui/CoverImage";
 import { fetchTripBySlugForAdmin } from "@/lib/admin-auth";
 
 interface TripDetailPageProps {
@@ -207,9 +208,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
           Terv: design/D02_Trip_Management.pen#KpgDv (1440), #M0RLZp (390, StickyActionBar). */}
       <section data-surface="night" className="relative overflow-hidden bg-canvas text-ink" data-testid="trip-hero">
         {trip.cover_image_url ? (
-          // A borítókép külső tárhelyről jön (Supabase Storage, Unsplash).
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={trip.cover_image_url} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <CoverImage src={trip.cover_image_url} sizes="100vw" priority />
         ) : (
           <div aria-hidden className="absolute inset-0 [background:radial-gradient(60%_80%_at_0%_0%,rgba(45,212,191,.12),transparent_70%)]" />
         )}

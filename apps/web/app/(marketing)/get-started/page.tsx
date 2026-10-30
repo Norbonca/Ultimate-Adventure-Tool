@@ -11,6 +11,8 @@
 // fogja megoldani a CSS-token migrációt egyszerre, addig a stable hex-érték
 // jobban szolgálja a marketing iterációt.
 import Link from 'next/link';
+import Image from 'next/image';
+import { CoverImage } from '@/components/ui/CoverImage';
 import {
   MapPin,
   Zap,
@@ -1078,8 +1080,7 @@ export default function HomePage() {
       {/* HERO — Brand Guide v2 §5 (Night), igazítva a Discover herójához.
           Terv: design/D03_Marketing.pen#Jv6bY (Hero Section #h9sLr); kép: public/discover/hero.jpg (Unsplash @hdbernd). */}
       <section data-surface="night" className="relative overflow-hidden bg-canvas text-ink" data-testid="landing-hero">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/discover/hero.jpg" alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <CoverImage src="/discover/hero.jpg" sizes="100vw" priority />
         <div aria-hidden className="absolute inset-0 bg-hero-scrim-mobile md:bg-hero-scrim" />
         <div className="relative mx-auto flex min-h-[520px] max-w-7xl flex-col justify-end gap-5 px-5 pb-10 pt-24 md:min-h-[640px] md:px-[120px] md:pb-14">
           <span className="inline-flex w-fit items-center gap-2 rounded-full bg-glass px-4 py-1.5 text-[13px] font-semibold text-ink backdrop-blur">
@@ -1155,11 +1156,13 @@ export default function HomePage() {
                 {t('landing.feature1Description')}
               </p>
             </div>
-            <img
+            <Image
               src="https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=80&fit=crop&auto=format"
               alt="Smart trip planning"
               className="feature-image"
-              loading="lazy"
+              width={800}
+              height={533}
+              sizes="(min-width: 768px) 50vw, 100vw"
             />
           </div>
 
@@ -1177,11 +1180,13 @@ export default function HomePage() {
                 {t('landing.feature2Description')}
               </p>
             </div>
-            <img
+            <Image
               src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80&fit=crop&auto=format"
               alt="Expense splitting"
               className="feature-image"
-              loading="lazy"
+              width={800}
+              height={533}
+              sizes="(min-width: 768px) 50vw, 100vw"
             />
           </div>
 
@@ -1199,11 +1204,13 @@ export default function HomePage() {
                 {t('landing.feature3Description')}
               </p>
             </div>
-            <img
+            <Image
               src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80&fit=crop&auto=format"
               alt="Offline maps"
               className="feature-image"
-              loading="lazy"
+              width={800}
+              height={533}
+              sizes="(min-width: 768px) 50vw, 100vw"
             />
           </div>
         </div>

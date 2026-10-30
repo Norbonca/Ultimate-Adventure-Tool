@@ -9,6 +9,7 @@
  */
 
 import Link from "next/link";
+import { CoverImage } from "@/components/ui/CoverImage";
 import type { LucideIcon } from "@/lib/icons";
 import { Calendar, MapPin, UserCircle, Users } from "@/lib/icons";
 import { CATEGORY_TEXT, type CategoryToken } from "./TripBand";
@@ -37,9 +38,7 @@ export function TripTile({ href, title, imageUrl, place, dates, spots, host, dif
     >
       <div className="relative h-[200px] shrink-0 bg-line">
         {imageUrl && (
-          // A borítóképek külső tárhelyről jönnek (Supabase Storage, Unsplash) — a sávokkal egyezően <img>.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={imageUrl} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+          <CoverImage src={imageUrl} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" />
         )}
         <div className="absolute inset-x-3 top-3 flex items-center justify-between gap-2">
           {category && CatIcon ? (
