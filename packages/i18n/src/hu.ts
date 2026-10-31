@@ -104,6 +104,16 @@ const hu = {
   // Auth (Bejelentkezés / Regisztráció)
   // ============================================================================
   auth: {
+    errors: {
+      invalidCredentials: "Hibás email-cím vagy jelszó.",
+      userAlreadyExists: "Ezzel az email-címmel már regisztráltak. Jelentkezz be.",
+      emailNotConfirmed: "A bejelentkezés előtt erősítsd meg az email-címedet.",
+      weakPassword: "Adj meg erősebb jelszót.",
+      invalidEmail: "Adj meg érvényes email-címet.",
+      rateLimited: "Túl sok próbálkozás. Próbáld újra később.",
+      unavailable: "Ez a bejelentkezési mód jelenleg nem érhető el.",
+      generic: "A művelet nem sikerült. Próbáld újra.",
+    },
     login: "Bejelentkezés",
     loginTitle: "Bejelentkezés",
     loginSubtitle: "Üdvözlünk a Trevu-ban",
@@ -881,6 +891,9 @@ const hu = {
 
     // Organizer dashboard (/trips/[slug]/manage)
     manage: {
+      linkCopied: "A link a vágólapra került.",
+      copyLinkManually: "A másolás nem sikerült. Jelöld ki és másold ki a linket.",
+      tripLink: "Túra linkje",
       timeline: "Túra menetrend",
       addPhase: "+ Fázis hozzáadása",
       crewProgress: "Legénység állapota",
@@ -1041,6 +1054,8 @@ const hu = {
 
     // Participant dashboard (/trips/[slug]/participant)
     participant: {
+      paymentUnavailable: "Az alkalmazáson belüli fizetés még nem érhető el.",
+      experienceFormUnavailable: "A tapasztalati űrlap még nem érhető el.",
       actionItems: "Teendők",
       payBalance: "Fizetendő összeg",
       payNow: "Fizess most",
@@ -1131,6 +1146,10 @@ const hu = {
   // Discover page
   // ============================================================================
   discover: {
+    currency: "Pénznem",
+    allCurrencies: "Minden pénznem",
+    currencyHint: "Az árszűrés és az árrendezés csak a kiválasztott pénznemben megadott túrákra vonatkozik.",
+    underAmount: "{amount} alatt",
     title: "Túrák felfedezése",
     searchPlaceholder: "Keresés helyszín, kategória vagy túranév alapján...",
     noResults: "Nincs találat a keresési feltételeknek megfelelően.",
@@ -1408,6 +1427,11 @@ const hu = {
   // Admin Panel (M15)
   // ============================================================================
   admin: {
+    login: {
+      accessRequired: "Aktív adminjogosultság szükséges.",
+      failed: "Sikertelen bejelentkezés. Ellenőrizd az adataidat és az adminjogosultságodat.",
+      requiredFields: "Add meg az email-címedet és a jelszavadat.",
+    },
     // Navigáció
     nav: {
       operations: "Műveletek",

@@ -105,6 +105,16 @@ const en: TranslationKeys = {
   // Auth
   // ============================================================================
   auth: {
+    errors: {
+      invalidCredentials: "Invalid email or password.",
+      userAlreadyExists: "An account with this email already exists. Please log in.",
+      emailNotConfirmed: "Confirm your email address before logging in.",
+      weakPassword: "Choose a stronger password.",
+      invalidEmail: "Enter a valid email address.",
+      rateLimited: "Too many attempts. Please try again later.",
+      unavailable: "This sign-in method is currently unavailable.",
+      generic: "The request failed. Please try again.",
+    },
     login: "Log in",
     loginTitle: "Log in",
     loginSubtitle: "Welcome to Trevu",
@@ -858,6 +868,9 @@ const en: TranslationKeys = {
     },
 
     manage: {
+      linkCopied: "Link copied.",
+      copyLinkManually: "Could not copy. Select and copy the link below.",
+      tripLink: "Trip link",
       timeline: "Trip Timeline",
       addPhase: "+ Add Phase",
       crewProgress: "Crew Progress",
@@ -1013,6 +1026,8 @@ const en: TranslationKeys = {
     },
 
     participant: {
+      paymentUnavailable: "In-app payment is not available yet.",
+      experienceFormUnavailable: "The experience form is not available yet.",
       actionItems: "Your Action Items",
       payBalance: "Pay remaining balance",
       payNow: "Pay Now",
@@ -1103,6 +1118,10 @@ const en: TranslationKeys = {
   // Discover page
   // ============================================================================
   discover: {
+    currency: "Currency",
+    allCurrencies: "All currencies",
+    currencyHint: "Price filters and sorting only include trips priced in the selected currency.",
+    underAmount: "Under {amount}",
     title: "Discover Trips",
     searchPlaceholder: "Search by location, category, or trip name...",
     noResults: "No results match your search criteria.",
@@ -1380,6 +1399,11 @@ const en: TranslationKeys = {
   // Admin Panel (M15)
   // ============================================================================
   admin: {
+    login: {
+      accessRequired: "An active admin role is required.",
+      failed: "Sign-in failed. Check your credentials and admin access.",
+      requiredFields: "Enter your email and password.",
+    },
     // Navigation
     nav: {
       operations: "Operations",
