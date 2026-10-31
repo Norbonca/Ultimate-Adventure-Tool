@@ -5,9 +5,10 @@ import { createAdminClient } from "@/lib/supabase/admin-client";
 /**
  * The signed-in platform admin, or null. Never redirects — callers decide
  * (admin actions redirect, public pages merely widen what an admin may see).
- * Same rule as the admin layout: the confirmed ADMIN_EMAIL, or an active admin_roles row.
+ * The confirmed ADMIN_EMAIL is the bootstrap super-admin; otherwise an active admin_roles row is required.
+ * Role management passes requiredRole to exclude every lower administrative role.
  */
-export async function getPlatformAdmin(): Promise<User | null> {
+export async function getPlatformAdmin(requiredRole?: "super_admin"): Promise<User | null> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -15,15 +16,15 @@ export async function getPlatformAdmin(): Promise<User | null> {
   if (!user) return null;
 
   const adminEmail = process.env.ADMIN_EMAIL;
-  if (adminEmail && user.email === adminEmail && user.email_confirmed_at) return user;
+  if (adminEmail && user.email?.toLowerCase() === adminEmail.toLowerCase() && user.email_confirmed_at) return user;
 
   const { data: role, error } = await supabase
     .from("admin_roles")
-    .select("id")
+    .select("id, role")
     .eq("user_id", user.id)
     .eq("is_active", true)
     .maybeSingle();
-  return error || !role ? null : user;
+  return error || !role || (requiredRole && role.role !== requiredRole) ? null : user;
 }
 
 /**
