@@ -75,6 +75,7 @@ interface EditTripFormProps {
   categoryParameters: CategoryParameterRow[];
   parameterOptions: ParameterOptionRow[];
   countries: { code: string; name_hu: string; name_en: string; flag_emoji: string }[];
+  crewPositions: string[];
 }
 
 const TAB_DEFS: { key: TabKey; icon: string; labelKey: string }[] = [
@@ -94,6 +95,7 @@ export function EditTripForm({
   categoryParameters,
   parameterOptions,
   countries,
+  crewPositions,
 }: EditTripFormProps) {
   const { t, locale: clientLocale } = useTranslation();
   const effectiveLocale = clientLocale || locale;
@@ -133,7 +135,7 @@ export function EditTripForm({
     card_image_url: trip.card_image_url || "",
     card_image_source: (trip.card_image_source as WizardFormData["card_image_source"]) || "system",
     tags: trip.tags || [],
-    crew_positions: [],
+    crew_positions: crewPositions,
     show_on_landing: true,
   }));
 
