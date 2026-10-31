@@ -5,7 +5,7 @@ import { useTranslation } from "@/lib/i18n/useTranslation";
 import { createCoverUploadTicket, fetchCoverImages } from "@/app/(app)/trips/actions";
 import { createAvatarUploadTicket, fetchSystemAvatars } from "@/app/(app)/settings/actions";
 import { Icon } from "@/components/Icon";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/browser";
 import {
   IMAGE_UPLOAD_RULES,
   acceptAttribute,
