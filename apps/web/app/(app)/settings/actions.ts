@@ -191,21 +191,22 @@ export async function savePrivacySettings(settings: Record<string, unknown>) {
 export async function uploadAvatar(
   formDataFile: FormData
 ): Promise<{ url: string; error?: string }> {
+  const { t } = await getServerT();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { url: "", error: "Not authenticated" };
+  if (!user) return { url: "", error: t("errors.sessionExpired") };
 
   const file = formDataFile.get("file") as File;
-  if (!file) return { url: "", error: "No file provided" };
+  if (!file || typeof file === "string") return { url: "", error: t("errors.noFileSelected") };
 
   const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
   if (!allowedTypes.includes(file.type)) {
-    return { url: "", error: "Invalid file type. Allowed: JPG, PNG, WebP" };
+    return { url: "", error: t("errors.unsupportedFileFormat") };
   }
 
   const maxSize = 5 * 1024 * 1024; // 5 MB
   if (file.size > maxSize) {
-    return { url: "", error: "File too large. Max 5 MB" };
+    return { url: "", error: t("errors.fileTooLarge", { max: 5 }) };
   }
 
   const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
@@ -221,7 +222,7 @@ export async function uploadAvatar(
     });
 
   if (uploadError) {
-    return { url: "", error: uploadError.message };
+    return { url: "", error: t("errors.saveFailed") };
   }
 
   const { data: urlData } = supabase.storage
