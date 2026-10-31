@@ -56,15 +56,22 @@ test.describe('Discover — hero search', () => {
   });
 
   test('DISCOVER-SEARCH-3: a category pill filters, and the filter sheet counts it on mobile', async ({ page }) => {
-    const pills = page.getByTestId('discover-category-pills').locator('button');
+    const desktopPills = page.getByTestId('discover-category-pills');
+    const mobile = !(await desktopPills.isVisible());
+    if (mobile) await page.getByTestId('discover-filters-open').click();
+    const pills = mobile
+      ? page.getByTestId('discover-filter-sheet').locator('button[data-testid^="sheet-category-"]')
+      : desktopPills.locator('button');
     test.skip((await pills.count()) < 2, 'no categories in the local data');
 
     await pills.nth(1).click();
     await expect(pills.nth(1)).toHaveAttribute('aria-pressed', 'true');
     await expect(pills.first()).toHaveAttribute('aria-pressed', 'false');
+    if (mobile) await expect(page.getByTestId('discover-filters-open')).toContainText('(1)');
 
     await pills.first().click();
     await expect(pills.first()).toHaveAttribute('aria-pressed', 'true');
+    if (mobile) await page.getByTestId('discover-filter-sheet-apply').click();
   });
 
   test('DISCOVER-SEARCH-4: the filter sheet opens, applies a filter, clears it and closes with Escape', async ({ page }) => {
