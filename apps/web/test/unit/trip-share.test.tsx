@@ -1,4 +1,5 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom/vitest";
 import { afterEach, expect, it, vi } from "vitest";
 vi.mock("@/lib/i18n/useTranslation", () => ({ useTranslation: () => ({ t: (key: string) => key }) }));
 import { TripShareButton } from "@/components/TripShareButton";
