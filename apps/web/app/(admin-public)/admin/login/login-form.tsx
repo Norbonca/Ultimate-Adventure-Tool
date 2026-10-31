@@ -1,9 +1,11 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 import { adminLogin } from "./actions";
 
-export function AdminLoginForm({ adminEmail }: { adminEmail: string }) {
+export function AdminLoginForm() {
+  const { t } = useTranslation();
   const [state, formAction, pending] = useActionState(adminLogin, null);
 
   return (
@@ -19,16 +21,16 @@ export function AdminLoginForm({ adminEmail }: { adminEmail: string }) {
 
         {/* Card */}
         <div className="bg-slate-800 rounded-2xl p-8 border border-white/10 shadow-2xl">
-          <h1 className="text-white text-xl font-semibold mb-1">Bejelentkezés</h1>
-          <p className="text-slate-400 text-sm mb-6">Admin hozzáférés szükséges</p>
+          <h1 className="text-white text-xl font-semibold mb-1">{t("auth.login")}</h1>
+          <p className="text-slate-400 text-sm mb-6">{t("admin.login.accessRequired")}</p>
 
           <form action={formAction} className="space-y-4">
             <div>
-              <label className="block text-sm text-slate-300 mb-1.5">Email</label>
+              <label htmlFor="admin-email" className="block text-sm text-slate-300 mb-1.5">{t("auth.email")}</label>
               <input
+                id="admin-email"
                 type="email"
                 name="email"
-                defaultValue={adminEmail}
                 required
                 autoComplete="email"
                 className="w-full bg-slate-900 border border-white/10 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
@@ -36,8 +38,9 @@ export function AdminLoginForm({ adminEmail }: { adminEmail: string }) {
             </div>
 
             <div>
-              <label className="block text-sm text-slate-300 mb-1.5">Jelszó</label>
+              <label htmlFor="admin-password" className="block text-sm text-slate-300 mb-1.5">{t("auth.password")}</label>
               <input
+                id="admin-password"
                 type="password"
                 name="password"
                 required
@@ -58,13 +61,10 @@ export function AdminLoginForm({ adminEmail }: { adminEmail: string }) {
               disabled={pending}
               className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 text-white font-medium py-2.5 rounded-lg text-sm transition-colors mt-2"
             >
-              {pending ? "Bejelentkezés..." : "Belépés"}
+              {pending ? t("common.loading") : t("auth.login")}
             </button>
           </form>
 
-          <p className="text-slate-600 text-xs text-center mt-6">
-            Első belépésnél a fiók automatikusan létrejön.
-          </p>
         </div>
       </div>
     </div>
