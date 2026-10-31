@@ -422,3 +422,74 @@ export async function updateTripStatus(
 
   return { success: true };
 }
+
+// ─── M22 Ötletbörze moderáció (FR-M22-013, BR-M22-009) ───────────────────────
+
+export interface AdminIdeaRow {
+  id: string;
+  slug: string;
+  title: string;
+  owner_name: string | null;
+  member_count: number;
+  report_count: number;
+  reasons: string[];
+}
+
+/** A jelentési küszöböt elért (under_review) ötletek. Admin-kliens: RLS-től függetlenül látja. */
+export async function getIdeasUnderReview(): Promise<AdminIdeaRow[]> {
+  const { supabase } = await requireAdmin();
+  const { data: ideas } = await supabase
+    .from("trip_ideas")
+    .select("id, slug, title, member_count, owner:profiles!trip_ideas_owner_id_fkey(display_name)")
+    .eq("moderation_status", "under_review")
+    .is("deleted_at", null)
+    .order("updated_at", { ascending: false });
+  if (!ideas || ideas.length === 0) return [];
+
+  const ids = ideas.map((i) => i.id);
+  const { data: reports } = await supabase.from("trip_idea_reports").select("idea_id, reason").in("idea_id", ids);
+  const byIdea = new Map<string, string[]>();
+  for (const r of reports ?? []) byIdea.set(r.idea_id, [...(byIdea.get(r.idea_id) ?? []), r.reason]);
+
+  return ideas.map((i) => {
+    const owner = Array.isArray(i.owner) ? i.owner[0] : i.owner;
+    const reasons = byIdea.get(i.id) ?? [];
+    return {
+      id: i.id,
+      slug: i.slug,
+      title: i.title,
+      owner_name: (owner as { display_name: string | null } | null)?.display_name ?? null,
+      member_count: i.member_count,
+      report_count: reasons.length,
+      reasons: Array.from(new Set(reasons)),
+    };
+  });
+}
+
+/** restore → moderation_status none (visszakerül a táblára); remove → removed (nem látható). */
+export async function moderateIdea(
+  ideaId: string,
+  decision: "restore" | "remove"
+): Promise<{ success: boolean; error?: string }> {
+  const { supabase, user: adminUser } = await requireAdmin();
+  const next = decision === "restore" ? "none" : "removed";
+  const { error } = await supabase
+    .from("trip_ideas")
+    .update({ moderation_status: next, updated_at: new Date().toISOString() })
+    .eq("id", ideaId);
+  if (error) return { success: false, error: error.message };
+
+  try {
+    await supabase.from("admin_audit_log").insert({
+      admin_user_id: adminUser.id,
+      admin_role: "content_moderator",
+      action: `idea.moderation.${decision}`,
+      target_type: "trip_idea",
+      target_id: ideaId,
+      result: "success",
+    });
+  } catch {
+    // audit log opcionális
+  }
+  return { success: true };
+}

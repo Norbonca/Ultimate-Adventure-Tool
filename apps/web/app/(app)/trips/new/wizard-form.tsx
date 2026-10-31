@@ -29,13 +29,25 @@ import { Step4Publish } from "./steps/step4-publish";
 import { CATEGORY_DISPLAY } from "@/lib/categories";
 import { missingPublishFields } from "@/lib/trip-validation";
 import { useTranslation } from "@/lib/i18n/useTranslation";
+import { linkTripToIdea } from "@/app/(app)/ideas/actions";
 import { Icon } from "@/components/Icon";
 import { Button } from "@/components/ui";
+
+/** M22 FR-M22-008: „Ötletből” indítás — előtöltés + ötlet–túra kapcsolat az első mentéskor. Design: D22 `3kB6w`, `Gvgnj`. */
+export interface WizardFromIdea {
+  id: string;
+  slug: string;
+  title: string;
+  memberCount: number;
+  partySizeTotal: number;
+  prefill: Partial<WizardFormData>;
+}
 
 interface WizardFormProps {
   categories: CategoryRow[];
   countries: { code: string; name_hu: string; name_en: string; flag_emoji: string }[];
   userId: string;
+  fromIdea?: WizardFromIdea | null;
 }
 
 const STEP_KEYS = [
@@ -45,11 +57,13 @@ const STEP_KEYS = [
   { num: 4, key: "stepPublish" },
 ];
 
-export function WizardForm({ categories, countries, userId: _userId }: WizardFormProps) {
+export function WizardForm({ categories, countries, userId: _userId, fromIdea = null }: WizardFormProps) {
   const { t, locale } = useTranslation();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [planningMode, setPlanningMode] = useState<PlanningMode | null>(null);
-  const [formData, setFormData] = useState<WizardFormData>(INITIAL_FORM_DATA);
+  const tr = t as (k: string, p?: Record<string, string | number>) => string;
+  // Ötletből indítva a 0. lépés (sablon/AI/nulláról) kimarad: az ötlet az előtöltő mód (FR-M22-008 V0.3)
+  const [currentStep, setCurrentStep] = useState(fromIdea ? 1 : 0);
+  const [planningMode, setPlanningMode] = useState<PlanningMode | null>(fromIdea ? "scratch" : null);
+  const [formData, setFormData] = useState<WizardFormData>(fromIdea ? { ...INITIAL_FORM_DATA, ...fromIdea.prefill } : INITIAL_FORM_DATA);
   const [tripId, setTripId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -208,6 +222,8 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
       setTripId(result.tripId);
       setSaveStatus("saved");
       setTimeout(() => setSaveStatus("idle"), 2000);
+      // M22: ötlet–túra kapcsolat a vázlat első mentésekor (FR-M22-008 3.)
+      if (fromIdea) void linkTripToIdea(fromIdea.id, result.tripId);
     }
 
     // Save draft on every step transition after initial save
@@ -223,7 +239,7 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
     }
 
     setCurrentStep((prev) => Math.min(prev + 1, 4));
-  }, [currentStep, formData, tripId, persistDraft]);
+  }, [currentStep, formData, tripId, persistDraft, fromIdea]);
 
   const goBack = useCallback(() => {
     setCurrentStep((prev) => Math.max(prev - 1, 0));
@@ -323,6 +339,19 @@ export function WizardForm({ categories, countries, userId: _userId }: WizardFor
         })}
       </div>
 
+      {/* M22 — „Ötletből” sáv (D22 Gvgnj aiBanner variáns) */}
+      {fromIdea && (
+        <div className="mb-4 flex items-start gap-3 rounded-xl bg-trevu-50 px-4 py-3" data-testid="wizard-from-idea">
+          <Icon name="lightbulb" size={18} className="mt-0.5 shrink-0 text-trevu-700" aria-hidden />
+          <div className="min-w-0 text-sm">
+            <p className="font-semibold text-navy-900">{tr("ideas.fromIdea.badge", { title: fromIdea.title })}</p>
+            <p className="text-navy-600">{tr("ideas.fromIdea.summary", { members: tr("ideas.common.members", { count: fromIdea.memberCount }) })} <a href={`/ideas/${fromIdea.slug}`} className="font-semibold text-trevu-700 underline-offset-2 hover:underline">{tr("ideas.board.details")}</a></p>
+            {currentStep === 4 && formData.visibility === "private" && (
+              <p className="mt-1 rounded-lg bg-amber-50 px-2.5 py-1.5 text-xs font-medium text-amber-800" role="status">{tr("ideas.fromIdea.privateWarning")}</p>
+            )}
+          </div>
+        </div>
+      )}
       {/* ── Step Content ── */}
       <div className="bg-white rounded-2xl border border-navy-200 shadow-sm p-6 sm:p-8">
         {currentStep === 0 && (

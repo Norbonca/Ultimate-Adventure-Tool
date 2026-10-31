@@ -8,12 +8,14 @@ import { CATEGORY_DISPLAY } from "@/lib/categories";
 import { getServerT, getServerLocale } from "@/lib/i18n/server";
 import type { TranslationKey } from "@uat/i18n";
 import { AppHeader } from "@/components/AppHeader";
+import { getDemandIdeas } from "@/lib/ideas/queries";
+import { categoryChip, destinationsText, membersText, statusChip, windowText } from "@/lib/ideas/present";
 import { Icon } from "@/components/Icon";
 import { Button, StateTemplate } from "@/components/ui";
 
 // My Trips Dashboard — a Túratervező otthona. Design: design/D02_Trip_Management.pen#eQdvE
 
-type TabKey = "active" | "past" | "drafts";
+type TabKey = "active" | "past" | "drafts" | "demand";
 
 export default async function MyTripsPage({
   searchParams,
@@ -37,16 +39,19 @@ export default async function MyTripsPage({
 
   // ── Fülekre bontás ──
   const today = new Date().toISOString().slice(0, 10);
-  const buckets: Record<TabKey, typeof trips> = { active: [], past: [], drafts: [] };
+  const buckets: Record<TabKey, typeof trips> = { active: [], past: [], drafts: [], demand: [] };
   for (const trip of trips) {
     if (trip.status === "draft") buckets.drafts.push(trip);
     else if (trip.end_date && trip.end_date < today) buckets.past.push(trip);
     else buckets.active.push(trip);
   }
   const tab: TabKey =
-    tabParam === "past" || tabParam === "drafts" ? tabParam : "active";
+    tabParam === "past" || tabParam === "drafts" || tabParam === "demand" ? tabParam : "active";
+  // M22 FR-M22-013 — „Mire várnak”: ötletek a szervező kategóriáiban (design: D22 eQdvE)
+  const demand = await getDemandIdeas(user.id);
+  const tr = t as (k: string, p?: Record<string, string | number>) => string;
   const query = (q ?? "").trim().toLowerCase();
-  const visible = buckets[tab].filter(
+  const visible = (tab === "demand" ? [] : buckets[tab]).filter(
     (trip) => !query || trip.title.toLowerCase().includes(query)
   );
 
@@ -81,6 +86,7 @@ export default async function MyTripsPage({
     { key: "active", label: t("trips.listTabs.active"), count: buckets.active.length },
     { key: "past", label: t("trips.listTabs.past"), count: buckets.past.length },
     { key: "drafts", label: t("trips.listTabs.drafts"), count: buckets.drafts.length },
+    { key: "demand", label: t("ideas.demand.tab"), count: demand.items.length },
   ];
 
   return (
@@ -138,7 +144,31 @@ export default async function MyTripsPage({
         <div className="flex flex-col lg:flex-row gap-6 items-start">
           {/* ── Túra sorok ── */}
           <div className="flex-1 min-w-0 w-full space-y-3">
-            {visible.length === 0 ? (
+            {tab === "demand" ? (
+              <div className="space-y-3" data-testid="trips-demand-tab">
+                <p className="text-sm text-navy-500">{t("ideas.demand.subtitle")}</p>
+                {!demand.eligible ? (
+                  <p className="text-sm text-navy-500 bg-white border border-navy-200 rounded-xl px-4 py-8 text-center">{t("ideas.demand.ineligible")}</p>
+                ) : demand.items.length === 0 ? (
+                  <p className="text-sm text-navy-500 bg-white border border-navy-200 rounded-xl px-4 py-8 text-center">{t("ideas.demand.empty")}</p>
+                ) : (
+                  demand.items.map((idea) => {
+                    const chip = categoryChip(idea.category, locale);
+                    const st = statusChip(idea, tr);
+                    return (
+                      <div key={idea.id} className="flex items-center gap-4 rounded-2xl border border-navy-200 bg-white p-5">
+                        {chip && <Icon name={chip.icon} size={18} className="shrink-0 text-navy-500" aria-hidden />}
+                        <Link href={`/ideas/${idea.slug}`} className="min-w-0 flex-1">
+                          <p className="flex flex-wrap items-center gap-2 font-semibold text-navy-900"><span className="truncate">{idea.title}</span><span className="rounded-chip bg-navy-50 px-2 py-0.5 text-[11px] font-semibold text-navy-600">{st.label}</span></p>
+                          <p className="text-sm text-navy-500">{membersText(idea, tr)} · {windowText(idea, tr, locale)} · {destinationsText(idea, tr)}</p>
+                        </Link>
+                        <Button href={`/ideas/${idea.slug}`} variant="outline" size="sm" icon="clipboard-check">{t("ideas.demand.organize")}</Button>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            ) : visible.length === 0 ? (
               trips.length === 0 ? (
                 /* Üres fiók — design/D00_Core_Components.pen#3VCtO */
                 <StateTemplate

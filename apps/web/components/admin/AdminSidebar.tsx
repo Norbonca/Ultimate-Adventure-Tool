@@ -39,6 +39,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
         { key: "alerts", label: t("admin.nav.alerts"), href: "/admin/alerts", icon: "bell", badge: 3, comingSoon: true },
         { key: "users", label: t("admin.nav.users"), href: "/admin/users", icon: "users" },
         { key: "trips", label: t("admin.nav.trips"), href: "/admin/trips", icon: "backpack" },
+        { key: "ideas", label: t("admin.nav.ideas"), href: "/admin/ideas", icon: "lightbulb" }, // M22 moderáció
         { key: "routes", label: t("admin.nav.routes"), href: "/admin/routes", icon: "map", comingSoon: true },
         { key: "support", label: t("admin.nav.support"), href: "/admin/support", icon: "ticket", comingSoon: true },
       ],

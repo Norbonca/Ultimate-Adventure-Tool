@@ -35,6 +35,7 @@ import {
   LayoutGrid,
   List,
   SlidersHorizontal,
+  Lightbulb,
 } from '@/lib/icons';
 import type { LucideIcon } from '@/lib/icons';
 import { SearchPill, OptionChip, FilterSheet } from '@/components/ui';
@@ -640,6 +641,24 @@ export default function DiscoverClient({
                   {trips.length === 0 ? t('discover.noTrips') : t('discover.noMatchTitle')}
                 </h2>
                 <p className="max-w-[420px] text-sm text-ink-muted">{t('discover.noTripsHint')}</p>
+                {/* M22 FR-M22-009 — gyors kitűzés az üres találati állapotból (D22 `XXcOv`). Csak aktív szűrő
+                    mellett: a szűrők előtöltik az ötlet-űrlapot (kategória). A szöveg kimondja: érdeklődés, nem foglalás. */}
+                {trips.length > 0 && (
+                  <div
+                    className="mt-3 flex w-full max-w-[520px] flex-col items-center gap-3 rounded-trevu-2xl border border-line bg-canvas p-5"
+                    data-testid="discover-quick-pin"
+                  >
+                    <p className="text-sm font-semibold text-ink">{t('ideas.discover.emptyTitle')}</p>
+                    <Link
+                      href={`/ideas/new?via=discover_empty${activeCategory !== 'all' ? `&category=${activeCategory}` : ''}`}
+                      className="inline-flex h-11 items-center gap-2 rounded-trevu bg-accent px-5 text-sm font-semibold text-accent-on hover:opacity-95 focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+                    >
+                      <Lightbulb size={16} aria-hidden />
+                      {t('ideas.discover.pin')}
+                    </Link>
+                    <p className="text-xs text-ink-muted">{t('ideas.discover.note')}</p>
+                  </div>
+                )}
               </section>
             ) : (
               <>
@@ -706,6 +725,13 @@ export default function DiscoverClient({
                     </button>
                   </div>
                 )}
+                {/* M22 FR-M22-009 — egysoros lista-végi belépő az Ötletbörzébe (D22 `XXcOv` lista-vég). */}
+                <p className="pt-6 text-center text-sm text-ink-secondary" data-testid="discover-list-end-idea">
+                  <Link href="/ideas/new" className="inline-flex items-center gap-1.5 font-semibold text-accent hover:underline">
+                    <Lightbulb size={14} aria-hidden />
+                    {t('ideas.discover.listEnd')}
+                  </Link>
+                </p>
               </>
             )}
           </main>
