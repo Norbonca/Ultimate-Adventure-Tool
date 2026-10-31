@@ -9,6 +9,7 @@ import { draftTripSchema, publishTripSchema } from "@/lib/trip-validation";
 import { countryCentroid, geocodeLocation } from "@/lib/geocoding";
 import { z } from "zod";
 import type { WizardFormData } from "./types";
+import { issueImageUploadTicket, type ImageUploadTicket } from "@/lib/storage/image-upload-ticket";
 
 // §11.5.3: a saját visszavonás (cancelled) és a szervezői eltávolítás (removed) után újra lehet jelentkezni.
 const REAPPLICABLE_STATUSES: readonly string[] = ["cancelled", "removed"];
@@ -678,57 +679,16 @@ export async function fetchExperienceLevels(categoryId?: string) {
 }
 
 // ============================================
-// uploadCoverImage — Upload user image to Supabase Storage
+// createCoverUploadTicket — aláírt feltöltési URL borító- és kártyaképhez
+// A fájl közvetlenül a Storage-ba megy (a server action 1 MB-os törzskorlátja
+// miatt), lásd lib/storage/image-upload.ts.
 // ============================================
-export async function uploadCoverImage(
-  formDataFile: FormData
-): Promise<{ url: string; error?: string }> {
-  const { t } = await getServerT();
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { url: "", error: t('errors.notAuthenticated') };
-  }
-
-  const file = formDataFile.get("file") as File;
-  if (!file) {
-    return { url: "", error: t('errors.noFileSelected') };
-  }
-
-  // Validate file type
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
-  if (!allowedTypes.includes(file.type)) {
-    return { url: "", error: t('errors.unsupportedFileFormat') };
-  }
-
-  // Validate file size (10MB)
-  if (file.size > 10 * 1024 * 1024) {
-    return { url: "", error: t('errors.fileSizeLimitExceeded') };
-  }
-
-  const ext = file.name.split(".").pop() || "jpg";
-  const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`;
-
-  const { error: uploadError } = await supabase.storage
-    .from("trip-covers")
-    .upload(fileName, file, {
-      cacheControl: "3600",
-      upsert: false,
-    });
-
-  if (uploadError) {
-    console.error("Upload error:", uploadError);
-    return { url: "", error: t('errors.uploadFailed').replace('{error}', uploadError.message) };
-  }
-
-  const { data: publicUrl } = supabase.storage
-    .from("trip-covers")
-    .getPublicUrl(fileName);
-
-  return { url: publicUrl.publicUrl };
+export async function createCoverUploadTicket(
+  file: { type: string; size: number }
+): Promise<ImageUploadTicket> {
+  const ticket = await issueImageUploadTicket("cover", file);
+  if (!ticket.ok) return { ok: false, error: ticket.error };
+  return { ok: true, bucket: ticket.bucket, path: ticket.path, token: ticket.token, publicUrl: ticket.publicUrl };
 }
 
 // ============================================
