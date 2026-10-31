@@ -303,15 +303,15 @@ export function WizardForm({ categories, countries, userId: _userId, fromIdea = 
   return (
     <div>
       {/* ── Stepper ── */}
-      <div className="flex items-center justify-center mb-10">
+      <div className="grid grid-cols-4 items-start mb-10">
         {STEP_KEYS.map((step, i) => {
           const isActive = currentStep === step.num;
           const isCompleted = currentStep > step.num;
           const label = step.num === 3 ? step3Label : t(`trips.wizard.${step.key}` as Parameters<typeof t>[0]);
 
           return (
-            <div key={step.num} className="flex items-center">
-              <div className="flex flex-col items-center">
+            <div key={step.num} className="flex min-w-0 items-center justify-center">
+              <div className="flex min-w-0 flex-col items-center">
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
                     isActive
@@ -324,7 +324,7 @@ export function WizardForm({ categories, countries, userId: _userId, fromIdea = 
                   {isCompleted ? <Icon name="check" size={16} strokeWidth={2.5} /> : step.num}
                 </div>
                 <span
-                  className={`text-xs mt-1.5 font-medium ${
+                  className={`text-xs mt-1.5 text-center break-words font-medium ${
                     isActive
                       ? "text-trevu-700"
                       : isCompleted
@@ -337,7 +337,7 @@ export function WizardForm({ categories, countries, userId: _userId, fromIdea = 
               </div>
               {i < STEP_KEYS.length - 1 && (
                 <div
-                  className={`w-16 sm:w-24 h-0.5 mx-2 mt-[-16px] ${
+                  className={`hidden sm:block sm:w-8 md:w-16 shrink-0 h-0.5 mx-2 mt-[-16px] ${
                     currentStep > step.num ? "bg-trevu-400" : "bg-navy-200"
                   }`}
                 />
@@ -411,7 +411,7 @@ export function WizardForm({ categories, countries, userId: _userId, fromIdea = 
       </div>
 
       {/* ── Navigation Footer ── */}
-      <div className="flex items-center justify-between mt-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mt-6">
         <div>
           {currentStep > 0 && (
             <Button variant="outline" size="sm" icon="arrow-left" onClick={goBack}>
@@ -420,7 +420,7 @@ export function WizardForm({ categories, countries, userId: _userId, fromIdea = 
           )}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 flex-wrap items-center justify-end gap-3">
           {/* Save status */}
           {saveStatus === "saving" && (
             <span className="text-xs text-navy-400 animate-pulse">{t("common.saving")}</span>
@@ -429,7 +429,7 @@ export function WizardForm({ categories, countries, userId: _userId, fromIdea = 
             <span className="text-xs text-green-600 flex items-center gap-1"><Icon name="check" size={12} strokeWidth={2.5} /> {t("trips.wizard.saved")}</span>
           )}
           {saveStatus === "error" && (
-            <span role="alert" className="text-xs text-red-500">{errorMsg}</span>
+            <span role="alert" className="max-w-full break-words text-xs text-red-500">{errorMsg}</span>
           )}
 
           {/* Draft save button (visible from step 2) */}
