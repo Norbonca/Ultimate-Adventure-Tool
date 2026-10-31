@@ -17,7 +17,7 @@ import { fetchCategories } from "../trips/actions";
 import { CATEGORY_DISPLAY } from "@/lib/categories";
 import { CATEGORY_TEXT } from "@/components/discover/TripBand";
 
-export const metadata: Metadata = { title: "Ötletbörze · Trevu" };
+export const metadata: Metadata = { title: "Ötletbörze" }; // a root layout sablonja fűzi hozzá a „· Trevu”-t
 
 interface PageProps { searchParams: Promise<Record<string, string | string[] | undefined>> }
 
