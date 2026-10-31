@@ -7,7 +7,7 @@ import { getPlatformAdmin } from "@/lib/admin-auth";
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
 
-async function requireAdmin() {
+async function requireSuperAdmin() {
   // SEC-013: a közös szabály (lib/admin-auth.ts). A redirect nem kerülhet try/catch-be:
   // a Next.js redirect() kivételt dob, és egy üres catch továbbengedné a nem admin felhasználót.
   const supabase = await createClient();
@@ -16,7 +16,7 @@ async function requireAdmin() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/admin/login");
 
-  const admin = await getPlatformAdmin();
+  const admin = await getPlatformAdmin("super_admin");
   if (!admin) redirect("/admin/login");
   return admin;
 }
@@ -40,7 +40,7 @@ export async function getAdminRoles(): Promise<{
   admins: AdminRoleEntry[];
   currentUserId: string;
 }> {
-  const currentUser = await requireAdmin();
+  const currentUser = await requireSuperAdmin();
   const adminClient = createAdminClient();
 
   // ADMIN_EMAIL env alapján auto-sync: ha még nincs DB-ben, beírjuk super_admin-ként
@@ -126,7 +126,7 @@ export async function grantAdmin(formData: {
   displayName?: string;
   password?: string;
 }): Promise<{ success: boolean; error?: string }> {
-  const currentUser = await requireAdmin();
+  const currentUser = await requireSuperAdmin();
   const adminClient = createAdminClient();
   const email = formData.email.toLowerCase().trim();
 
@@ -229,7 +229,7 @@ export async function updateAdminRole(
   role: string,
   notes?: string
 ): Promise<{ success: boolean; error?: string }> {
-  await requireAdmin();
+  await requireSuperAdmin();
   const adminClient = createAdminClient();
 
   const { error } = await adminClient
@@ -246,7 +246,7 @@ export async function updateAdminRole(
 export async function revokeAdmin(
   adminRoleId: string
 ): Promise<{ success: boolean; error?: string }> {
-  await requireAdmin();
+  await requireSuperAdmin();
   const adminClient = createAdminClient();
 
   // Megakadályozzuk az utolsó aktív admin törlését

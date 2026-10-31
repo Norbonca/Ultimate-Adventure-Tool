@@ -12,6 +12,7 @@ import { CATEGORY_DISPLAY } from "@/lib/categories";
 import { getServerT, getServerLocale } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
 import { BackButton } from "@/components/BackButton";
+import { TripShareButton } from "@/components/TripShareButton";
 import { TripTimelineClient } from "@/components/TripTimelineClient";
 import { Icon } from "@/components/Icon";
 import { formatMoney } from "@/lib/currency";
@@ -76,9 +77,9 @@ export default async function TripManagePage({ params }: ManagePageProps) {
 
       <BackButton fallback={`/trips/${slug}`} label={t('common.back')} />
 
-      <div className="max-w-7xl mx-auto flex">
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row">
         {/* ── Sidebar ── */}
-        <aside className="w-72 border-r border-navy-200 bg-white min-h-[calc(100vh-64px)] p-5 space-y-6">
+        <aside className="w-full min-w-0 shrink-0 border-b border-navy-200 bg-white p-5 space-y-6 lg:w-72 lg:border-b-0 lg:border-r lg:min-h-[calc(100vh-64px)]">
           {/* Status Badge */}
           <span className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full ${sc.bg} ${sc.text}`}>
             {sc.label}
@@ -86,7 +87,7 @@ export default async function TripManagePage({ params }: ManagePageProps) {
 
           {/* Trip Name + Meta */}
           <div className="space-y-2">
-            <h2 className="text-lg font-bold text-navy-900 leading-tight">
+            <h2 className="text-lg font-bold text-navy-900 leading-tight break-words">
               {trip.title}
             </h2>
             <div className="text-sm text-navy-500 space-y-1">
@@ -164,12 +165,7 @@ export default async function TripManagePage({ params }: ManagePageProps) {
             >
               <Icon name="pencil" size={15} /> {t("trips.manage.editTrip")}
             </Link>
-            <button
-              onClick={undefined}
-              className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm font-medium text-navy-600 bg-white border border-navy-200 rounded-xl hover:bg-navy-50 transition-colors"
-            >
-              <Icon name="share-2" size={15} /> {t("trips.manage.shareLink")}
-            </button>
+            <TripShareButton slug={slug} title={trip.title} />
             <Link
               href={`/trips/${slug}`}
               className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm font-medium text-navy-600 bg-white border border-navy-200 rounded-xl hover:bg-navy-50 transition-colors"
@@ -180,7 +176,7 @@ export default async function TripManagePage({ params }: ManagePageProps) {
         </aside>
 
         {/* ── Main Content ── */}
-        <div className="flex-1 p-8 space-y-8">
+        <div className="flex-1 min-w-0 p-4 space-y-6 sm:p-8 sm:space-y-8">
           {/* ── M021 Trip Timeline ── */}
           <TripTimelineClient tripId={trip.id} isOrganizer={true} />
 
@@ -190,8 +186,8 @@ export default async function TripManagePage({ params }: ManagePageProps) {
               <h2 className="text-lg font-bold text-navy-900 mb-4">{t("trips.manage.crewPositions")}</h2>
               <div className="space-y-3">
                 {crewPositions.map((pos) => (
-                  <div key={pos.id} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+                  <div key={pos.id} className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex min-w-0 flex-wrap items-center gap-3">
                       <span className="text-sm font-semibold text-navy-800 bg-trevu-50 px-3 py-1 rounded-lg">
                         {pos.role_name}
                       </span>
@@ -219,7 +215,7 @@ export default async function TripManagePage({ params }: ManagePageProps) {
           {/* Quick Actions */}
           <div className="bg-white rounded-2xl border border-navy-200 p-6">
             <h2 className="text-lg font-bold text-navy-900 mb-4">{t("trips.manage.quickActions")}</h2>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Link
                 href={`/trips/${slug}/edit`}
                 className="flex items-center gap-3 p-4 rounded-xl border border-navy-200 hover:border-trevu-300 hover:bg-trevu-50/50 transition-all"
@@ -240,7 +236,7 @@ export default async function TripManagePage({ params }: ManagePageProps) {
           {/* Financial Summary */}
           <div className="bg-white rounded-2xl border border-navy-200 p-6">
             <h2 className="text-lg font-bold text-navy-900 mb-4">{t("trips.manage.financialSummary")}</h2>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="bg-navy-50 rounded-xl p-4">
                 <span className="text-xs text-navy-400 block mb-1">{t("trips.manage.totalRevenue")}</span>
                 <span className="text-xl font-bold text-navy-900">

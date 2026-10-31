@@ -137,8 +137,11 @@ export default async function ParticipantDashboardPage({ params }: ParticipantPa
                         <p className="text-xs text-navy-500 mt-0.5">
                           {trip.price_currency} {Number(trip.price_amount || 0).toLocaleString(dateLocale)}
                         </p>
+                        <p id="payment-unavailable" className="text-xs text-ink-secondary mt-1">
+                          {t("trips.participant.paymentUnavailable")}
+                        </p>
                       </div>
-                      <button className="px-4 py-2 text-sm font-semibold text-white bg-trevu-600 rounded-lg hover:bg-trevu-700">
+                      <button disabled aria-describedby="payment-unavailable" className="px-4 py-2 text-sm font-semibold text-ink-muted bg-canvas rounded-lg cursor-not-allowed">
                         {t("trips.participant.payNow")}
                       </button>
                     </div>
@@ -150,11 +153,11 @@ export default async function ParticipantDashboardPage({ params }: ParticipantPa
                       <span className="text-sm font-semibold text-navy-800">
                         {t("trips.participant.submitExperienceForm")}
                       </span>
-                      <p className="text-xs text-navy-500 mt-0.5">
-                        {t("trips.participant.submitExperienceFormDesc")}
+                      <p id="experience-form-unavailable" className="text-xs text-ink-secondary mt-0.5">
+                        {t("trips.participant.experienceFormUnavailable")}
                       </p>
                     </div>
-                    <button className="px-4 py-2 text-sm font-semibold text-trevu-600 bg-white border border-trevu-200 rounded-lg hover:bg-trevu-50">
+                    <button disabled aria-describedby="experience-form-unavailable" className="px-4 py-2 text-sm font-semibold text-ink-muted bg-surface border border-line rounded-lg cursor-not-allowed">
                       {t("trips.participant.fillForm")}
                     </button>
                   </div>

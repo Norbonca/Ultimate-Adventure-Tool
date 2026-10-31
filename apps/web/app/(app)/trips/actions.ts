@@ -307,6 +307,12 @@ export async function saveDraft(
       console.error("Draft update error:", error);
       return { tripId: existingTripId, error: t("errors.saveFailed") };
     }
+    if (formData.crew_positions !== undefined) {
+      const { error: crewError } = await supabase.rpc("sync_trip_crew_positions", {
+        p_trip_id: existingTripId, p_roles: formData.crew_positions,
+      });
+      if (crewError) return { tripId: existingTripId, error: t("errors.saveFailed") };
+    }
     return { tripId: existingTripId };
   } else {
     // INSERT new draft
@@ -319,6 +325,12 @@ export async function saveDraft(
     if (error) {
       console.error("Draft insert error:", error);
       return { tripId: "", error: t("errors.saveFailed") };
+    }
+    if (formData.crew_positions !== undefined) {
+      const { error: crewError } = await supabase.rpc("sync_trip_crew_positions", {
+        p_trip_id: data.id, p_roles: formData.crew_positions,
+      });
+      if (crewError) return { tripId: data.id, error: t("errors.saveFailed") };
     }
     return { tripId: data.id };
   }
@@ -607,7 +619,7 @@ export async function fetchTripForEdit(tripId: string): Promise<{
     card_image_url: trip.card_image_url || "",
     card_image_source: trip.card_image_source || "system",
     tags: (trip.tags as string[]) || [],
-    crew_positions: [],
+    crew_positions: (await fetchCrewPositions(trip.id)).map((position) => position.role_name),
     show_on_landing: trip.show_on_landing ?? true,
   };
 
@@ -901,9 +913,19 @@ export async function applyToTrip(
     application_text: applicationText?.trim() || null,
     applied_at: new Date().toISOString(),
     approved_at: trip.require_approval ? null : new Date().toISOString(),
+    checked_in: false,
+    checked_in_at: null,
+    paid_at: null,
+    rejection_reason: null,
+    removed_at: null,
+    removal_message: null,
+    crew_position_id: null,
+    skill_match: null,
+    is_staff_seat: false,
+    staff_role_label: null,
   };
 
-  // Ha volt cancelled rekord → update; egyébként insert
+  // Új jelentkezés: a korábbi visszavonás/eltávolítás adatai nem öröklődnek.
   if (existing) {
     const { error } = await supabase
       .from("trip_participants")

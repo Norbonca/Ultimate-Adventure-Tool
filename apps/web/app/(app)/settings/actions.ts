@@ -84,28 +84,59 @@ export async function fetchUserSkills() {
   return { skills: data ?? [], error: null };
 }
 
+const SKILL_LEVEL_VALUES = ["beginner", "intermediate", "advanced", "expert"] as const;
+
+const skillEntrySchema = z.object({
+  category_id: z.string().uuid(),
+  skill_level: z.enum(SKILL_LEVEL_VALUES),
+  years_experience: z.number().int().min(0).max(50).optional(),
+});
+
+/**
+ * Saves the user's skill levels in one round-trip (batch upsert) and removes
+ * the rows listed in `removeCategoryIds` (a level set back to "none", or a
+ * category the user deselected). Previously each level was a separate upsert
+ * and "none" was silently dropped, so a cleared level reappeared on reload.
+ */
 export async function saveUserSkills(
-  skills: { category_id: string; skill_level: string; years_experience?: number }[]
+  skills: { category_id: string; skill_level: string; years_experience?: number }[],
+  removeCategoryIds: string[] = []
 ) {
+  const { t } = await getServerT();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
-  // Upsert each skill
-  for (const skill of skills) {
+  const parsed = z.array(skillEntrySchema).max(500).safeParse(skills);
+  const parsedRemove = z.array(z.string().uuid()).max(500).safeParse(removeCategoryIds);
+  if (!parsed.success || !parsedRemove.success) return { error: t("errors.validationFailed") };
+
+  if (parsed.data.length > 0) {
+    const { error } = await supabase.from("user_skills").upsert(
+      parsed.data.map((skill) => ({
+        user_id: user.id,
+        category_id: skill.category_id,
+        skill_level: skill.skill_level,
+        years_experience: skill.years_experience ?? null,
+      })),
+      { onConflict: "user_id,category_id" }
+    );
+    if (error) {
+      console.error("Skills save failed", error);
+      return { error: t("errors.saveFailed") };
+    }
+  }
+
+  if (parsedRemove.data.length > 0) {
     const { error } = await supabase
       .from("user_skills")
-      .upsert(
-        {
-          user_id: user.id,
-          category_id: skill.category_id,
-          skill_level: skill.skill_level,
-          years_experience: skill.years_experience ?? null,
-        },
-        { onConflict: "user_id,category_id" }
-      );
-
-    if (error) return { error: error.message };
+      .delete()
+      .eq("user_id", user.id)
+      .in("category_id", parsedRemove.data);
+    if (error) {
+      console.error("Skills delete failed", error);
+      return { error: t("errors.saveFailed") };
+    }
   }
 
   return { error: null };
@@ -160,21 +191,22 @@ export async function savePrivacySettings(settings: Record<string, unknown>) {
 export async function uploadAvatar(
   formDataFile: FormData
 ): Promise<{ url: string; error?: string }> {
+  const { t } = await getServerT();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { url: "", error: "Not authenticated" };
+  if (!user) return { url: "", error: t("errors.sessionExpired") };
 
   const file = formDataFile.get("file") as File;
-  if (!file) return { url: "", error: "No file provided" };
+  if (!file || typeof file === "string") return { url: "", error: t("errors.noFileSelected") };
 
   const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
   if (!allowedTypes.includes(file.type)) {
-    return { url: "", error: "Invalid file type. Allowed: JPG, PNG, WebP" };
+    return { url: "", error: t("errors.unsupportedFileFormat") };
   }
 
   const maxSize = 5 * 1024 * 1024; // 5 MB
   if (file.size > maxSize) {
-    return { url: "", error: "File too large. Max 5 MB" };
+    return { url: "", error: t("errors.fileTooLarge", { max: 5 }) };
   }
 
   const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
@@ -190,7 +222,7 @@ export async function uploadAvatar(
     });
 
   if (uploadError) {
-    return { url: "", error: uploadError.message };
+    return { url: "", error: t("errors.saveFailed") };
   }
 
   const { data: urlData } = supabase.storage

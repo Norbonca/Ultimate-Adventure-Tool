@@ -109,6 +109,7 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
     return (
       <TemplateSelector
         tripId={tripId}
+        onEmpty={() => setShowTemplateSelector(false)}
         onInit={() => {
           setShowTemplateSelector(false);
           reloadTimeline();
@@ -183,7 +184,7 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
 // TEMPLATE SELECTOR
 // ═════════════════���════════════════════════════
 
-function TemplateSelector({ tripId, onInit }: { tripId: string; onInit: () => void }) {
+function TemplateSelector({ tripId, onInit, onEmpty }: { tripId: string; onInit: () => void; onEmpty: () => void }) {
   const { t, locale } = useTranslation();
   const [templates, setTemplates] = useState<TimelineTemplate[]>([]);
   const [loading, setLoading] = useState(true);
@@ -210,7 +211,7 @@ function TemplateSelector({ tripId, onInit }: { tripId: string; onInit: () => vo
   };
 
   const handleEmpty = () => {
-    onInit(); // just close and show empty timeline
+    onEmpty();
   };
 
   if (loading) {
@@ -456,7 +457,7 @@ function MilestoneModal({
       ...(trimmed && trimmed !== displayName ? { name: trimmed } : {}),
       status,
       due_date: dueDate || null,
-      description: notes || undefined,
+      description: notes,
     });
     setSaving(false);
     onRefresh();

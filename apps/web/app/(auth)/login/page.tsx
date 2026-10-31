@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { BrandIcon } from "@/lib/brand-icons";
 import { createClient } from "@/lib/supabase/client";
+import { authErrorKey } from "@/lib/auth-error";
+import type { TranslationKey } from "@uat/i18n";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/useTranslation";
@@ -16,7 +18,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<TranslationKey | null>(null);
   const [deletionScheduled, setDeletionScheduled] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -49,7 +51,7 @@ export default function LoginPage() {
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      setError(error.message);
+      setError(authErrorKey(error));
       setLoading(false);
     } else {
       router.push("/dashboard");
@@ -64,7 +66,7 @@ export default function LoginPage() {
       options: { redirectTo: `${window.location.origin}/callback` },
     });
     if (error) {
-      setError(error.message);
+      setError(authErrorKey(error));
       setGoogleLoading(false);
     }
   };
@@ -119,8 +121,8 @@ export default function LoginPage() {
           )}
 
           {error && (
-            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
-              {error}
+            <div role="alert" className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+              {t(error)}
             </div>
           )}
 

@@ -28,12 +28,14 @@ test.describe('FLOW-CORE — smoke', () => {
     ).toBeVisible();
   });
 
-  test('FLOW-CORE-6: language switch HU → EN → HU', async ({ page }) => {
+  test('FLOW-CORE-6: language switch HU → EN → HU', async ({ page, locale }) => {
     await page.goto('/');
     const header = new AppHeaderPage(page);
 
-    // Default locale is HU per playwright.config (locale: 'hu-HU').
-    await expect(page.locator('html')).toHaveAttribute('lang', /hu/i);
+    // A fresh context bootstraps its language from the configured browser locale.
+    await expect(page.locator('html')).toHaveAttribute('lang', locale?.startsWith('en') ? 'en' : 'hu');
+    await header.switchLocale('hu');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hu');
 
     await header.switchLocale('en');
     await expect(page.locator('html')).toHaveAttribute('lang', /en/i);

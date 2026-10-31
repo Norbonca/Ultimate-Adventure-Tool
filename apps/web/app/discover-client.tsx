@@ -47,6 +47,7 @@ import {
   type DiscoverView,
 } from '@/lib/discover-view';
 import { buildTripSearchText, createTripSearch } from '@/lib/trip-search';
+import { matchesAdvanced, NO_FILTERS, type AdvancedFilters, type Choice } from '@/lib/discover-filters';
 
 // The globe (d3-geo + tiles) only runs in the browser and is a large chunk —
 // load it on demand so the list view never pays for it.
@@ -156,50 +157,6 @@ const resolveJoin = <T,>(val: Joined<T>): T | null => {
   return Array.isArray(val) ? val[0] ?? null : val;
 };
 
-const tripDurationDays = (trip: Trip): number => {
-  if (!trip.start_date || !trip.end_date) return 0;
-  const start = new Date(trip.start_date);
-  const end = new Date(trip.end_date);
-  return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-};
-
-type Choice = 'all' | string;
-
-interface AdvancedFilters {
-  difficulty: Choice;
-  price: Choice;
-  duration: Choice;
-  spots: Choice;
-}
-
-const NO_FILTERS: AdvancedFilters = { difficulty: 'all', price: 'all', duration: 'all', spots: 'all' };
-
-function matchesAdvanced(trip: Trip, f: AdvancedFilters): boolean {
-  if (f.difficulty !== 'all' && String(trip.difficulty) !== f.difficulty) return false;
-  if (f.price !== 'all') {
-    const price = trip.price_amount || 0;
-    if (f.price === 'free' && price > 0) return false;
-    if (f.price === 'under50' && (price === 0 || price >= 50)) return false;
-    if (f.price === '50-200' && (price < 50 || price > 200)) return false;
-    if (f.price === '200-500' && (price < 200 || price > 500)) return false;
-    if (f.price === '500+' && price < 500) return false;
-  }
-  if (f.duration !== 'all') {
-    const days = tripDurationDays(trip);
-    if (f.duration === '1' && days > 1) return false;
-    if (f.duration === '2-3' && (days < 2 || days > 3)) return false;
-    if (f.duration === '4-7' && (days < 4 || days > 7)) return false;
-    if (f.duration === '1-2w' && (days < 7 || days > 14)) return false;
-    if (f.duration === '2w+' && days < 14) return false;
-  }
-  if (f.spots !== 'all') {
-    const spots = trip.max_participants - (trip.current_participants || 0);
-    if (f.spots === '1-3' && (spots < 1 || spots > 3)) return false;
-    if (f.spots === '4-8' && (spots < 4 || spots > 8)) return false;
-    if (f.spots === '9+' && spots < 9) return false;
-  }
-  return true;
-}
 
 function FilterGroup({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
   return (
@@ -281,7 +238,7 @@ export default function DiscoverClient({
   });
 
   // Lapozás: szűrés-/rendezésváltáskor újra az első oldal (állapot kulccsal, effekt nélkül).
-  const pageKey = [query, activeCategory, sortBy, filters.difficulty, filters.price, filters.duration, filters.spots].join('|');
+  const pageKey = [query, activeCategory, sortBy, filters.difficulty, filters.price, filters.currency, filters.duration, filters.spots].join('|');
   const visibleCount = page.key === pageKey ? page.count : PAGE_SIZE;
   const visibleTrips = sortedTrips.slice(0, visibleCount);
   const remaining = sortedTrips.length - visibleTrips.length;
@@ -335,19 +292,38 @@ export default function DiscoverClient({
     }
   };
 
+  const priceCurrency = filters.currency === 'all' ? 'EUR' : filters.currency;
+  const currencyOptions = [...new Set(['EUR', ...trips.map((trip) => trip.price_currency).filter(Boolean)])].sort();
+  const changeSort = (value: string) => {
+    if (value.startsWith('price-')) {
+      setFilters((current) => ({ ...current, currency: current.currency === 'all' ? 'EUR' : current.currency }));
+    }
+    setSortBy(value);
+  };
+  const changeCurrency = (currency: string) => {
+    setFilters((current) => ({ ...current, currency,
+      price: currency === 'all' && current.price !== 'free' ? 'all' : current.price,
+    }));
+    if (currency === 'all' && sortBy.startsWith('price-')) setSortBy('recent');
+  };
   const setFilter = (key: keyof AdvancedFilters, value: Choice) =>
-    setFilters((current) => ({ ...current, [key]: current[key] === value ? 'all' : value }));
+    setFilters((current) => ({ ...current,
+      [key]: current[key] === value ? 'all' : value,
+      currency: key === 'price' && value !== 'free' && value !== current.price && current.currency === 'all'
+        ? 'EUR' : current.currency,
+    }));
 
   const clearFilters = () => {
     setFilters(NO_FILTERS);
     setActiveCategory('all');
+    if (sortBy.startsWith('price-')) setSortBy('recent');
   };
 
   const sortOptions: Array<[string, string]> = [
     ['recent', t('discover.sortRecent')],
     ['date', t('discover.sortSoonestLong')],
-    ['price-low', t('discover.priceLowHigh')],
-    ['price-high', t('discover.priceHighLow')],
+    ['price-low', `${t('discover.priceLowHigh')} (${priceCurrency})`],
+    ['price-high', `${t('discover.priceHighLow')} (${priceCurrency})`],
   ];
 
   const filterGroups: Array<{ key: keyof AdvancedFilters; label: string; options: Array<[string, string]> }> = [
@@ -361,10 +337,10 @@ export default function DiscoverClient({
       label: t('discover.priceRange'),
       options: [
         ['free', t('discover.free')],
-        ['under50', t('discover.underPrice')],
-        ['50-200', '€50–200'],
-        ['200-500', '€200–500'],
-        ['500+', '€500+'],
+        ['under50', t('discover.underAmount').replace('{amount}', `50 ${priceCurrency}`)],
+        ['50-200', `50–200 ${priceCurrency}`],
+        ['200-500', `200–500 ${priceCurrency}`],
+        ['500+', `500+ ${priceCurrency}`],
       ],
     },
     {
@@ -562,11 +538,21 @@ export default function DiscoverClient({
                   </FilterGroup>
                   <FilterGroup label={t('discover.sortLabel')} className="md:hidden">
                     {sortOptions.map(([value, label]) => (
-                      <OptionChip key={value} mode="radio" selected={sortBy === value} onClick={() => setSortBy(value)}>
+                      <OptionChip key={value} mode="radio" selected={sortBy === value} onClick={() => changeSort(value)} testId={`sort-${value}`}>
                         {label}
                       </OptionChip>
                     ))}
                   </FilterGroup>
+                  <div className="flex flex-col gap-2">
+                    <label htmlFor="discover-currency" className="text-sm font-semibold text-ink-secondary">{t('discover.currency')}</label>
+                    <select id="discover-currency" data-testid="filter-currency" value={filters.currency}
+                      onChange={(event) => changeCurrency(event.target.value)}
+                      className="h-10 rounded-trevu border border-line bg-surface px-3 text-sm text-ink">
+                      <option value="all">{t('discover.allCurrencies')}</option>
+                      {currencyOptions.map((currency) => <option key={currency} value={currency}>{currency}</option>)}
+                    </select>
+                    <p className="text-xs text-ink-muted">{t('discover.currencyHint')}</p>
+                  </div>
                   {filterGroups.map((group) => (
                     <FilterGroup key={group.key} label={group.label}>
                       {group.options.map(([value, label]) => (
@@ -615,7 +601,7 @@ export default function DiscoverClient({
                 <span>{t('discover.sortLabel')}:</span>
                 <select
                   value={sortBy}
-                  onChange={(event) => setSortBy(event.target.value)}
+                  onChange={(event) => changeSort(event.target.value)}
                   data-testid="discover-sort"
                   className="h-10 rounded-trevu border border-line bg-surface px-3 text-sm text-ink focus:border-accent focus:outline-none focus:shadow-[var(--focus-ring)]"
                 >
@@ -628,6 +614,11 @@ export default function DiscoverClient({
               </label>
             </div>
 
+            {filters.currency !== 'all' && (
+              <p data-testid="discover-currency-notice" className="pb-4 text-sm text-ink-secondary">
+                {t('discover.currency')}: {filters.currency}. {t('discover.currencyHint')}
+              </p>
+            )}
             {filteredTrips.length === 0 ? (
               <section
                 role="status"

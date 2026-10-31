@@ -1,72 +1,29 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin-client";
+import { getPlatformAdmin } from "@/lib/admin-auth";
+import { getServerT } from "@/lib/i18n/server";
 import { redirect } from "next/navigation";
 
 export async function adminLogin(
   _prev: { error: string } | null,
   formData: FormData
 ): Promise<{ error: string }> {
-  const email = (formData.get("email") as string)?.trim().toLowerCase();
-  const password = formData.get("password") as string;
-
-  const adminEmail = process.env.ADMIN_EMAIL;
-
-  if (!adminEmail) {
-    return { error: "ADMIN_EMAIL nincs beállítva a szerveren." };
-  }
-
-  if (email !== adminEmail.toLowerCase()) {
-    return { error: "Ezzel az email-lel nincs admin hozzáférés." };
-  }
-
-  if (!email || !password) {
-    return { error: "Add meg az email-t és a jelszót." };
-  }
+  const { t } = await getServerT();
+  const emailValue = formData.get("email");
+  const passwordValue = formData.get("password");
+  const email = typeof emailValue === "string" ? emailValue.trim().toLowerCase() : "";
+  const password = typeof passwordValue === "string" ? passwordValue : "";
+  if (!email || !password) return { error: t("admin.login.requiredFields") };
 
   const supabase = await createClient();
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) return { error: t("admin.login.failed") };
 
-  // Bejelentkezési kísérlet
-  const { error: signInError } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (!signInError) {
-    redirect("/admin");
+  // Authentication alone does not authorize admin access. Never provision accounts here.
+  if (!(await getPlatformAdmin())) {
+    await supabase.auth.signOut();
+    return { error: t("admin.login.failed") };
   }
-
-  // Ha a fiók még nem létezik → automatikus létrehozás service role-lal
-  if (
-    signInError.message.includes("Invalid login credentials") ||
-    signInError.message.includes("invalid_credentials")
-  ) {
-    const adminClient = createAdminClient();
-
-    // Próbálunk fiókot létrehozni
-    const { error: createError } = await adminClient.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true, // email megerősítés kihagyása lokálban
-    });
-
-    if (createError && !createError.message.includes("already registered")) {
-      return { error: `Fiók létrehozása sikertelen: ${createError.message}` };
-    }
-
-    // Bejelentkezés az új fiókkal
-    const { error: retryError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (retryError) {
-      return { error: retryError.message };
-    }
-
-    redirect("/admin");
-  }
-
-  return { error: signInError.message };
+  redirect("/admin");
 }

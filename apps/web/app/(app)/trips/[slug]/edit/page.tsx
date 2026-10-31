@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound, redirect } from "next/navigation";
-import { fetchTripBySlug, fetchCategoryParameters, fetchParameterOptions, fetchCountries } from "../../actions";
+import { fetchTripBySlug, fetchCategoryParameters, fetchParameterOptions, fetchCountries, fetchCrewPositions } from "../../actions";
 import { getServerLocale } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
 import { CATEGORY_DISPLAY } from "@/lib/categories";
@@ -27,9 +27,10 @@ export default async function EditTripPage({ params }: EditPageProps) {
   const categoryId = trip.category_id;
   const subDisciplineId = trip.sub_discipline_id;
 
-  const [params_list, countries] = await Promise.all([
+  const [params_list, countries, crewPositions] = await Promise.all([
     categoryId ? fetchCategoryParameters(categoryId, subDisciplineId || undefined) : Promise.resolve([]),
     fetchCountries(),
+    fetchCrewPositions(trip.id),
   ]);
 
   const selectParamIds = params_list
@@ -53,6 +54,7 @@ export default async function EditTripPage({ params }: EditPageProps) {
         categoryParameters={params_list}
         parameterOptions={paramOptions}
         countries={countries}
+        crewPositions={crewPositions.map((position) => position.role_name)}
       />
     </main>
   );
