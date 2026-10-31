@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { CATEGORY_DISPLAY, getCategoryName } from "@/lib/categories";
 import { saveUserInterests, saveUserSkills } from "../actions";
@@ -70,6 +71,8 @@ export function InterestsForm({ categories, subDisciplines, initialInterests, in
   });
   const [isPending, startTransition] = useTransition();
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const toggleCategory = (catId: string) => {
     setSelectedCategories((prev) => {
@@ -100,20 +103,35 @@ export function InterestsForm({ categories, subDisciplines, initialInterests, in
   };
 
   const handleSave = () => {
+    setError(null);
     startTransition(async () => {
       const interestsResult = await saveUserInterests(Array.from(selectedCategories));
-      if (interestsResult.error) return;
+      if (interestsResult.error) {
+        setError(interestsResult.error);
+        return;
+      }
 
-      // Save skills for sub-disciplines that have a level set
-      const skillEntries = Object.entries(skills)
-        .filter(([, level]) => level && level !== "none")
-        .map(([category_id, skill_level]) => ({ category_id, skill_level }));
-      if (skillEntries.length > 0) {
-        const skillsResult = await saveUserSkills(skillEntries);
-        if (skillsResult.error) return;
+      // Skills: a level is kept only under a selected category; "none" or a
+      // deselected category removes the stored row (otherwise it came back on reload).
+      const categoryOfSub = new Map(subDisciplines.map((sd) => [sd.id, sd.category_id]));
+      const skillEntries: { category_id: string; skill_level: string }[] = [];
+      const removeIds: string[] = [];
+      for (const [subId, level] of Object.entries(skills)) {
+        const parentSelected = selectedCategories.has(categoryOfSub.get(subId) ?? "");
+        if (parentSelected && level && level !== "none") {
+          skillEntries.push({ category_id: subId, skill_level: level });
+        } else {
+          removeIds.push(subId);
+        }
+      }
+      const skillsResult = await saveUserSkills(skillEntries, removeIds);
+      if (skillsResult.error) {
+        setError(skillsResult.error);
+        return;
       }
 
       setSaved(true);
+      router.refresh();
     });
   };
 
@@ -283,6 +301,11 @@ export function InterestsForm({ categories, subDisciplines, initialInterests, in
             {isPending ? t('common.loading') : saved ? t('common.saved') : t('common.saveChanges')}
           </button>
         </div>
+        {error && (
+          <p role="alert" className="mt-3 text-sm text-red-600">
+            {error}
+          </p>
+        )}
       </div>
     </div>
   );
