@@ -28,5 +28,12 @@ import { admin, clientFor, createTestUser, deleteTestUser, INTEGRATION_ENABLED, 
     expect(await fetchPublicProfile(anonymous, owner.id)).toBeNull();
     expect(await fetchPublicProfile(signedIn, owner.id)).toBeNull();
     expect((await fetchPublicProfile(self, owner.id))?.id).toBe(owner.id);
+    const { error: deleteError } = await admin().from('profiles').update({
+      profile_visibility: 'public', deleted_at: new Date().toISOString(),
+    }).eq('id', owner.id);
+    expect(deleteError).toBeNull();
+    expect(await fetchPublicProfile(anonymous, owner.id)).toBeNull();
+    expect(await fetchPublicProfile(signedIn, owner.id)).toBeNull();
+    expect(await fetchPublicProfile(self, owner.id)).toBeNull();
   });
 });
