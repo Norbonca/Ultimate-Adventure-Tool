@@ -23,6 +23,7 @@ import {
   uniqueIndex,
   index,
   check,
+  primaryKey,
 } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
 import { profiles } from './m01-user'; // M01
@@ -98,9 +99,21 @@ export const expenses = pgTable(
 
     // Összeg adatok
     amount: decimal('amount', { precision: 10, scale: 2 }).notNull(),
-    currency: varchar('currency', { length: 3 }).notNull().default('EUR'),
+    currency: varchar('currency', { length: 3 }).notNull(),
+    /** @deprecated 066 — helyette amountSettlement; kódból nem írjuk, DROP külön migrációban */
     amountInPrimary: decimal('amount_in_primary', { precision: 10, scale: 2 }),
+    /** @deprecated 066 — helyette fxRate + fxRateDate + fxRateSource */
     exchangeRate: decimal('exchange_rate', { precision: 10, scale: 6 }),
+
+    // §14.4 pillanatkép (066): 1 egység elszámolási pénznem = fxRate × currency; amountSettlement NULL = átváltás függőben
+    fxRate: decimal('fx_rate', { precision: 20, scale: 10 }),
+    fxRateDate: date('fx_rate_date'),
+    fxRateSource: text('fx_rate_source'),
+    fxQuality: text('fx_quality'),
+    amountSettlement: decimal('amount_settlement', { precision: 12, scale: 2 }),
+    fxLockedAt: timestamp('fx_locked_at', { withTimezone: true }),
+    createdBy: uuid('created_by').references(() => profiles.id, { onDelete: 'set null' }),
+    title: varchar('title', { length: 120 }),
 
     // Kategorizálás
     category: expenseCategoryEnum('category').notNull(),
@@ -162,6 +175,8 @@ export const expenseSplits = pgTable(
     // Elosztási adatok
     amount: decimal('amount', { precision: 10, scale: 2 }).notNull(),
     percentage: decimal('percentage', { precision: 5, scale: 2 }),
+    /** 066: részesedés az elszámolási pénznemben, 2 tizedes; a kerekítési maradék a fizetőé (BR-M03-004) */
+    amountSettlement: decimal('amount_settlement', { precision: 12, scale: 2 }),
 
     // Settlement tracking
     isSettled: boolean('is_settled').notNull().default(false),
@@ -257,6 +272,11 @@ export const settlements = pgTable(
 
     // Megjegyzések
     notes: text('notes'),
+    // 066: a felek nem módosítják az összeget; csak „Kifizettem” és „Nem értek egyet”
+    paidMarkedAt: timestamp('paid_marked_at', { withTimezone: true }),
+    disputedBy: uuid('disputed_by').references(() => profiles.id, { onDelete: 'set null' }),
+    disputedAt: timestamp('disputed_at', { withTimezone: true }),
+    disputeNote: text('dispute_note'),
 
     // Timestamps
     completedAt: timestamp('completed_at', { withTimezone: true }),
@@ -290,15 +310,19 @@ export const exchangeRates = pgTable(
       .notNull()
       .default('EUR'),
     targetCurrency: varchar('target_currency', { length: 3 }).notNull(),
-    rate: decimal('rate', { precision: 10, scale: 6 }).notNull(),
-    source: varchar('source', { length: 20 }).notNull().default('ecb'),
+    rate: decimal('rate', { precision: 14, scale: 6 }).notNull(), // 048: DECIMAL(14,6)
+    source: varchar('source', { length: 20 }).notNull().default('ecb'), // 065: FK → fx_rate_sources.code
     rateDate: date('rate_date').notNull(),
     fetchedAt: timestamp('fetched_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
+    // 065 (§14.6)
+    unit: integer('unit').notNull().default(1),
+    isDerived: boolean('is_derived').notNull().default(false),
   },
   (table) => [
-    uniqueIndex('idx_exchange_rates_unique').on(
+    uniqueIndex('uq_exchange_rates_source_pair_date').on(
+      table.source,
       table.baseCurrency,
       table.targetCurrency,
       table.rateDate
@@ -406,3 +430,57 @@ export type ExpenseStatus = (typeof expenseStatusEnum.enumValues)[number];
 export type SettlementMethod = (typeof settlementMethodEnum.enumValues)[number];
 /** Settlement status enum values */
 export type SettlementStatus = (typeof settlementStatusEnum.enumValues)[number];
+
+// ============================================
+// §14 DEVIZAKEZELÉS — 065 (2026-10-31)
+// ============================================
+
+/** §14.7: árfolyamforrások; az admin kapcsolja és sorrendezi (Frankfurter az elsődleges, manual = állandó paritás). */
+export const fxRateSources = pgTable('fx_rate_sources', {
+  code: text('code').primaryKey(),
+  name: text('name').notNull(),
+  kind: text('kind').notNull(), // 'api' | 'manual'
+  baseUrl: text('base_url'),
+  enabled: boolean('enabled').notNull().default(false),
+  priority: integer('priority').notNull().default(100),
+  lastSyncedAt: timestamp('last_synced_at', { withTimezone: true }),
+  notes: text('notes'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** §14.8: minden napi szinkron és admin „Szinkronizálás most” futás egy sor. */
+export const fxSyncRuns = pgTable('fx_sync_runs', {
+  id: integer('id').primaryKey().generatedByDefaultAsIdentity(),
+  sourceCode: text('source_code')
+    .notNull()
+    .references(() => fxRateSources.code),
+  startedAt: timestamp('started_at', { withTimezone: true }).notNull().defaultNow(),
+  finishedAt: timestamp('finished_at', { withTimezone: true }),
+  status: text('status').notNull().default('running'), // running | ok | partial | error
+  rateDate: date('rate_date'),
+  ratesUpserted: integer('rates_upserted').notNull().default(0),
+  errorMessage: text('error_message'),
+  triggeredBy: text('triggered_by').notNull().default('cron'), // cron | admin | test
+});
+
+/** §14.3 fixed mód: a szervező árfolyamai pénznemenként — rate = ennyi `currency` jár 1 egység elszámolási pénznemért. */
+export const tripFxRates = pgTable(
+  'trip_fx_rates',
+  {
+    tripId: uuid('trip_id')
+      .notNull()
+      .references(() => trips.id, { onDelete: 'cascade' }),
+    currency: varchar('currency', { length: 3 }).notNull(),
+    rate: decimal('rate', { precision: 14, scale: 6 }).notNull(),
+    setBy: uuid('set_by').references(() => profiles.id, { onDelete: 'set null' }),
+    setAt: timestamp('set_at', { withTimezone: true }).notNull().defaultNow(),
+    note: text('note'),
+  },
+  (table) => [primaryKey({ columns: [table.tripId, table.currency] })]
+);
+
+export type FxRateSource = typeof fxRateSources.$inferSelect;
+export type FxSyncRun = typeof fxSyncRuns.$inferSelect;
+export type TripFxRate = typeof tripFxRates.$inferSelect;
+export type NewTripFxRate = typeof tripFxRates.$inferInsert;
