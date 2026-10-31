@@ -23,7 +23,7 @@ export function SettingsSidebar() {
   const { t } = useTranslation();
 
   return (
-    <aside className="w-[260px] shrink-0">
+    <aside className="w-full min-w-0 shrink-0 lg:w-[260px]">
       <nav className="rounded-2xl border border-navy-200 bg-white py-2">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
