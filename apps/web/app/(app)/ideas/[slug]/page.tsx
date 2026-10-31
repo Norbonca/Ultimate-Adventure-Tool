@@ -29,9 +29,9 @@ interface Props { params: Promise<{ slug: string }> }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const idea = await getIdeaBySlug(slug);
-  if (!idea) return { title: "Trevu" };
+  if (!idea) return { title: "Ötletbörze" };
   const noindex = idea.visibility !== "public";
-  return { title: `${idea.title} · Trevu`, description: idea.description?.slice(0, 160) ?? undefined, robots: noindex ? { index: false, follow: false } : undefined };
+  return { title: idea.title, description: idea.description?.slice(0, 160) ?? undefined, robots: noindex ? { index: false, follow: false } : undefined };
 }
 
 export default async function IdeaDetailPage({ params }: Props) {
