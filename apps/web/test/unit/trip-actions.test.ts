@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-const mocks = vi.hoisted(() => ({ client: { auth: { getUser: vi.fn() }, from: vi.fn() } }));
+const mocks = vi.hoisted(() => ({ client: { auth: { getUser: vi.fn() }, from: vi.fn(), rpc: vi.fn() } }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: async () => mocks.client }));
 vi.mock("@/lib/supabase/admin-client", () => ({ createAdminClient: vi.fn() }));
 vi.mock("@/lib/i18n/server", () => ({ getServerT: async () => ({ t: (key: string) => key }) }));
@@ -19,6 +19,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   mocks.client.auth.getUser.mockResolvedValue({ data: { user: { id } } });
   geo.geocodeLocation.mockResolvedValue(null);
+  mocks.client.rpc.mockResolvedValue({ error: null });
 });
 
 /** profiles + trips mock where the INSERT branch reports the written payload. */
@@ -60,6 +61,20 @@ function mockUpdatingClient(current: Record<string, unknown>) {
   return { updated };
 }
 describe("trip server actions", () => {
+  it("persists the submitted crew list, including explicit removal of all roles", async () => {
+    mockUpdatingClient({});
+    await saveDraft({ crew_positions: ["Leader"] }, id);
+    expect(mocks.client.rpc).toHaveBeenCalledWith("sync_trip_crew_positions", { p_trip_id: id, p_roles: ["Leader"] });
+    await saveDraft({ crew_positions: [] }, id);
+    expect(mocks.client.rpc).toHaveBeenLastCalledWith("sync_trip_crew_positions", { p_trip_id: id, p_roles: [] });
+  });
+  it("does not erase roles when omitted and reports a crew persistence failure", async () => {
+    mockUpdatingClient({});
+    await saveDraft({ title: "Unrelated edit" }, id);
+    expect(mocks.client.rpc).not.toHaveBeenCalled();
+    mocks.client.rpc.mockResolvedValue({ error: { message: "crew_position_in_use" } });
+    expect(await saveDraft({ crew_positions: [] }, id)).toMatchObject({ tripId: id, error: "errors.saveFailed" });
+  });
   it("rejects unauthenticated writes before DB access", async () => {
     mocks.client.auth.getUser.mockResolvedValue({ data: { user: null } });
     expect(await saveDraft({})).toMatchObject({ error: "errors.notAuthenticated" });

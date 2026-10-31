@@ -307,6 +307,12 @@ export async function saveDraft(
       console.error("Draft update error:", error);
       return { tripId: existingTripId, error: t("errors.saveFailed") };
     }
+    if (formData.crew_positions !== undefined) {
+      const { error: crewError } = await supabase.rpc("sync_trip_crew_positions", {
+        p_trip_id: existingTripId, p_roles: formData.crew_positions,
+      });
+      if (crewError) return { tripId: existingTripId, error: t("errors.saveFailed") };
+    }
     return { tripId: existingTripId };
   } else {
     // INSERT new draft
@@ -319,6 +325,12 @@ export async function saveDraft(
     if (error) {
       console.error("Draft insert error:", error);
       return { tripId: "", error: t("errors.saveFailed") };
+    }
+    if (formData.crew_positions !== undefined) {
+      const { error: crewError } = await supabase.rpc("sync_trip_crew_positions", {
+        p_trip_id: data.id, p_roles: formData.crew_positions,
+      });
+      if (crewError) return { tripId: data.id, error: t("errors.saveFailed") };
     }
     return { tripId: data.id };
   }
@@ -607,7 +619,7 @@ export async function fetchTripForEdit(tripId: string): Promise<{
     card_image_url: trip.card_image_url || "",
     card_image_source: trip.card_image_source || "system",
     tags: (trip.tags as string[]) || [],
-    crew_positions: [],
+    crew_positions: (await fetchCrewPositions(trip.id)).map((position) => position.role_name),
     show_on_landing: trip.show_on_landing ?? true,
   };
 
