@@ -4,6 +4,7 @@ import { getServerT } from "@/lib/i18n/server";
 import { z } from "zod";
 
 import { createClient } from "@/lib/supabase/server";
+import { issueImageUploadTicket, type ImageUploadTicket } from "@/lib/storage/image-upload-ticket";
 
 // ============================================
 // Categories + Sub-disciplines (from M02 ref tables)
@@ -188,48 +189,14 @@ export async function savePrivacySettings(settings: Record<string, unknown>) {
 // Avatar Image Actions
 // ============================================
 
-export async function uploadAvatar(
-  formDataFile: FormData
-): Promise<{ url: string; error?: string }> {
-  const { t } = await getServerT();
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { url: "", error: t("errors.sessionExpired") };
-
-  const file = formDataFile.get("file") as File;
-  if (!file || typeof file === "string") return { url: "", error: t("errors.noFileSelected") };
-
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
-  if (!allowedTypes.includes(file.type)) {
-    return { url: "", error: t("errors.unsupportedFileFormat") };
-  }
-
-  const maxSize = 5 * 1024 * 1024; // 5 MB
-  if (file.size > maxSize) {
-    return { url: "", error: t("errors.fileTooLarge", { max: 5 }) };
-  }
-
-  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const timestamp = Date.now();
-  const random = Math.random().toString(36).substring(2, 8);
-  const filePath = `${user.id}/${timestamp}-${random}.${ext}`;
-
-  const { error: uploadError } = await supabase.storage
-    .from("avatars")
-    .upload(filePath, file, {
-      cacheControl: "3600",
-      upsert: true,
-    });
-
-  if (uploadError) {
-    return { url: "", error: t("errors.saveFailed") };
-  }
-
-  const { data: urlData } = supabase.storage
-    .from("avatars")
-    .getPublicUrl(filePath);
-
-  return { url: urlData.publicUrl };
+// Aláírt feltöltési URL az avatarhoz — a fájl közvetlenül a Storage-ba megy
+// (a server action 1 MB-os törzskorlátja miatt), lásd lib/storage/image-upload.ts.
+export async function createAvatarUploadTicket(
+  file: { type: string; size: number }
+): Promise<ImageUploadTicket> {
+  const ticket = await issueImageUploadTicket("avatar", file);
+  if (!ticket.ok) return { ok: false, error: ticket.error };
+  return { ok: true, bucket: ticket.bucket, path: ticket.path, token: ticket.token, publicUrl: ticket.publicUrl };
 }
 
 export async function fetchSystemAvatars(type?: string) {

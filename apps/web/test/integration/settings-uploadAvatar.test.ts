@@ -1,5 +1,5 @@
 /**
- * Integration: settings/actions.ts uploadAvatar
+ * Integration: settings/actions.ts createAvatarUploadTicket (2026-10-31-ig: uploadAvatar)
  *
  * Coverage targets (TEST_CASES.md INT-settings-uploadAvatar):
  *   1. happy path — valid jpg ≤2MB → storage + profiles.avatar_url set

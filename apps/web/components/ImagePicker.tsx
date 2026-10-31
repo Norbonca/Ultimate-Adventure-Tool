@@ -2,9 +2,16 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
-import { uploadCoverImage, fetchCoverImages } from "@/app/(app)/trips/actions";
-import { uploadAvatar, fetchSystemAvatars } from "@/app/(app)/settings/actions";
+import { createCoverUploadTicket, fetchCoverImages } from "@/app/(app)/trips/actions";
+import { createAvatarUploadTicket, fetchSystemAvatars } from "@/app/(app)/settings/actions";
 import { Icon } from "@/components/Icon";
+import { createClient } from "@/lib/supabase/client";
+import {
+  IMAGE_UPLOAD_RULES,
+  acceptAttribute,
+  validateImageUpload,
+  type ImageUploadKind,
+} from "@/lib/storage/image-upload";
 
 // ============================================
 // ImagePicker — Közös képválasztó component
@@ -70,27 +77,56 @@ export function ImagePicker({
       const file = e.target.files?.[0];
       if (!file) return;
 
+      // Reset input — ugyanaz a fájl újra kiválasztható
+      e.target.value = "";
+
+      const kind: ImageUploadKind = type === "avatar" ? "avatar" : "cover";
+      const problem = validateImageUpload(kind, file);
+      if (problem) {
+        setUploadError(
+          problem === "fileTooLarge"
+            ? t("errors.fileTooLarge", { max: IMAGE_UPLOAD_RULES[kind].maxMb })
+            : problem === "unsupportedFileFormat"
+              ? t("errors.unsupportedFileFormat")
+              : t("errors.noFileSelected")
+        );
+        return;
+      }
+
       setIsUploading(true);
       setUploadError("");
 
-      const fd = new FormData();
-      fd.append("file", file);
+      try {
+        // 1. Jegy a szervertől (bejelentkezés, típus, méret, saját mappa)
+        const request = { type: file.type, size: file.size };
+        const ticket = await (kind === "cover"
+          ? createCoverUploadTicket(request)
+          : createAvatarUploadTicket(request));
+        if (!ticket.ok) {
+          setUploadError(ticket.error);
+          return;
+        }
 
-      const result = await (type === "cover" || type === "card"
-        ? uploadCoverImage(fd)
-        : uploadAvatar(fd)).catch(() => ({ url: "", error: t("errors.saveFailed") }));
+        // 2. Feltöltés közvetlenül a Storage-ba — a fájl nem megy át server actionön
+        const { error } = await createClient()
+          .storage.from(ticket.bucket)
+          .uploadToSignedUrl(ticket.path, ticket.token, file, {
+            contentType: file.type,
+            cacheControl: "3600",
+          });
+        if (error) {
+          console.error("[ImagePicker] upload failed:", error.message);
+          setUploadError(t("errors.saveFailed"));
+          return;
+        }
 
-      setIsUploading(false);
-
-      if (result.error) {
-        setUploadError(result.error);
-      } else {
-        onSelect(result.url, "user_upload");
+        onSelect(ticket.publicUrl, "user_upload");
         setShowGallery(false);
+      } catch {
+        setUploadError(t("errors.saveFailed"));
+      } finally {
+        setIsUploading(false);
       }
-
-      // Reset input
-      e.target.value = "";
     },
     [type, onSelect, t]
   );
@@ -107,10 +143,9 @@ export function ImagePicker({
   const isCover = type === "cover";
   const isCard = type === "card";
   const isImageType = isCover || isCard;
-  const maxSize = isImageType ? "10 MB" : "5 MB";
-  const acceptTypes = isImageType
-    ? "image/jpeg,image/png,image/webp,image/avif"
-    : "image/jpeg,image/png,image/webp";
+  const uploadKind: ImageUploadKind = isImageType ? "cover" : "avatar";
+  const maxSize = `${IMAGE_UPLOAD_RULES[uploadKind].maxMb} MB`;
+  const acceptTypes = acceptAttribute(uploadKind);
 
   // Filter avatar images by tab
   const filteredImages =
