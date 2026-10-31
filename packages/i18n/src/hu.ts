@@ -412,7 +412,7 @@ const hu = {
       phoneHint: "Csak aktív túra résztvevői láthatják a túra ideje alatt",
       gdprTitle: "Adatok & Fiók",
       exportTitle: "Adataim letöltése",
-      exportDesc: "Exportáld az összes személyes adatodat JSON/CSV formátumban. A feldolgozás legfeljebb 24 óra.",
+      exportDesc: "Profilod, beállításaid, kapcsolataid, jelentkezéseid és saját túraötleteid letöltése JSON-fájlként.",
       exportBtn: "Adatok exportálása",
       deleteTitle: "Fiók törlése",
       deleteDesc: "A fiókod és az összes kapcsolódó adat végleges törlése. 30 napos türelmi idő érvényes.",
@@ -927,7 +927,6 @@ const hu = {
       lockCrew: "Legénység véglegesítése",
       bookAccommodation: "Szállás foglalása",
       equipmentChecklist: "Felszerelés ellenőrzőlista",
-      linkCopied: "Link másolva!",
     },
 
     // Edit page (/trips/[slug]/edit)

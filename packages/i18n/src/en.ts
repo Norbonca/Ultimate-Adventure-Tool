@@ -411,7 +411,7 @@ const en: TranslationKeys = {
       phoneHint: "Only visible to trip companions during active trips",
       gdprTitle: "Data & Account",
       exportTitle: "Download my data",
-      exportDesc: "Export all your personal data as JSON/CSV. Processing takes up to 24 hours.",
+      exportDesc: "Download your profile, settings, connections, applications and trip ideas as a JSON file.",
       exportBtn: "Export Data",
       deleteTitle: "Delete account",
       deleteDesc: "Permanently delete your account and all associated data. 30-day grace period applies.",
@@ -903,7 +903,6 @@ const en: TranslationKeys = {
       lockCrew: "Lock crew / final",
       bookAccommodation: "Book accommodation",
       equipmentChecklist: "Equipment checklist",
-      linkCopied: "Link copied!",
     },
 
     edit: {
