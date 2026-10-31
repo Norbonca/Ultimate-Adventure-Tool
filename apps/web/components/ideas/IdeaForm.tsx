@@ -84,6 +84,11 @@ export function IdeaForm({ mode, initial, categories, countries, currencies }: P
   const year = yearOverride ?? autoYear(sm, em, now);
   const windowErr = validateWindow({ startMonth: sm, endMonth: em, year }, now);
   const countryName = (c: IdeaFormCountry) => (locale === "en" ? c.name_en : c.name_hu);
+  // Norbert 2026-10-31: az országlista ábécérendben (a nyelv szerinti rendezéssel: Á, É, Ö, Ü helyesen).
+  const sortedCountries = useMemo(() => {
+    const collator = new Intl.Collator(locale === "en" ? "en" : "hu", { sensitivity: "base" });
+    return [...countries].sort((a, b) => collator.compare(locale === "en" ? a.name_en : a.name_hu, locale === "en" ? b.name_en : b.name_hu));
+  }, [countries, locale]);
   const catName = (c: IdeaFormCategory) => c.name_localized?.[locale] ?? c.name;
 
   // generált cím (FR-M22-001): kategória · első célterület · időablak
@@ -173,7 +178,7 @@ export function IdeaForm({ mode, initial, categories, countries, currencies }: P
                 ))}
                 <select aria-label={t("ideas.form.addCountry")} value="" onChange={(e) => addCountry(i, e.target.value)} className="input-trevu px-3 py-2 text-xs">
                   <option value="">+ {t("ideas.form.addCountry")}</option>
-                  {countries.map((c) => <option key={c.code} value={c.code}>{countryName(c)}</option>)}
+                  {sortedCountries.map((c) => <option key={c.code} value={c.code}>{countryName(c)}</option>)}
                 </select>
                 <select aria-label={t("ideas.form.continent")} value={d.continent ?? ""} onChange={(e) => setDest(i, { continent: e.target.value || null })} className="input-trevu px-3 py-2 text-xs">
                   <option value="">{t("ideas.form.continentNone")}</option>
