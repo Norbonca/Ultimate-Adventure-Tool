@@ -182,6 +182,11 @@ export {
   CloudSun,
   Languages,
   WifiOff,
+
+  // ── M22 Trip Ideas (Ikon Bank 6.6) ──────────────────────────────
+  Lightbulb,
+  Hand,
+  Pin,
 } from 'lucide-react';
 
 // Márkaikonok (Facebook, Instagram, X, YouTube, Google): a lucide 1.x nem tartalmazza őket —

@@ -19,6 +19,7 @@ import { endOfLocalDay, formatInstant } from "@/lib/calendar/time";
 import { CalendarAlerts, CalendarBadge, DualTime } from "@/components/calendar/CalendarUi";
 import { CoverImage } from "@/components/ui/CoverImage";
 import { fetchTripBySlugForAdmin } from "@/lib/admin-auth";
+import { getIdeaForTrip } from "@/lib/ideas/queries";
 
 interface TripDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -72,7 +73,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
   } = await supabase.auth.getUser();
   const isOrganizer = user?.id === trip.organizer_id;
 
-  const [paramDefs, myParticipation, staffCountResult, crewPositions, tripCalendar] = await Promise.all([
+  const [paramDefs, myParticipation, staffCountResult, crewPositions, bornFromIdea, tripCalendar] = await Promise.all([
     fetchCategoryParametersForDisplay(trip.category_id, trip.sub_discipline_id),
     fetchMyParticipation(trip.id),
     supabase
@@ -82,6 +83,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
       .eq("is_staff_seat", true),
     fetchCrewPositions(trip.id),
     // M23 V1.1 — jelvények (S2), figyelmeztetések (S11), kettős időpont (S10); hiba esetén csendben üres
+    getIdeaForTrip(trip.id).catch(() => null),
     getTripCalendar(
       {
         start_date: trip.start_date,
@@ -283,6 +285,12 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                 organizerName={organizer?.display_name ?? null}
                 note={t("trips.deletion.cancelledNote")}
               />
+            )}
+            {/* M22 FR-M22-010 — „Ebből az ötletből született” */}
+            {bornFromIdea && (
+              <Link href={`/ideas/${bornFromIdea.slug}`} className="flex items-center gap-2 rounded-xl border border-trevu-200 bg-trevu-50 px-4 py-2.5 text-sm font-medium text-trevu-800" data-testid="trip-born-from-idea">
+                <Icon name="lightbulb" size={16} aria-hidden />{t("ideas.fromIdea.bornFrom", { title: bornFromIdea.title })}
+              </Link>
             )}
             {/* Quick Info Bar */}
             <div className="flex flex-wrap gap-3 text-sm">

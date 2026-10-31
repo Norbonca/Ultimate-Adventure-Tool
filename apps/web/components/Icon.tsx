@@ -23,6 +23,10 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   "calendar-days": L.CalendarDays,
   "calendar-range": L.CalendarRange,
   "calendar-x": L.CalendarX,
+  // M22 Trip Ideas (Ikon Bank 6.6)
+  lightbulb: L.Lightbulb,
+  hand: L.Hand,
+  pin: L.Pin,
   home: L.Home,
   "layout-dashboard": L.LayoutDashboard,
   "log-in": L.LogIn,
