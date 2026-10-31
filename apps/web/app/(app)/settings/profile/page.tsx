@@ -114,6 +114,7 @@ export default function ProfileSettingsPage() {
     preferred_currency: "EUR", timezone: "",
     avatar_url: "", avatar_source: "system",
   });
+  const [emergencyId, setEmergencyId] = useState<string | null>(null);
   const [emergency, setEmergency] = useState<EmergencyContact>({ name: "", phone: "", relationship: "" });
   const [refCountries, setRefCountries] = useState<RefCountry[]>([]);
   const [refLanguages, setRefLanguages] = useState<RefLanguage[]>([]);
@@ -155,6 +156,7 @@ export default function ProfileSettingsPage() {
         });
       }
       if (emergencyRes.data) {
+        setEmergencyId(emergencyRes.data.id);
         setEmergency({
           name: emergencyRes.data.name || "",
           phone: emergencyRes.data.phone || "",
@@ -232,17 +234,9 @@ export default function ProfileSettingsPage() {
       return;
     }
 
-    // Fetch current slug so upsert doesn't violate NOT NULL
-    const { data: currentProfile } = await supabase
-      .from("profiles")
-      .select("slug")
-      .eq("id", user.id)
-      .single();
-
-    const { error: profileError } = await supabase.from("profiles").upsert({
-      id: user.id,
-      email: user.email || "",
-      slug: currentProfile?.slug || user.email?.split("@")[0] || "user",
+    // The auth trigger creates the row. Updating only editable fields preserves the
+    // restricted SELECT grants and never rewrites identity or system-managed fields.
+    const { data: savedProfile, error: profileError } = await supabase.from("profiles").update({
       first_name: form.first_name,
       last_name: form.last_name,
       display_name: `${form.first_name} ${form.last_name}`.trim() || user.email?.split("@")[0] || "User",
@@ -256,9 +250,9 @@ export default function ProfileSettingsPage() {
       timezone: form.country_code ? (form.timezone || null) : null,
       avatar_url: form.avatar_url || null,
       avatar_source: form.avatar_source,
-    }, { onConflict: "id" });
+    }).eq("id", user.id).select("id").maybeSingle();
 
-    if (profileError) {
+    if (profileError || !savedProfile) {
       console.error("Profile save error:", profileError);
       const key = profileSaveErrorKey(profileError);
       if (key === "profile.settings.errors.timezoneRequired" || key === "profile.settings.errors.timezoneMismatch" || key === "profile.settings.errors.timezoneInvalid") {
@@ -271,19 +265,26 @@ export default function ProfileSettingsPage() {
     }
 
     if (emergency.name && emergency.phone) {
-      const { error: emergencyError } = await supabase.from("emergency_contacts").upsert({
+      const contact = {
         user_id: user.id,
         name: emergency.name,
         phone: emergency.phone,
         relationship: emergency.relationship || "other",
         is_primary: true,
-      }, { onConflict: "user_id,is_primary" });
-      if (emergencyError) {
+      };
+      // There is no UNIQUE(user_id, is_primary) constraint: an upsert on that
+      // pair always fails. Persist the loaded contact by its real primary key.
+      const contactWrite = emergencyId
+        ? supabase.from("emergency_contacts").update(contact).eq("id", emergencyId).eq("user_id", user.id)
+        : supabase.from("emergency_contacts").insert(contact);
+      const { data: savedContact, error: emergencyError } = await contactWrite.select("id").single();
+      if (emergencyError || !savedContact) {
         console.error("Emergency contact save error:", emergencyError);
         setSaveError("errors.saveFailed");
         setSaving(false);
         return;
       }
+      setEmergencyId(savedContact.id);
     }
 
     setSaving(false);
