@@ -30,6 +30,7 @@ import { CATEGORY_DISPLAY } from "@/lib/categories";
 import { missingPublishFields } from "@/lib/trip-validation";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { linkTripToIdea } from "@/app/(app)/ideas/actions";
+import { saveLinkedDraft } from "@/lib/ideas/save-linked-draft";
 import { Icon } from "@/components/Icon";
 import { Button } from "@/components/ui";
 
@@ -151,11 +152,14 @@ export function WizardForm({ categories, countries, userId: _userId, fromIdea = 
 
   const persistDraft = useCallback(async (data: Partial<WizardFormData>, id?: string) => {
     try {
-      return await saveDraft(data, id);
+      return await saveLinkedDraft(
+        () => saveDraft(data, id), setTripId, t("errors.saveFailed"),
+        fromIdea ? (savedId) => linkTripToIdea(fromIdea.id, savedId) : undefined,
+      );
     } catch {
       return { tripId: id || "", error: t("errors.saveFailed") };
     }
-  }, [t]);
+  }, [t, fromIdea]);
 
   // ── Save draft ──
   const doSaveDraft = useCallback(async () => {
@@ -222,8 +226,6 @@ export function WizardForm({ categories, countries, userId: _userId, fromIdea = 
       setTripId(result.tripId);
       setSaveStatus("saved");
       setTimeout(() => setSaveStatus("idle"), 2000);
-      // M22: ötlet–túra kapcsolat a vázlat első mentésekor (FR-M22-008 3.)
-      if (fromIdea) void linkTripToIdea(fromIdea.id, result.tripId);
     }
 
     // Save draft on every step transition after initial save
@@ -239,7 +241,7 @@ export function WizardForm({ categories, countries, userId: _userId, fromIdea = 
     }
 
     setCurrentStep((prev) => Math.min(prev + 1, 4));
-  }, [currentStep, formData, tripId, persistDraft, fromIdea]);
+  }, [currentStep, formData, tripId, persistDraft]);
 
   const goBack = useCallback(() => {
     setCurrentStep((prev) => Math.max(prev - 1, 0));
@@ -268,6 +270,12 @@ export function WizardForm({ categories, countries, userId: _userId, fromIdea = 
     }
 
     setSaveStatus("saving");
+    const saved = await persistDraft(formData, tripId);
+    if (saved.error) {
+      setSaveStatus("error");
+      setErrorMsg(saved.error);
+      return;
+    }
     const result = await publishTrip(tripId, formData).catch(() => ({ slug: "", error: t("errors.saveFailed") }));
     if (result.error) {
       setSaveStatus("error");
@@ -275,7 +283,7 @@ export function WizardForm({ categories, countries, userId: _userId, fromIdea = 
     } else {
       window.location.href = `/trips/${result.slug}`;
     }
-  }, [tripId, formData, t]);
+  }, [tripId, formData, t, persistDraft]);
 
   // ── Step 3 label adapts to category ──
   const step3Label =
