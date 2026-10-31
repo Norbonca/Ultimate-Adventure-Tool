@@ -141,7 +141,7 @@ export default async function ParticipantDashboardPage({ params }: ParticipantPa
                           {t("trips.participant.paymentUnavailable")}
                         </p>
                       </div>
-                      <button disabled aria-describedby="payment-unavailable" className="px-4 py-2 text-sm font-semibold text-ink-muted bg-surface-alt rounded-lg cursor-not-allowed">
+                      <button disabled aria-describedby="payment-unavailable" className="px-4 py-2 text-sm font-semibold text-ink-muted bg-canvas rounded-lg cursor-not-allowed">
                         {t("trips.participant.payNow")}
                       </button>
                     </div>
@@ -157,7 +157,7 @@ export default async function ParticipantDashboardPage({ params }: ParticipantPa
                         {t("trips.participant.experienceFormUnavailable")}
                       </p>
                     </div>
-                    <button disabled aria-describedby="experience-form-unavailable" className="px-4 py-2 text-sm font-semibold text-ink-muted bg-surface border border-border rounded-lg cursor-not-allowed">
+                    <button disabled aria-describedby="experience-form-unavailable" className="px-4 py-2 text-sm font-semibold text-ink-muted bg-surface border border-line rounded-lg cursor-not-allowed">
                       {t("trips.participant.fillForm")}
                     </button>
                   </div>
