@@ -901,9 +901,19 @@ export async function applyToTrip(
     application_text: applicationText?.trim() || null,
     applied_at: new Date().toISOString(),
     approved_at: trip.require_approval ? null : new Date().toISOString(),
+    checked_in: false,
+    checked_in_at: null,
+    paid_at: null,
+    rejection_reason: null,
+    removed_at: null,
+    removal_message: null,
+    crew_position_id: null,
+    skill_match: null,
+    is_staff_seat: false,
+    staff_role_label: null,
   };
 
-  // Ha volt cancelled rekord → update; egyébként insert
+  // Új jelentkezés: a korábbi visszavonás/eltávolítás adatai nem öröklődnek.
   if (existing) {
     const { error } = await supabase
       .from("trip_participants")
