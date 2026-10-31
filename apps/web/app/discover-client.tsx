@@ -538,7 +538,7 @@ export default function DiscoverClient({
                   </FilterGroup>
                   <FilterGroup label={t('discover.sortLabel')} className="md:hidden">
                     {sortOptions.map(([value, label]) => (
-                      <OptionChip key={value} mode="radio" selected={sortBy === value} onClick={() => changeSort(value)}>
+                      <OptionChip key={value} mode="radio" selected={sortBy === value} onClick={() => changeSort(value)} testId={`sort-${value}`}>
                         {label}
                       </OptionChip>
                     ))}
