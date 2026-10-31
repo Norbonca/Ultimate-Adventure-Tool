@@ -17,6 +17,14 @@ describe('idea draft persistence', () => {
     expect(await saveLinkedDraft(async () => ({ tripId: 'same-draft' }), remember, 'failed', link)).toEqual({ tripId: 'same-draft' });
     expect(link.mock.calls).toEqual([['same-draft'], ['same-draft']]);
   });
+  it('reuses an inserted draft after a secondary crew save fails', async () => {
+    const remember = vi.fn();
+    const link = vi.fn();
+    const result = { tripId: 'inserted-draft', error: 'crew-failed' };
+    expect(await saveLinkedDraft(async () => result, remember, 'failed', link)).toEqual(result);
+    expect(remember).toHaveBeenCalledWith('inserted-draft');
+    expect(link).not.toHaveBeenCalled();
+  });
   it('does not link a failed draft save', async () => {
     const link = vi.fn();
     const result = { tripId: '', error: 'validation' };

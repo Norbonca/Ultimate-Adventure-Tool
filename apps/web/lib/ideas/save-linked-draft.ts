@@ -8,8 +8,9 @@ export async function saveLinkedDraft(
   link?: (id: string) => Promise<{ ok: boolean }>,
 ): Promise<DraftResult> {
   const result = await save();
+  // A secondary save can fail after INSERT succeeded; retries must reuse its ID.
+  if (result.tripId) rememberDraft(result.tripId);
   if (result.error || !result.tripId) return result;
-  rememberDraft(result.tripId);
   if (link) {
     try {
       if (!(await link(result.tripId)).ok) return { ...result, error: failureMessage };
