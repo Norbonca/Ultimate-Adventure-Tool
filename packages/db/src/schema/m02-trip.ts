@@ -37,6 +37,9 @@ export const categoryStatusEnum = pgEnum('category_status_t', [
   'deprecated',
 ]);
 
+/** §14.3 átváltási mód (065): a költés napja · a kiegyenlítés napja · túraszintű rögzített árfolyam */
+export const fxModeEnum = pgEnum('fx_mode_t', ['expense_date', 'settlement_date', 'fixed']);
+
 export const tripStatusEnum = pgEnum('trip_status_t', [
   'draft',
   'published',
@@ -241,6 +244,10 @@ export const trips = pgTable(
     // Pricing
     priceAmount: decimal('price_amount', { precision: 10, scale: 2 }),
     priceCurrency: varchar('price_currency', { length: 3 }).default('EUR'),
+    // §14 devizakezelés (065): elszámolási pénznem (alap: az ország pénzneme, DB-trigger), átváltási mód, rögzítési jog
+    settlementCurrency: varchar('settlement_currency', { length: 3 }).notNull(),
+    fxMode: fxModeEnum('fx_mode').notNull().default('expense_date'),
+    expensesParticipantsCanAdd: boolean('expenses_participants_can_add').notNull().default(false),
     priceIncludes: text('price_includes'),
     priceExcludes: text('price_excludes'),
     isCostSharing: boolean('is_cost_sharing').notNull().default(true),
