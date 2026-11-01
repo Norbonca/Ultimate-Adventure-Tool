@@ -45,6 +45,9 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   "arrow-left": L.ArrowLeft,
   "arrow-right": L.ArrowRight,
   "arrow-up-down": L.ArrowUpDown,
+  // M021 Menetrend v2 (Ikon Bank 3.26–27, 6.8)
+  "arrow-up": L.ArrowUp,
+  "arrow-down": L.ArrowDown,
   check: L.Check,
   "chevron-left": L.ChevronLeft,
   "chevron-right": L.ChevronRight,

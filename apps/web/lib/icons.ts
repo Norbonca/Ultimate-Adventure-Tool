@@ -40,6 +40,8 @@ export {
   ArrowLeft,
   ArrowRight,
   ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
   Check,
   ChevronLeft,
   ChevronRight,

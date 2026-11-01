@@ -1,6 +1,8 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { effectiveTripTimezone } from "@/lib/calendar/trip-calendar";
+import { normalizeTime } from "@/lib/timeline/format";
 
 // ============================================
 // M021 — Trip Timeline Server Actions
@@ -41,7 +43,22 @@ export interface TimelineMilestone {
   description: string | null;
   status: "not_started" | "in_progress" | "done";
   due_date: string | null;
+  /** 071: óra:perc a due_date napján, a túra helyi idejében („HH:MM:SS”). */
+  due_time: string | null;
   sort_order: number;
+  /** 070 (M121): a mérföldkőhöz kötött hely, ha van. */
+  location: TimelineLocation | null;
+}
+
+/** M121 hely, ahogy a menetrend mutatja (trip_locations + locations). */
+export interface TimelineLocation {
+  binding_id: string;
+  location_id: string;
+  name: string;
+  address: string | null;
+  lat: number | null;
+  lng: number | null;
+  notes: string | null;
 }
 
 export interface TimelineTask {
@@ -58,7 +75,9 @@ export interface TimelineTask {
   is_blocking: boolean;
   requires_verification: boolean;
   due_date: string | null;
+  due_time: string | null;
   sort_order: number;
+  location: TimelineLocation | null;
 }
 
 export interface PhaseWithMilestones extends TimelinePhase {
@@ -86,6 +105,28 @@ async function getAuthUser() {
     data: { user },
   } = await supabase.auth.getUser();
   return { supabase, user };
+}
+
+/**
+ * 071: a due_time csak nappal együtt értelmes (DB CHECK is). Üres nap → az óra is törlődik;
+ * hibás formátumú óra → null (a hívó „invalid_time”-ot ad vissza). Ha egyik sincs a patch-ben, változatlan.
+ */
+function withDueTime<T extends { due_date?: string | null; due_time?: string | null }>(data: T): T | null {
+  if (!("due_time" in data) && !("due_date" in data)) return data;
+  const next = { ...data };
+  if ("due_date" in data && !data.due_date) {
+    next.due_time = null;
+    return next;
+  }
+  if ("due_time" in data) {
+    if (data.due_time == null || data.due_time === "") next.due_time = null;
+    else {
+      const hhmm = normalizeTime(data.due_time);
+      if (!hhmm) return null;
+      next.due_time = hhmm;
+    }
+  }
+  return next;
 }
 
 async function verifyTripOrganizer(supabase: Awaited<ReturnType<typeof createClient>>, tripId: string, userId: string) {
@@ -294,11 +335,52 @@ export async function initTimelineFromTemplate(
 // TIMELINE LEKÉRDEZÉS (teljes fa)
 // ══════════════════════════════════════════════
 
+const TASK_COLUMNS =
+  "id, milestone_id, trip_id, name, name_localized, status, task_type, assignee_type, assignee_id, is_required, is_blocking, requires_verification, due_date, due_time, sort_order";
+
+type LocationJoinRow = {
+  id: string;
+  milestone_id: string | null;
+  task_id: string | null;
+  notes: string | null;
+  locations: { id: string; name: string; formatted_address: string | null; latitude: number | string | null; longitude: number | string | null } | null;
+};
+
+function toTimelineLocation(row: LocationJoinRow): TimelineLocation | null {
+  const loc = row.locations;
+  if (!loc) return null;
+  const lat = loc.latitude == null ? null : Number(loc.latitude);
+  const lng = loc.longitude == null ? null : Number(loc.longitude);
+  return {
+    binding_id: row.id,
+    location_id: loc.id,
+    name: loc.name,
+    address: loc.formatted_address,
+    lat: Number.isFinite(lat) ? lat : null,
+    lng: Number.isFinite(lng) ? lng : null,
+    notes: row.notes,
+  };
+}
+
 export async function fetchTripTimeline(
   tripId: string
-): Promise<{ phases: PhaseWithMilestones[]; stats: TimelineStats; error?: string }> {
+): Promise<{ phases: PhaseWithMilestones[]; stats: TimelineStats; timezone: string; error?: string }> {
+  const empty = { total_tasks: 0, completed_tasks: 0, progress_percent: 0 };
   const { supabase, user } = await getAuthUser();
-  if (!user) return { phases: [], stats: { total_tasks: 0, completed_tasks: 0, progress_percent: 0 }, error: "Not authenticated" };
+  if (!user) return { phases: [], stats: empty, timezone: "UTC", error: "Not authenticated" };
+
+  // A túra helyi ideje (M23): a szervező választása, különben az ország fő zónája.
+  const { data: tripRow } = await supabase.from("trips").select("timezone, location_country").eq("id", tripId).maybeSingle();
+  let countryZone: string | null = null;
+  if (tripRow?.location_country) {
+    const { data: c } = await supabase
+      .from("ref_countries")
+      .select("primary_timezone")
+      .eq("code", tripRow.location_country)
+      .maybeSingle();
+    countryZone = (c as { primary_timezone?: string | null } | null)?.primary_timezone ?? null;
+  }
+  const timezone = effectiveTripTimezone(tripRow?.timezone ?? null, countryZone);
 
   // Fázisok
   const { data: phases } = await supabase
@@ -308,7 +390,7 @@ export async function fetchTripTimeline(
     .order("sort_order");
 
   if (!phases || phases.length === 0) {
-    return { phases: [], stats: { total_tasks: 0, completed_tasks: 0, progress_percent: 0 } };
+    return { phases: [], stats: empty, timezone };
   }
 
   const phaseIds = phases.map((p) => p.id);
@@ -316,7 +398,7 @@ export async function fetchTripTimeline(
   // Mérföldkövek
   const { data: milestones } = await supabase
     .from("trip_milestones")
-    .select("id, phase_id, trip_id, name, name_localized, description, status, due_date, sort_order")
+    .select("id, phase_id, trip_id, name, name_localized, description, status, due_date, due_time, sort_order")
     .in("phase_id", phaseIds)
     .order("sort_order");
 
@@ -325,9 +407,24 @@ export async function fetchTripTimeline(
   // Feladatok
   const { data: tasks } = await supabase
     .from("trip_tasks")
-    .select("id, milestone_id, trip_id, name, name_localized, status, task_type, assignee_type, assignee_id, is_required, is_blocking, requires_verification, due_date, sort_order")
+    .select(TASK_COLUMNS)
     .eq("trip_id", tripId)
     .order("sort_order");
+
+  // Helyek (070, M121): mérföldkőhöz vagy feladathoz kötve
+  const { data: placeRows } = await supabase
+    .from("trip_locations")
+    .select("id, milestone_id, task_id, notes, locations(id, name, formatted_address, latitude, longitude)")
+    .eq("trip_id", tripId)
+    .or("milestone_id.not.is.null,task_id.not.is.null");
+  const placeByMilestone = new Map<string, TimelineLocation>();
+  const placeByTask = new Map<string, TimelineLocation>();
+  for (const row of (placeRows ?? []) as unknown as LocationJoinRow[]) {
+    const loc = toTimelineLocation(row);
+    if (!loc) continue;
+    if (row.milestone_id) placeByMilestone.set(row.milestone_id, loc);
+    if (row.task_id) placeByTask.set(row.task_id, loc);
+  }
 
   // Assignee-k
   const { data: assignees } = await supabase
@@ -336,7 +433,10 @@ export async function fetchTripTimeline(
     .in("milestone_id", milestoneIds.length ? milestoneIds : ["__none__"]);
 
   // Stats
-  const allTasks = tasks ?? [];
+  const allTasks: TimelineTask[] = ((tasks ?? []) as Omit<TimelineTask, "location">[]).map((t) => ({
+    ...t,
+    location: placeByTask.get(t.id) ?? null,
+  }));
   const totalTasks = allTasks.length;
   const completedTasks = allTasks.filter((t) => t.status === "completed").length;
   const progressPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
@@ -358,6 +458,7 @@ export async function fetchTripTimeline(
 
         return {
           ...ms,
+          location: placeByMilestone.get(ms.id) ?? null,
           tasks: msTasks,
           assignees: msAssignees,
           task_count: msTasks.length,
@@ -366,7 +467,7 @@ export async function fetchTripTimeline(
       }),
   }));
 
-  return { phases: result, stats: { total_tasks: totalTasks, completed_tasks: completedTasks, progress_percent: progressPercent } };
+  return { phases: result, stats: { total_tasks: totalTasks, completed_tasks: completedTasks, progress_percent: progressPercent }, timezone };
 }
 
 // ══════════════════════════════════════════════
@@ -464,11 +565,11 @@ export async function createMilestone(
       name,
       sort_order: nextOrder,
     })
-    .select("id, phase_id, trip_id, name, name_localized, description, status, due_date, sort_order")
+    .select("id, phase_id, trip_id, name, name_localized, description, status, due_date, due_time, sort_order")
     .single();
 
   if (error) return { milestone: null, error: error.message };
-  return { milestone: data as TimelineMilestone };
+  return { milestone: { ...(data as Omit<TimelineMilestone, "location">), location: null } };
 }
 
 export async function updateMilestone(
@@ -478,6 +579,7 @@ export async function updateMilestone(
     description?: string;
     status?: "not_started" | "in_progress" | "done";
     due_date?: string | null;
+    due_time?: string | null;
     phase_id?: string;
     sort_order?: number;
   }
@@ -485,9 +587,11 @@ export async function updateMilestone(
   const { supabase, user } = await getAuthUser();
   if (!user) return { error: "Not authenticated" };
 
+  const patch = withDueTime(data);
+  if (!patch) return { error: "invalid_time" };
   const { error } = await supabase
     .from("trip_milestones")
-    .update(data.name !== undefined ? { ...data, name_localized: {} } : data)
+    .update(patch.name !== undefined ? { ...patch, name_localized: {} } : patch)
     .eq("id", milestoneId);
 
   if (error) return { error: error.message };
@@ -547,11 +651,11 @@ export async function createTask(
       sort_order: nextOrder,
       due_date: data.due_date || null,
     })
-    .select("id, milestone_id, trip_id, name, name_localized, status, task_type, assignee_type, assignee_id, is_required, is_blocking, requires_verification, due_date, sort_order")
+    .select(TASK_COLUMNS)
     .single();
 
   if (error) return { task: null, error: error.message };
-  return { task: task as TimelineTask };
+  return { task: { ...(task as Omit<TimelineTask, "location">), location: null } };
 }
 
 export async function updateTask(
@@ -565,6 +669,7 @@ export async function updateTask(
     is_required: boolean;
     is_blocking: boolean;
     due_date: string | null;
+    due_time: string | null;
     task_type: string;
     task_result: Record<string, unknown>;
     notes: string;
@@ -574,9 +679,11 @@ export async function updateTask(
   const { supabase, user } = await getAuthUser();
   if (!user) return { error: "Not authenticated" };
 
+  const patch = withDueTime(data);
+  if (!patch) return { error: "invalid_time" };
   const { error } = await supabase
     .from("trip_tasks")
-    .update(data.name !== undefined ? { ...data, name_localized: {} } : data)
+    .update(patch.name !== undefined ? { ...patch, name_localized: {} } : patch)
     .eq("id", taskId);
   if (error) return { error: error.message };
   return {};
@@ -861,4 +968,54 @@ export async function fetchMyTasks(
       };
     }),
   };
+}
+
+// ══════════════════════════════════════════════
+// ÁTRENDEZÉS (071) — egy RPC, egy tranzakció
+// ══════════════════════════════════════════════
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const isUuidList = (ids: unknown): ids is string[] =>
+  Array.isArray(ids) && ids.length > 0 && ids.length <= 500 && ids.every((id) => typeof id === "string" && UUID_RE.test(id));
+
+/** A felületnek csak a kategória megy ki, a nyers DB-üzenet nem. */
+function reorderError(error: { code?: string } | null): { error?: "forbidden" | "failed" } {
+  if (!error) return {};
+  return { error: error.code === "42501" ? "forbidden" : "failed" };
+}
+
+export async function reorderPhases(tripId: string, phaseIds: string[]): Promise<{ error?: "forbidden" | "failed" }> {
+  if (!UUID_RE.test(tripId) || !isUuidList(phaseIds)) return { error: "failed" };
+  const { supabase, user } = await getAuthUser();
+  if (!user) return { error: "forbidden" };
+  const { error } = await supabase.rpc("reorder_trip_phases", { p_trip_id: tripId, p_phase_ids: phaseIds });
+  return reorderError(error);
+}
+
+export async function reorderMilestones(
+  tripId: string,
+  layout: { phase_id: string; milestone_ids: string[] }[],
+): Promise<{ error?: "forbidden" | "failed" }> {
+  if (
+    !UUID_RE.test(tripId) ||
+    !Array.isArray(layout) ||
+    layout.length === 0 ||
+    !layout.every((e) => UUID_RE.test(e?.phase_id ?? "") && Array.isArray(e.milestone_ids) &&
+      e.milestone_ids.every((id) => typeof id === "string" && UUID_RE.test(id)))
+  ) {
+    return { error: "failed" };
+  }
+  const { supabase, user } = await getAuthUser();
+  if (!user) return { error: "forbidden" };
+  const payload = layout.map((e) => ({ phase_id: e.phase_id, milestone_ids: e.milestone_ids }));
+  const { error } = await supabase.rpc("reorder_trip_milestones", { p_trip_id: tripId, p_layout: payload });
+  return reorderError(error);
+}
+
+export async function reorderTasks(milestoneId: string, taskIds: string[]): Promise<{ error?: "forbidden" | "failed" }> {
+  if (!UUID_RE.test(milestoneId) || !isUuidList(taskIds)) return { error: "failed" };
+  const { supabase, user } = await getAuthUser();
+  if (!user) return { error: "forbidden" };
+  const { error } = await supabase.rpc("reorder_trip_tasks", { p_milestone_id: milestoneId, p_task_ids: taskIds });
+  return reorderError(error);
 }

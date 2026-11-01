@@ -231,3 +231,84 @@ export async function geocodeLocation(
   cache.set(key, { result, storedAt: Date.now() });
   return result;
 }
+
+// ── Place search (M121 L3, spec §4.4 step 4) ────────────────────────────────
+
+/** One free-text search hit; `placeId` is provider-prefixed (spec §5.1 `geocode_place_id`). */
+export interface PlaceCandidate {
+  placeId: string;
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+  city: string | null;
+  countryCode: string | null;
+}
+
+const PLACE_CACHE_TTL_MS = 60 * 60 * 1000;
+const placeCache = new Map<string, { result: PlaceCandidate[] | null; storedAt: number }>();
+
+/**
+ * Free-text place search, narrowed to the trip's country. Called only on an explicit
+ * "Search" (button / Enter) — never per keystroke (Nominatim policy, spec §4.4).
+ * Returns at most 5 hits; `null` means the provider is unreachable (the caller still
+ * lets the organiser save the name without coordinates). Never throws.
+ */
+export async function searchPlaces(query: string, countryCode?: string | null): Promise<PlaceCandidate[] | null> {
+  const q = query.trim().replace(/\s+/g, ' ');
+  if (q.length < 3) return [];
+  const country = countryCode?.trim().toLowerCase() || '';
+  const key = `${country}|${q.toLowerCase()}`;
+  const cached = placeCache.get(key);
+  if (cached && Date.now() - cached.storedAt < PLACE_CACHE_TTL_MS) return cached.result;
+
+  const result = await throttle(async (): Promise<PlaceCandidate[] | null> => {
+    const url = new URL(NOMINATIM_ENDPOINT);
+    url.searchParams.set('format', 'jsonv2');
+    url.searchParams.set('limit', '5');
+    url.searchParams.set('addressdetails', '1');
+    url.searchParams.set('q', q);
+    if (/^[a-z]{2}$/.test(country)) url.searchParams.set('countrycodes', country);
+    try {
+      const response = await fetch(url, {
+        headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        cache: 'no-store',
+      });
+      if (!response.ok) {
+        console.warn(`[geocoding] Nominatim search responded ${response.status}`);
+        return null;
+      }
+      const rows: unknown = await response.json();
+      if (!Array.isArray(rows)) return null;
+      return rows.flatMap((row) => {
+        const r = row as {
+          osm_type?: string; osm_id?: number; lat?: string; lon?: string; name?: string; display_name?: string;
+          address?: Record<string, string | undefined>;
+        };
+        const lat = Number(r.lat);
+        const lng = Number(r.lon);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) return [];
+        const display = r.display_name ?? '';
+        const name = (r.name && r.name.trim()) || display.split(',')[0]?.trim() || q;
+        const address = display.startsWith(name) ? display.slice(name.length).replace(/^,\s*/, '') : display;
+        const a = r.address ?? {};
+        return [{
+          placeId: `nominatim:${r.osm_type ?? 'x'}/${r.osm_id ?? ''}`,
+          name: name.slice(0, 300),
+          address: address.slice(0, 500),
+          lat: Number(lat.toFixed(7)),
+          lng: Number(lng.toFixed(7)),
+          city: a.city ?? a.town ?? a.village ?? a.municipality ?? null,
+          countryCode: a.country_code ? a.country_code.toUpperCase() : null,
+        }];
+      });
+    } catch (error) {
+      console.warn('[geocoding] Nominatim search failed:', error);
+      return null;
+    }
+  });
+
+  if (result !== null) placeCache.set(key, { result, storedAt: Date.now() });
+  return result;
+}
