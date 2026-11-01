@@ -1,8 +1,25 @@
 import { formatMoney } from '@/lib/currency';
 import type { ExpenseCategory } from './schemas';
 
-/** Cent → lokalizált pénzösszeg (a pénznem tizedeseit az Intl adja; HUF 0 tizedes). */
-export const money = (cents: number, currency: string, locale: string) => formatMoney(cents / 100, currency, locale);
+/**
+ * Cent → lokalizált pénzösszeg (a pénznem tizedeseit az Intl adja; HUF 0 tizedes).
+ * Kivétel: ha az összegnek van törtrésze (legfeljebb 2 tizedes rögzíthető, GAP-012), a 0 tizedesű
+ * pénznemet is 2 tizedessel mutatjuk — különben a kiegyenlítési összeg eltérne a rögzítettől.
+ */
+export function money(cents: number, currency: string, locale: string): string {
+  if (cents % 100 !== 0) {
+    try {
+      const loc = locale === 'en' ? 'en-US' : 'hu-HU';
+      const nf = new Intl.NumberFormat(loc, { style: 'currency', currency });
+      if (nf.resolvedOptions().maximumFractionDigits === 0) {
+        return new Intl.NumberFormat(loc, { style: 'currency', currency, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cents / 100);
+      }
+    } catch {
+      /* ismeretlen kód — a közös formázó tartaléka */
+    }
+  }
+  return formatMoney(cents / 100, currency, locale);
+}
 
 /** Icon Bank kulcsok (a meglévő bankból — a D04 anchor/bed/fuel ikonjai helyett a bankban lévő megfelelők). */
 export const CATEGORY_ICON: Record<ExpenseCategory, string> = {
