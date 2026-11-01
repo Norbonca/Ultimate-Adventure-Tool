@@ -1176,7 +1176,7 @@ const en: TranslationKeys = {
     },
     settlePage: {
       title: "Settle up",
-      intro: "Optimised settle-up — {count} transfers",
+      intro: "Optimised settle-up — transfers: {count}",
       introBody: "We compute the fewest transfers from the net balances. Amounts cannot be changed; if you disagree, flag it — the organiser sees it and resolves it by correcting the expense items.",
       yours: "Your items",
       all: "All settlements on this trip",
