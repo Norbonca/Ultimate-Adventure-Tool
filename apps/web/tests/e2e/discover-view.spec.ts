@@ -66,7 +66,8 @@ test.describe('Discover — view toggle', () => {
 
   test('DISCOVER-VIEW-2b: a grid tile links to its trip', async ({ page }) => {
     await page.goto('/');
-    const tile = page.getByTestId('trip-tile').first();
+    // a series card (M024) is an <article> whose title links to the trip; a plain tile is the link itself
+    const tile = page.locator('[data-testid="trip-tile"]:not([data-series])').first();
     test.skip((await tile.count()) === 0, 'no trips in the data');
     await expect(tile).toHaveAttribute('href', /^\/trips\//);
     await expect(tile.getByTestId('trip-tile-title')).not.toBeEmpty();
@@ -159,11 +160,17 @@ test.describe('Discover — view toggle', () => {
     const hrefs = await page.getByTestId('discover-trip-list').locator('a[href^="/trips/"]').evaluateAll((links) =>
       [...new Set(links.map((link) => link.getAttribute('href')))]
     );
-    // Every marker is a listed card; a card may only be missing from the globe when it has no coordinates.
-    for (const marker of markers) {
-      expect(hrefs).toContain(`/trips/${marker.slug}`);
+    // Every marker is listed — directly, or (M024 K-10) as a date of a series whose card is listed: the globe keeps
+    // one marker per date, the list merges a series into one card that shows at most 3 dates.
+    const missing = markers.filter((marker) => !hrefs.includes(`/trips/${marker.slug}`));
+    for (const marker of missing) {
+      await page.goto(`/trips/${marker.slug}`);
+      await expect(page.getByTestId('trip-series-dates'), `/trips/${marker.slug} is neither listed nor a series date`).toBeVisible();
+      const siblings = await page.getByTestId('series-date-row').locator('a[href^="/trips/"]').evaluateAll((links) =>
+        links.map((link) => link.getAttribute('href'))
+      );
+      expect(siblings.some((href) => hrefs.includes(href))).toBe(true);
     }
-    expect(markers.length).toBeLessThanOrEqual(hrefs.length);
   });
 
   test('DISCOVER-VIEW-8: the card shows the trip image and "Details" opens the trip, even if the globe redraws mid-click', async ({ page }) => {

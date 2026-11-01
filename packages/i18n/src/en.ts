@@ -2058,6 +2058,63 @@ const en: TranslationKeys = {
   },
 
   // ============================================================================
+  // M024 Trip series — several dates, every date is a separate trip
+  // ============================================================================
+  series: {
+    dateCount: "{count} dates",
+    datesTitle: "Dates",
+    moreDates: "+{count} more dates",
+    priceFrom: "from {price}",
+    spots: "{count} spots",
+    full: "Full",
+    nextDate: "Next: {date}",
+    viewing: "Viewing",
+    closed: "Registration closed",
+    draft: "Draft",
+    datesSubtitle: "The same trip on several dates. Each date has its own group, capacity and price.",
+    chooseDate: "Which date are you applying for?",
+    alreadyApplied: "You have already applied: {dates}",
+    alreadyAppliedOption: "Already applied",
+    waitlistHint: "Full — the organizer may put you on the waitlist",
+    applyFor: "Apply — {date}",
+    selectedDate: "Selected date: {date}",
+    successTitle: "Your application has been sent",
+    successDate: "Date: {date}",
+    successBodyPending: "We will notify you once the organizer approves it. Your application appears under My trips with this date.",
+    successBodyApproved: "You have joined the group. The trip appears under My trips with this date.",
+    backToTrip: "Back to the trip",
+    openMyTrips: "Open My trips",
+    addDate: "New date",
+    addDateTitle: "Add a new date",
+    addDateSubtitle: "{title} — a new, separate trip in the same series",
+    startDate: "Start",
+    endDate: "End",
+    capacity: "Capacity",
+    price: "Price / person ({currency})",
+    deadline: "Application deadline",
+    optionalHint: "Optional",
+    copyTitle: "What is copied to the new date?",
+    copyYes1: "description, programme, details",
+    copyYes2: "category, difficulty, location",
+    copyYes3: "images and settings",
+    copyNo1: "applicants and waitlist",
+    copyNo2: "team (staff)",
+    copyNo3: "expenses, settlement, schedule",
+    createDraft: "Create date as draft",
+    created: "The new date has been created as a draft.",
+    openCreated: "Open it",
+    detach: "Detach",
+    detachConfirm: "Detach this date from the series? It will appear as a separate trip on its own card.",
+    orgRowStatus: "{applicants} applicants · {spots} spots left",
+    orgSubtitle: "Add a new date as a copy of this trip. In Discover the dates share one card.",
+    errors: {
+      invalidDates: "The end cannot be before the start.",
+      invalidDeadline: "The application deadline cannot be after the start.",
+      invalidCapacity: "Capacity must be between 1 and 1000.",
+    },
+  },
+
+  // ============================================================================
   // M23 — Calendar
   // ============================================================================
   // ── M22 Trip Ideas — Idea board ──

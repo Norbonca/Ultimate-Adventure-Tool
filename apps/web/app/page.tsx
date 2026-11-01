@@ -20,7 +20,7 @@ async function fetchPublishedTrips() {
     .from("trips")
     .select(
       `
-      id, title, slug, short_description, description,
+      id, title, slug, series_id, short_description, description,
       start_date, end_date,
       location_country, location_region, location_city,
       difficulty, max_participants, current_participants,
