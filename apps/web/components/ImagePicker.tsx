@@ -2,9 +2,16 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
-import { uploadCoverImage, fetchCoverImages } from "@/app/(app)/trips/actions";
-import { uploadAvatar, fetchSystemAvatars } from "@/app/(app)/settings/actions";
+import { createCoverUploadTicket, fetchCoverImages } from "@/app/(app)/trips/actions";
+import { createAvatarUploadTicket, fetchSystemAvatars } from "@/app/(app)/settings/actions";
 import { Icon } from "@/components/Icon";
+import { createClient } from "@/lib/supabase/browser";
+import {
+  IMAGE_UPLOAD_RULES,
+  acceptAttribute,
+  validateImageUpload,
+  type ImageUploadKind,
+} from "@/lib/storage/image-upload";
 
 // ============================================
 // ImagePicker — Közös képválasztó component
@@ -44,6 +51,7 @@ export function ImagePicker({
   const { t, locale } = useTranslation();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [avatarTab, setAvatarTab] = useState<"icon" | "nature" | "abstract">("icon");
@@ -64,35 +72,96 @@ export function ImagePicker({
     loadImages().catch(() => setUploadError(t("errors.loadFailed")));
   }, [showGallery, type, categoryId, t]);
 
-  // ── File upload handler ──
-  const handleFileUpload = useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
+  // ── Feltöltés (tallózás és behúzás közös útja) ──
+  const uploadFile = useCallback(
+    async (file: File) => {
+      const kind: ImageUploadKind = type === "avatar" ? "avatar" : "cover";
+      const problem = validateImageUpload(kind, file);
+      if (problem) {
+        setUploadError(
+          problem === "fileTooLarge"
+            ? t("errors.fileTooLarge", { max: IMAGE_UPLOAD_RULES[kind].maxMb })
+            : problem === "unsupportedFileFormat"
+              ? t("errors.unsupportedFileFormat")
+              : t("errors.noFileSelected")
+        );
+        return;
+      }
 
       setIsUploading(true);
       setUploadError("");
 
-      const fd = new FormData();
-      fd.append("file", file);
+      try {
+        // 1. Jegy a szervertől (bejelentkezés, típus, méret, saját mappa)
+        const request = { type: file.type, size: file.size };
+        const ticket = await (kind === "cover"
+          ? createCoverUploadTicket(request)
+          : createAvatarUploadTicket(request));
+        if (!ticket.ok) {
+          setUploadError(ticket.error);
+          return;
+        }
 
-      const result = await (type === "cover" || type === "card"
-        ? uploadCoverImage(fd)
-        : uploadAvatar(fd)).catch(() => ({ url: "", error: t("errors.saveFailed") }));
+        // 2. Feltöltés közvetlenül a Storage-ba — a fájl nem megy át server actionön
+        const { error } = await createClient()
+          .storage.from(ticket.bucket)
+          .uploadToSignedUrl(ticket.path, ticket.token, file, {
+            contentType: file.type,
+            cacheControl: "3600",
+          });
+        if (error) {
+          console.error("[ImagePicker] upload failed:", error.message);
+          setUploadError(t("errors.saveFailed"));
+          return;
+        }
 
-      setIsUploading(false);
-
-      if (result.error) {
-        setUploadError(result.error);
-      } else {
-        onSelect(result.url, "user_upload");
+        onSelect(ticket.publicUrl, "user_upload");
         setShowGallery(false);
+      } catch {
+        setUploadError(t("errors.saveFailed"));
+      } finally {
+        setIsUploading(false);
       }
-
-      // Reset input
-      e.target.value = "";
     },
     [type, onSelect, t]
+  );
+
+  // ── Tallózás ──
+  const handleFileUpload = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      // Reset input — ugyanaz a fájl újra kiválasztható
+      e.target.value = "";
+      if (file) void uploadFile(file);
+    },
+    [uploadFile]
+  );
+
+  // ── Behúzás (drag & drop) — a böngésző alapból megnyitná a fájlt ──
+  const handleDragOver = useCallback(
+    (e: React.DragEvent<HTMLLabelElement>) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = isUploading ? "none" : "copy";
+      if (!isUploading) setIsDragging(true);
+    },
+    [isUploading]
+  );
+
+  const handleDragLeave = useCallback((e: React.DragEvent<HTMLLabelElement>) => {
+    // a gyerekelemek közti mozgás ne kapcsolja ki a kiemelést
+    if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
+    setIsDragging(false);
+  }, []);
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent<HTMLLabelElement>) => {
+      e.preventDefault();
+      setIsDragging(false);
+      if (isUploading) return;
+      const file = e.dataTransfer.files?.[0];
+      if (file) void uploadFile(file);
+    },
+    [isUploading, uploadFile]
   );
 
   // ── Select gallery image ──
@@ -107,10 +176,9 @@ export function ImagePicker({
   const isCover = type === "cover";
   const isCard = type === "card";
   const isImageType = isCover || isCard;
-  const maxSize = isImageType ? "10 MB" : "5 MB";
-  const acceptTypes = isImageType
-    ? "image/jpeg,image/png,image/webp,image/avif"
-    : "image/jpeg,image/png,image/webp";
+  const uploadKind: ImageUploadKind = isImageType ? "cover" : "avatar";
+  const maxSize = `${IMAGE_UPLOAD_RULES[uploadKind].maxMb} MB`;
+  const acceptTypes = acceptAttribute(uploadKind);
 
   // Filter avatar images by tab
   const filteredImages =
@@ -174,7 +242,17 @@ export function ImagePicker({
       ) : (
         <>
           {/* ── Upload zone ── */}
-          <label className="flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-slate-200 hover:border-teal-400 transition-colors cursor-pointer bg-white">
+          <label
+            data-testid={`image-drop-zone-${type}`}
+            data-dragging={isDragging || undefined}
+            onDragEnter={handleDragOver}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={`flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed hover:border-teal-400 transition-colors cursor-pointer bg-white ${
+              isDragging ? "border-teal-400" : "border-slate-200"
+            }`}
+          >
             <input
               type="file"
               accept={acceptTypes}
