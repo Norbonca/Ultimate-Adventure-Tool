@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin-client";
 import { redirect } from "next/navigation";
 import { getPlatformAdmin } from "@/lib/admin-auth";
+import { recordAdminAudit } from "@/lib/admin-audit";
 
 // ─── Admin jogosultság ellenőrzés ────────────────────────────────────────────
 
@@ -160,20 +161,15 @@ export async function banUser(
 
   if (error) return { success: false, error: error.message };
 
-  // Audit log kísérlet (tábla még nem létezhet)
-  try {
-    await supabase.from("admin_audit_log").insert({
-      admin_user_id: adminUser.id,
-      admin_role: "operations_admin",
-      action: "user.ban",
-      target_type: "user",
-      target_id: userId,
-      details: { reason, duration, banned_until: banUntil },
-      result: "success",
-    });
-  } catch {
-    // Audit log tábla még nem létezik
-  }
+  await recordAdminAudit(supabase, {
+    admin_user_id: adminUser.id,
+    admin_role: "operations_admin",
+    action: "user.ban",
+    target_type: "user",
+    target_id: userId,
+    details: { reason, duration, banned_until: banUntil },
+    result: "success",
+  });
 
   return { success: true };
 }
@@ -190,18 +186,14 @@ export async function unbanUser(
 
   if (error) return { success: false, error: error.message };
 
-  try {
-    await supabase.from("admin_audit_log").insert({
-      admin_user_id: adminUser.id,
-      admin_role: "operations_admin",
-      action: "user.unban",
-      target_type: "user",
-      target_id: userId,
-      result: "success",
-    });
-  } catch {
-    // Audit log tábla még nem létezik
-  }
+  await recordAdminAudit(supabase, {
+    admin_user_id: adminUser.id,
+    admin_role: "operations_admin",
+    action: "user.unban",
+    target_type: "user",
+    target_id: userId,
+    result: "success",
+  });
 
   return { success: true };
 }
@@ -407,18 +399,14 @@ export async function updateTripStatus(
 
   if (error) return { success: false, error: error.message };
 
-  try {
-    await supabase.from("admin_audit_log").insert({
-      admin_user_id: adminUser.id,
-      admin_role: "content_moderator",
-      action: `trip.status.${newStatus}`,
-      target_type: "trip",
-      target_id: tripId,
-      result: "success",
-    });
-  } catch {
-    // Audit log tábla még nem létezik
-  }
+  await recordAdminAudit(supabase, {
+    admin_user_id: adminUser.id,
+    admin_role: "content_moderator",
+    action: `trip.status.${newStatus}`,
+    target_type: "trip",
+    target_id: tripId,
+    result: "success",
+  });
 
   return { success: true };
 }
@@ -479,17 +467,13 @@ export async function moderateIdea(
     .eq("id", ideaId);
   if (error) return { success: false, error: error.message };
 
-  try {
-    await supabase.from("admin_audit_log").insert({
-      admin_user_id: adminUser.id,
-      admin_role: "content_moderator",
-      action: `idea.moderation.${decision}`,
-      target_type: "trip_idea",
-      target_id: ideaId,
-      result: "success",
-    });
-  } catch {
-    // audit log opcionális
-  }
+  await recordAdminAudit(supabase, {
+    admin_user_id: adminUser.id,
+    admin_role: "content_moderator",
+    action: `idea.moderation.${decision}`,
+    target_type: "trip_idea",
+    target_id: ideaId,
+    result: "success",
+  });
   return { success: true };
 }
