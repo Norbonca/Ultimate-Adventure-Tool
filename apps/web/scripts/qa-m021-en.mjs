@@ -1,0 +1,27 @@
+// QA: M021 Menetrend angol felülettel (nyelvváltás után) — helyi dev szerveren.
+import { chromium } from "@playwright/test";
+const BASE = process.env.BASE ?? "http://localhost:3008";
+const OUT = process.env.OUT ?? "/tmp/qa-m021";
+const browser = await chromium.launch();
+const ctx = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+await ctx.addCookies([{ name: "trevu-locale", value: "en", url: BASE }]);
+const page = await ctx.newPage();
+const errors = [];
+page.on("pageerror", (e) => errors.push(String(e)));
+await page.goto(`${BASE}/login`);
+await page.locator('input[type="email"]').first().fill("dora@demo.trevu.local");
+await page.locator('input[type="password"]').first().fill("Demo-Trevu-2026!");
+await page.locator('form button[type="submit"]').first().click();
+await page.waitForURL((u) => !u.pathname.startsWith("/login"));
+await page.goto(`${BASE}/trips/split-vitorlas-tura/edit`);
+await page.getByText("Timeline", { exact: true }).first().click();
+await page.getByRole("button", { name: /^Move: / }).first().waitFor({ timeout: 20000 });
+const body = await page.locator("main, body").first().innerText();
+const huLeft = ["Áthelyezés", "Húzd a kártyát", "Mérföldkő hozzáadása", "Fázis hozzáadása"].filter((w) => body.includes(w));
+await page.locator("section[aria-label]").filter({ has: page.getByText("Add milestone") }).filter({ has: page.getByRole("button", { name: /^Move: / }).nth(1) }).first().locator("button:not([aria-label])").first().click();
+await page.getByRole("dialog").waitFor();
+const dlg = await page.getByRole("dialog").innerText();
+const huInDialog = ["Időpont", "Helyszín", "Feljebb", "Lejjebb", "Fázis", "Feladatok"].filter((w) => dlg.includes(w));
+await page.screenshot({ path: `${OUT}/10-modal-en.png` });
+console.log("[qa-en] HU maradvány a táblán:", huLeft, "| a modálban:", huInDialog, "| hibák:", errors.length);
+await browser.close();

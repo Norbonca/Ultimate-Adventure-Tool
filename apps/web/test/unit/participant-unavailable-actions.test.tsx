@@ -4,6 +4,8 @@ import { afterEach, expect, it, vi } from "vitest";
 vi.mock("@/lib/supabase/server", () => ({ createClient: async () => ({ auth: { getUser: async () => ({ data: { user: { id: "guest", user_metadata: {} } } }) } }) }));
 vi.mock("@/lib/i18n/server", () => ({ getServerT: async () => ({ t: (key: string) => key }), getServerLocale: async () => "en" }));
 vi.mock("@/components/AppHeader", () => ({ AppHeader: () => null }));
+vi.mock("@/app/(app)/trips/timeline-actions", () => ({ fetchParticipantTimeline: async () => ({ phases: [], stats: { total_tasks: 0, completed_tasks: 0, progress_percent: 0 }, timezone: "UTC", myTaskIds: [] }) }));
+vi.mock("@/components/timeline/ParticipantTimeline", () => ({ ParticipantTimeline: () => null }));
 vi.mock("@/app/(app)/trips/actions", () => ({
   fetchTripBySlug: async () => ({ id: "trip", organizer_id: "owner", title: "Trip", price_currency: "EUR", price_amount: 10, max_participants: 4 }),
   fetchTripParticipants: async () => [{ id: "member", user_id: "guest", status: "approved_pending_payment" }],

@@ -183,6 +183,7 @@
      kapcsoló: az útvonal teszi a Night-régió gyökerére (data-surface="night").
      A .dark osztály a későbbi, teljes felületű dark mode-é marad. */
   [data-surface="night"] {
+    --color-primary-subtle: #0D3B3A; /* = D02 Pencil Night token (M021 v2 kiemelés) */
     --color-bg: #0F172A;
     --color-surface: #1E293B;
     --color-border: #334155;
@@ -217,6 +218,7 @@
   /* Day régió Night oldalon belül (pl. a Discover alsó CTA-sávja, a Trip Detail
      hero alatti tartalma) — a :root értékeit állítja vissza (Brand Guide v2 §2/2). */
   [data-surface="day"] {
+    --color-primary-subtle: #F0FDFA;
     --color-bg: var(--arctic-white);
     --color-surface: #FFFFFF;
     --color-border: var(--border-subtle);
