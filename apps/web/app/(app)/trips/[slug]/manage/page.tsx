@@ -16,6 +16,7 @@ import { TripShareButton } from "@/components/TripShareButton";
 import { TripTimelineClient } from "@/components/TripTimelineClient";
 import { Icon } from "@/components/Icon";
 import { formatMoney } from "@/lib/currency";
+import { fetchTripExpenseTotal } from "../../expense-actions";
 import { ApplicationsManager, type ParticipantRow } from "@/components/trip-forms/ApplicationsManager";
 
 interface ManagePageProps {
@@ -64,9 +65,12 @@ export default async function TripManagePage({ params }: ManagePageProps) {
   const sc = statusConfig[trip.status] || statusConfig.draft;
 
   const revenue = trip.price_amount ? approvedCount * Number(trip.price_amount) : 0;
-  // TODO: M03 Expense integration — for now expenses are 0
-  const expenses = 0;
-  const netProfit = revenue - expenses;
+  // M03: a túra aktív költségei az elszámolási pénznemben; a nettó csak azonos pénznemnél számolható.
+  const expenseTotal = await fetchTripExpenseTotal(trip.id);
+  const expenses = expenseTotal.total / 100;
+  const expenseCurrency = expenseTotal.currency ?? trip.price_currency;
+  const sameCurrency = expenseCurrency === trip.price_currency;
+  const netProfit = sameCurrency ? revenue - expenses : null;
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -246,13 +250,13 @@ export default async function TripManagePage({ params }: ManagePageProps) {
               <div className="bg-navy-50 rounded-xl p-4">
                 <span className="text-xs text-navy-400 block mb-1">{t("trips.manage.expenses")}</span>
                 <span className="text-xl font-bold text-navy-900">
-                  {formatMoney(expenses, trip.price_currency, locale)}
+                  {formatMoney(expenses, expenseCurrency, locale)}
                 </span>
               </div>
               <div className="bg-navy-50 rounded-xl p-4">
                 <span className="text-xs text-navy-400 block mb-1">{t("trips.manage.netProfit")}</span>
                 <span className="text-xl font-bold text-green-600">
-                  {formatMoney(netProfit, trip.price_currency, locale)}
+                  {netProfit === null ? "—" : formatMoney(netProfit, trip.price_currency, locale)}
                 </span>
               </div>
             </div>
