@@ -14,6 +14,7 @@ import { CategoryDetailsSection } from "@/components/trip-forms/CategoryDetailsS
 import { ImagesSection } from "@/components/trip-forms/ImagesSection";
 import { SettingsSection } from "@/components/trip-forms/SettingsSection";
 import { TripDangerZone } from "@/components/trip-forms/TripDangerZone";
+import { TripFxSettings, type TripFxSettingsProps } from "@/components/expenses/TripFxSettings";
 import { CrewSection } from "@/components/trip-forms/CrewSection";
 import { StaffSeatsManager } from "@/components/trip-forms/StaffSeatsManager";
 import { ApplicationsManager, CrewMembersList } from "@/components/trip-forms/ApplicationsManager";
@@ -76,6 +77,7 @@ interface EditTripFormProps {
   parameterOptions: ParameterOptionRow[];
   countries: { code: string; name_hu: string; name_en: string; flag_emoji: string }[];
   crewPositions: string[];
+  fxSettings?: TripFxSettingsProps | null;
 }
 
 const TAB_DEFS: { key: TabKey; icon: string; labelKey: string }[] = [
@@ -96,6 +98,7 @@ export function EditTripForm({
   parameterOptions,
   countries,
   crewPositions,
+  fxSettings,
 }: EditTripFormProps) {
   const { t, locale: clientLocale } = useTranslation();
   const effectiveLocale = clientLocale || locale;
@@ -197,6 +200,7 @@ export function EditTripForm({
         return (
           <>
             <SettingsSection data={formData} onChange={updateForm} />
+            {fxSettings && <TripFxSettings {...fxSettings} />}
             <TripDangerZone tripId={trip.id} slug={slug} title={trip.title} status={trip.status} />
           </>
         );
@@ -215,7 +219,7 @@ export function EditTripForm({
           />
         );
     }
-  }, [activeTab, formData, updateForm, countries, categoryParameters, parameterOptions, trip.id, trip.title, trip.status, slug]);
+  }, [activeTab, formData, updateForm, countries, categoryParameters, parameterOptions, trip.id, trip.title, trip.status, slug, fxSettings]);
 
   return (
     <div className="bg-slate-50">

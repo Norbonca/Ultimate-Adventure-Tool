@@ -58,6 +58,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
       items: [
         { key: "tripConfig", label: t("admin.nav.tripConfig"), href: "/admin/trip-config", icon: "settings-2" },
         { key: "calendar", label: t("admin.nav.calendar"), href: "/admin/calendar", icon: "calendar" },
+        { key: "fx", label: t("admin.nav.fx"), href: "/admin/fx", icon: "banknote" },
         { key: "adminUsers", label: t("admin.nav.adminUsers"), href: "/admin/admin-users", icon: "shield" },
         { key: "settings", label: t("admin.nav.settings"), href: "/admin/settings", icon: "wrench", comingSoon: true },
       ],

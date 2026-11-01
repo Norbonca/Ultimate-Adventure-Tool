@@ -5,6 +5,7 @@ import { getServerLocale } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
 import { CATEGORY_DISPLAY } from "@/lib/categories";
 import { EditTripForm } from "./edit-form";
+import type { TripFxSettingsProps } from "@/components/expenses/TripFxSettings";
 
 interface EditPageProps {
   params: Promise<{ slug: string }>;
@@ -40,6 +41,23 @@ export default async function EditTripPage({ params }: EditPageProps) {
     ? await fetchParameterOptions(selectParamIds)
     : [];
 
+  // M03 · Elszámolás (D02 XKV28): a túra devizabeállításai, túraszintű árfolyamai és a zárolás állapota.
+  const [{ data: fxRow }, { data: fxRates }, { count: activeExpenses }] = await Promise.all([
+    supabase.from("trips").select("settlement_currency, fx_mode, expenses_participants_can_add").eq("id", trip.id).maybeSingle(),
+    supabase.from("trip_fx_rates").select("currency, rate").eq("trip_id", trip.id).order("currency"),
+    supabase.from("expenses").select("id", { count: "exact", head: true }).eq("trip_id", trip.id).eq("status", "active"),
+  ]);
+  const fxSettings: TripFxSettingsProps | null = fxRow
+    ? {
+        tripId: trip.id,
+        settlementCurrency: fxRow.settlement_currency,
+        fxMode: fxRow.fx_mode,
+        participantsCanAdd: fxRow.expenses_participants_can_add,
+        rates: (fxRates ?? []).map((r) => ({ currency: r.currency, rate: String(r.rate) })),
+        locked: (activeExpenses ?? 0) > 0,
+      }
+    : null;
+
   return (
     <main className="min-h-screen bg-slate-50">
       <AppHeader
@@ -55,6 +73,7 @@ export default async function EditTripPage({ params }: EditPageProps) {
         parameterOptions={paramOptions}
         countries={countries}
         crewPositions={crewPositions.map((position) => position.role_name)}
+        fxSettings={fxSettings}
       />
     </main>
   );
