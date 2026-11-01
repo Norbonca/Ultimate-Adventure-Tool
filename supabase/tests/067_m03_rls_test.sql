@@ -1,5 +1,5 @@
 -- Tranzakciós füstteszt a 067-hez (fx-sync ütemezés + M03 olvasási/írási szabályok). A végén ROLLBACK.
--- Élesben lefuttatva 2026-11-01 a migráció tartalmával, visszagörgetett tranzakcióban: PASS.
+-- Élesben lefuttatva 2026-11-01 a migráció tartalmával, visszagörgetett tranzakcióban: PASS (a 067 élesítése után is, a claim-nullázással).
 BEGIN;
 DO $$
 DECLARE org uuid := gen_random_uuid(); a uuid := gen_random_uuid(); b uuid := gen_random_uuid(); c uuid := gen_random_uuid(); cat uuid := (SELECT id FROM public.categories LIMIT 1);
@@ -36,6 +36,8 @@ DO $$
 DECLARE org uuid := gen_random_uuid(); a uuid := gen_random_uuid(); b uuid := gen_random_uuid(); x uuid := gen_random_uuid(); cat uuid := (SELECT id FROM public.categories LIMIT 1);
   trip uuid; trip2 uuid; ex uuid; ok boolean;
 BEGIN
+  -- az előző blokk JWT-claimje a tranzakcióban marad (set_config …, true) → nullázni kell, különben a guard_participant_transition 42501-et dob
+  PERFORM set_config('request.jwt.claims', '', true);
   INSERT INTO auth.users (id, email, aud, role) SELECT u, u||'@t.local','authenticated','authenticated' FROM unnest(ARRAY[org,a,b,x]) u;
   INSERT INTO public.profiles (id, display_name, slug, first_name, email) SELECT u, 'T '||u, 't-'||u, 'T', u||'@t.local' FROM unnest(ARRAY[org,a,b,x]) u ON CONFLICT (id) DO NOTHING;
   INSERT INTO public.trips (organizer_id, title, slug, description, difficulty, location_country, max_participants, status, visibility, category_id, start_date, end_date, expenses_participants_can_add)
