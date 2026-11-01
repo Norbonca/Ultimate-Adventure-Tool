@@ -1,6 +1,36 @@
 "use client";
 
-import { useCallback, useEffect, useId, useState } from "react";
+/**
+ * M021 Menetrend — tábla (fázisoszlopok, mérföldkő-kártyák) húzással, időponttal, helyszínnel.
+ * Terv: D02 „M021 v2” — tábla 1440 `UDerj`, 390 `PbOhz`; modál `NO5UX` / alsó lap `zNUB9`; folyamat `DngVH`.
+ * Átrendezés: @dnd-kit (egér, érintés hosszú nyomással, billentyűzet); mentés egy RPC-vel (071), hibánál visszaáll.
+ */
+
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  closestCenter,
+  closestCorners,
+  useDroppable,
+  useSensor,
+  useSensors,
+  type Announcements,
+  type CollisionDetection,
+  type DragEndEvent,
+  type DragOverEvent,
+  type UniqueIdentifier,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  horizontalListSortingStrategy,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import {
   fetchTripTimeline,
@@ -8,73 +38,92 @@ import {
   initTimelineFromTemplate,
   createPhase,
   createMilestone,
-  createTask,
-  updateMilestone,
-  updateTask,
-  deleteMilestone,
-  deleteTask,
-  submitTask,
-  verifyTask,
-  rejectTask,
+  reorderMilestones,
+  reorderPhases,
   type PhaseWithMilestones,
   type TimelineStats,
   type TimelineTemplate,
   type MilestoneWithTasks,
-  type TimelineTask,
 } from "@/app/(app)/trips/timeline-actions";
 import { Icon } from "@/components/Icon";
 import { getLocalizedName, getLocalizedText } from "@/lib/i18n/localized";
-
-// ── Status colors ───────────────────────────
+import { formatDue, moveInList, moveMilestone, type MilestoneLayoutEntry } from "@/lib/timeline/format";
+import { MilestoneModal } from "@/components/timeline/MilestoneModal";
+import { TIMELINE_INPUT } from "@/components/timeline/LocationField";
 
 const STATUS_DOT: Record<string, string> = {
-  not_started: "bg-slate-400",
-  in_progress: "bg-amber-500",
-  done: "bg-green-500",
+  not_started: "bg-[var(--color-text-muted)]",
+  in_progress: "bg-[var(--color-warning)]",
+  done: "bg-[var(--color-success)]",
 };
-
-const TASK_STATUS_COLORS: Record<string, { bg: string; text: string }> = {
-  pending: { bg: "bg-slate-100", text: "text-slate-600" },
-  in_progress: { bg: "bg-blue-50", text: "text-blue-600" },
-  pending_verification: { bg: "bg-amber-50", text: "text-amber-600" },
-  completed: { bg: "bg-green-50", text: "text-green-600" },
-  rejected: { bg: "bg-red-50", text: "text-red-600" },
-  skipped: { bg: "bg-slate-50", text: "text-slate-400" },
-  blocked: { bg: "bg-orange-50", text: "text-orange-600" },
-};
-
-// ── Phase icons ─────────────────────────────
 
 // Phase icons are Icon Bank keys (03_Icon_Bank.md §6.2) stored in trip_phases.icon.
 const PHASE_ICON_FALLBACK = "circle";
 
+const P = (id: string) => `p:${id}`;
+const M = (id: string) => `m:${id}`;
+const COL = (id: string) => `col:${id}`;
+const raw = (id: UniqueIdentifier) => String(id).replace(/^(p|m|col):/, "");
+const kind = (id: UniqueIdentifier) => String(id).split(":")[0];
+
+function layoutOf(phases: PhaseWithMilestones[]): MilestoneLayoutEntry[] {
+  return phases.map((p) => ({ phase_id: p.id, milestone_ids: p.milestones.map((m) => m.id) }));
+}
+
+function applyLayout(phases: PhaseWithMilestones[], layout: MilestoneLayoutEntry[]): PhaseWithMilestones[] {
+  const byId = new Map(phases.flatMap((p) => p.milestones).map((m) => [m.id, m]));
+  const phaseById = new Map(phases.map((p) => [p.id, p]));
+  return layout.flatMap((e) => {
+    const phase = phaseById.get(e.phase_id);
+    if (!phase) return [];
+    return [
+      {
+        ...phase,
+        milestones: e.milestone_ids.flatMap((id) => {
+          const m = byId.get(id);
+          return m ? [{ ...m, phase_id: e.phase_id }] : [];
+        }),
+      },
+    ];
+  });
+}
+
+const sameLayout = (a: MilestoneLayoutEntry[], b: MilestoneLayoutEntry[]) => JSON.stringify(a) === JSON.stringify(b);
+
 // ══════════════════════════════════════════════
 // MAIN COMPONENT
-// ══���════════════════���══════════════════════════
+// ══════════════════════════════════════════════
 
 interface TripTimelineClientProps {
   tripId: string;
   isOrganizer: boolean;
 }
 
+type Toast = { tone: "ok" | "error"; text: string } | null;
+
 export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientProps) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [phases, setPhases] = useState<PhaseWithMilestones[]>([]);
   const [stats, setStats] = useState<TimelineStats>({ total_tasks: 0, completed_tasks: 0, progress_percent: 0 });
+  const [timezone, setTimezone] = useState("UTC");
   const [loading, setLoading] = useState(true);
-  const [selectedMilestone, setSelectedMilestone] = useState<MilestoneWithTasks | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
+  const [toast, setToast] = useState<Toast>(null);
+  const snapshot = useRef<PhaseWithMilestones[] | null>(null);
 
-  // Betöltés (D12, 2026-10-30): az effect nem állít szinkron state-et — az eredmény a válasz után érkezik;
-  // az első futásnál a loading már true (useState). Az újratöltés (felhasználói művelet után) külön.
+  // Betöltés (D12, 2026-10-30): az effect nem állít szinkron state-et — az eredmény a válasz után érkezik.
   const applyTimeline = useCallback(
     (result: Awaited<ReturnType<typeof fetchTripTimeline>>) => {
-      if (!result.error) {
+      if (result.error) {
+        setLoadError(true);
+      } else {
+        setLoadError(false);
         setPhases(result.phases);
         setStats(result.stats);
-        if (result.phases.length === 0 && isOrganizer) {
-          setShowTemplateSelector(true);
-        }
+        setTimezone(result.timezone);
+        if (result.phases.length === 0 && isOrganizer) setShowTemplateSelector(true);
       }
       setLoading(false);
     },
@@ -83,24 +132,190 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
 
   useEffect(() => {
     let alive = true;
-    fetchTripTimeline(tripId).then((result) => {
-      if (alive) applyTimeline(result);
-    });
+    fetchTripTimeline(tripId)
+      .then((result) => {
+        if (alive) applyTimeline(result);
+      })
+      .catch(() => {
+        if (alive) {
+          setLoadError(true);
+          setLoading(false);
+        }
+      });
     return () => {
       alive = false;
     };
   }, [tripId, applyTimeline]);
 
+  useEffect(() => {
+    if (toast?.tone !== "ok") return;
+    const timer = setTimeout(() => setToast(null), 2500);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
   const reloadTimeline = useCallback(() => {
     setLoading(true);
-    fetchTripTimeline(tripId).then(applyTimeline);
+    fetchTripTimeline(tripId)
+      .then(applyTimeline)
+      .catch(() => {
+        setLoadError(true);
+        setLoading(false);
+      });
   }, [tripId, applyTimeline]);
 
+  /** Mérföldkő-elrendezés mentése; hibánál visszaáll a `previous` állapotra. */
+  const persistLayout = useCallback(
+    async (next: PhaseWithMilestones[], previous: PhaseWithMilestones[]): Promise<boolean> => {
+      setPhases(next);
+      if (sameLayout(layoutOf(next), layoutOf(previous))) return true;
+      const res = await reorderMilestones(tripId, layoutOf(next)).catch(() => ({ error: "failed" as const }));
+      if (res.error) {
+        setPhases(previous);
+        setToast({ tone: "error", text: t("timeline.reorderFailed") });
+        return false;
+      }
+      setToast({ tone: "ok", text: t("timeline.reorderSaved") });
+      return true;
+    },
+    [tripId, t],
+  );
+
+  const persistPhaseOrder = useCallback(
+    async (next: PhaseWithMilestones[], previous: PhaseWithMilestones[]) => {
+      setPhases(next);
+      const res = await reorderPhases(tripId, next.map((p) => p.id)).catch(() => ({ error: "failed" as const }));
+      if (res.error) {
+        setPhases(previous);
+        setToast({ tone: "error", text: t("timeline.reorderFailed") });
+        return;
+      }
+      setToast({ tone: "ok", text: t("timeline.reorderSaved") });
+    },
+    [tripId, t],
+  );
+
+  // ── Húzás ──────────────────────────────────
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const phaseOfMilestone = (list: PhaseWithMilestones[], milestoneId: string) =>
+    list.find((p) => p.milestones.some((m) => m.id === milestoneId))?.id ?? null;
+
+  const collision: CollisionDetection = useCallback((args) => {
+    const activeKind = kind(args.active.id);
+    const allowed = args.droppableContainers.filter((c) =>
+      activeKind === "p" ? kind(c.id) === "p" : kind(c.id) === "m" || kind(c.id) === "col",
+    );
+    return activeKind === "p"
+      ? closestCenter({ ...args, droppableContainers: allowed })
+      : closestCorners({ ...args, droppableContainers: allowed });
+  }, []);
+
+  const onDragStart = () => {
+    snapshot.current = phases;
+  };
+
+  const onDragOver = (event: DragOverEvent) => {
+    const { active, over } = event;
+    if (!over || kind(active.id) !== "m") return;
+    const id = raw(active.id);
+    const fromPhase = phaseOfMilestone(phases, id);
+    const toPhase =
+      kind(over.id) === "col" ? raw(over.id) : kind(over.id) === "m" ? phaseOfMilestone(phases, raw(over.id)) : null;
+    if (!fromPhase || !toPhase || fromPhase === toPhase) return;
+    const target = phases.find((p) => p.id === toPhase);
+    if (!target) return;
+    const overIndex = kind(over.id) === "m" ? target.milestones.findIndex((m) => m.id === raw(over.id)) : -1;
+    const toIndex = overIndex < 0 ? target.milestones.length : overIndex;
+    setPhases((current) => applyLayout(current, moveMilestone(layoutOf(current), id, toPhase, toIndex)));
+  };
+
+  const onDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    const previous = snapshot.current ?? phases;
+    snapshot.current = null;
+    if (!over) {
+      setPhases(previous);
+      return;
+    }
+    if (kind(active.id) === "p") {
+      const from = phases.findIndex((p) => p.id === raw(active.id));
+      const to = phases.findIndex((p) => p.id === raw(over.id));
+      if (from < 0 || to < 0 || from === to) return;
+      void persistPhaseOrder(moveInList(phases, from, to), previous);
+      return;
+    }
+    const id = raw(active.id);
+    const phaseId = phaseOfMilestone(phases, id);
+    let next = phases;
+    if (phaseId && kind(over.id) === "m") {
+      const phase = phases.find((p) => p.id === phaseId);
+      const from = phase ? phase.milestones.findIndex((m) => m.id === id) : -1;
+      const to = phase ? phase.milestones.findIndex((m) => m.id === raw(over.id)) : -1;
+      if (to >= 0 && from !== to) next = applyLayout(phases, moveMilestone(layoutOf(phases), id, phaseId, to));
+    }
+    void persistLayout(next, previous);
+  };
+
+  const onDragCancel = () => {
+    if (snapshot.current) setPhases(snapshot.current);
+    snapshot.current = null;
+  };
+
+  const nameOf = (id: UniqueIdentifier) => {
+    const r = raw(id);
+    if (kind(id) === "p" || kind(id) === "col") {
+      const p = phases.find((x) => x.id === r);
+      return p ? getLocalizedName(p, locale) : "";
+    }
+    const m = phases.flatMap((p) => p.milestones).find((x) => x.id === r);
+    return m ? getLocalizedName(m, locale) : "";
+  };
+
+  const announcements: Announcements = {
+    onDragStart: ({ active }) => t("timeline.dndPickedUp").replace("{name}", nameOf(active.id)),
+    onDragOver: ({ active, over }) =>
+      over ? t("timeline.dndMovedOver").replace("{name}", nameOf(active.id)).replace("{target}", nameOf(over.id)) : undefined,
+    onDragEnd: ({ active }) => t("timeline.dndDropped").replace("{name}", nameOf(active.id)),
+    onDragCancel: () => t("timeline.dndCancelled"),
+  };
+
+  // ── Modál ──────────────────────────────────
+  const selected = (() => {
+    if (!selectedId) return null;
+    for (const p of phases) {
+      const index = p.milestones.findIndex((m) => m.id === selectedId);
+      if (index >= 0) return { milestone: p.milestones[index], phaseId: p.id, index, count: p.milestones.length };
+    }
+    return null;
+  })();
+
+  const moveSelected = async (toPhaseId: string, toIndex: number) => {
+    if (!selectedId) return false;
+    const next = applyLayout(phases, moveMilestone(layoutOf(phases), selectedId, toPhaseId, toIndex));
+    return persistLayout(next, phases);
+  };
+
+  // ── Állapotok ──────────────────────────────
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-16 text-slate-400">
-        <div className="w-6 h-6 border-2 border-slate-300 border-t-teal-500 rounded-full animate-spin mr-3" />
+      <div className="flex items-center justify-center py-16 text-ink-muted" role="status">
+        <span className="mr-3 h-6 w-6 animate-spin rounded-full border-2 border-line border-t-accent" />
         {t("common.loading")}
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div role="alert" className="rounded-2xl border border-line bg-surface p-8 text-center">
+        <p className="mb-4 text-ink-secondary">{t("timeline.loadFailed")}</p>
+        <button type="button" onClick={reloadTimeline} className="h-11 rounded-[10px] border border-line px-4 text-sm font-medium text-ink hover:bg-ghost">
+          {t("timeline.retry")}
+        </button>
       </div>
     );
   }
@@ -118,60 +333,111 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
     );
   }
 
+  const board = (
+    <div className="-mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-4 sm:gap-4">
+      {phases.map((phase) => (
+        <PhaseColumn
+          key={phase.id}
+          phase={phase}
+          tripId={tripId}
+          isOrganizer={isOrganizer}
+          onMilestoneClick={(ms) => setSelectedId(ms.id)}
+          onRefresh={reloadTimeline}
+        />
+      ))}
+    </div>
+  );
+
   return (
     <div className="space-y-5">
-      {/* ── Timeline Header ── */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-slate-900">{t("timeline.title")}</h2>
-        {isOrganizer && (
-          <AddPhaseButton tripId={tripId} onCreated={reloadTimeline} />
-        )}
+      {/* ── Fej ── */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <h2 className="text-xl font-semibold text-ink">{t("timeline.title")}</h2>
+          {isOrganizer && (
+            <>
+              <p className="hidden text-[13px] text-ink-muted sm:block">{t("timeline.dragHint").replace("{zone}", timezone)}</p>
+              <p className="text-[13px] text-ink-muted sm:hidden">{t("timeline.dragHintMobile")}</p>
+            </>
+          )}
+        </div>
+        {isOrganizer && <AddPhaseButton tripId={tripId} onCreated={reloadTimeline} />}
       </div>
 
-      {/* ── Progress Bar ── */}
+      {/* ── Haladás ── */}
       <div className="flex items-center gap-3">
-        <span className="text-sm text-slate-500">
+        <span className="text-[13px] text-ink-muted">
           {t("timeline.overallProgress")
             .replace("{completed}", String(stats.completed_tasks))
             .replace("{total}", String(stats.total_tasks))}
         </span>
-        <div className="flex-1 h-1.5 bg-slate-200 rounded-full">
-          <div
-            className="h-1.5 bg-teal-500 rounded-full transition-all"
-            style={{ width: `${stats.progress_percent}%` }}
-          />
+        <div className="h-1.5 flex-1 rounded-full bg-[var(--color-border)]">
+          <div className="h-1.5 rounded-full bg-accent transition-all" style={{ width: `${stats.progress_percent}%` }} />
         </div>
-        <span className="text-sm font-semibold text-teal-600">
+        <span className="text-[13px] font-semibold text-accent">
           {t("timeline.progressPercent").replace("{percent}", String(stats.progress_percent))}
         </span>
       </div>
 
-      {/* ── Phases (horizontal scroll) ── */}
-      <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollSnapType: "x mandatory" }}>
-        {phases.map((phase) => (
-          <PhaseColumn
-            key={phase.id}
-            phase={phase}
-            tripId={tripId}
-            isOrganizer={isOrganizer}
-            onMilestoneClick={setSelectedMilestone}
-            onRefresh={reloadTimeline}
-          />
-        ))}
-      </div>
+      {/* ── Oszlopok ── */}
+      {isOrganizer ? (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={collision}
+          onDragStart={onDragStart}
+          onDragOver={onDragOver}
+          onDragEnd={onDragEnd}
+          onDragCancel={onDragCancel}
+          accessibility={{ announcements, screenReaderInstructions: { draggable: t("timeline.dndInstructions") } }}
+        >
+          <SortableContext items={phases.map((p) => P(p.id))} strategy={horizontalListSortingStrategy}>
+            {board}
+          </SortableContext>
+        </DndContext>
+      ) : (
+        board
+      )}
 
-      {/* ── Milestone Modal ── */}
-      {selectedMilestone && (
+      {/* ── Visszajelzés ── */}
+      {toast && (
+        <div
+          role={toast.tone === "error" ? "alert" : "status"}
+          className="fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2.5 rounded-[10px] border border-[var(--color-border-strong)] bg-surface px-4 py-3 text-sm font-medium text-ink shadow-lg sm:left-auto sm:right-8 sm:translate-x-0"
+        >
+          <Icon
+            name={toast.tone === "ok" ? "check" : "alert-triangle"}
+            size={18}
+            className={toast.tone === "ok" ? "text-[var(--color-success)]" : "text-[var(--color-danger)]"}
+          />
+          {toast.text}
+          {toast.tone === "error" && (
+            <button type="button" onClick={() => setToast(null)} aria-label={t("common.close")} className="ml-1 text-ink-muted hover:text-ink">
+              <Icon name="x" size={14} />
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* ── Mérföldkő modál ── */}
+      {selected && (
         <MilestoneModal
-          milestone={selectedMilestone}
+          key={selected.milestone.id}
+          milestone={selected.milestone}
           tripId={tripId}
           isOrganizer={isOrganizer}
+          timezone={timezone}
+          phases={phases.map((p) => ({ id: p.id, name: getLocalizedName(p, locale) }))}
+          phaseId={selected.phaseId}
+          index={selected.index}
+          count={selected.count}
+          onMove={moveSelected}
           onClose={(changed) => {
-            setSelectedMilestone(null);
+            setSelectedId(null);
             if (changed) reloadTimeline();
           }}
-          onRefresh={() => {
-            setSelectedMilestone(null);
+          onSaved={() => {
+            setSelectedId(null);
+            setToast({ tone: "ok", text: t("timeline.milestoneSaved") });
             reloadTimeline();
           }}
         />
@@ -181,8 +447,8 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
 }
 
 // ══════════════════════════════════════════════
-// TEMPLATE SELECTOR
-// ═════════════════���════════════════════════════
+// TEMPLATE SELECTOR (üres állapot)
+// ══════════════════════════════════════════════
 
 function TemplateSelector({ tripId, onInit, onEmpty }: { tripId: string; onInit: () => void; onEmpty: () => void }) {
   const { t, locale } = useTranslation();
@@ -205,68 +471,66 @@ function TemplateSelector({ tripId, onInit, onEmpty }: { tripId: string; onInit:
     if (result.success) {
       onInit();
     } else {
-      setError(result.error ?? "Unknown error");
+      setError(result.error ?? t("timeline.initError"));
     }
     setInitializing(false);
   };
 
-  const handleEmpty = () => {
-    onEmpty();
-  };
-
   if (loading) {
-    return <div className="py-16 text-center text-slate-400">{t("common.loading")}</div>;
+    return <div className="py-16 text-center text-ink-muted">{t("common.loading")}</div>;
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-6">
+    <div className="space-y-6 rounded-2xl border border-line bg-surface p-8 text-center">
       <div>
-        <h2 className="text-xl font-bold text-slate-900 mb-2">{t("timeline.title")}</h2>
-        <p className="text-slate-500">{t("timeline.noTimeline")}</p>
+        <h2 className="mb-2 text-xl font-semibold text-ink">{t("timeline.title")}</h2>
+        <p className="text-ink-muted">{t("timeline.noTimeline")}</p>
       </div>
 
-      <div className="space-y-3 max-w-md mx-auto">
-        <p className="text-sm font-semibold text-slate-700">{t("timeline.chooseTemplate")}</p>
+      <div className="mx-auto max-w-md space-y-3">
+        <p className="text-sm font-semibold text-ink-secondary">{t("timeline.chooseTemplate")}</p>
         {templates.map((tpl) => {
           const description = getLocalizedText(tpl.description, tpl.description_localized, locale);
           return (
             <button
               key={tpl.id}
+              type="button"
               onClick={() => handleInit(tpl.id)}
               disabled={initializing}
-              className="w-full flex items-center gap-4 px-5 py-4 rounded-xl border border-slate-200 hover:border-teal-300 hover:bg-teal-50/50 transition-all text-left disabled:opacity-50"
+              className="flex w-full items-center gap-4 rounded-xl border border-line px-5 py-4 text-left transition-all hover:border-accent hover:bg-ghost disabled:opacity-50"
             >
-              <span className="text-teal-600"><Icon name={tpl.icon || "clipboard-list"} size={24} /></span>
+              <span className="text-accent">
+                <Icon name={tpl.icon || "clipboard-list"} size={24} />
+              </span>
               <div>
-                <span className="block text-sm font-semibold text-slate-800">
-                  {getLocalizedName(tpl, locale)}
-                </span>
-                {description && (
-                  <span className="block text-xs text-slate-500 mt-0.5">{description}</span>
-                )}
+                <span className="block text-sm font-semibold text-ink">{getLocalizedName(tpl, locale)}</span>
+                {description && <span className="mt-0.5 block text-xs text-ink-muted">{description}</span>}
               </div>
             </button>
           );
         })}
         <button
-          onClick={handleEmpty}
+          type="button"
+          onClick={onEmpty}
           disabled={initializing}
-          className="w-full flex items-center gap-4 px-5 py-4 rounded-xl border border-dashed border-slate-300 hover:border-teal-300 hover:bg-teal-50/30 transition-all text-left disabled:opacity-50"
+          className="flex w-full items-center gap-4 rounded-xl border border-dashed border-line-strong px-5 py-4 text-left transition-all hover:border-accent hover:bg-ghost disabled:opacity-50"
         >
-          <span className="text-slate-500"><Icon name="plus" size={24} /></span>
-          <span className="text-sm font-medium text-slate-600">{t("timeline.emptyTemplate")}</span>
+          <span className="text-ink-muted">
+            <Icon name="plus" size={24} />
+          </span>
+          <span className="text-sm font-medium text-ink-secondary">{t("timeline.emptyTemplate")}</span>
         </button>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700 break-all">
+        <div role="alert" className="break-all rounded-xl border border-line bg-ghost p-4 text-sm text-[var(--color-danger)]">
           <strong>{t("timeline.initError")}:</strong> {error}
         </div>
       )}
 
       {initializing && (
-        <div className="flex items-center justify-center gap-2 text-teal-600 text-sm">
-          <div className="w-4 h-4 border-2 border-teal-300 border-t-teal-600 rounded-full animate-spin" />
+        <div className="flex items-center justify-center gap-2 text-sm text-accent" role="status">
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-line border-t-accent" />
           {t("common.loading")}
         </div>
       )}
@@ -276,7 +540,7 @@ function TemplateSelector({ tripId, onInit, onEmpty }: { tripId: string; onInit:
 
 // ══════════════════════════════════════════════
 // PHASE COLUMN
-// ═════════════��════════════════════════════════
+// ══════════════════════════════════════════════
 
 function PhaseColumn({
   phase,
@@ -294,6 +558,12 @@ function PhaseColumn({
   const { t, locale } = useTranslation();
   const [addingMilestone, setAddingMilestone] = useState(false);
   const [newMilestoneName, setNewMilestoneName] = useState("");
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
+    id: P(phase.id),
+    disabled: !isOrganizer,
+  });
+  const { setNodeRef: setDropRef, isOver } = useDroppable({ id: COL(phase.id), disabled: !isOrganizer });
+  const name = getLocalizedName(phase, locale);
 
   const handleAddMilestone = async () => {
     if (!newMilestoneName.trim()) return;
@@ -303,425 +573,160 @@ function PhaseColumn({
     onRefresh();
   };
 
-  const milestoneCount = phase.milestones.length;
-  const icon = phase.icon || PHASE_ICON_FALLBACK;
+  const cards: ReactNode = phase.milestones.map((ms) => (
+    <MilestoneCard key={ms.id} milestone={ms} isOrganizer={isOrganizer} onClick={() => onMilestoneClick(ms)} />
+  ));
 
   return (
-    <div
-      className="flex-shrink-0 w-64 bg-slate-100 rounded-xl p-3 space-y-2.5"
-      style={{ scrollSnapAlign: "start" }}
+    <section
+      ref={setNodeRef}
+      style={{ transform: CSS.Translate.toString(transform), transition }}
+      aria-label={name}
+      className={`w-[300px] shrink-0 snap-start space-y-2.5 rounded-2xl bg-ghost p-3 ${
+        isDragging || isOver ? "relative z-10 ring-1 ring-accent" : ""
+      }`}
     >
-      {/* Phase Header */}
-      <div className="flex items-center justify-between px-1">
-        <div className="flex items-center gap-2">
-          <Icon name={icon} size={16} className="text-slate-600" />
-          <span className="text-sm font-bold text-slate-900">{getLocalizedName(phase, locale)}</span>
-        </div>
-        <span className="flex items-center justify-center w-6 h-6 text-xs font-semibold text-white bg-teal-500 rounded-full">
-          {milestoneCount}
+      {/* Fázis fej */}
+      <div className="flex items-center gap-2 px-0.5">
+        {isOrganizer && (
+          <button
+            type="button"
+            ref={setActivatorNodeRef}
+            {...attributes}
+            {...listeners}
+            aria-label={t("timeline.dragHandle").replace("{name}", name)}
+            className="-ml-1 flex h-11 w-8 shrink-0 cursor-grab touch-none items-center justify-center rounded-md text-ink-muted hover:text-ink active:cursor-grabbing sm:h-8"
+          >
+            <Icon name="grip-vertical" size={16} />
+          </button>
+        )}
+        <Icon name={phase.icon || PHASE_ICON_FALLBACK} size={18} className="text-ink" />
+        <h3 className="flex-1 text-[15px] font-semibold text-ink">{name}</h3>
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent text-xs font-semibold text-accent-on">
+          {phase.milestones.length}
         </span>
       </div>
 
-      {/* Milestone Cards */}
-      {phase.milestones.map((ms) => (
-        <MilestoneCard key={ms.id} milestone={ms} onClick={() => onMilestoneClick(ms)} />
-      ))}
+      {/* Kártyák */}
+      <div ref={setDropRef} className="min-h-2 space-y-2.5">
+        {isOrganizer ? (
+          <SortableContext items={phase.milestones.map((m) => M(m.id))} strategy={verticalListSortingStrategy}>
+            {cards}
+          </SortableContext>
+        ) : (
+          cards
+        )}
+      </div>
 
-      {/* Add Milestone */}
-      {isOrganizer && (
-        addingMilestone ? (
+      {/* Új mérföldkő */}
+      {isOrganizer &&
+        (addingMilestone ? (
           <div className="space-y-2">
             <input
               type="text"
               value={newMilestoneName}
               onChange={(e) => setNewMilestoneName(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") handleAddMilestone(); if (e.key === "Escape") setAddingMilestone(false); }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") void handleAddMilestone();
+                if (e.key === "Escape") setAddingMilestone(false);
+              }}
               placeholder={t("timeline.milestoneName")}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:border-teal-400 focus:ring-1 focus:ring-teal-400 outline-none"
+              aria-label={t("timeline.milestoneName")}
+              className={TIMELINE_INPUT}
               autoFocus
             />
             <div className="flex gap-2">
-              <button onClick={handleAddMilestone} className="flex-1 text-xs font-medium text-white bg-teal-500 rounded-lg py-1.5 hover:bg-teal-600">
+              <button type="button" onClick={() => void handleAddMilestone()} className="h-10 flex-1 rounded-[10px] bg-accent text-sm font-semibold text-accent-on hover:bg-accent-hover">
                 {t("common.save")}
               </button>
-              <button onClick={() => setAddingMilestone(false)} className="flex-1 text-xs font-medium text-slate-500 bg-white rounded-lg py-1.5 border border-slate-200 hover:bg-slate-50">
+              <button type="button" onClick={() => setAddingMilestone(false)} className="h-10 flex-1 rounded-[10px] border border-line text-sm text-ink-secondary hover:text-ink">
                 {t("common.cancel")}
               </button>
             </div>
           </div>
         ) : (
           <button
+            type="button"
             onClick={() => setAddingMilestone(true)}
-            className="w-full flex items-center justify-center gap-1.5 py-2 text-xs text-slate-400 border border-dashed border-slate-300 rounded-lg hover:border-teal-300 hover:text-teal-500 transition-colors"
+            className="flex h-11 w-full items-center justify-center gap-1.5 rounded-[10px] border border-line text-[13px] text-ink-muted transition-colors hover:border-accent hover:text-accent"
           >
-            <span>+</span> {t("timeline.addMilestone")}
+            <Icon name="plus" size={14} /> {t("timeline.addMilestone")}
           </button>
-        )
-      )}
-    </div>
-  );
-}
-
-// ════════════════════���═════════════════════════
-// MILESTONE CARD
-// ════════��═════════════════════════════════════
-
-function MilestoneCard({ milestone, onClick }: { milestone: MilestoneWithTasks; onClick: () => void }) {
-  const { locale } = useTranslation();
-  const progressPct = milestone.task_count > 0
-    ? Math.round((milestone.completed_count / milestone.task_count) * 100)
-    : 0;
-
-  return (
-    <button
-      onClick={onClick}
-      className="w-full text-left bg-white rounded-lg p-3 border border-slate-200 hover:border-teal-300 hover:shadow-sm transition-all space-y-2"
-    >
-      {/* Top row: status dot + name */}
-      <div className="flex items-start gap-2">
-        <div className={`w-2.5 h-2.5 rounded-full mt-1 shrink-0 ${STATUS_DOT[milestone.status] || STATUS_DOT.not_started}`} />
-        <span className="text-sm font-medium text-slate-800 leading-tight">{getLocalizedName(milestone, locale)}</span>
-      </div>
-
-      {/* Bottom row: due date + progress */}
-      <div className="flex items-center justify-between">
-        {milestone.due_date ? (
-          <span className="text-xs text-slate-400">
-            {new Date(milestone.due_date).toLocaleDateString(locale === "en" ? "en-US" : "hu-HU", { month: "short", day: "numeric" })}
-          </span>
-        ) : (
-          <span />
-        )}
-        <div className="flex items-center gap-2">
-          <div className="w-12 h-1 bg-slate-200 rounded-full">
-            <div className="h-1 bg-teal-500 rounded-full" style={{ width: `${progressPct}%` }} />
-          </div>
-          <span className="text-xs text-slate-400">{milestone.completed_count}/{milestone.task_count}</span>
-        </div>
-      </div>
-    </button>
+        ))}
+    </section>
   );
 }
 
 // ══════════════════════════════════════════════
-// MILESTONE MODAL
-// ══════════════════���═══════════════════════════
+// MILESTONE CARD
+// ══════════════════════════════════════════════
 
-function MilestoneModal({
-  milestone,
-  tripId,
-  isOrganizer,
-  onClose,
-  onRefresh,
-}: {
-  milestone: MilestoneWithTasks;
-  tripId: string;
-  isOrganizer: boolean;
-  onClose: (changed: boolean) => void;
-  onRefresh: () => void;
-}) {
+function MilestoneCard({ milestone, isOrganizer, onClick }: { milestone: MilestoneWithTasks; isOrganizer: boolean; onClick: () => void }) {
   const { t, locale } = useTranslation();
-  const displayName = getLocalizedName(milestone, locale);
-  const [name, setName] = useState(displayName);
-  const [status, setStatus] = useState(milestone.status);
-  const [dueDate, setDueDate] = useState(milestone.due_date || "");
-  const [notes, setNotes] = useState(milestone.description || "");
-  const [newTaskName, setNewTaskName] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [tasks, setTasks] = useState<TimelineTask[]>(milestone.tasks);
-  // A feladatműveletek azonnal a szerverre írnak; bezáráskor a szülő ezért újratölt (UX-014).
-  const [tasksChanged, setTasksChanged] = useState(false);
-  const [taskError, setTaskError] = useState<string | null>(null);
-
-  const runTaskAction = async (
-    action: () => Promise<{ error?: string }>,
-    apply: (current: TimelineTask[]) => TimelineTask[],
-  ) => {
-    setTaskError(null);
-    const result = await action().catch(() => ({ error: "network" }));
-    if (result?.error) {
-      setTaskError(t("errors.saveFailed"));
-      return;
-    }
-    setTasks(apply);
-    setTasksChanged(true);
-  };
-  const close = () => onClose(tasksChanged);
-  const fieldId = useId();
-
-  const handleSave = async () => {
-    setSaving(true);
-    const trimmed = name.trim();
-    await updateMilestone(milestone.id, {
-      // Csak tényleges átnevezéskor küldjük a nevet — így a sablon fordítása megmarad.
-      ...(trimmed && trimmed !== displayName ? { name: trimmed } : {}),
-      status,
-      due_date: dueDate || null,
-      description: notes,
-    });
-    setSaving(false);
-    onRefresh();
-  };
-
-  const handleDelete = async () => {
-    if (!confirm(t("timeline.milestoneDeleteConfirm"))) return;
-    await deleteMilestone(milestone.id);
-    onRefresh();
-  };
-
-  const handleAddTask = async () => {
-    if (!newTaskName.trim()) return;
-    setTaskError(null);
-    const result = await createTask(milestone.id, tripId, { name: newTaskName.trim() })
-      .catch(() => ({ task: undefined, error: "network" }));
-    if (!result.task) {
-      setTaskError(t("errors.saveFailed"));
-      return;
-    }
-    const created = result.task;
-    setTasks((current) => [...current, created]);
-    setTasksChanged(true);
-    setNewTaskName("");
-  };
-
-  const handleToggleTask = async (task: TimelineTask) => {
-    if (task.status === "completed") {
-      await runTaskAction(
-        () => updateTask(task.id, { status: "pending" }),
-        (current) => current.map((x) => x.id === task.id ? { ...x, status: "pending" } : x),
-      );
-    } else if (task.status === "pending" || task.status === "rejected") {
-      const next = task.requires_verification ? "pending_verification" : "completed";
-      await runTaskAction(
-        () => submitTask(task.id),
-        (current) => current.map((x) => x.id === task.id ? { ...x, status: next } : x),
-      );
-    }
-  };
-
-  const handleVerify = async (task: TimelineTask) => {
-    await runTaskAction(
-      () => verifyTask(task.id),
-      (current) => current.map((x) => x.id === task.id ? { ...x, status: "completed" } : x),
-    );
-  };
-
-  const handleReject = async (task: TimelineTask) => {
-    const note = prompt(t("timeline.rejectionNote"));
-    if (note == null) return;
-    await runTaskAction(
-      () => rejectTask(task.id, note),
-      (current) => current.map((x) => x.id === task.id ? { ...x, status: "rejected" } : x),
-    );
-  };
-
-  const handleDeleteTask = async (taskId: string) => {
-    await runTaskAction(
-      () => deleteTask(taskId),
-      (current) => current.filter((x) => x.id !== taskId),
-    );
-  };
-
-  const statusOptions: { value: typeof status; label: string; color: string }[] = [
-    { value: "not_started", label: t("timeline.statusNotStarted"), color: "bg-slate-100 text-slate-600" },
-    { value: "in_progress", label: t("timeline.statusInProgress"), color: "bg-amber-100 text-amber-700" },
-    { value: "done", label: t("timeline.statusDone"), color: "bg-green-100 text-green-700" },
-  ];
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
+    id: M(milestone.id),
+    disabled: !isOrganizer,
+  });
+  const name = getLocalizedName(milestone, locale);
+  const due = formatDue(milestone.due_date, milestone.due_time, locale);
+  const progressPct = milestone.task_count > 0 ? Math.round((milestone.completed_count / milestone.task_count) * 100) : 0;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-slate-900/50" onClick={close} />
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[85vh] overflow-y-auto mx-4">
-        <div className="p-6 space-y-5">
-          {/* Title */}
-          {isOrganizer ? (
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              aria-label={t("timeline.milestoneName")}
-              className="w-full text-lg font-bold text-slate-900 border-0 border-b-2 border-transparent focus:border-teal-400 outline-none pb-1"
-            />
-          ) : (
-            <h3 className="text-lg font-bold text-slate-900">{name}</h3>
-          )}
-
-          {/* Status pills */}
-          {isOrganizer && (
-            <div className="flex gap-2">
-              {statusOptions.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => setStatus(opt.value)}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all ${
-                    status === opt.value ? opt.color : "bg-slate-50 text-slate-400"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Due date */}
-          {isOrganizer ? (
-            <div>
-              <label htmlFor={`${fieldId}-due`} className="text-xs font-semibold text-slate-500 block mb-1">{t("timeline.milestoneDueDate")}</label>
-              <input
-                id={`${fieldId}-due`}
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:border-teal-400 focus:ring-1 focus:ring-teal-400 outline-none"
-              />
-            </div>
-          ) : milestone.due_date ? (
-            <p className="text-sm text-slate-500">
-              {t("timeline.milestoneDueDate")}: {new Date(milestone.due_date).toLocaleDateString(locale === "en" ? "en-US" : "hu-HU")}
-            </p>
-          ) : null}
-
-          {/* Tasks */}
-          <div>
-            <p className="text-xs font-semibold text-slate-500 block mb-2">
-              {t("timeline.milestoneTasks")} ({tasks.filter((t) => t.status === "completed").length}/{tasks.length})
-            </p>
-            {taskError && (
-              <p role="alert" className="mb-2 text-xs font-medium text-red-600">{taskError}</p>
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Translate.toString(transform), transition }}
+      className={`flex rounded-[10px] border bg-surface transition-colors ${
+        isDragging ? "relative z-10 border-accent shadow-lg" : "border-line hover:border-[var(--color-border-strong)]"
+      }`}
+    >
+      {isOrganizer && (
+        <button
+          type="button"
+          ref={setActivatorNodeRef}
+          {...attributes}
+          {...listeners}
+          aria-label={t("timeline.dragHandle").replace("{name}", name)}
+          className="flex w-8 shrink-0 cursor-grab touch-none items-start justify-center pt-3 text-ink-muted hover:text-ink active:cursor-grabbing"
+        >
+          <Icon name="grip-vertical" size={16} />
+        </button>
+      )}
+      <button type="button" onClick={onClick} className={`min-w-0 flex-1 space-y-2 py-3 pr-3 text-left ${isOrganizer ? "" : "pl-3"}`}>
+        <span className="flex items-center gap-2">
+          <span className={`h-2 w-2 shrink-0 rounded-full ${STATUS_DOT[milestone.status] || STATUS_DOT.not_started}`} />
+          <span className="text-sm font-semibold leading-tight text-ink">{name}</span>
+        </span>
+        {(due || milestone.location) && (
+          <span className="block space-y-1 pl-4">
+            {due && (
+              <span className="flex items-center gap-1.5 text-[13px] text-ink-secondary">
+                <Icon name="clock" size={14} className="text-ink-muted" /> {due}
+              </span>
             )}
-            <div className="space-y-1.5">
-              {tasks.map((task) => {
-                const isCompleted = task.status === "completed" || task.status === "skipped";
-                const isPendingVerification = task.status === "pending_verification";
-                const statusStyle = TASK_STATUS_COLORS[task.status] || TASK_STATUS_COLORS.pending;
-
-                return (
-                  <div key={task.id} className="flex items-center gap-2 group">
-                    {/* Checkbox */}
-                    <button
-                      type="button"
-                      onClick={() => handleToggleTask(task)}
-                      aria-label={getLocalizedName(task, locale)}
-                      aria-pressed={isPendingVerification ? "mixed" : isCompleted}
-                      className={`w-5 h-5 rounded border-2 flex items-center justify-center text-xs shrink-0 transition-colors ${
-                        isCompleted
-                          ? "border-green-500 bg-green-50 text-green-600"
-                          : isPendingVerification
-                          ? "border-amber-400 bg-amber-50 text-amber-600"
-                          : "border-slate-300 hover:border-teal-400"
-                      }`}
-                    >
-                      {isCompleted && <Icon name="check" size={12} strokeWidth={3} />}
-                      {isPendingVerification && <Icon name="hourglass" size={12} />}
-                    </button>
-
-                    {/* Task name */}
-                    <span className={`flex-1 text-sm ${isCompleted ? "text-slate-400 line-through" : "text-slate-700"}`}>
-                      {getLocalizedName(task, locale)}
-                    </span>
-
-                    {/* Status badge for non-standard */}
-                    {isPendingVerification && isOrganizer && (
-                      <div className="flex gap-1">
-                        <button onClick={() => handleVerify(task)} className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded font-medium hover:bg-green-200" aria-label={t("common.confirm")}>
-                          <Icon name="check" size={12} strokeWidth={3} />
-                        </button>
-                        <button onClick={() => handleReject(task)} className="text-xs px-2 py-0.5 bg-red-100 text-red-600 rounded font-medium hover:bg-red-200" aria-label={t("common.cancel")}>
-                          <Icon name="x" size={12} strokeWidth={3} />
-                        </button>
-                      </div>
-                    )}
-
-                    {task.status === "rejected" && (
-                      <span className={`text-xs px-2 py-0.5 rounded ${statusStyle.bg} ${statusStyle.text}`}>
-                        {t("timeline.taskRejected")}
-                      </span>
-                    )}
-
-                    {/* Delete */}
-                    {isOrganizer && (
-                      <button
-                        onClick={() => handleDeleteTask(task.id)}
-                        className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-400 transition-all text-sm"
-                        aria-label={t("common.delete")}
-                      >
-                        <Icon name="x" size={14} />
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Add task */}
-            {isOrganizer && (
-              <div className="flex gap-2 mt-3">
-                <input
-                  type="text"
-                  value={newTaskName}
-                  onChange={(e) => setNewTaskName(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter") handleAddTask(); }}
-                  placeholder={t("timeline.addTask")}
-                  aria-label={t("timeline.taskName")}
-                  className="flex-1 px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:border-teal-400 outline-none"
-                />
-                <button
-                  onClick={handleAddTask}
-                  disabled={!newTaskName.trim()}
-                  aria-label={t("timeline.addTask")}
-                  className="px-3 py-1.5 text-xs font-semibold text-teal-600 bg-teal-50 rounded-lg hover:bg-teal-100 disabled:opacity-40"
-                >
-                  +
-                </button>
-              </div>
+            {milestone.location && (
+              <span className="flex items-center gap-1.5 text-[13px] text-ink-secondary">
+                <Icon name="map-pin" size={14} className="shrink-0 text-ink-muted" />
+                <span className="truncate">{milestone.location.name}</span>
+              </span>
             )}
-          </div>
-
-          {/* Notes */}
-          {isOrganizer && (
-            <div>
-              <label htmlFor={`${fieldId}-notes`} className="text-xs font-semibold text-slate-500 block mb-1">{t("timeline.milestoneNotes")}</label>
-              <textarea
-                id={`${fieldId}-notes`}
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={2}
-                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:border-teal-400 focus:ring-1 focus:ring-teal-400 outline-none resize-none"
-              />
-            </div>
-          )}
-
-          {/* Footer */}
-          <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-            {isOrganizer && (
-              <button onClick={handleDelete} className="text-xs text-red-500 hover:text-red-600 font-medium">
-                {t("timeline.milestoneDelete")}
-              </button>
-            )}
-            <div className="flex gap-2 ml-auto">
-              <button onClick={close} className="px-4 py-2 text-sm text-slate-500 hover:text-slate-700">
-                {t(tasksChanged ? "common.close" : "common.cancel")}
-              </button>
-              {isOrganizer && (
-                <button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="px-4 py-2 text-sm font-semibold text-white bg-teal-500 rounded-lg hover:bg-teal-600 disabled:opacity-50"
-                >
-                  {saving ? "..." : t("timeline.milestoneSave")}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+          </span>
+        )}
+        <span className="flex items-center gap-2 pl-4">
+          <span className="h-1 flex-1 rounded-full bg-[var(--color-border)]">
+            <span className="block h-1 rounded-full bg-accent" style={{ width: `${progressPct}%` }} />
+          </span>
+          <span className="text-xs text-ink-muted">
+            {milestone.completed_count}/{milestone.task_count}
+          </span>
+        </span>
+      </button>
     </div>
   );
 }
 
-// ══���═══════════════════════════════════════════
+// ══════════════════════════════════════════════
 // ADD PHASE BUTTON
-// ═══════��════════════════════════════════���═════
+// ══════════════════════════════════════════════
 
 function AddPhaseButton({ tripId, onCreated }: { tripId: string; onCreated: () => void }) {
   const { t } = useTranslation();
@@ -739,10 +744,11 @@ function AddPhaseButton({ tripId, onCreated }: { tripId: string; onCreated: () =
   if (!adding) {
     return (
       <button
+        type="button"
         onClick={() => setAdding(true)}
-        className="flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-teal-600 transition-colors"
+        className="flex h-11 shrink-0 items-center gap-1.5 rounded-[10px] border border-line px-3.5 text-sm font-medium text-ink hover:bg-ghost"
       >
-        <span>+</span> {t("timeline.addPhase")}
+        <Icon name="plus" size={16} /> {t("timeline.addPhase")}
       </button>
     );
   }
@@ -753,17 +759,20 @@ function AddPhaseButton({ tripId, onCreated }: { tripId: string; onCreated: () =
         type="text"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        onKeyDown={(e) => { if (e.key === "Enter") handleAdd(); if (e.key === "Escape") setAdding(false); }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") void handleAdd();
+          if (e.key === "Escape") setAdding(false);
+        }}
         placeholder={t("timeline.phaseName")}
         aria-label={t("timeline.phaseName")}
-        className="px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:border-teal-400 outline-none"
+        className={`${TIMELINE_INPUT} w-48`}
         autoFocus
       />
-      <button onClick={handleAdd} className="px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600">
+      <button type="button" onClick={() => void handleAdd()} className="h-11 rounded-[10px] bg-accent px-3.5 text-sm font-semibold text-accent-on hover:bg-accent-hover">
         {t("common.save")}
       </button>
-      <button onClick={() => setAdding(false)} className="text-xs text-slate-400 hover:text-slate-600" aria-label={t("common.cancel")}>
-        <Icon name="x" size={14} />
+      <button type="button" onClick={() => setAdding(false)} className="flex h-11 w-11 items-center justify-center text-ink-muted hover:text-ink" aria-label={t("common.cancel")}>
+        <Icon name="x" size={16} />
       </button>
     </div>
   );

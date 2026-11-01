@@ -73,19 +73,22 @@ export async function saveTimelineLocation(input: SaveTimelineLocationInput): Pr
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "forbidden" };
 
-  const fields = {
-    name: v.name,
-    location_type: "poi",
-    latitude: v.place?.lat ?? null,
-    longitude: v.place?.lng ?? null,
-    formatted_address: v.place?.address || null,
-    city: v.place?.city ?? null,
-    country_code: v.place?.countryCode ?? null,
-    geocode_source: v.place ? "nominatim" : "manual",
-    geocode_precision: v.place ? "place" : null,
-    geocode_place_id: v.place?.placeId ?? null,
-    geocoded_at: v.place ? new Date().toISOString() : null,
-  };
+  // place: új találat → koordinátával; null → csak név (koordináta törlődik); undefined → a meglévő koordináta marad.
+  const geoFields =
+    v.place === undefined
+      ? {}
+      : {
+          latitude: v.place?.lat ?? null,
+          longitude: v.place?.lng ?? null,
+          formatted_address: v.place?.address || null,
+          city: v.place?.city ?? null,
+          country_code: v.place?.countryCode ?? null,
+          geocode_source: v.place ? "nominatim" : "manual",
+          geocode_precision: v.place ? "place" : null,
+          geocode_place_id: v.place?.placeId ?? null,
+          geocoded_at: v.place ? new Date().toISOString() : null,
+        };
+  const fields = { name: v.name, location_type: "poi", ...geoFields };
 
   const target = v.milestoneId ? { column: "milestone_id", id: v.milestoneId } : { column: "task_id", id: v.taskId as string };
   const { data: existing } = await supabase

@@ -2634,6 +2634,8 @@ const hu = {
     taskDetails: "Részletek: {name}",
     taskSave: "Feladat mentése",
     milestoneSaved: "Mérföldkő mentve",
+    loadFailed: "A menetrendet nem sikerült betölteni.",
+    retry: "Újrapróbálás",
   },
 
   // ============================================================================
