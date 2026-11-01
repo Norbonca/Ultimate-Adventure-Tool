@@ -110,7 +110,9 @@ jobs:
         # Majd: GitHub → Settings → Secrets → SUPABASE_DB_PASSWORD
         run: |
           supabase link --project-ref rpwajsbxrvypeqaalhvd
-          supabase db push --yes
+          # --include-all: a párhuzamos sessionök előre foglalnak migrációszámot (pl. 058, 059–064 nyitott PR-ben, 065–066 előbb mergelve);
+          # kapcsoló nélkül a CLI elutasítja a remote utolsó migrációjánál kisebb számú, még nem futott fájlt. Norbert döntése 2026-11-01.
+          supabase db push --yes --include-all
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
