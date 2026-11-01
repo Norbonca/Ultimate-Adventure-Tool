@@ -130,9 +130,9 @@ export function SkillsForm({ categories, subDisciplines, userInterests, initialS
       </p>
 
       {/* Level legend */}
-      <div className="flex gap-3 rounded-xl bg-slate-50 p-4 mb-8">
+      <div className="grid grid-cols-2 gap-3 rounded-xl bg-slate-50 p-4 mb-8 sm:grid-cols-4">
         {SKILL_LEVELS.map((level) => (
-          <div key={level.key} className="flex-1 text-center">
+          <div key={level.key} className="min-w-0 text-center">
             <span
               className="inline-block rounded-md px-3 py-1 text-xs font-semibold mb-1"
               style={{ backgroundColor: level.bg, color: level.color }}

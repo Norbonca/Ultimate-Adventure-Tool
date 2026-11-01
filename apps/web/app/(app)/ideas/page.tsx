@@ -117,12 +117,12 @@ export default async function IdeasBoardPage({ searchParams }: PageProps) {
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
           <p className="text-xs font-semibold uppercase tracking-wider text-ink-muted">{t("ideas.board.resultHead", { count: total })}</p>
-          <div className="flex items-center gap-3 text-sm text-ink-secondary">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-ink-secondary">
             <Link href={link({ closed: filters.includeClosed ? null : "1", page: null })} className="underline-offset-2 hover:underline">{filters.includeClosed ? t("ideas.board.hideClosed") : t("ideas.board.showClosed")}</Link>
             <span aria-hidden>·</span>
-            <label className="inline-flex items-center gap-2">
+            <label className="inline-flex flex-wrap items-center gap-2">
               {t("ideas.board.sort")}
-              <span className="inline-flex gap-1">
+              <span className="inline-flex flex-wrap gap-1">
                 {(["members", "newest", "soonest"] as const).map((s) => (
                   <Link key={s} href={link({ sort: s === "members" ? null : s, page: null })} className={`rounded-chip px-2 py-0.5 ${filters.sort === s ? "bg-ghost font-semibold text-ink" : ""}`}>{t(`ideas.board.sort_${s}`)}</Link>
                 ))}

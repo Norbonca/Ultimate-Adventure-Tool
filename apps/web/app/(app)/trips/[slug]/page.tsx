@@ -111,6 +111,13 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
       })
     : null;
   const filledStaff = staffCountResult.count ?? 0;
+  // Mobil ragadós sáv: meglévő jelentkezés állapota a „Jelentkezem” helyett
+  const STICKY_STATUS: Record<string, string> = {
+    pending: "pending", approved: "approved", approved_pending_payment: "approvedPendingPayment",
+    participant: "participant", waitlisted: "waitlisted", rejected: "rejected",
+  };
+  const myStatus = (myParticipation as { status?: string } | null)?.status ?? "";
+  const stickyStatusKey = !isOrganizer ? STICKY_STATUS[myStatus] ?? null : null;
   const totalStaff = trip.staff_seats ?? 0;
   const totalGuests = trip.max_participants ?? 0;
   const teamTotal = totalGuests + totalStaff;
@@ -778,9 +785,16 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
               {isSeriesVisible ? ` · ${seriesDateLabel(trip)}` : ""}
             </span>
           </div>
-          <a href="#trip-apply" className="inline-flex h-11 items-center rounded-trevu bg-accent px-5 text-sm font-semibold text-accent-on">
-            {isOrganizer ? t("trips.detail.edit") : t("trips.detail.apply")}
-          </a>
+          {/* Meglévő jelentkezésnél az állapot látszik, nem a „Jelentkezem” (a fenti doboz is ezt mutatja) */}
+          {stickyStatusKey ? (
+            <a href="#trip-apply" className="inline-flex h-11 items-center rounded-trevu border border-line px-5 text-sm font-semibold text-ink" data-testid="trip-sticky-status">
+              {tr(`trips.participantStatus.${stickyStatusKey}`)}
+            </a>
+          ) : (
+            <a href="#trip-apply" className="inline-flex h-11 items-center rounded-trevu bg-accent px-5 text-sm font-semibold text-accent-on">
+              {isOrganizer ? t("trips.detail.edit") : t("trips.detail.apply")}
+            </a>
+          )}
         </div>
       )}
     </main>
