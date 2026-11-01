@@ -51,6 +51,7 @@ export function ImagePicker({
   const { t, locale } = useTranslation();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [avatarTab, setAvatarTab] = useState<"icon" | "nature" | "abstract">("icon");
@@ -71,15 +72,9 @@ export function ImagePicker({
     loadImages().catch(() => setUploadError(t("errors.loadFailed")));
   }, [showGallery, type, categoryId, t]);
 
-  // ── File upload handler ──
-  const handleFileUpload = useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      // Reset input — ugyanaz a fájl újra kiválasztható
-      e.target.value = "";
-
+  // ── Feltöltés (tallózás és behúzás közös útja) ──
+  const uploadFile = useCallback(
+    async (file: File) => {
       const kind: ImageUploadKind = type === "avatar" ? "avatar" : "cover";
       const problem = validateImageUpload(kind, file);
       if (problem) {
@@ -129,6 +124,44 @@ export function ImagePicker({
       }
     },
     [type, onSelect, t]
+  );
+
+  // ── Tallózás ──
+  const handleFileUpload = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      // Reset input — ugyanaz a fájl újra kiválasztható
+      e.target.value = "";
+      if (file) void uploadFile(file);
+    },
+    [uploadFile]
+  );
+
+  // ── Behúzás (drag & drop) — a böngésző alapból megnyitná a fájlt ──
+  const handleDragOver = useCallback(
+    (e: React.DragEvent<HTMLLabelElement>) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = isUploading ? "none" : "copy";
+      if (!isUploading) setIsDragging(true);
+    },
+    [isUploading]
+  );
+
+  const handleDragLeave = useCallback((e: React.DragEvent<HTMLLabelElement>) => {
+    // a gyerekelemek közti mozgás ne kapcsolja ki a kiemelést
+    if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
+    setIsDragging(false);
+  }, []);
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent<HTMLLabelElement>) => {
+      e.preventDefault();
+      setIsDragging(false);
+      if (isUploading) return;
+      const file = e.dataTransfer.files?.[0];
+      if (file) void uploadFile(file);
+    },
+    [isUploading, uploadFile]
   );
 
   // ── Select gallery image ──
@@ -209,7 +242,17 @@ export function ImagePicker({
       ) : (
         <>
           {/* ── Upload zone ── */}
-          <label className="flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-slate-200 hover:border-teal-400 transition-colors cursor-pointer bg-white">
+          <label
+            data-testid={`image-drop-zone-${type}`}
+            data-dragging={isDragging || undefined}
+            onDragEnter={handleDragOver}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={`flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed hover:border-teal-400 transition-colors cursor-pointer bg-white ${
+              isDragging ? "border-teal-400" : "border-slate-200"
+            }`}
+          >
             <input
               type="file"
               accept={acceptTypes}

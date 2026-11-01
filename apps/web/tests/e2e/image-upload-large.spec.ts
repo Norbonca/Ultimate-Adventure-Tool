@@ -85,3 +85,63 @@ test("an 11 MB cover is rejected in the browser before any upload", async ({ pag
     await deleteTestUser(user.id);
   }
 });
+
+// 2026-11-01 (Norbert hibajelzése): a behúzás nem működött (nem volt drop-kezelő, a böngésző
+// megnyitotta a fájlt), és egy elbukott próbálkozás után a feltöltés nem indult újra.
+async function openWizardStep4(page: Page) {
+  const next = () => page.getByRole("button", { name: /^(következő|next|tovább)$/i }).last().click();
+  await page.goto("/trips/new");
+  await page.getByRole("button", { name: /sablon használata|use a template/i }).click();
+  await page.getByRole("button", { name: /hétvégi hegyi túra|weekend hike in the making/i }).click();
+  await page.getByRole("button", { name: /nyilvános esemény|public event/i }).click();
+  await next();
+  await page.locator("#trip-title").fill(`Upload ${Date.now()}`);
+  await page.locator('input[type="date"]').nth(0).fill("2027-01-01");
+  await page.locator('input[type="date"]').nth(1).fill("2027-01-02");
+  await next();
+  await next();
+}
+
+test("a cover dropped onto the zone is uploaded (drag & drop)", async ({ page }) => {
+  test.setTimeout(120_000);
+  const user = await createTestUser("upload-drop");
+  try {
+    await login(page, user.email, user.password);
+    await openWizardStep4(page);
+    const zone = page.getByTestId("image-drop-zone-cover");
+    const dataTransfer = await page.evaluateHandle((b64) => {
+      const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+      const dt = new DataTransfer();
+      dt.items.add(new File([bytes], "dropped.png", { type: "image/png" }));
+      return dt;
+    }, LARGE_PNG.toString("base64"));
+    await zone.dispatchEvent("dragenter", { dataTransfer });
+    await zone.dispatchEvent("dragover", { dataTransfer });
+    await zone.dispatchEvent("drop", { dataTransfer });
+    await expect.poll(() => storedSizes("trip-covers", user.id), { timeout: 30_000 }).toEqual([LARGE_PNG.length]);
+    await expect(page.getByText(/a mentés sikertelen|save failed/i)).toHaveCount(0);
+  } finally {
+    const { data } = await admin.storage.from("trip-covers").list(user.id);
+    if (data?.length) await admin.storage.from("trip-covers").remove(data.map((o) => `${user.id}/${o.name}`));
+    await deleteTestUser(user.id);
+  }
+});
+
+test("after a rejected file the next pick still uploads", async ({ page }) => {
+  test.setTimeout(120_000);
+  const user = await createTestUser("upload-retry");
+  try {
+    await login(page, user.email, user.password);
+    await openWizardStep4(page);
+    const input = page.locator('input[type="file"]').first();
+    await input.setInputFiles({ name: "huge.png", mimeType: "image/png", buffer: Buffer.concat([PNG_1PX, Buffer.alloc(11 * 1024 * 1024)]) });
+    await expect(page.getByText(/túl nagy|too large/i).first()).toBeVisible();
+    await expect(input).toBeEnabled();
+    await input.setInputFiles({ name: "cover.png", mimeType: "image/png", buffer: LARGE_PNG });
+    await expect.poll(() => storedSizes("trip-covers", user.id), { timeout: 30_000 }).toEqual([LARGE_PNG.length]);
+  } finally {
+    const { data } = await admin.storage.from("trip-covers").list(user.id);
+    if (data?.length) await admin.storage.from("trip-covers").remove(data.map((o) => `${user.id}/${o.name}`));
+    await deleteTestUser(user.id);
+  }
+});
