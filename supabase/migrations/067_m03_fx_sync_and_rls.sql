@@ -51,3 +51,62 @@ CREATE POLICY expenses_update_created_by ON public.expenses FOR UPDATE TO authen
 DROP POLICY IF EXISTS settlements_select_trip_member ON public.settlements;
 CREATE POLICY settlements_select_trip_member ON public.settlements FOR SELECT TO authenticated
   USING (public.is_trip_participant(trip_id));
+
+-- ── Biztonsági pótlások (2026-11-01, főkontextusbeli átnézés) ─────────────────
+-- A 003 szabályai a kliens (PostgREST) közvetlen hívásaival kijátszhatók voltak; az M03 élesítése előtt zárjuk.
+-- Tag = a túra szervezője vagy jóváhagyott résztvevője (approved/participant). SECURITY DEFINER, hogy RLS-rekurzió ne legyen.
+CREATE OR REPLACE FUNCTION public.is_trip_member(p_trip_id uuid, p_user_id uuid)
+RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = '' AS $$
+  SELECT EXISTS (SELECT 1 FROM public.trips t WHERE t.id = p_trip_id AND t.organizer_id = p_user_id)
+      OR EXISTS (SELECT 1 FROM public.trip_participants p WHERE p.trip_id = p_trip_id AND p.user_id = p_user_id AND p.status IN ('approved', 'participant'));
+$$;
+REVOKE ALL ON FUNCTION public.is_trip_member(uuid, uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.is_trip_member(uuid, uuid) TO authenticated, service_role;
+
+-- 4. Kiegyenlítés beszúrása: csak a saját túrán, tagnak, „függőben” állapotban, kedvezményezetti megerősítés nélkül
+--    (a 003 csak payer_id = auth.uid()-t nézett → bárki beírhatott „completed” sort bármely túra egyenlegébe).
+ALTER POLICY "settlements_insert_payer" ON public.settlements
+  WITH CHECK (
+    payer_id = auth.uid()
+    AND public.is_trip_member(trip_id, auth.uid())
+    AND public.is_trip_member(trip_id, receiver_id)
+    AND status = 'pending'
+    AND confirmed_by_payee = false
+  );
+-- 5. Költség beszúrása: a rögzítő önmaga, a fizető a túra tagja (a 066 szabálya csak a beszúró jogát nézte).
+ALTER POLICY expenses_insert_allowed ON public.expenses
+  WITH CHECK (
+    created_by = auth.uid()
+    AND public.is_trip_member(trip_id, payer_id)
+    AND (
+      EXISTS (SELECT 1 FROM public.trips t WHERE t.id = trip_id AND t.organizer_id = auth.uid())
+      OR EXISTS (
+        SELECT 1 FROM public.trips t
+        JOIN public.trip_participants p ON p.trip_id = t.id AND p.user_id = auth.uid()
+        WHERE t.id = trip_id AND t.expenses_participants_can_add AND p.status IN ('approved', 'participant')
+      )
+    )
+  );
+-- 6. Részesedés: csak a túra tagja kaphat részt.
+ALTER POLICY expense_splits_write_expense_owner ON public.expense_splits
+  WITH CHECK (EXISTS (SELECT 1 FROM public.expenses e JOIN public.trips t ON t.id = e.trip_id
+                      WHERE e.id = expense_id
+                        AND (e.payer_id = auth.uid() OR e.created_by = auth.uid() OR t.organizer_id = auth.uid())
+                        AND public.is_trip_member(e.trip_id, user_id)));
+-- 7. A tétel nem költöztethető másik túrára, a rögzítője nem írható át, a fizető csak tag lehet
+--    (a 003 UPDATE-szabályának nincs WITH CHECK-je → a fizető átírhatta a trip_id-t).
+CREATE OR REPLACE FUNCTION public.guard_expense_identity()
+RETURNS trigger LANGUAGE plpgsql SET search_path = '' AS $$
+BEGIN
+  IF current_setting('role', true) = 'service_role' THEN RETURN NEW; END IF;
+  IF NEW.trip_id IS DISTINCT FROM OLD.trip_id OR NEW.created_by IS DISTINCT FROM OLD.created_by THEN
+    RAISE EXCEPTION 'expense_identity_immutable' USING ERRCODE = 'check_violation';
+  END IF;
+  IF NEW.payer_id IS DISTINCT FROM OLD.payer_id AND NOT public.is_trip_member(NEW.trip_id, NEW.payer_id) THEN
+    RAISE EXCEPTION 'expense_payer_not_member' USING ERRCODE = 'check_violation';
+  END IF;
+  RETURN NEW;
+END $$;
+DROP TRIGGER IF EXISTS trg_guard_expense_identity ON public.expenses;
+CREATE TRIGGER trg_guard_expense_identity BEFORE UPDATE ON public.expenses
+  FOR EACH ROW EXECUTE FUNCTION public.guard_expense_identity();

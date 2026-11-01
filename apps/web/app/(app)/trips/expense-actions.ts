@@ -71,6 +71,17 @@ export async function saveExpense(raw: unknown, expenseId?: string): Promise<Res
   const trip = await tripCtx(supabase, input.tripId);
   if (!trip) return { ok: false, error: t("expenses.errors.tripNotFound") };
 
+  // A fizető és minden részesedő a túra tagja (szervező vagy jóváhagyott résztvevő) — az RLS ezt nem nézi.
+  const { data: memberRows } = await supabase
+    .from("trip_participants")
+    .select("user_id")
+    .eq("trip_id", trip.id)
+    .in("status", ["approved", "participant"]);
+  const members = new Set([trip.organizer_id, ...(memberRows ?? []).map((m) => m.user_id as string)]);
+  if (!members.has(input.payerId) || input.participants.some((p) => !members.has(p))) {
+    return { ok: false, error: t("expenses.errors.notAllowed") };
+  }
+
   const fx = await resolveRate(supabase, trip.id, input.currency, input.date, trip.fx_mode);
   const built = buildExpenseRows(input, fx);
   if (!built.ok) return { ok: false, error: t(BUILD_ERRORS[built.error] as never) };
@@ -89,11 +100,12 @@ export async function saveExpense(raw: unknown, expenseId?: string): Promise<Res
     }
     id = data.id as string;
   } else {
-    const { error } = await supabase.from("expenses").update(expense).eq("id", id).eq("trip_id", trip.id);
+    const { data: updated, error } = await supabase.from("expenses").update(expense).eq("id", id).eq("trip_id", trip.id).select("id");
     if (error) {
       console.error("saveExpense update:", error);
       return { ok: false, error: t(error.message.includes("expense_settled_locked") ? "expenses.errors.locked" : "errors.saveFailed") };
     }
+    if (!updated?.length) return { ok: false, error: t("expenses.errors.notAllowed") };
     const { error: delErr } = await supabase.from("expense_splits").delete().eq("expense_id", id);
     if (delErr) {
       console.error("saveExpense splits delete:", delErr);
