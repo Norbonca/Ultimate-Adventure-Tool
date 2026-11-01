@@ -2606,6 +2606,7 @@ const en: TranslationKeys = {
     taskDetails: "Details: {name}",
     taskSave: "Save task",
     milestoneSaved: "Milestone saved",
+    locationName: "Place name",
     loadFailed: "Couldn't load the timeline.",
     retry: "Try again",
   },

@@ -351,7 +351,7 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
   return (
     <div className="space-y-5">
       {/* ── Fej ── */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col items-start gap-3 sm:flex-row sm:justify-between sm:gap-4">
         <div className="space-y-1">
           <h2 className="text-xl font-semibold text-ink">{t("timeline.title")}</h2>
           {isOrganizer && (
@@ -402,7 +402,7 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
       {toast && (
         <div
           role={toast.tone === "error" ? "alert" : "status"}
-          className="fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2.5 rounded-[10px] border border-[var(--color-border-strong)] bg-surface px-4 py-3 text-sm font-medium text-ink shadow-lg sm:left-auto sm:right-8 sm:translate-x-0"
+          className="fixed bottom-28 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2.5 rounded-[10px] border border-[var(--color-border-strong)] bg-surface px-4 py-3 text-sm font-medium text-ink shadow-lg sm:left-auto sm:right-8 sm:translate-x-0"
         >
           <Icon
             name={toast.tone === "ok" ? "check" : "alert-triangle"}

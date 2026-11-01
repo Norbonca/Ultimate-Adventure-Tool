@@ -119,7 +119,14 @@ export function LocationField({
           <div className="flex gap-2.5">
             <Icon name="map-pin" size={18} className="mt-0.5 shrink-0 text-accent" />
             <div className="min-w-0">
-              <p className="break-words font-semibold text-ink">{value.name}</p>
+              <input
+                type="text"
+                value={value.name}
+                maxLength={300}
+                onChange={(e) => onChange({ ...value, name: e.target.value })}
+                aria-label={t("timeline.locationName")}
+                className="-mx-1.5 w-[calc(100%+0.75rem)] rounded-md border border-transparent bg-transparent px-1.5 py-0.5 font-semibold text-ink outline-none hover:border-line focus:border-accent"
+              />
               <p className="break-words text-[13px] text-ink-muted">
                 {[value.address, value.lat != null ? t("timeline.locationHasCoords") : t("timeline.locationNoCoords")]
                   .filter(Boolean)

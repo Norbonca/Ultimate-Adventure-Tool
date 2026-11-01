@@ -11,7 +11,8 @@ import { searchPlaces, type PlaceCandidate } from "@/lib/geocoding";
 // Jogosultság: RLS (is_trip_organizer) + guard_trip_location_refs trigger; itt csak a bemenet ellenőrzése.
 // ============================================
 
-const uuid = z.string().uuid();
+// Laza UUID-forma (a seed-adatok nem RFC 4122 változatúak; a zod 4 uuid() azokat elutasítaná).
+const uuid = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 
 /** Helykeresés — csak kifejezett indításra (gomb / Enter), a túra országára szűkítve, max. 5 találat. */
 export async function searchTimelinePlaces(
@@ -33,7 +34,10 @@ export async function searchTimelinePlaces(
     .maybeSingle();
   if (!trip || trip.organizer_id !== user.id) return { results: [], error: "forbidden" };
 
-  const results = await searchPlaces(q, trip.location_country);
+  // Előbb a túra országában; ha ott nincs találat, ország nélkül — a menetrend helyei (indulás, gyülekező,
+  // átszállás) gyakran a túra országán kívül vannak (pl. budapesti gyülekező egy horvát túrához).
+  let results = await searchPlaces(q, trip.location_country);
+  if (results !== null && results.length === 0 && trip.location_country) results = await searchPlaces(q, null);
   if (results === null) return { results: [], error: "unavailable" };
   return { results };
 }

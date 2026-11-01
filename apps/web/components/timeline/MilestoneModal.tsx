@@ -161,7 +161,8 @@ function TaskRow({
     setBusy(true);
     setError(false);
     const res = await updateTask(task.id, { due_date: date || null, due_time: date ? time || null : null }).catch(() => ({ error: "network" }));
-    const placeOk = res.error ? false : await persistLocation(tripId, { taskId: task.id }, toDraft(task.location), place).catch(() => false);
+    const placeDraft = place && place.name.trim() ? { ...place, name: place.name.trim() } : null;
+    const placeOk = res.error ? false : await persistLocation(tripId, { taskId: task.id }, toDraft(task.location), placeDraft).catch(() => false);
     setBusy(false);
     if (res.error || !placeOk) {
       setError(true);
@@ -415,7 +416,9 @@ export function MilestoneModal({
       due_time: date ? time || null : null,
       description: notes,
     }).catch(() => ({ error: "network" }));
-    const placeOk = res.error ? false : await persistLocation(tripId, { milestoneId: milestone.id }, toDraft(milestone.location), place).catch(() => false);
+    // Üres helynév = a hely törlése.
+    const placeDraft = place && place.name.trim() ? { ...place, name: place.name.trim() } : null;
+    const placeOk = res.error ? false : await persistLocation(tripId, { milestoneId: milestone.id }, toDraft(milestone.location), placeDraft).catch(() => false);
     setSaving(false);
     if (res.error || !placeOk) {
       setError(t("errors.saveFailed"));
@@ -652,7 +655,7 @@ export function MilestoneModal({
         </div>
 
         {/* Lábléc — mobilon ragadós alsó sáv */}
-        <div className="flex flex-col-reverse gap-3 border-t border-line p-4 sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-4">
+        <div className="flex flex-col gap-3 border-t border-line p-4 sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-4">
           {isOrganizer ? (
             <button type="button" onClick={() => setConfirmDelete(true)} className="min-h-11 text-left text-sm font-medium text-[var(--color-danger)] hover:underline sm:min-h-0">
               {t("timeline.milestoneDelete")}
