@@ -203,7 +203,7 @@ export function Step2Basics({
           >
             {countries.map((c) => (
               <option key={c.code} value={c.code}>
-                {c.flag_emoji} {locale === 'en' ? c.name_en : c.name_hu}
+                {locale === 'en' ? c.name_en : c.name_hu} {c.flag_emoji}
               </option>
             ))}
           </select>

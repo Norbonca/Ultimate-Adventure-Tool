@@ -435,7 +435,7 @@ export default function ProfileSettingsPage() {
               <option value="">{t('profile.settings.countryPlaceholder')}</option>
               {refCountries.map((c) => (
                 <option key={c.code} value={c.code}>
-                  {c.flag_emoji} {locale === "en" ? c.name_en : c.name_hu}
+                  {locale === "en" ? c.name_en : c.name_hu} {c.flag_emoji}
                 </option>
               ))}
             </select>
