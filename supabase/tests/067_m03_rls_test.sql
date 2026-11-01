@@ -58,6 +58,13 @@ BEGIN
   BEGIN UPDATE public.expenses SET trip_id = trip2 WHERE id = ex; ok := false; EXCEPTION WHEN check_violation THEN ok := true; END;
   ASSERT ok, 'E6 trip_id átírás';
   RESET ROLE;
-  RAISE NOTICE 'SEC-015/016 PASSED';
+  -- SEC-018: a csak szerveroldali függvényeket az anon és az authenticated nem hívhatja
+  ASSERT NOT has_function_privilege('anon', 'public.trigger_fx_sync(text)', 'EXECUTE'), 'SEC-018 trigger_fx_sync anon';
+  ASSERT NOT has_function_privilege('authenticated', 'public.trigger_fx_sync(text)', 'EXECUTE'), 'SEC-018 trigger_fx_sync authenticated';
+  ASSERT NOT has_function_privilege('anon', 'public.dispute_stale_settlements()', 'EXECUTE'), 'SEC-018 dispute anon';
+  ASSERT NOT has_function_privilege('authenticated', 'public.dispute_stale_settlements()', 'EXECUTE'), 'SEC-018 dispute authenticated';
+  ASSERT NOT has_function_privilege('anon', 'public.is_trip_member(uuid, uuid)', 'EXECUTE'), 'SEC-018 is_trip_member anon';
+  ASSERT has_function_privilege('authenticated', 'public.is_trip_member(uuid, uuid)', 'EXECUTE'), 'SEC-018 is_trip_member authenticated';
+  RAISE NOTICE 'SEC-015/016/018 PASSED';
 END $$;
 ROLLBACK;

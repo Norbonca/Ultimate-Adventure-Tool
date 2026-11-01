@@ -24,7 +24,9 @@ BEGIN
   ) INTO v_id;
   RETURN v_id;
 END $$;
-REVOKE ALL ON FUNCTION public.trigger_fx_sync(text) FROM PUBLIC;
+-- SEC-018: Supabase-en az alapértelmezett jogosultság (pg_default_acl) az anon és authenticated szerepnek
+-- KÜLÖN ad EXECUTE-ot — a FROM PUBLIC önmagában nem veszi el. Ezért a szerepeket név szerint is vissza kell vonni.
+REVOKE ALL ON FUNCTION public.trigger_fx_sync(text) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.trigger_fx_sync(text) TO service_role;
 COMMENT ON FUNCTION public.trigger_fx_sync(text) IS '§14.8: aszinkron hívás (pg_net) az fx-sync Edge Functionre; az eredmény az fx_sync_runs táblában.';
 
@@ -60,8 +62,13 @@ RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = '' AS $$
   SELECT EXISTS (SELECT 1 FROM public.trips t WHERE t.id = p_trip_id AND t.organizer_id = p_user_id)
       OR EXISTS (SELECT 1 FROM public.trip_participants p WHERE p.trip_id = p_trip_id AND p.user_id = p_user_id AND p.status IN ('approved', 'participant'));
 $$;
-REVOKE ALL ON FUNCTION public.is_trip_member(uuid, uuid) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.is_trip_member(uuid, uuid) FROM PUBLIC, anon;  -- SEC-018
 GRANT EXECUTE ON FUNCTION public.is_trip_member(uuid, uuid) TO authenticated, service_role;
+
+-- SEC-018: a 066 dispute_stale_settlements()-je élesben az anon és authenticated szerepnek is hívható volt
+-- (a 066 csak FROM PUBLIC vont vissza). Csak a pg_cron (postgres) és a service_role hívja.
+REVOKE ALL ON FUNCTION public.dispute_stale_settlements() FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.dispute_stale_settlements() TO service_role;
 
 -- 4. Kiegyenlítés beszúrása: csak a saját túrán, tagnak, „függőben” állapotban, kedvezményezetti megerősítés nélkül
 --    (a 003 csak payer_id = auth.uid()-t nézett → bárki beírhatott „completed” sort bármely túra egyenlegébe).
