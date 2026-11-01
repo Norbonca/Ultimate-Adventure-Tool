@@ -1068,6 +1068,7 @@ const hu = {
       paidOn: "Fizetve",
       you: "Te",
       noItinerary: "Az útiterv még nem érhető el.",
+      dailyProgram: "Napi program",
     },
 
     // Apply flow & organizer action errors
@@ -2635,6 +2636,12 @@ const hu = {
     taskSave: "Feladat mentése",
     milestoneSaved: "Mérföldkő mentve",
     locationName: "A hely neve",
+    doneOf: "{done}/{total} kész",
+    dueBy: "határidő: {date}",
+    participantIntro: "A szervező állítja össze. Időpontok a túra helyi idejében ({zone}).",
+    participantEmpty: "A szervező még nem állította össze a menetrendet.",
+    nextBadge: "Következő",
+    entryLink: "Menetrend és teendők",
     loadFailed: "A menetrendet nem sikerült betölteni.",
     retry: "Újrapróbálás",
   },

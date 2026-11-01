@@ -1040,6 +1040,7 @@ const en: TranslationKeys = {
       paidOn: "Paid on",
       you: "You",
       noItinerary: "Itinerary is not available yet.",
+      dailyProgram: "Daily programme",
     },
 
     // Apply flow & organizer action errors
@@ -2607,6 +2608,12 @@ const en: TranslationKeys = {
     taskSave: "Save task",
     milestoneSaved: "Milestone saved",
     locationName: "Place name",
+    doneOf: "{done}/{total} done",
+    dueBy: "due {date}",
+    participantIntro: "Put together by the organizer. Times are in the trip's local time ({zone}).",
+    participantEmpty: "The organizer hasn't put the timeline together yet.",
+    nextBadge: "Next",
+    entryLink: "Timeline and to-dos",
     loadFailed: "Couldn't load the timeline.",
     retry: "Try again",
   },

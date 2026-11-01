@@ -45,3 +45,30 @@ describe('M021 timeline helpers', () => {
     expect(mapsDirectionsUrl(null, 19)).toBeNull();
   });
 });
+
+import { nextMilestoneId, todayIn } from '@/lib/timeline/format';
+
+describe('M021 participant helpers', () => {
+  it('computes today in the trip zone, not the viewer zone', () => {
+    const lateEvening = new Date('2026-12-09T23:30:00Z');
+    expect(todayIn('Europe/Zagreb', lateEvening)).toBe('2026-12-10');
+    expect(todayIn('America/New_York', lateEvening)).toBe('2026-12-09');
+    expect(todayIn('Not/AZone', lateEvening)).toBe('2026-12-09');
+  });
+
+  it('picks the earliest upcoming, unfinished milestone by date and time', () => {
+    const phases = [
+      { milestones: [
+        { id: 'past', status: 'not_started', due_date: '2026-11-01', due_time: null },
+        { id: 'done', status: 'done', due_date: '2026-12-01', due_time: null },
+        { id: 'later', status: 'not_started', due_date: '2026-12-10', due_time: '16:00:00' },
+      ] },
+      { milestones: [
+        { id: 'first', status: 'in_progress', due_date: '2026-12-10', due_time: '08:00:00' },
+        { id: 'nodate', status: 'not_started', due_date: null, due_time: null },
+      ] },
+    ];
+    expect(nextMilestoneId(phases, '2026-11-02')).toBe('first');
+    expect(nextMilestoneId(phases, '2026-12-11')).toBeNull();
+  });
+});

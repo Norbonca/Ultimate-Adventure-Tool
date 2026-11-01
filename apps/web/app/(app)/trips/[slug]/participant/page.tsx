@@ -12,6 +12,8 @@ import { getServerT, getServerLocale } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
 import { Icon } from "@/components/Icon";
 import { formatMoney } from "@/lib/currency";
+import { fetchParticipantTimeline } from "../../timeline-actions";
+import { ParticipantTimeline } from "@/components/timeline/ParticipantTimeline";
 
 interface ParticipantPageProps {
   params: Promise<{ slug: string }>;
@@ -30,10 +32,11 @@ export default async function ParticipantDashboardPage({ params }: ParticipantPa
   const locale = await getServerLocale();
   const dateLocale = locale === "en" ? "en-US" : "hu-HU";
 
-  const [participants, _crewPositions, itinerary] = await Promise.all([
+  const [participants, _crewPositions, itinerary, timeline] = await Promise.all([
     fetchTripParticipants(trip.id),
     fetchCrewPositions(trip.id),
     fetchTripItinerary(trip.id),
+    fetchParticipantTimeline(trip.id),
   ]);
 
   // Find current user's participation
@@ -165,9 +168,19 @@ export default async function ParticipantDashboardPage({ params }: ParticipantPa
               </div>
             )}
 
-            {/* Trip Timeline / Itinerary */}
+            {/* M021 Menetrend + Feladataim (US-TL-007; terv: D02 pSwuh / YbL0h) */}
+            {!timeline.error && (
+              <ParticipantTimeline
+                phases={timeline.phases}
+                stats={timeline.stats}
+                timezone={timeline.timezone}
+                myTaskIds={timeline.myTaskIds}
+              />
+            )}
+
+            {/* Napi program (itinerary) */}
             <div className="bg-white rounded-2xl border border-navy-200 p-6">
-              <h2 className="text-lg font-bold text-navy-900 mb-4">{t("trips.manage.timeline")}</h2>
+              <h2 className="text-lg font-bold text-navy-900 mb-4">{t("trips.participant.dailyProgram")}</h2>
               {itinerary.length > 0 ? (
                 <div className="space-y-4">
                   {itinerary.map((day) => (

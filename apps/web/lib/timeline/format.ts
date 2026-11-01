@@ -67,3 +67,21 @@ export function mapsDirectionsUrl(lat: number | null | undefined, lng: number | 
   if (typeof lat !== "number" || typeof lng !== "number" || !Number.isFinite(lat) || !Number.isFinite(lng)) return null;
   return `https://www.google.com/maps/dir/?api=1&destination=${lat.toFixed(6)},${lng.toFixed(6)}`;
 }
+
+/** A mai nap a túra helyi idejében (ÉÉÉÉ-HH-NN). */
+export function todayIn(timezone: string, now: Date = new Date()): string {
+  try {
+    return new Intl.DateTimeFormat("en-CA", { timeZone: timezone, year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
+  } catch {
+    return now.toISOString().slice(0, 10);
+  }
+}
+
+/** A következő, még nem kész mérföldkő a mai naptól (nap + óra szerint); null, ha nincs. */
+export function nextMilestoneId(phases: readonly { milestones: readonly { id: string; status: string; due_date: string | null; due_time: string | null }[] }[], today: string): string | null {
+  const candidates = phases
+    .flatMap((p) => p.milestones)
+    .filter((m) => m.status !== "done" && m.due_date && m.due_date >= today)
+    .sort((a, b) => `${a.due_date} ${normalizeTime(a.due_time) ?? "99:99"}`.localeCompare(`${b.due_date} ${normalizeTime(b.due_time) ?? "99:99"}`));
+  return candidates[0]?.id ?? null;
+}

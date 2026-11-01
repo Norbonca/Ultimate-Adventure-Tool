@@ -602,6 +602,18 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                 </Link>
               )}
 
+              {/* M021 belépő: a jóváhagyott résztvevőnek a menetrend és a saját teendők (terv: D02 CLbUx) */}
+              {!isOrganizer && ["approved", "approved_pending_payment", "participant"].includes((myParticipation as { status?: string } | null)?.status ?? "") && (
+                <Link
+                  href={`/trips/${slug}/participant`}
+                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-navy-200 py-3 text-center font-bold text-navy-700 transition-colors hover:bg-navy-50"
+                  data-testid="trip-participant-link"
+                >
+                  <Icon name="calendar" size={18} />
+                  {t("timeline.entryLink")}
+                </Link>
+              )}
+
               {/* M03 belépő (NyK-10): a szervezőnek és a jóváhagyott résztvevőnek */}
               {(isOrganizer || ["approved", "participant"].includes((myParticipation as { status?: string } | null)?.status ?? "")) && (
                 <Link

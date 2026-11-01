@@ -1019,3 +1019,58 @@ export async function reorderTasks(milestoneId: string, taskIds: string[]): Prom
   const { error } = await supabase.rpc("reorder_trip_tasks", { p_milestone_id: milestoneId, p_task_ids: taskIds });
   return reorderError(error);
 }
+
+// ══════════════════════════════════════════════
+// RÉSZTVEVŐI NÉZET (US-TL-007) — csak olvasható menetrend + saját feladatok
+// Terv: D02 `pSwuh` (1440), `YbL0h` (390), belépő `CLbUx`.
+// ══════════════════════════════════════════════
+
+export async function fetchParticipantTimeline(tripId: string): Promise<{
+  phases: PhaseWithMilestones[];
+  stats: TimelineStats;
+  timezone: string;
+  myTaskIds: string[];
+  error?: string;
+}> {
+  const base = await fetchTripTimeline(tripId);
+  if (base.error) return { ...base, myTaskIds: [] };
+  const { supabase, user } = await getAuthUser();
+  if (!user) return { ...base, myTaskIds: [], error: "Not authenticated" };
+
+  const allTasks = base.phases.flatMap((p) => p.milestones.flatMap((m) => m.tasks));
+  const taskIds = allTasks.map((t) => t.id);
+  const milestoneIds = base.phases.flatMap((p) => p.milestones.map((m) => m.id));
+
+  // Saját: közvetlen felelős, feladat-felelős (trip_task_assignees) vagy a mérföldkő felelőse — a
+  // trip_tasks_assignee_update RLS-szabály ugyanezt a hármat engedi írni.
+  const [{ data: taskAssign }, { data: msAssign }] = await Promise.all([
+    supabase.from("trip_task_assignees").select("task_id").eq("user_id", user.id).in("task_id", taskIds.length ? taskIds : ["00000000-0000-0000-0000-000000000000"]),
+    supabase.from("trip_milestone_assignees").select("milestone_id").eq("user_id", user.id).in("milestone_id", milestoneIds.length ? milestoneIds : ["00000000-0000-0000-0000-000000000000"]),
+  ]);
+  const viaTask = new Set((taskAssign ?? []).map((r) => r.task_id as string));
+  const viaMilestone = new Set((msAssign ?? []).map((r) => r.milestone_id as string));
+  const myTaskIds = allTasks
+    .filter((t) => t.assignee_id === user.id || viaTask.has(t.id) || viaMilestone.has(t.milestone_id))
+    .map((t) => t.id);
+
+  return { ...base, myTaskIds };
+}
+
+/** Saját feladat kész / vissza — a résztvevői nézetből. Ha az RLS nem engedi, nincs csendes „siker”. */
+export async function setMyTaskDone(taskId: string, done: boolean): Promise<{ error?: "forbidden" | "failed"; status?: string }> {
+  if (!UUID_RE.test(taskId)) return { error: "failed" };
+  const { supabase, user } = await getAuthUser();
+  if (!user) return { error: "forbidden" };
+  const { data: task } = await supabase.from("trip_tasks").select("requires_verification, status").eq("id", taskId).maybeSingle();
+  if (!task) return { error: "forbidden" };
+  const now = new Date().toISOString();
+  const status = done ? (task.requires_verification ? "pending_verification" : "completed") : "pending";
+  const patch: Record<string, unknown> = done
+    ? { status, submitted_at: now, submitted_by: user.id, ...(status === "completed" ? { completed_at: now, completed_by: user.id } : {}) }
+    : { status, completed_at: null, completed_by: null };
+  const { data: rows, error } = await supabase.from("trip_tasks").update(patch).eq("id", taskId).select("id");
+  if (error) return { error: error.code === "42501" ? "forbidden" : "failed" };
+  if (!rows || rows.length === 0) return { error: "forbidden" };
+  await autoUpdateMilestoneStatus(supabase, taskId);
+  return { status };
+}
