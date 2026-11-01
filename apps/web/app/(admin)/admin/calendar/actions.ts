@@ -13,6 +13,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin-client";
+import { recordAdminAudit } from "@/lib/admin-audit";
 import { missingYears } from "@/lib/calendar/coverage";
 import type { LocalizedLabel } from "@/lib/calendar/period";
 import type { RuleKind } from "@/lib/calendar/rules";
@@ -70,8 +71,8 @@ function dbError(error: { code?: string } | null, conflict: CalendarErrorKey = "
 }
 
 async function audit(admin: AdminClient, userId: string, action: string, targetId: string | null, details?: Record<string, unknown>) {
-  // Az audit-napló hibája nem akadályozza a műveletet (a meglévő admin műveletek mintája).
-  await admin.from("admin_audit_log").insert({
+  // Az audit-napló hibája nem akadályozza a műveletet, de naplózzuk (recordAdminAudit).
+  await recordAdminAudit(admin, {
     admin_user_id: userId,
     admin_role: "operations_admin",
     action,
