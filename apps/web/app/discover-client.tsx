@@ -9,6 +9,8 @@
  *   design/D02_Trip_Management.pen#W9Kgy   szűrőpanel nyitva (asztali) + üres állapot
  *   design/D02_Trip_Management.pen#RTE9l   FilterSheet, mobil 390
  * Komponensek: components/ui/SearchPill, OptionChip, FilterSheet; components/discover/TripBand.
+ * M024 (design/D09_Search_Discover.pen#ZD6Bo, #c57jCF, #SFkdK, #Kx86J): az azonos sorozat időpontjai
+ * egy kártyára vonódnak (lib/trip-series.ts groupTripsForDiscover, spec K-1…K-11); a találatszám kártyát számol.
  * Nézetszerződés: components/discover/discover-view-toggle.md.
  *
  * A teljes oldal Night (data-surface="night"); az alsó CTA-sáv az egyetlen Day-régió
@@ -48,6 +50,7 @@ import {
 } from '@/lib/discover-view';
 import { buildTripSearchText, createTripSearch } from '@/lib/trip-search';
 import { matchesAdvanced, NO_FILTERS, type AdvancedFilters, type Choice } from '@/lib/discover-filters';
+import { groupTripsForDiscover, todayUtc, type DiscoverCard } from '@/lib/trip-series';
 
 // The globe (d3-geo + tiles) only runs in the browser and is a large chunk —
 // load it on demand so the list view never pays for it.
@@ -62,6 +65,8 @@ interface Trip {
   id: string;
   slug: string;
   title: string;
+  /** M024: a túrasorozat; azonos sorozat időpontjai egy kártyán (K-1). */
+  series_id?: string | null;
   short_description: string | null;
   description: string;
   location_country: string;
@@ -237,11 +242,16 @@ export default function DiscoverClient({
     return 0; // recent: published order, as Supabase returns it
   });
 
+  // M024: a sorozatok egy kártyára vonódnak; a lapozás és a darabszám kártyát számol (K-9).
+  const today = todayUtc();
+  const cards: DiscoverCard<Trip>[] = groupTripsForDiscover(sortedTrips, trips, today);
+  const allCardCount = groupTripsForDiscover(trips, trips, today).length;
+
   // Lapozás: szűrés-/rendezésváltáskor újra az első oldal (állapot kulccsal, effekt nélkül).
   const pageKey = [query, activeCategory, sortBy, filters.difficulty, filters.price, filters.currency, filters.duration, filters.spots].join('|');
   const visibleCount = page.key === pageKey ? page.count : PAGE_SIZE;
-  const visibleTrips = sortedTrips.slice(0, visibleCount);
-  const remaining = sortedTrips.length - visibleTrips.length;
+  const visibleCards = cards.slice(0, visibleCount);
+  const remaining = cards.length - visibleCards.length;
 
   const advancedCount = Object.values(filters).filter((v) => v !== 'all').length;
   const mobileFilterCount = advancedCount + (activeCategory === 'all' ? 0 : 1);
@@ -278,18 +288,39 @@ export default function DiscoverClient({
     return text.replace(/[\u00a0\u2009\u202f]/g, ' ');
   };
 
-  const formatPrice = (trip: Trip) => {
-    if (!trip.price_amount || trip.price_amount <= 0) return t('discover.free');
+  const formatAmount = (amount: number | null, currency: string) => {
+    if (!amount || amount <= 0) return t('discover.free');
     try {
       return new Intl.NumberFormat(intlLocale, {
         style: 'currency',
-        currency: trip.price_currency || 'EUR',
+        currency: currency || 'EUR',
         currencyDisplay: 'narrowSymbol',
         maximumFractionDigits: 0,
-      }).format(trip.price_amount).replace(/[\u00a0\u2009\u202f]/g, ' ');
+      }).format(amount).replace(/[\u00a0\u2009\u202f]/g, ' ');
     } catch {
-      return `${trip.price_amount} ${trip.price_currency}`;
+      return `${amount} ${currency}`;
     }
+  };
+  const formatPrice = (trip: Trip) => formatAmount(trip.price_amount, trip.price_currency);
+
+  // M024 — rövid dátumtartomány az időpontsorokhoz („máj. 10–17.”); más évben az évvel együtt.
+  const thisYear = today.slice(0, 4);
+  const formatShortDates = (trip: Trip) => {
+    if (!trip.start_date) return '';
+    const withYear = trip.start_date.slice(0, 4) !== thisYear;
+    const fmt = new Intl.DateTimeFormat(intlLocale, { month: 'short', day: 'numeric', ...(withYear ? { year: 'numeric' } : {}), timeZone: 'UTC' });
+    const text = trip.end_date && trip.end_date !== trip.start_date
+      ? fmt.formatRange(new Date(trip.start_date), new Date(trip.end_date))
+      : fmt.format(new Date(trip.start_date));
+    return text.replace(/[\u00a0\u2009\u202f]/g, ' ');
+  };
+  const spotsLeftOf = (trip: Trip) => Math.max(0, trip.max_participants - (trip.current_participants || 0));
+  const seriesStatus = (trip: Trip) =>
+    spotsLeftOf(trip) > 0 ? t('series.spots', { count: spotsLeftOf(trip) }) : t('series.full');
+  const cardPrice = (card: DiscoverCard<Trip>) => {
+    if (card.kind === 'single') return formatPrice(card.trip);
+    const text = formatAmount(card.price.amount, card.price.currency);
+    return card.price.from && card.price.amount ? t('series.priceFrom', { price: text }) : text;
   };
 
   const priceCurrency = filters.currency === 'all' ? 'EUR' : filters.currency;
@@ -470,7 +501,7 @@ export default function DiscoverClient({
             <div className="relative mx-auto flex min-h-[380px] max-w-7xl flex-col justify-end gap-3 px-5 pb-8 pt-16 md:min-h-[480px] md:gap-4 md:px-[120px] md:pb-12">
               <p className="text-sm font-semibold text-ink">
                 {t('discover.heroStats')
-                  .replace('{trips}', String(trips.length))
+                  .replace('{trips}', String(allCardCount))
                   .replace('{countries}', String(countryCount))}
               </p>
               <h1 className="max-w-[720px] text-hero-display-mobile text-ink [text-wrap:balance] md:text-hero-display">
@@ -529,7 +560,7 @@ export default function DiscoverClient({
                 closeLabel={t('discover.filtersClose')}
                 clearLabel={t('discover.filtersClear')}
                 onClear={clearFilters}
-                applyLabel={t('discover.filtersApply').replace('{count}', String(filteredTrips.length))}
+                applyLabel={t('discover.filtersApply').replace('{count}', String(cards.length))}
                 testId="discover-filter-sheet"
               >
                 <div className="flex flex-col gap-5 pb-2">
@@ -595,7 +626,7 @@ export default function DiscoverClient({
               <p className="text-base font-medium text-ink md:text-lg" data-testid="discover-count">
                 {filteredTrips.length === 0
                   ? t('discover.noTripsYet')
-                  : t('discover.tripsAvailable').replace('{count}', String(filteredTrips.length))}
+                  : t('discover.tripsAvailable').replace('{count}', String(cards.length))}
               </p>
               <label className="hidden items-center gap-2 text-sm text-ink-secondary md:flex">
                 <span>{t('discover.sortLabel')}:</span>
@@ -655,25 +686,46 @@ export default function DiscoverClient({
               <>
                 {viewMode === 'grid' ? (
                   <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6" data-testid="discover-trip-grid">
-                    {visibleTrips.map((trip) => {
+                    {visibleCards.map((card) => {
+                      const trip = card.kind === 'single' ? card.trip : card.representative;
                       const category = resolveJoin(trip.categories);
                       const meta = category ? categoryMeta(category.name) : null;
-                      const spotsLeft = trip.max_participants - (trip.current_participants || 0);
                       const level = difficultyLevels.find((d) => d.value === trip.difficulty);
                       return (
-                        <li key={trip.id}>
+                        <li key={card.key}>
                           <TripTile
                             href={`/trips/${trip.slug}`}
                             title={trip.title}
                             imageUrl={trip.card_image_url || trip.cover_image_url}
                             place={formatPlace(trip)}
                             dates={formatDates(trip)}
-                            spots={t('discover.spotsLeft').replace('{count}', String(spotsLeft))}
+                            spots={
+                              card.kind === 'series'
+                                ? t('series.dateCount', { count: card.dateCount })
+                                : t('discover.spotsLeft').replace('{count}', String(spotsLeftOf(trip)))
+                            }
                             host={resolveJoin(trip.profiles)?.display_name ?? null}
                             difficulty={level ? (locale === 'en' ? level.labelEn : level.label) : null}
                             category={category && meta ? { label: categoryLabel(category.name), token: meta.token, icon: meta.icon } : null}
-                            price={formatPrice(trip)}
+                            price={cardPrice(card)}
                             priceCaption={t('discover.perPerson')}
+                            series={
+                              card.kind === 'series'
+                                ? {
+                                    title: t('series.datesTitle'),
+                                    rows: card.rows.map((row) => ({
+                                      key: row.id,
+                                      href: `/trips/${row.slug}`,
+                                      label: formatShortDates(row),
+                                      status: seriesStatus(row),
+                                      full: spotsLeftOf(row) === 0,
+                                    })),
+                                    more: card.moreCount > 0
+                                      ? { href: `/trips/${trip.slug}#idopontok`, label: t('series.moreDates', { count: card.moreCount }) }
+                                      : null,
+                                  }
+                                : null
+                            }
                           />
                         </li>
                       );
@@ -681,22 +733,42 @@ export default function DiscoverClient({
                   </ul>
                 ) : (
                 <ul className="flex flex-col gap-3 md:gap-4" data-testid="discover-trip-list">
-                  {visibleTrips.map((trip) => {
+                  {visibleCards.map((card) => {
+                    const trip = card.kind === 'single' ? card.trip : card.representative;
                     const category = resolveJoin(trip.categories);
                     const meta = category ? categoryMeta(category.name) : null;
-                    const spotsLeft = trip.max_participants - (trip.current_participants || 0);
+                    const next = card.kind === 'series' ? card.rows[0] : null;
                     return (
-                      <li key={trip.id}>
+                      <li key={card.key}>
                         <TripBand
                           href={`/trips/${trip.slug}`}
                           title={trip.title}
                           imageUrl={trip.card_image_url || trip.cover_image_url}
                           place={formatPlace(trip)}
-                          details={[formatDates(trip), t('discover.spotsLeft').replace('{count}', String(spotsLeft))]}
+                          details={[formatDates(trip), t('discover.spotsLeft').replace('{count}', String(spotsLeftOf(trip)))]}
                           category={category && meta ? { label: categoryLabel(category.name), token: meta.token, icon: meta.icon } : null}
-                          price={formatPrice(trip)}
+                          price={cardPrice(card)}
                           priceCaption={t('discover.priceCaption')}
                           ctaLabel={t('discover.viewDetails')}
+                          series={
+                            card.kind === 'series'
+                              ? {
+                                  chips: card.rows.map((row) => ({
+                                    key: row.id,
+                                    href: `/trips/${row.slug}`,
+                                    label: formatShortDates(row),
+                                    full: spotsLeftOf(row) === 0,
+                                    title: seriesStatus(row),
+                                  })),
+                                  more: card.moreCount > 0
+                                    ? { href: `/trips/${trip.slug}#idopontok`, label: t('series.moreDates', { count: card.moreCount }) }
+                                    : null,
+                                  nextLabel: next
+                                    ? `${t('series.nextDate', { date: formatShortDates(next) })} · ${seriesStatus(next)}`
+                                    : t('series.dateCount', { count: card.dateCount }),
+                                }
+                              : null
+                          }
                         />
                       </li>
                     );

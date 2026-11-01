@@ -2086,6 +2086,63 @@ const hu = {
   },
 
   // ============================================================================
+  // M024 Túrasorozat — több időpont, minden időpont önálló túra
+  // ============================================================================
+  series: {
+    dateCount: "{count} időpont",
+    datesTitle: "Időpontok",
+    moreDates: "+{count} további időpont",
+    priceFrom: "{price}-tól",
+    spots: "{count} hely",
+    full: "Betelt",
+    nextDate: "Legközelebb: {date}",
+    viewing: "Ezt nézed",
+    closed: "Jelentkezés lezárult",
+    draft: "Piszkozat",
+    datesSubtitle: "Ugyanez a túra több időpontban. Minden időpontnak saját csapata, létszáma és ára van.",
+    chooseDate: "Melyik időpontra jelentkezel?",
+    alreadyApplied: "Már jelentkeztél: {dates}",
+    alreadyAppliedOption: "Már jelentkeztél",
+    waitlistHint: "Betelt — a szervező várólistára tehet",
+    applyFor: "Jelentkezem — {date}",
+    selectedDate: "Választott időpont: {date}",
+    successTitle: "Jelentkezésed elküldtük",
+    successDate: "Időpont: {date}",
+    successBodyPending: "A szervező jóváhagyása után értesítünk. A jelentkezésed a Túráim között ezzel a dátummal látszik.",
+    successBodyApproved: "Bekerültél a csapatba. A túra a Túráim között ezzel a dátummal látszik.",
+    backToTrip: "Vissza a túrához",
+    openMyTrips: "Túráim megnyitása",
+    addDate: "Új időpont",
+    addDateTitle: "Új időpont hozzáadása",
+    addDateSubtitle: "{title} — új, önálló túra lesz ugyanebben a sorozatban",
+    startDate: "Kezdés",
+    endDate: "Befejezés",
+    capacity: "Létszám",
+    price: "Ár / fő ({currency})",
+    deadline: "Jelentkezési határidő",
+    optionalHint: "Üresen hagyható",
+    copyTitle: "Mit másolunk az új időpontba?",
+    copyYes1: "leírás, program, részletek",
+    copyYes2: "kategória, nehézség, helyszín",
+    copyYes3: "képek és beállítások",
+    copyNo1: "jelentkezők és várólista",
+    copyNo2: "csapat (stáb)",
+    copyNo3: "költségek, elszámolás, menetrend",
+    createDraft: "Időpont létrehozása piszkozatként",
+    created: "Az új időpont piszkozatként elkészült.",
+    openCreated: "Megnyitom",
+    detach: "Leválasztás",
+    detachConfirm: "Leválasztod ezt az időpontot a sorozatról? Önálló túraként, külön kártyán jelenik meg.",
+    orgRowStatus: "{applicants} jelentkező · {spots} szabad hely",
+    orgSubtitle: "Új időpontot a túra másolataként adhatsz hozzá. A Felfedezésben egy kártyán jelennek meg.",
+    errors: {
+      invalidDates: "A befejezés nem lehet a kezdés előtt.",
+      invalidDeadline: "A jelentkezési határidő nem lehet a kezdés után.",
+      invalidCapacity: "A létszám 1 és 1000 között lehet.",
+    },
+  },
+
+  // ============================================================================
   // M23 — Calendar (naptár)
   // ============================================================================
   // ── M22 Trip Ideas — Ötletbörze (spec 15.1, 11. fejezet) ──

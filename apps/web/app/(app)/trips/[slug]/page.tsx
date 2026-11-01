@@ -7,7 +7,8 @@ import { CATEGORY_DISPLAY, DIFFICULTY_LEVELS } from "@/lib/categories";
 import { getServerT, getServerLocale } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
 import { BackButtonNight } from "@/components/BackButton";
-import { ApplyButton } from "@/components/ApplyButton";
+import { ApplyButton, type ApplySeriesOption } from "@/components/ApplyButton";
+import { SeriesDatesSection, type SeriesDateRow } from "@/components/trip-series/SeriesDatesSection";
 import { TripCancelledBanner } from "@/components/trip-forms/TripCancelledBanner";
 import { CANCELLATION_REASON_LABEL, type CancellationReason } from "@/lib/trip-deletion";
 import { Icon } from "@/components/Icon";
@@ -179,6 +180,84 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
       : null;
 
   const spotsLeft = trip.max_participants - (trip.current_participants || 0);
+
+  // M024 — a sorozat időpontjai (minden időpont önálló túra; spec BR-M024-004/007, terv D02 #Np8RX, #s9YQ4F).
+  type SeriesTrip = {
+    id: string; slug: string; start_date: string | null; end_date: string | null;
+    max_participants: number; current_participants: number | null; price_amount: number | null;
+    price_currency: string | null; status: string; registration_deadline: string | null; require_approval: boolean;
+  };
+  const seriesTrips: SeriesTrip[] = trip.series_id
+    ? ((await supabase
+        .from("trips")
+        .select("id, slug, start_date, end_date, max_participants, current_participants, price_amount, price_currency, status, registration_deadline, require_approval")
+        .eq("series_id", trip.series_id)
+        .is("deleted_at", null)
+        .order("start_date", { ascending: true })).data ?? []) as SeriesTrip[]
+    : [];
+  const nowIso = new Date().toISOString();
+  const todayIso = nowIso.slice(0, 10);
+  const OPEN_STATUSES = ["published", "registration_open"];
+  const visitorDates = seriesTrips.filter(
+    (s) => s.id === trip.id || (OPEN_STATUSES.includes(s.status) && (!s.start_date || s.start_date >= todayIso)),
+  );
+  const seriesIds = seriesTrips.map((s) => s.id);
+  const [{ data: seriesApplicants }, { data: mySeriesApplications }] = await Promise.all([
+    isOrganizer && seriesIds.length > 0
+      ? supabase.from("trip_participants").select("trip_id").in("trip_id", seriesIds)
+          .in("status", ["pending", "approved", "approved_pending_payment", "participant", "waitlisted"])
+      : Promise.resolve({ data: [] as { trip_id: string }[] }),
+    user && !isOrganizer && seriesIds.length > 1
+      ? supabase.from("trip_participants").select("trip_id").eq("user_id", user.id).in("trip_id", seriesIds)
+          .in("status", ["pending", "approved", "approved_pending_payment", "participant", "waitlisted"])
+      : Promise.resolve({ data: [] as { trip_id: string }[] }),
+  ]);
+  const seriesDateFmt = new Intl.DateTimeFormat(dateLocale, { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" });
+  const seriesDateLabel = (s: { start_date: string | null; end_date: string | null }) => {
+    if (!s.start_date) return "—";
+    const text = s.end_date && s.end_date !== s.start_date
+      ? seriesDateFmt.formatRange(new Date(s.start_date), new Date(s.end_date))
+      : seriesDateFmt.format(new Date(s.start_date));
+    return text.replace(/[\u00a0\u2009\u202f]/g, " ");
+  };
+  const seriesPriceLabel = (s: { price_amount: number | null; price_currency: string | null }) =>
+    s.price_amount ? `${Number(s.price_amount).toFixed(0)} ${s.price_currency ?? ""}`.trim() : t("trips.detail.free");
+  const seriesClosed = (s: SeriesTrip) =>
+    !OPEN_STATUSES.includes(s.status) || (!!s.registration_deadline && s.registration_deadline < nowIso);
+  const seriesSpots = (s: SeriesTrip) => Math.max(0, s.max_participants - (s.current_participants || 0));
+  const applicantCount = new Map<string, number>();
+  for (const row of seriesApplicants ?? []) applicantCount.set(row.trip_id, (applicantCount.get(row.trip_id) ?? 0) + 1);
+  const myAppliedIds = new Set((mySeriesApplications ?? []).map((row) => row.trip_id));
+  const currentAsSeries: SeriesTrip = {
+    id: trip.id, slug: trip.slug, start_date: trip.start_date, end_date: trip.end_date,
+    max_participants: trip.max_participants, current_participants: trip.current_participants,
+    price_amount: trip.price_amount, price_currency: trip.price_currency, status: trip.status,
+    registration_deadline: trip.registration_deadline, require_approval: trip.require_approval,
+  };
+  const sectionSource = isOrganizer ? (seriesTrips.length > 0 ? seriesTrips : [currentAsSeries]) : visitorDates;
+  const seriesRows: SeriesDateRow[] = sectionSource.map((s) => ({
+    id: s.id,
+    slug: s.slug,
+    dateLabel: seriesDateLabel(s),
+    priceLabel: seriesPriceLabel(s),
+    spotsLeft: seriesSpots(s),
+    closed: seriesClosed(s),
+    isDraft: s.status === "draft",
+    applicants: isOrganizer ? applicantCount.get(s.id) ?? 0 : undefined,
+  }));
+  const isSeriesVisible = visitorDates.length > 1;
+  const applySeriesOptions: ApplySeriesOption[] | undefined = isSeriesVisible
+    ? visitorDates.map((s) => ({
+        tripId: s.id,
+        slug: s.slug,
+        dateLabel: seriesDateLabel(s),
+        priceLabel: seriesPriceLabel(s),
+        spotsLeft: seriesSpots(s),
+        requireApproval: s.require_approval,
+        closed: seriesClosed(s),
+        applied: myAppliedIds.has(s.id),
+      }))
+    : undefined;
 
   // BR-M02-009: a lemondott túra az okkal és a szervező üzenetével jelenik meg, jelentkezni nem lehet.
   const isCancelled = trip.status === "cancelled";
@@ -352,6 +431,28 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
               </span>
             </div>
 
+            {/* M024 — Időpontok (látogató: több nyilvános időpontnál; szervező: mindig, „Új időpont”) */}
+            {((isOrganizer && !isCancelled) || (!isOrganizer && isSeriesVisible)) && (
+              <SeriesDatesSection
+                rows={seriesRows}
+                currentTripId={trip.id}
+                isOrganizer={isOrganizer}
+                organizer={
+                  isOrganizer
+                    ? {
+                        tripId: trip.id,
+                        title: trip.title,
+                        currency: trip.price_currency || "EUR",
+                        defaultMaxParticipants: trip.max_participants,
+                        defaultPrice: trip.price_amount != null ? Number(trip.price_amount) : null,
+                        durationDays: dayCount,
+                        canDetach: seriesTrips.length > 1,
+                      }
+                    : null
+                }
+              />
+            )}
+
             {/* Description */}
             <div className="bg-white rounded-2xl border border-navy-200 p-6">
               <h2 className="text-lg font-bold text-navy-900 mb-3">
@@ -483,6 +584,8 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
               {!isOrganizer && !isCancelled && (
                 <ApplyButton
                   tripId={trip.id}
+                  tripSlug={slug}
+                  seriesOptions={applySeriesOptions}
                   requireApproval={trip.require_approval}
                   spotsLeft={spotsLeft}
                   isAuthenticated={!!user}
@@ -658,7 +761,10 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
             <span className="text-base font-semibold text-ink">
               {trip.price_amount ? `${Number(trip.price_amount).toFixed(0)} ${trip.price_currency} / ${t("trips.detail.perPerson")}` : t("trips.detail.free")}
             </span>
-            <span className="text-xs text-ink-muted">{spotsLeft > 0 ? `${spotsLeft} ${t("trips.detail.spotsLeft")}` : t("trips.detail.full")}</span>
+            <span className="text-xs text-ink-muted">
+              {spotsLeft > 0 ? `${spotsLeft} ${t("trips.detail.spotsLeft")}` : t("trips.detail.full")}
+              {isSeriesVisible ? ` · ${seriesDateLabel(trip)}` : ""}
+            </span>
           </div>
           <a href="#trip-apply" className="inline-flex h-11 items-center rounded-trevu bg-accent px-5 text-sm font-semibold text-accent-on">
             {isOrganizer ? t("trips.detail.edit") : t("trips.detail.apply")}

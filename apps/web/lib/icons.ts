@@ -183,6 +183,10 @@ export {
   Languages,
   WifiOff,
 
+  // ── M024 Trip Series (Ikon Bank 6.7) ─────────────────────────────
+  CalendarPlus,
+  Unlink,
+
   // ── M22 Trip Ideas (Ikon Bank 6.6) ──────────────────────────────
   Lightbulb,
   Hand,

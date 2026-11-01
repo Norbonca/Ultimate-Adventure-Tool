@@ -1,6 +1,14 @@
 "use client";
 
+/**
+ * Jelentkezés a túrára.
+ * M024 (design/D02_Trip_Management.pen#s9YQ4F 1440, #X8RfTp 390, siker #OUuEB): ha a túra egy sorozat
+ * időpontja, a felhasználó itt választja ki, melyik időpontra jelentkezik (BR-M024-004); a jelentkezés a
+ * választott időpont önálló túrájára jön létre. Siker után a választott dátum és a Túráim látszik.
+ */
+
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { applyToTrip, cancelApplication } from "@/app/(app)/trips/actions";
@@ -22,16 +30,38 @@ type Participation = {
   removal_message?: string | null;
 } | null;
 
+/** M024: a sorozat egy időpontja a jelentkezési választóban. */
+export interface ApplySeriesOption {
+  tripId: string;
+  slug: string;
+  dateLabel: string;
+  priceLabel: string;
+  spotsLeft: number;
+  requireApproval: boolean;
+  /** Határidő lejárt / nem fogad jelentkezést. */
+  closed: boolean;
+  /** A felhasználónak már van élő jelentkezése erre az időpontra. */
+  applied: boolean;
+}
+
 interface ApplyButtonProps {
   tripId: string;
+  /** A bejelentkezés utáni visszatéréshez (GAP-007). */
+  tripSlug: string;
+  /** M024: a sorozat időpontjai (legalább kettő esetén időpontválasztó). */
+  seriesOptions?: ApplySeriesOption[];
   requireApproval: boolean;
   spotsLeft: number;
   isAuthenticated: boolean;
   participation: Participation;
 }
 
+const selectable = (o: ApplySeriesOption) => !o.closed && !o.applied && (o.spotsLeft > 0 || o.requireApproval);
+
 export function ApplyButton({
   tripId,
+  tripSlug,
+  seriesOptions,
   requireApproval,
   spotsLeft,
   isAuthenticated,
@@ -43,12 +73,54 @@ export function ApplyButton({
   const [showForm, setShowForm] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const options = seriesOptions && seriesOptions.length > 1 ? seriesOptions : null;
+  const defaultChoice = options
+    ? (options.find((o) => o.tripId === tripId && selectable(o)) ?? options.find(selectable))?.tripId ?? null
+    : tripId;
+  const [chosenId, setChosenId] = useState<string | null>(defaultChoice);
+  const chosen = options?.find((o) => o.tripId === chosenId) ?? null;
+  const [success, setSuccess] = useState<{ dateLabel: string | null; slug: string; status?: string } | null>(null);
 
-  // 1) Nem bejelentkezett → login redirect link
+  // 0) M024: sikeres jelentkezés — a választott dátummal (D02 #OUuEB)
+  if (success) {
+    return (
+      <div className="space-y-3 text-center" role="status" data-testid="apply-success">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-success)_15%,transparent)]">
+          <Icon name="check" size={28} className="text-[var(--color-success)]" />
+        </div>
+        <p className="text-lg font-bold text-navy-900">{t("series.successTitle")}</p>
+        {success.dateLabel && (
+          <p className="inline-flex items-center gap-2 rounded-lg bg-trevu-50 px-3 py-2 text-sm font-semibold text-navy-900" data-testid="apply-success-date">
+            <Icon name="calendar-days" size={16} className="text-trevu-700" />
+            {t("series.successDate", { date: success.dateLabel })}
+          </p>
+        )}
+        <p className="text-sm text-navy-500">
+          {success.status === "approved" ? t("series.successBodyApproved") : t("series.successBodyPending")}
+        </p>
+        <div className="flex flex-col gap-2">
+          <Link href="/trips" className="block w-full rounded-xl bg-trevu-600 py-3 text-center font-bold text-white hover:bg-trevu-700">
+            {t("series.openMyTrips")}
+          </Link>
+          {success.slug !== tripSlug ? (
+            <Link href={`/trips/${success.slug}`} className="block w-full rounded-xl border border-navy-200 py-3 text-center font-semibold text-navy-700 hover:bg-navy-50">
+              {t("series.backToTrip")}
+            </Link>
+          ) : (
+            <button type="button" onClick={() => setSuccess(null)} className="block w-full rounded-xl border border-navy-200 py-3 text-center font-semibold text-navy-700 hover:bg-navy-50">
+              {t("series.backToTrip")}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // 1) Nem bejelentkezett → login, majd vissza erre a túrára (GAP-007)
   if (!isAuthenticated) {
     return (
       <a
-        href={`/login?redirect=/trips`}
+        href={`/login?redirect=${encodeURIComponent(`/trips/${tripSlug}`)}`}
         className="block w-full py-3 text-center bg-trevu-600 text-white font-bold rounded-xl hover:bg-trevu-700 transition-colors shadow-lg shadow-trevu-600/20"
       >
         {t("trips.detail.loginToApply")}
@@ -161,19 +233,26 @@ export function ApplyButton({
   }
 
   // 3) Nincs jelentkezés (vagy cancelled / removed — §11.5.3: az eltávolított újra jelentkezhet) → apply form
+  const targetId = options ? chosenId : tripId;
   const handleApply = () => {
+    if (!targetId) return;
     setError(null);
     startTransition(async () => {
-      const res = await applyToTrip(tripId, message);
+      const res = await applyToTrip(targetId, message);
       if (!res.ok) {
         setError(res.error || t("errors.generic"));
         return;
       }
       setShowForm(false);
       setMessage("");
+      if (options) {
+        setSuccess({ dateLabel: chosen?.dateLabel ?? null, slug: chosen?.slug ?? tripSlug, status: res.status });
+      }
       router.refresh();
     });
   };
+  const anySelectable = options ? options.some(selectable) : true;
+  const applied = options?.filter((o) => o.applied) ?? [];
 
   // Az eltávolítás ténye és a szervező üzenete az újrajelentkezés fölött látszik (D02 o4u2N6 következménye).
   const removedNotice =
@@ -195,7 +274,7 @@ export function ApplyButton({
         {removedNotice}
         <button
           onClick={() => setShowForm(true)}
-          disabled={spotsLeft <= 0 && !requireApproval}
+          disabled={options ? !anySelectable : spotsLeft <= 0 && !requireApproval}
           className="w-full py-3 bg-trevu-600 text-white font-bold rounded-xl hover:bg-trevu-700 transition-colors shadow-lg shadow-trevu-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {t("trips.detail.apply")}
@@ -207,6 +286,53 @@ export function ApplyButton({
   return (
     <div className="space-y-3">
       {removedNotice}
+      {options && (
+        <fieldset className="space-y-2" data-testid="apply-series-options">
+          <legend className="mb-2 text-sm font-semibold text-navy-900">{t("series.chooseDate")}</legend>
+          {applied.length > 0 && (
+            <p className="flex gap-2 rounded-lg bg-trevu-50 p-2.5 text-xs text-navy-700" data-testid="apply-series-already">
+              <Icon name="info" size={14} className="mt-0.5 shrink-0 text-trevu-700" />
+              {t("series.alreadyApplied", { dates: applied.map((o) => o.dateLabel).join(", ") })}
+            </p>
+          )}
+          {options.map((o) => {
+            const enabled = selectable(o);
+            const full = o.spotsLeft <= 0;
+            const hint = o.applied
+              ? t("series.alreadyAppliedOption")
+              : o.closed
+                ? t("series.closed")
+                : full
+                  ? o.requireApproval ? t("series.waitlistHint") : t("series.full")
+                  : t("series.spots", { count: o.spotsLeft });
+            return (
+              <label
+                key={o.tripId}
+                className={[
+                  "flex min-h-14 items-center gap-3 rounded-xl border px-3 py-2",
+                  enabled ? "cursor-pointer" : "cursor-not-allowed opacity-60",
+                  chosenId === o.tripId ? "border-trevu-600 bg-trevu-50" : "border-navy-200",
+                ].join(" ")}
+              >
+                <input
+                  type="radio"
+                  name={`apply-date-${tripId}`}
+                  value={o.tripId}
+                  checked={chosenId === o.tripId}
+                  disabled={!enabled}
+                  onChange={() => setChosenId(o.tripId)}
+                  className="h-5 w-5 accent-trevu-600"
+                />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-bold text-navy-900">{o.dateLabel}</span>
+                  <span className={`block text-xs ${full && !o.applied && !o.closed ? "text-[var(--color-danger)]" : "text-navy-500"}`}>{hint}</span>
+                </span>
+                <span className="text-sm font-semibold text-navy-700">{o.priceLabel}</span>
+              </label>
+            );
+          })}
+        </fieldset>
+      )}
       <div>
         <label className="text-xs font-semibold text-navy-600 mb-1 block">
           {t("trips.detail.applicationMessage")}
@@ -227,7 +353,7 @@ export function ApplyButton({
         </div>
       </div>
 
-      {requireApproval && (
+      {(chosen ? chosen.requireApproval : requireApproval) && (
         <p className="text-xs text-amber-700 bg-amber-50 rounded-lg p-2 leading-relaxed">
           ℹ️ {t("trips.detail.approvalRequiredNote")}
         </p>
@@ -247,14 +373,17 @@ export function ApplyButton({
         </button>
         <button
           onClick={handleApply}
-          disabled={isPending}
+          disabled={isPending || !targetId}
+          data-testid="apply-submit"
           className="flex-1 py-2.5 text-sm font-bold text-white bg-trevu-600 hover:bg-trevu-700 rounded-lg transition-colors disabled:opacity-50"
         >
           {isPending
             ? t("common.loading")
-            : requireApproval
-              ? t("trips.detail.submitApplication")
-              : t("trips.detail.joinTrip")}
+            : chosen
+              ? t("series.applyFor", { date: chosen.dateLabel })
+              : requireApproval
+                ? t("trips.detail.submitApplication")
+                : t("trips.detail.joinTrip")}
         </button>
       </div>
 
