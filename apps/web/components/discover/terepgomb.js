@@ -24,7 +24,9 @@
 // - tiles: { url(z, x, y), maxZoom }, atlasUrl: a countries-50m.json helye
 // - t: feliratszótár (ld. GlobeDiscover.tsx), locale: 'hu' | 'en'
 // - onOpen(slug): a "Részletek" gomb
-import maplibregl from "maplibre-gl";
+import * as maplibregl from "maplibre-gl"; // MapLibre 6: csak ESM, nincs default export (SEC-017)
+// MapLibre 6: bundlerben a worker URL-t egyszer meg kell adni (v5→v6 migrációs útmutató, Next.js/Turbopack minta).
+maplibregl.setWorkerUrl(new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).toString());
 import { geoDistance, geoGraticule, mean } from "d3";
 import * as topojson from "topojson-client";
 
@@ -214,13 +216,15 @@ export async function mountGlobe(root, opts) {
 
   const projection = (ll) => { const p = map.project(ll); return [p.x, p.y]; };
   const centerLL = () => { const c = map.getCenter(); return [c.lng, c.lat]; };
-  const occluded = (ll) => { const tr = map.transform; return typeof tr.isLocationOccluded === "function" ? tr.isLocationOccluded({ lng: ll[0], lat: ll[1] }) : geoDistance(ll, centerLL()) > Math.PI / 2; };
+  // MapLibre 6: a Map már nem a Camera leszármazottja, a `map.transform` megszűnt — a belső transzformáció a `_camera`-n van (SEC-017).
+  const mapTransform = () => map._camera?.transform ?? map.transform;
+  const occluded = (ll) => { const tr = mapTransform(); return tr && typeof tr.isLocationOccluded === "function" ? tr.isLocationOccluded({ lng: ll[0], lat: ll[1] }) : geoDistance(ll, centerLL()) > Math.PI / 2; };
   function visible(ll) { return !occluded(ll) && geoDistance(ll, centerLL()) < Math.PI / 2 - 0.05; }
 
   // a gömb sugara pixelben (a MapLibre saját képlete: a nagyítás a középpont szélességén a síkvetítéssel egyező),
   // és a látszó körvonal (perspektivikus kamera: a középpontból a kamera c távolságra van)
   const globeRadius = (zoom, lat) => 512 * Math.pow(2, zoom) / (2 * Math.PI) / Math.cos(lat * Math.PI / 180);
-  const cameraDist = () => { const c = map.transform.cameraToCenterDistance; return Number.isFinite(c) && c > 0 ? c : 1.5 * height; };
+  const cameraDist = () => { const c = mapTransform()?.cameraToCenterDistance; return Number.isFinite(c) && c > 0 ? c : 1.5 * height; };
   const silhouette = (r, c) => c * r / Math.sqrt(c * c + 2 * c * r);
   /** A nagyítás, amelynél a gömb látszó körvonala `s` pixel sugarú (a teljes bolygó nézethez). */
   function zoomForSilhouette(s, lat) { const c = cameraDist(); const r = (s * s + s * Math.sqrt(s * s + c * c)) / c; return Math.log2(r * 2 * Math.PI * Math.cos(lat * Math.PI / 180) / 512); }
