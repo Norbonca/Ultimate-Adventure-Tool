@@ -2,8 +2,10 @@
 
 import { useState, useCallback, useMemo } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/useTranslation";
-import { saveDraft } from "../../actions";
+import { saveDraft, publishTrip } from "../../actions";
+import { missingPublishFields } from "@/lib/trip-validation";
 import type {
   CategoryParameterRow,
   ParameterOptionRow,
@@ -101,6 +103,7 @@ export function EditTripForm({
   fxSettings,
 }: EditTripFormProps) {
   const { t, locale: clientLocale } = useTranslation();
+  const router = useRouter();
   const effectiveLocale = clientLocale || locale;
 
   // Single WizardFormData state — shared form components consume this.
@@ -147,7 +150,7 @@ export function EditTripForm({
   }, []);
 
   const [activeTab, setActiveTab] = useState<TabKey>("basic");
-  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "publishing" | "saved" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
   const handleSave = useCallback(async () => {
@@ -165,6 +168,34 @@ export function EditTripForm({
     }
   }, [formData, trip.id]);
 
+  const handlePublish = useCallback(async () => {
+    setErrorMsg("");
+    const missing = missingPublishFields(formData);
+    if (missing.length > 0) {
+      const labels = {
+        category_id: t("trips.wizard.category"),
+        title: t("trips.fields.title"),
+        start_date: t("trips.fields.startDate"),
+        end_date: t("trips.fields.endDate"),
+        cover_image_url: t("trips.wizard.coverImage"),
+      };
+      setSaveStatus("error");
+      setErrorMsg(t("trips.wizard.missingRequired", { fields: missing.map((key) => labels[key]).join(", ") }));
+      return;
+    }
+
+    setSaveStatus("publishing");
+    const result = await publishTrip(trip.id, formData).catch(() => ({ slug: "", error: t("errors.saveFailed") }));
+    if (result.error) {
+      setSaveStatus("error");
+      setErrorMsg(result.error);
+    } else {
+      router.push(`/trips/${result.slug}`);
+      router.refresh();
+    }
+  }, [formData, trip.id, t, router]);
+
+  const isDraft = trip.status === "draft";
   const isPublished = trip.status === "published";
   const statusLabel = isPublished
     ? t("trips.edit.statusPublished")
@@ -324,8 +355,12 @@ export function EditTripForm({
             <button
               type="button"
               onClick={handleSave}
-              disabled={saveStatus === "saving"}
-              className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-trevu-600 rounded-xl hover:bg-trevu-700 transition-colors disabled:opacity-50"
+              disabled={saveStatus === "saving" || saveStatus === "publishing"}
+              className={
+                isDraft
+                  ? "inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-navy-700 bg-white border border-navy-300 rounded-xl hover:bg-navy-50 transition-colors disabled:opacity-50"
+                  : "inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-trevu-600 rounded-xl hover:bg-trevu-700 transition-colors disabled:opacity-50"
+              }
             >
               <Icon name="save" size={15} />
               <span>
@@ -334,6 +369,21 @@ export function EditTripForm({
                   : t("trips.edit.saveChanges")}
               </span>
             </button>
+            {isDraft && (
+              <button
+                type="button"
+                onClick={handlePublish}
+                disabled={saveStatus === "saving" || saveStatus === "publishing"}
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-trevu-600 rounded-xl hover:bg-trevu-700 transition-colors disabled:opacity-50"
+              >
+                <Icon name="rocket" size={15} />
+                <span>
+                  {saveStatus === "publishing"
+                    ? t("trips.edit.publishing")
+                    : t("trips.edit.publish")}
+                </span>
+              </button>
+            )}
           </div>
         </div>
       </div>

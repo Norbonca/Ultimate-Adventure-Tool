@@ -953,6 +953,8 @@ const hu = {
       statusPublished: "Közzétéve",
       statusDraft: "Piszkozat",
       draftSaved: "Piszkozat mentve",
+      publish: "Közzététel",
+      publishing: "Közzététel…",
       tabs: {
         basicInfo: "Alapadatok",
         categoryDetails: "Kategória részletek",
