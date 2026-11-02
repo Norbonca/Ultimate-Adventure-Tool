@@ -155,7 +155,7 @@ const en: TranslationKeys = {
     loginBrandDesc: "Log in to plan your next adventure, manage your trips, and connect with your crew.",
     loginFeature1: "Plan trips across 8 adventure categories",
     loginFeature2: "Split expenses fairly with your crew",
-    loginFeature3: "Works offline — even at the summit",
+    loginFeature3: "Fully featured in your mobile browser, no install",
     freeForever: "Free forever for personal use",
     phoneTab: "Phone",
     phonePlaceholder: "+1 555 000 0000",
@@ -250,7 +250,7 @@ const en: TranslationKeys = {
     // Hero
     heroBadge: "Now in Early Access — Central Europe",
     heroHeadline: "Trek beyond ordinary",
-    heroSubheadline: "The all-in-one adventure platform that replaces your trip planner, expense splitter, offline maps, and five other apps — so you can focus on the trail ahead.",
+    heroSubheadline: "The all-in-one adventure platform that replaces your trip planner, expense splitter, and more apps — so you can focus on the trail ahead.",
     heroCta: "Start Planning Free →",
     heroCtaSecondary: "Explore Trips",
     heroTrust: "Trusted by adventurers across",
@@ -267,8 +267,8 @@ const en: TranslationKeys = {
     problemCard1Text: "Choose from 8 adventure categories. Add waypoints, set difficulty, pack the right gear — all in one place.",
     problemCard2Title: "Go together, split fairly",
     problemCard2Text: "Invite your crew, split costs in any currency, and settle debts with one tap. No more awkward spreadsheets after the trip.",
-    problemCard3Title: "Stay connected, even offline",
-    problemCard3Text: "Full offline support means your plans, maps, and packing lists work at the summit, on the water, or deep in the forest.",
+    problemCard3Title: "Everything at hand, on the trip too",
+    problemCard3Text: "Trip details, the timeline and shared costs are one tap away in your mobile browser.",
 
     // Features section
     featuresTag: "CORE FEATURES",
@@ -278,8 +278,8 @@ const en: TranslationKeys = {
     feature1Description: "Build trips across 8 adventure categories with category-specific planning tools. From elevation profiles for hikers to avalanche risk for skiers — every sport gets the intelligence it deserves.",
     feature2Title: "Effortless Expense Splitting",
     feature2Description: "Multi-currency cost splitting that actually understands group trips. Add expenses on the go, see who owes what instantly, and export clean reports when you're home.",
-    feature3Title: "Offline-First, Always Ready",
-    feature3Description: "Your plans, maps, and packing lists work without internet. Because summits, rivers, and forests don't come with Wi-Fi. Everything syncs automatically when you're back online.",
+    feature3Title: "Fully featured in a mobile browser",
+    feature3Description: "Every page adapts to your phone: the price and the main button stay visible, and the timeline and shared costs are at hand in the browser, no install needed.",
 
     // Categories section
     categoriesTag: "8 ADVENTURE CATEGORIES",
@@ -312,20 +312,9 @@ const en: TranslationKeys = {
 
     // Social proof / stats
     statCategories: "Adventure Categories",
-    statOffline: "Offline Capable",
     statServices: "Integrated Services",
     statLanguages: "Languages Supported",
 
-    // Testimonials
-    testimonial1Text: "Finally, one app that understands hiking isn't the same as cycling. The category-specific planning is a game changer for our mountain club.",
-    testimonial1Author: "Márta K.",
-    testimonial1Role: "Mountain Club Organizer, Budapest",
-    testimonial2Text: "We used to lose hours reconciling expenses after every group trip. With trevu, costs are split in real-time and everyone stays in the loop.",
-    testimonial2Author: "Tomáš R.",
-    testimonial2Role: "Trail Running Group Leader, Bratislava",
-    testimonial3Text: "Offline maps that actually work at 2,500m elevation? That alone sold me. But the packing lists and weather alerts make it indispensable.",
-    testimonial3Author: "Lukas H.",
-    testimonial3Role: "Alpine Guide, Innsbruck",
 
     // Final CTA
     finalHeadline: "Your next adventure starts here",

@@ -131,26 +131,6 @@ export default function HomePage() {
     },
   ];
 
-  const testimonials = [
-    {
-      text: t('landing.testimonial1Text'),
-      author: t('landing.testimonial1Author'),
-      role: t('landing.testimonial1Role'),
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=96&q=80&fit=crop&auto=format',
-    },
-    {
-      text: t('landing.testimonial2Text'),
-      author: t('landing.testimonial2Author'),
-      role: t('landing.testimonial2Role'),
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=96&q=80&fit=crop&auto=format',
-    },
-    {
-      text: t('landing.testimonial3Text'),
-      author: t('landing.testimonial3Author'),
-      role: t('landing.testimonial3Role'),
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=96&q=80&fit=crop&auto=format',
-    },
-  ];
 
   return (
     <>
@@ -658,9 +638,9 @@ export default function HomePage() {
 
         .stats-row {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: repeat(3, 1fr);
           gap: 2rem;
-          margin-bottom: 4rem;
+          margin-bottom: 0;
           text-align: center;
         }
 
@@ -1283,10 +1263,6 @@ export default function HomePage() {
               <div className="stat-label">{t('landing.statCategories')}</div>
             </div>
             <div className="stat-item">
-              <div className="stat-number">100%</div>
-              <div className="stat-label">{t('landing.statOffline')}</div>
-            </div>
-            <div className="stat-item">
               <div className="stat-number">16+</div>
               <div className="stat-label">{t('landing.statServices')}</div>
             </div>
@@ -1296,25 +1272,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="testimonials-grid">
-            {testimonials.map((testimonial, idx) => (
-              <div key={idx} className="testimonial">
-                <p className="testimonial-text">{'"'}{testimonial.text}{'"'}</p>
-                <div className="testimonial-author">
-                  <img
-                    src={testimonial.avatar}
-                    alt={testimonial.author}
-                    className="testimonial-avatar"
-                    loading="lazy"
-                  />
-                  <div className="testimonial-info">
-                    <div className="testimonial-name">{testimonial.author}</div>
-                    <div className="testimonial-role">{testimonial.role}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 

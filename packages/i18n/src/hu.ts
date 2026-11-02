@@ -154,7 +154,7 @@ const hu = {
     loginBrandDesc: "Jelentkezz be a következő kalandod megtervezéséhez, túráid kezeléséhez és a csapatoddal való kapcsolattartáshoz.",
     loginFeature1: "Tervezz túrákat 8 kalandkategóriában",
     loginFeature2: "Oszd el a költségeket igazságosan a csapatoddal",
-    loginFeature3: "Működik offline is — még a csúcson is",
+    loginFeature3: "Mobilböngészőben is teljes értékű, telepítés nélkül",
     freeForever: "Személyes használatra örökre ingyenes",
     phoneTab: "Telefon",
     phonePlaceholder: "+36 20 123 4567",
@@ -249,7 +249,7 @@ const hu = {
     // Hero
     heroBadge: "Korai hozzáférés — Közép-Európa",
     heroHeadline: "Trek beyond ordinary",
-    heroSubheadline: "Az all-in-one kalandplatform, ami felváltja az útvonalterveződet, a költségmegosztódat, az offline térképeidet és még öt másik appot — hogy a túrára koncentrálhass.",
+    heroSubheadline: "Az all-in-one kalandplatform, ami felváltja az útvonalterveződet, a költségmegosztódat és még több másik appot — hogy a túrára koncentrálhass.",
     heroCta: "Tervezz ingyen →",
     heroCtaSecondary: "Túrák böngészése",
     heroTrust: "Kalandorok bizalma szerte",
@@ -266,8 +266,8 @@ const hu = {
     problemCard1Text: "Válassz 8 kalandkategóriából. Adj hozzá útvonalpontokat, állítsd be a nehézséget, csomagold be a megfelelő felszerelést — minden egy helyen.",
     problemCard2Title: "Menjetek együtt, osszatok igazságosan",
     problemCard2Text: "Hívd meg a csapatot, oszd el a költségeket bármilyen valutában, és rendezd a tartozásokat egyetlen érintéssel. Nincs több kínos táblázat a túra után.",
-    problemCard3Title: "Maradj kapcsolatban, akár offline",
-    problemCard3Text: "Teljes offline támogatás: a terveid, térképeid és csomagolási listáid működnek a csúcson, a vízen vagy mélyen az erdőben.",
+    problemCard3Title: "Minden kéznél, a túrán is",
+    problemCard3Text: "A túra adatai, a menetrend és a közös költségek a mobilböngésződben is egy érintésre elérhetők.",
 
     // Features section
     featuresTag: "ALAPFUNKCIÓK",
@@ -277,8 +277,8 @@ const hu = {
     feature1Description: "Tervezz túrákat 8 kalandkategóriában kategória-specifikus eszközökkel. A szintvonalaktól a lavinakockázatig — minden sport megkapja a megérdemelt intelligenciát.",
     feature2Title: "Könnyű költségmegosztás",
     feature2Description: "Többvalutás költségmegosztás, ami tényleg érti a csoportos túrákat. Adj hozzá kiadásokat menet közben, lásd azonnal ki kinek tartozik, és exportálj tiszta kimutatásokat.",
-    feature3Title: "Offline-first, mindig kész",
-    feature3Description: "A terveid, térképeid és csomagolási listáid internet nélkül is működnek. Mert csúcsokhoz, folyókhoz és erdőkhöz nem jár Wi-Fi. Minden automatikusan szinkronizálódik, ha újra online vagy.",
+    feature3Title: "Mobilböngészőben is teljes értékű",
+    feature3Description: "Minden oldal telefonra igazodik: az ár és a fő gomb mindig látható, a menetrend és a közös költségek pedig böngészőből, telepítés nélkül is kéznél vannak.",
 
     // Categories section
     categoriesTag: "8 KALANDKATEGÓRIA",
@@ -311,20 +311,9 @@ const hu = {
 
     // Social proof / stats
     statCategories: "Kalandkategória",
-    statOffline: "Offline képes",
     statServices: "Integrált szolgáltatás",
     statLanguages: "Támogatott nyelv",
 
-    // Testimonials
-    testimonial1Text: "Végre egy app, ami érti, hogy a túrázás nem ugyanaz, mint a kerékpározás. A kategória-specifikus tervezés forradalmi a hegyiklubunknak.",
-    testimonial1Author: "Márta K.",
-    testimonial1Role: "Hegyiklub szervező, Budapest",
-    testimonial2Text: "Korábban órákat vesztegettünk a költségek egyeztetésére minden csoportos túra után. A trevuval valós időben osztjuk a költségeket, és mindenki képben van.",
-    testimonial2Author: "Tomáš R.",
-    testimonial2Role: "Terepfutó csoportvezető, Pozsony",
-    testimonial3Text: "Offline térképek, amik tényleg működnek 2500 méteren? Már ez eladta nekem. De a csomagolási listák és időjárási riasztások nélkülözhetetlenné teszik.",
-    testimonial3Author: "Lukas H.",
-    testimonial3Role: "Alpesi vezető, Innsbruck",
 
     // Final CTA
     finalHeadline: "A következő kalandod itt kezdődik",
