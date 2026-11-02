@@ -103,7 +103,9 @@ jobs:
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          # 2.122.1 rögzítve: a 2026-11-02-i v3.0.0 a supabase/config.toml [inbucket] szakaszát már nem fogadja el
+          # ("[inbucket] … is no longer supported. Use [local_smtp]"), a db push ezért bukott. Frissítés külön PR-ben, a config átírásával.
+          version: 2.122.1
 
       - name: Push DB migrations
         # SUPABASE_DB_PASSWORD szükséges: Supabase Dashboard → Project Settings → Database → Reset password
