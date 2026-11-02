@@ -34,11 +34,11 @@ for (const w of [1440, 390]) {
   const p = await page(w);
   await p.goto(BASE + "/presentation", { waitUntil: "networkidle", timeout: 120000 });
   check(`/presentation ${w}: kijelentkezve elérhető, 1. dia`, (await idx(p)) === 0 && (await p.getByTestId("slide-cover").count()) === 1);
-  check(`/presentation ${w}: számláló 1 / 19`, (await p.getByTestId("presentation-counter").textContent())?.trim() === "1 / 19");
+  check(`/presentation ${w}: számláló 1 / 20`, (await p.getByTestId("presentation-counter").textContent())?.trim() === "1 / 20");
   check(`/presentation ${w}: borítócím a jóváhagyott szöveg`, (await p.locator("h1").first().textContent())?.trim() === "A kalandtúrád szervezése egy helyen");
   await p.waitForTimeout(1400);
   await p.screenshot({ path: `${OUT}/p-${w}-01.png` });
-  const shots = w === 1440 ? [2, 3, 4, 8, 15, 16, 18, 19] : [2, 4, 8, 15, 19];
+  const shots = w === 1440 ? [2, 3, 6, 7, 16, 18, 19, 20] : [2, 3, 6, 18, 20];
   await p.getByTestId("presentation-toggle").click(); // szünet
   for (const n of shots) {
     await p.goto(BASE + `/presentation#${n}`, { waitUntil: "networkidle" });
@@ -66,7 +66,7 @@ for (const w of [1440, 390]) {
   await p.keyboard.press("ArrowLeft");
   check("← billentyű → 2. dia", (await idx(p)) === 1);
   await p.keyboard.press("End");
-  check("End → utolsó dia, regisztráció gomb", (await idx(p)) === 18 && (await p.getByTestId("presentation-register").isVisible()));
+  check("End → utolsó dia, regisztráció gomb", (await idx(p)) === 19 && (await p.getByTestId("presentation-register").isVisible()));
   check("utolsó dián a Következő tiltott", await p.getByTestId("presentation-next").isDisabled());
   await p.keyboard.press("Home");
   check("Home → 1. dia, az Előző tiltott", (await idx(p)) === 0 && (await p.getByTestId("presentation-prev").isDisabled()));
