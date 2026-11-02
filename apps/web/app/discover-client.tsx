@@ -536,6 +536,9 @@ export default function DiscoverClient({
             </div>
           </section>
 
+          {/* M211b — promó blokk a bemutatóvideóval, a hero alatt: csak kijelentkezett látogatónak (D09 `JvYxg`). */}
+          {auth === 'out' && <PresentationPromo />}
+
           {/* TOOLBAR — asztali: kategória-pirulák | Szűrők + nézetváltó; mobil: Szűrők (n) + nézetváltó */}
           <div className="mx-auto max-w-7xl px-4 pb-2 pt-5 md:px-[120px] md:pb-5 md:pt-7">
             <div className="relative flex items-start justify-between gap-4">
@@ -814,9 +817,6 @@ export default function DiscoverClient({
           </main>
         </>
       )}
-
-      {/* M211b — promó blokk a szervezői bemutatóhoz: csak kijelentkezett látogatónak (D09 „M211b — Promó blokk”). */}
-      {viewMode !== 'globe' && auth === 'out' && <PresentationPromo />}
 
       {/* CTA — Night sáv, Dawn Gradient gomb. Norbert 2026-09-16: az alsó fehér (Day) sáv megszűnik.
           3D térkép nézetben nincs: ott a térkép a teljes képernyőt kitölti, és az oldal nem görgethető

@@ -2728,6 +2728,7 @@ const en: TranslationKeys = {
     promoEyebrow: "For organizers",
     promoCta: "Watch the presentation",
     promoMeta: "{count} slides · about {minutes} min",
+    videoLabel: "Trevu presentation for organizers — video",
   },
   tutorials: {
     groups: {

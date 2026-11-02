@@ -90,6 +90,9 @@ for (const w of [1440, 390]) {
   const promo = p.getByTestId("presentation-promo");
   await promo.waitFor({ timeout: 15000 }).catch(() => {});
   check(`nyitóoldal ${w} kijelentkezve: promó blokk`, (await promo.count()) === 1);
+  await p.waitForTimeout(2500);
+  const vstate = await p.getByTestId("presentation-promo-video").evaluate((v) => ({ paused: v.paused, muted: v.muted, t: v.currentTime, loop: v.loop }));
+  check(`nyitóoldal ${w}: a bemutatóvideó magától, némán, ismétlődve fut`, !vstate.paused && vstate.muted && vstate.loop && vstate.t > 0.5, JSON.stringify(vstate));
   check(`nyitóoldal ${w}: nincs vízszintes görgetés`, await noHScroll(p));
   await promo.scrollIntoViewIfNeeded();
   await p.waitForTimeout(500);
