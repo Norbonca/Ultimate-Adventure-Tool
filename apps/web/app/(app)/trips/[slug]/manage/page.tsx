@@ -18,6 +18,7 @@ import { Icon } from "@/components/Icon";
 import { formatMoney } from "@/lib/currency";
 import { fetchTripExpenseTotal } from "../../expense-actions";
 import { ApplicationsManager, type ParticipantRow } from "@/components/trip-forms/ApplicationsManager";
+import { ScrollToHash } from "@/components/ScrollToHash";
 
 interface ManagePageProps {
   params: Promise<{ slug: string }>;
@@ -264,11 +265,12 @@ export default async function TripManagePage({ params }: ManagePageProps) {
 
           {/* Pending Applications */}
           {pendingCount > 0 && (
-            <div className="bg-white rounded-2xl border border-amber-200 p-6">
+            <div id="applications" className="scroll-mt-24 bg-white rounded-2xl border border-amber-200 p-6">
               <h2 className="text-lg font-bold text-navy-900 mb-4">
                 {t("trips.manage.pendingApplications")} ({pendingCount})
               </h2>
               <ApplicationsManager tripId={trip.id} initial={participants as ParticipantRow[]} />
+              <ScrollToHash id="applications" />
             </div>
           )}
         </div>
