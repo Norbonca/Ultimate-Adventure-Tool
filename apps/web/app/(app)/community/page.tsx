@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { pageMeta } from "@/lib/seo";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getServerT } from "@/lib/i18n/server";
@@ -65,6 +66,12 @@ function PersonRow({
     </div>
   );
 }
+
+export const metadata = pageMeta({
+  title: "Közösség",
+  description: "Kalandorok és szervezők a Trevun: kövesd őket, és fedezd fel a túráikat.",
+  path: "/community",
+});
 
 export default async function CommunityPage() {
   const supabase = await createClient();

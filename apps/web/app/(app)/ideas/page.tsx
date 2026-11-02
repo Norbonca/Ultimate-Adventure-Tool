@@ -3,6 +3,7 @@
  * Szerveroldalon renderelt, bejelentkezés nélkül is elérhető (NK-M22-001); a szűrők az URL-ben.
  */
 
+import { pageMeta } from "@/lib/seo";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
@@ -18,7 +19,11 @@ import { fetchCategories } from "../trips/actions";
 import { CATEGORY_DISPLAY } from "@/lib/categories";
 import { CATEGORY_TEXT } from "@/components/discover/TripBand";
 
-export const metadata: Metadata = { title: "Ötletbörze" }; // a root layout sablonja fűzi hozzá a „· Trevu”-t
+export const metadata: Metadata = pageMeta({
+  title: "Ötletbörze",
+  description: "Túraötletek, amelyekhez csatlakozhatsz, vagy amelyeket megszervezhetsz: célterület, időablak és az érdeklődők száma egy helyen.",
+  path: "/ideas",
+}); // a root layout sablonja fűzi hozzá a „· Trevu”-t
 
 interface PageProps { searchParams: Promise<Record<string, string | string[] | undefined>> }
 

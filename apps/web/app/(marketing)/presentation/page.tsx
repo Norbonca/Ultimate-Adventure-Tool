@@ -3,17 +3,19 @@
  * Design: design/D09_Search_Discover.pen „M211b — Bemutató lejátszó” 1440 / MOBIL 390.
  */
 
+import { pageMeta } from "@/lib/seo";
 import type { Metadata } from "next";
 import { getServerT } from "@/lib/i18n/server";
 import { PresentationPlayerClient } from "@/components/presentation/PresentationPlayerClient";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getServerT();
-  return {
+  return pageMeta({
     title: t("presentation.metaTitle"),
     description: t("presentation.metaDescription"),
-    openGraph: { images: ["/presentation/01-felfedezes.jpg"] },
-  };
+    path: "/presentation",
+    image: { url: "/videos/trevu-bemutato-poster.jpg", width: 1280, height: 720, alt: t("presentation.metaTitle") },
+  });
 }
 
 export default function PresentationPage() {

@@ -16,7 +16,7 @@ import { TUTORIAL_GROUPS, TUTORIAL_TAGS, filterTutorials, formatTime, isTutorial
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getServerT();
-  return { title: t("tutorials.metaTitle"), description: t("tutorials.metaDescription") };
+  return { title: t("tutorials.metaTitle"), description: t("tutorials.metaDescription"), robots: { index: false, follow: false } };
 }
 
 interface PageProps {
