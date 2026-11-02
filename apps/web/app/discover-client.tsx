@@ -51,6 +51,7 @@ import {
 import { buildTripSearchText, createTripSearch } from '@/lib/trip-search';
 import { matchesAdvanced, NO_FILTERS, type AdvancedFilters, type Choice } from '@/lib/discover-filters';
 import { groupTripsForDiscover, todayUtc, type DiscoverCard } from '@/lib/trip-series';
+import { TutorialHelp } from '@/components/tutorials/TutorialHelp';
 
 // The globe (d3-geo + tiles) only runs in the browser and is a large chunk —
 // load it on demand so the list view never pays for it.
@@ -426,6 +427,9 @@ export default function DiscoverClient({
   );
 
   const viewToggle = (
+    <div className="flex shrink-0 items-center gap-2">
+    {/* M211 — súgó (D21): a nézethez illő útmutató */}
+    <TutorialHelp anchor={viewMode === 'globe' ? 'discover.map' : 'discover'} variant="icon" />
     <div
       role="group"
       aria-label={t('discover.viewToggleLabel')}
@@ -457,6 +461,7 @@ export default function DiscoverClient({
           </button>
         );
       })}
+    </div>
     </div>
   );
 

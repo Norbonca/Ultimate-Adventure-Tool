@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { ChevronDown, Home, Sparkles, Users, CreditCard, Map , Lightbulb } from "@/lib/icons";
+import { ChevronDown, Home, Sparkles, Users, CreditCard, Map , Lightbulb, CirclePlay } from "@/lib/icons";
 
 // ── Types ──────────────────────────────────────────────────────────
 interface AnchorLink {
@@ -31,6 +31,7 @@ const NAV_ITEMS = [
   { key: "nav.tripIdeas", href: "/ideas", icon: Lightbulb }, // M22 — az Ötletbörze a Felfedezés alatt (NyK-08)
   { key: "nav.tripPlanner", href: "/trips", icon: Map },
   { key: "nav.getStarted", href: "/get-started", icon: Sparkles },
+  { key: "nav.tutorials", href: "/tutorials", icon: CirclePlay }, // M211 — Útmutatók (ND-06)
   { key: "nav.community", href: "/community", icon: Users },
   { key: "nav.pricing", href: "/pricing", icon: CreditCard },
 ] as const;

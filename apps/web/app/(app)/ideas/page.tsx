@@ -11,6 +11,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { Icon } from "@/components/Icon";
 import { CoverImage } from "@/components/ui/CoverImage";
 import { IdeaCard } from "@/components/ideas/IdeaCard";
+import { TutorialHelp } from "@/components/tutorials/TutorialHelp";
 import { BOARD_PAGE_SIZE, listIdeas } from "@/lib/ideas/queries";
 import { categoryChip, destinationsText, getCategoryCovers, membersText, ownerText, statusChip, windowText } from "@/lib/ideas/present";
 import { fetchCategories } from "../trips/actions";
@@ -99,6 +100,8 @@ export default async function IdeasBoardPage({ searchParams }: PageProps) {
             })}
           </div>
           <div className="flex flex-wrap items-center gap-2">
+            {/* M211 — súgó (D21) */}
+            <TutorialHelp anchor="ideas" variant="icon" />
             <div className="inline-flex rounded-trevu bg-ghost p-1" role="group" aria-label={t("ideas.board.intentFilter")}>
               {intents.map((i) => (
                 <Link key={i.key ?? "all"} href={link({ intent: i.key, offer: null, page: null })} className={`inline-flex h-8 items-center gap-1.5 rounded-[8px] px-3 text-xs font-semibold ${filters.intent === i.key && !filters.hasOffer ? "bg-surface text-ink" : "text-ink-secondary"}`}>

@@ -27,6 +27,7 @@ import {
 import { Icon } from "@/components/Icon";
 import { notifyParticipantsChanged, useParticipantsChanged } from "@/lib/participants-events";
 import { RemoveMemberModal } from "./RemoveMemberModal";
+import { TutorialHelp } from "@/components/tutorials/TutorialHelp";
 
 type ProfileLite = { display_name: string | null; avatar_url: string | null } | null;
 type PositionLite = { id: string; role_name: string | null } | null;
@@ -147,6 +148,12 @@ export function ApplicationsManager({ tripId, initial }: ApplicationsManagerProp
 
   return (
     <div className="space-y-2">
+      {/* M211 — súgó a funkcióban (D21 `ggGyk`, választó: `e9ero8`) */}
+      {pending.length > 0 && (
+        <div className="flex justify-end">
+          <TutorialHelp anchor="trip.applications" />
+        </div>
+      )}
       {pending.map((p) => {
         const name = profileOf(p)?.display_name || "—";
         const position = positionOf(p)?.role_name;

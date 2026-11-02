@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Icon } from "@/components/Icon";
 import { getServerT } from "@/lib/i18n/server";
 import { FX_MODE_KEY } from "@/lib/expenses/present";
+import { TutorialHelp } from "@/components/tutorials/TutorialHelp";
 
 interface Props {
   slug: string;
@@ -35,7 +36,11 @@ export async function ExpensesTripBar({ slug, title, heading, settlementCurrency
         </Link>
         <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
           <div className="min-w-0">
-            <h1 className="text-2xl font-semibold text-navy-900 sm:text-3xl">{heading}</h1>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <h1 className="text-2xl font-semibold text-navy-900 sm:text-3xl">{heading}</h1>
+              {/* M211 — súgó a funkcióban (D21 S3a `Ngg0L`) */}
+              <TutorialHelp anchor={active === "settle" ? "expenses.settle" : "expenses"} />
+            </div>
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-chip bg-navy-50 px-2.5 py-1 text-xs font-semibold text-navy-600">
                 <Icon name="banknote" size={14} aria-hidden />
