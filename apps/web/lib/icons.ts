@@ -193,6 +193,18 @@ export {
   Lightbulb,
   Hand,
   Pin,
+
+  // ── M211 Útmutatók (Ikon Bank 6.9) ──────────────────────────────
+  Captions,
+  CaptionsOff,
+  CirclePlay,
+  CircleQuestionMark,
+  Maximize,
+  Minimize,
+  Pause,
+  Play,
+  RotateCcw,
+  VideoOff,
 } from 'lucide-react';
 
 // Márkaikonok (Facebook, Instagram, X, YouTube, Google): a lucide 1.x nem tartalmazza őket —

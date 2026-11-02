@@ -50,6 +50,7 @@ import { getLocalizedName, getLocalizedText } from "@/lib/i18n/localized";
 import { formatDue, moveInList, moveMilestone, type MilestoneLayoutEntry } from "@/lib/timeline/format";
 import { MilestoneModal } from "@/components/timeline/MilestoneModal";
 import { TIMELINE_INPUT } from "@/components/timeline/LocationField";
+import { TutorialHelp } from "@/components/tutorials/TutorialHelp";
 
 const STATUS_DOT: Record<string, string> = {
   not_started: "bg-[var(--color-text-muted)]",
@@ -353,7 +354,11 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
       {/* ── Fej ── */}
       <div className="flex flex-col items-start gap-3 sm:flex-row sm:justify-between sm:gap-4">
         <div className="space-y-1">
-          <h2 className="text-xl font-semibold text-ink">{t("timeline.title")}</h2>
+          <div className="flex flex-wrap items-center gap-3">
+            <h2 className="text-xl font-semibold text-ink">{t("timeline.title")}</h2>
+            {/* M211 — súgó a funkcióban (D21) */}
+            {isOrganizer && <TutorialHelp anchor="trip.timeline" />}
+          </div>
           {isOrganizer && (
             <>
               <p className="hidden text-[13px] text-ink-muted sm:block">{t("timeline.dragHint").replace("{zone}", timezone)}</p>

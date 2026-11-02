@@ -33,6 +33,7 @@ import { linkTripToIdea } from "@/app/(app)/ideas/actions";
 import { saveLinkedDraft } from "@/lib/ideas/save-linked-draft";
 import { Icon } from "@/components/Icon";
 import { Button } from "@/components/ui";
+import { TutorialHelp } from "@/components/tutorials/TutorialHelp";
 
 /** M22 FR-M22-008: „Ötletből” indítás — előtöltés + ötlet–túra kapcsolat az első mentéskor. Design: D22 `3kB6w`, `Gvgnj`. */
 export interface WizardFromIdea {
@@ -360,6 +361,10 @@ export function WizardForm({ categories, countries, userId: _userId, fromIdea = 
           </div>
         </div>
       )}
+      {/* M211 — súgó a varázslóban (D21) */}
+      <div className="mb-3 flex justify-end">
+        <TutorialHelp anchor="trips.new" />
+      </div>
       {/* ── Step Content ── */}
       <div className="bg-white rounded-2xl border border-navy-200 shadow-sm p-6 sm:p-8">
         {currentStep === 0 && (

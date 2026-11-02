@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
 import { detachFromSeries } from "@/app/(app)/trips/series-actions";
 import { AddSeriesDateDialog } from "./AddSeriesDateDialog";
+import { TutorialHelp } from "@/components/tutorials/TutorialHelp";
 
 export interface SeriesDateRow {
   id: string;
@@ -92,11 +93,15 @@ export function SeriesDatesSection({ rows, currentTripId, isOrganizer, organizer
           </h2>
           <p className="mt-1 text-sm text-navy-500">{isOrganizer ? t("series.orgSubtitle") : t("series.datesSubtitle")}</p>
         </div>
-        {isOrganizer && organizer && (
-          <Button variant="outline" icon="calendar-plus" onClick={() => setAddOpen(true)} data-testid="series-add-date">
-            {t("series.addDate")}
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {/* M211 — súgó (D21 `ggGyk`): szervezőnek az új időpont, látogatónak a jelentkezés */}
+          <TutorialHelp anchor={isOrganizer ? "series.addDate" : "trip.apply"} variant="icon" />
+          {isOrganizer && organizer && (
+            <Button variant="outline" icon="calendar-plus" onClick={() => setAddOpen(true)} data-testid="series-add-date">
+              {t("series.addDate")}
+            </Button>
+          )}
+        </div>
       </div>
 
       <ul className="mt-4 flex flex-col gap-2">

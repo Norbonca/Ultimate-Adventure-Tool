@@ -26,6 +26,17 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   // M024 Trip Series (Ikon Bank 6.7)
   "calendar-plus": L.CalendarPlus,
   unlink: L.Unlink,
+  // M211 Útmutatók (Ikon Bank 6.9)
+  captions: L.Captions,
+  "captions-off": L.CaptionsOff,
+  "circle-play": L.CirclePlay,
+  "circle-question-mark": L.CircleQuestionMark,
+  maximize: L.Maximize,
+  minimize: L.Minimize,
+  pause: L.Pause,
+  play: L.Play,
+  "rotate-ccw": L.RotateCcw,
+  "video-off": L.VideoOff,
   // M22 Trip Ideas (Ikon Bank 6.6)
   lightbulb: L.Lightbulb,
   hand: L.Hand,
