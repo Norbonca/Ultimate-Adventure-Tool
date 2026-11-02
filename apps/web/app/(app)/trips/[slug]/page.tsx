@@ -344,17 +344,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
             <span className="text-2xl font-semibold text-ink">
               {trip.price_amount ? `${Number(trip.price_amount).toFixed(0)} ${trip.price_currency} / ${t("trips.detail.perPerson")}` : t("trips.detail.free")}
             </span>
-            {/* Meglévő jelentkezésnél a hero is az állapotot mutatja, nem a „Jelentkezem”-et (mint a mobil ragadós sáv) */}
-            {!isCancelled && stickyStatusKey && (
-              <a href="#trip-apply" className="inline-flex h-12 items-center rounded-trevu border border-line px-6 text-base font-semibold text-ink hover:bg-[rgba(255,255,255,.06)] focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]" data-testid="trip-hero-status">
-                {tr(`trips.participantStatus.${stickyStatusKey}`)}
-              </a>
-            )}
-            {!isCancelled && !stickyStatusKey && (
-              <a href="#trip-apply" className="inline-flex h-12 items-center rounded-trevu bg-accent px-6 text-base font-semibold text-accent-on hover:bg-accent-hover focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]" data-testid="trip-hero-cta">
-                {isOrganizer ? t("trips.detail.edit") : t("trips.detail.apply")}
-              </a>
-            )}
+            {/* Nincs gomb a heróban: az oldalsó #trip-apply doboz (Jelentkezem / állapot / Szerkesztés) egyszerre látszik vele — Norbert, 2026-11-02. Mobilon a ragadós sáv visz oda. */}
           </div>
         </div>
       </section>
