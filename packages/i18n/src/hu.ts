@@ -2758,6 +2758,7 @@ const hu = {
     promoEyebrow: "Szervezőknek",
     promoCta: "Nézd meg a bemutatót",
     promoMeta: "{count} dia · kb. {minutes} perc",
+    videoLabel: "A Trevu bemutatója szervezőknek — videó",
   },
   tutorials: {
     groups: {
