@@ -469,11 +469,6 @@ export default function DiscoverClient({
   return (
     <div data-surface="night" className="min-h-screen bg-canvas text-ink">
       <AppHeader
-        anchors={[
-          { label: t('nav.discover'), href: '/' },
-          { label: t('nav.pricing'), href: '/pricing' },
-          { label: t('nav.community'), href: '/community' },
-        ]}
       />
 
       {viewMode === 'globe' ? (

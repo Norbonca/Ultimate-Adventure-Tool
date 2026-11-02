@@ -8,14 +8,8 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ChevronDown, Home, Sparkles, Users, CreditCard, Map , Lightbulb, CirclePlay } from "@/lib/icons";
 
 // ── Types ──────────────────────────────────────────────────────────
-interface AnchorLink {
-  label: string;
-  href: string;
-}
-
 interface AppHeaderProps {
   /** Contextual anchor links for the center zone */
-  anchors?: AnchorLink[];
   /** User info — pass from server component to skip client-side fetch */
   user?: {
     email: string;
@@ -27,7 +21,7 @@ interface AppHeaderProps {
 
 // ── Navigation menu items (static) ────────────────────────────────
 const NAV_ITEMS = [
-  { key: "nav.home", href: "/", icon: Home },
+  { key: "nav.discover", href: "/", icon: Home },
   { key: "nav.tripIdeas", href: "/ideas", icon: Lightbulb }, // M22 — az Ötletbörze a Felfedezés alatt (NyK-08)
   { key: "nav.tripPlanner", href: "/trips", icon: Map },
   { key: "nav.getStarted", href: "/get-started", icon: Sparkles },
@@ -41,13 +35,23 @@ const NAV_ITEMS = [
 // Túratervező = M02 túraszervezés (a My Trips oldalról indul);
 // nem keverendő az M20 Utazástervezővel (per-túra oda-/hazaút tervezés).
 const INTERNAL_NAV = [
+  { key: "nav.discover", href: "/" },
+  { key: "nav.getStarted", href: "/get-started" },
   { key: "nav.tripPlanner", href: "/trips" },
   { key: "nav.community", href: "/community" },
   { key: "nav.tutorials", href: "/tutorials" }, // M211 — csak belépve
 ] as const;
 
+// Kijelentkezve a középső zóna (minden nyilvános oldalon azonos)
+const PUBLIC_NAV = [
+  { key: "nav.discover", href: "/" },
+  { key: "nav.getStarted", href: "/get-started" },
+  { key: "nav.pricing", href: "/pricing" },
+  { key: "nav.community", href: "/community" },
+] as const;
+
 // ── Component ─────────────────────────────────────────────────────
-export function AppHeader({ anchors, user }: AppHeaderProps) {
+export function AppHeader({ user }: AppHeaderProps) {
   const { t } = useTranslation();
   const pathname = usePathname();
 
@@ -159,60 +163,33 @@ export function AppHeader({ anchors, user }: AppHeaderProps) {
           )}
         </div>
 
-        {/* ── KÖZÉP ZÓNA: belső navigáció ──
-            Publikus oldal explicit anchorokat ad át; különben bejelentkezve
-            a belső funkciók menüje (My Trips · Travel Planner · Community). */}
-        {anchors && anchors.length > 0 ? (
-          <nav className="hidden md:flex items-center gap-1 mx-auto">
-            {anchors.map((anchor, i) => {
-              const active = anchor.href === "/"
-                ? pathname === "/"
-                : !anchor.href.startsWith("#") && pathname?.startsWith(anchor.href);
-              return (
-                <span key={anchor.href} className="flex items-center">
-                  {i > 0 && (
-                    <span className="text-slate-300 mx-1.5 night:text-line-strong">·</span>
-                  )}
-                  <a
-                    href={anchor.href}
-                    className={`text-sm transition-colors whitespace-nowrap ${
-                      active
-                        ? "font-semibold text-teal-600 night:text-accent"
-                        : "font-medium text-slate-500 hover:text-teal-600 night:text-ink-secondary night:hover:text-accent"
-                    }`}
-                  >
-                    {anchor.label}
-                  </a>
-                </span>
-              );
-            })}
-          </nav>
-        ) : authChecked && isLoggedIn ? (
-          <nav className="hidden md:flex items-center gap-1 mx-auto">
-            {INTERNAL_NAV.map((item, i) => {
-              const active = pathname?.startsWith(item.href);
-              return (
-                <span key={item.href} className="flex items-center">
-                  {i > 0 && (
-                    <span className="text-slate-300 mx-1.5 night:text-line-strong">·</span>
-                  )}
-                  <Link
-                    href={item.href}
-                    className={`text-sm transition-colors whitespace-nowrap ${
-                      active
-                        ? "font-semibold text-teal-600 night:text-accent"
-                        : "font-medium text-slate-500 hover:text-teal-600 night:text-ink-secondary night:hover:text-accent"
-                    }`}
-                  >
-                    {t(item.key as Parameters<typeof t>[0])}
-                  </Link>
-                </span>
-              );
-            })}
-          </nav>
-        ) : (
-          <div className="flex-1" />
-        )}
+        {/* ── KÖZÉP ZÓNA: egységes fő navigáció (Norbert 2026-11-02: „mindkettő legyen felül, és legyen
+            egyértelmű, mi az a funkció”). Design: D02/D09 `Component/Header` — kijelentkezve
+            Túrák felfedezése · Mi a Trevu? · Árazás · Közösség; belépve Túrák felfedezése · Mi a Trevu? ·
+            Túratervező · Közösség · Útmutatók. Az `anchors` prop már nem befolyásolja a középső zónát. */}
+        <nav className="hidden lg:flex items-center gap-1 mx-auto" data-testid="header-nav">
+          {(authChecked && isLoggedIn ? INTERNAL_NAV : PUBLIC_NAV).map((item, i) => {
+            const active = item.href === "/" ? pathname === "/" : pathname?.startsWith(item.href);
+            return (
+              <span key={item.href} className="flex items-center">
+                {i > 0 && (
+                  <span className="text-slate-300 mx-1.5 night:text-line-strong">·</span>
+                )}
+                <Link
+                  href={item.href}
+                  aria-current={active ? "page" : undefined}
+                  className={`text-sm transition-colors whitespace-nowrap ${
+                    active
+                      ? "font-semibold text-teal-600 night:text-accent"
+                      : "font-medium text-slate-500 hover:text-teal-600 night:text-ink-secondary night:hover:text-accent"
+                  }`}
+                >
+                  {t(item.key as Parameters<typeof t>[0])}
+                </Link>
+              </span>
+            );
+          })}
+        </nav>
 
         {/* ── JOBB ZÓNA: Nyelv + User ── */}
         <div className="ml-auto flex items-center gap-3">
