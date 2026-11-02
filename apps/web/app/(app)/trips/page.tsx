@@ -75,7 +75,7 @@ export default async function MyTripsPage({
     ? await supabase
         .from("trip_participants")
         .select(
-          "id, applied_at, trips!inner(title), profiles!trip_participants_user_id_fkey(display_name)"
+          "id, status, applied_at, trips!inner(title, slug), profiles!trip_participants_user_id_fkey(display_name)"
         )
         .in("trip_id", tripIds)
         .order("applied_at", { ascending: false })
@@ -266,9 +266,9 @@ export default async function MyTripsPage({
                     const profile = app.profiles as unknown as {
                       display_name: string | null;
                     } | null;
-                    const trip = app.trips as unknown as { title: string } | null;
-                    return (
-                      <li key={app.id} className="text-sm">
+                    const trip = app.trips as unknown as { title: string; slug: string } | null;
+                    const body = (
+                      <>
                         <p className="text-navy-800">
                           {t("trips.newApplication", {
                             name: profile?.display_name ?? "—",
@@ -279,6 +279,22 @@ export default async function MyTripsPage({
                           {app.applied_at &&
                             ` · ${new Date(app.applied_at).toLocaleDateString(dateLocale, { month: "short", day: "numeric" })}`}
                         </p>
+                      </>
+                    );
+                    return (
+                      <li key={app.id} className="text-sm">
+                        {/* Minden esemény kattintható — a jelentkezések döntési helyére visz */}
+                        {trip?.slug ? (
+                          <Link
+                            href={`/trips/${trip.slug}/manage${app.status === "pending" ? "#applications" : ""}`}
+                            className="group -mx-2 flex min-h-[44px] items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-navy-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-trevu-500"
+                          >
+                            <span className="min-w-0 flex-1">{body}</span>
+                            <Icon name="chevron-right" size={16} className="shrink-0 text-navy-400 group-hover:text-navy-700" aria-hidden />
+                          </Link>
+                        ) : (
+                          body
+                        )}
                       </li>
                     );
                   })}
