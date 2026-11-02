@@ -11,7 +11,7 @@ import { getServerT } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
 import { Icon } from "@/components/Icon";
 import { TutorialCard } from "@/components/tutorials/TutorialCard";
-import { filterTutorials, formatTime, listTutorials, loc, posterUrl, tutorialHref, type TutorialRole } from "@/lib/tutorials";
+import { filterTutorials, formatTime, listTutorials, loc, posterUrl, tutorialHref, type Tutorial, type TutorialRole } from "@/lib/tutorials";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getServerT();
@@ -49,6 +49,8 @@ export default async function TutorialsPage({ searchParams }: PageProps) {
 
   const roleLabel = (r: TutorialRole) => (r === "organizer" ? t("tutorials.forOrganizers") : t("tutorials.forTravelers"));
   const captionsLabel = t("tutorials.captionLanguages", { languages: t(locale === "en" ? "tutorials.language.en" : "tutorials.language.hu") });
+  const badgeFor = (x: Tutorial) => (x.hasVideo ? { icon: "captions", label: captionsLabel } : { icon: "presentation", label: t("tutorials.slidesLabel") });
+  const lengthFor = (x: Tutorial) => (x.hasVideo ? formatTime(x.duration) : t("tutorials.stepsCount", { count: x.steps.length }));
   const link = (patch: { q?: string | null; role?: string | null }) => {
     const p = new URLSearchParams();
     const next = { q: q || null, role: role as string | null, ...patch };
@@ -125,8 +127,8 @@ export default async function TutorialsPage({ searchParams }: PageProps) {
                 <Icon name="play" size={28} className="translate-x-0.5" />
               </span>
               <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-chip bg-glass px-2 py-1 text-xs font-semibold text-ink">
-                <Icon name="timer" size={14} aria-hidden />
-                {formatTime(featured.duration)}
+                <Icon name={featured.hasVideo ? "timer" : "presentation"} size={14} aria-hidden />
+                {lengthFor(featured)}
               </span>
               <span className="sr-only">{loc(featured.title, locale)}</span>
             </Link>
@@ -181,7 +183,7 @@ export default async function TutorialsPage({ searchParams }: PageProps) {
               <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
                 {g.items.map((item) => (
                   <li key={item.slug}>
-                    <TutorialCard tutorial={item} locale={locale} roleLabel={roleLabel(item.role)} captionsLabel={captionsLabel} />
+                    <TutorialCard tutorial={item} locale={locale} roleLabel={roleLabel(item.role)} badge={badgeFor(item)} lengthLabel={lengthFor(item)} />
                   </li>
                 ))}
               </ul>

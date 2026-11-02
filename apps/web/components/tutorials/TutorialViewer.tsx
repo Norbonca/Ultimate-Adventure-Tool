@@ -12,6 +12,7 @@ import { Icon } from "@/components/Icon";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { activeStepIndex, formatTime, loc, type Tutorial } from "@/lib/tutorials";
 import { VideoPlayer, type VideoPlayerHandle } from "./VideoPlayer";
+import { SlidePlayer } from "./SlidePlayer";
 
 interface TutorialViewerProps {
   tutorial: Tutorial;
@@ -25,7 +26,10 @@ export function TutorialViewer({ tutorial, variant, panelFooter }: TutorialViewe
   const playerRef = useRef<VideoPlayerHandle>(null);
   const [time, setTime] = useState(0);
   const [started, setStarted] = useState(false);
-  const active = started ? activeStepIndex(tutorial, time) : -1;
+  const [slide, setSlide] = useState(0);
+  const slides = tutorial.hasSlides && !tutorial.hasVideo;
+  const interactive = tutorial.hasVideo || slides;
+  const active = slides ? slide : started ? activeStepIndex(tutorial, time) : -1;
   const compact = variant !== "page";
 
   const steps = (
@@ -53,12 +57,12 @@ export function TutorialViewer({ tutorial, variant, panelFooter }: TutorialViewe
         const cls = `flex w-full items-center gap-3 rounded-trevu-lg border px-3 py-2.5 ${isActive ? "border-accent bg-[rgba(45,212,191,0.12)]" : "border-line"}`;
         return (
           <li key={step.at} aria-current={isActive ? "step" : undefined}>
-            {tutorial.hasVideo ? (
+            {interactive ? (
               <button
                 type="button"
                 className={`${cls} min-h-11 hover:bg-ghost focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent`}
-                onClick={() => playerRef.current?.seek(step.at)}
-                aria-label={`${i + 1}. ${text} — ${t("tutorials.jumpTo", { time: formatTime(step.at) })}`}
+                onClick={() => (slides ? setSlide(i) : playerRef.current?.seek(step.at))}
+                aria-label={slides ? `${i + 1}. ${text}` : `${i + 1}. ${text} — ${t("tutorials.jumpTo", { time: formatTime(step.at) })}`}
                 data-testid={`tutorial-step-${i + 1}`}
               >
                 {inner}
@@ -74,7 +78,9 @@ export function TutorialViewer({ tutorial, variant, panelFooter }: TutorialViewe
     </ol>
   );
 
-  const player = (
+  const player = slides ? (
+    <SlidePlayer tutorial={tutorial} index={slide} onIndex={setSlide} compact={compact} priority={variant === "page"} />
+  ) : (
     <VideoPlayer
       ref={playerRef}
       tutorial={tutorial}
@@ -104,7 +110,7 @@ export function TutorialViewer({ tutorial, variant, panelFooter }: TutorialViewe
           <h2 id="tutorial-steps-title" className="text-lg font-bold text-ink">
             {t("tutorials.steps")}
           </h2>
-          <p className="text-[13px] text-ink-muted">{tutorial.hasVideo ? t("tutorials.stepsHint") : t("tutorials.stepsHintText")}</p>
+          <p className="text-[13px] text-ink-muted">{tutorial.hasVideo ? t("tutorials.stepsHint") : slides ? t("tutorials.stepsHintSlides") : t("tutorials.stepsHintText")}</p>
         </div>
         {steps}
         {panelFooter}

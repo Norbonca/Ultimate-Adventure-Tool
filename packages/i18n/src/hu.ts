@@ -2754,10 +2754,10 @@ const hu = {
   // ============================================================================
   tutorials: {
     metaTitle: "Útmutatók",
-    metaDescription: "Rövid, feliratos videók és lépésenkénti leírások a Trevu használatáról.",
+    metaDescription: "Lépésenkénti képes bemutatók és leírások a Trevu használatáról.",
     eyebrow: "Útmutatók",
     title: "Így használd a Trevut",
-    lead: "Rövid, feliratos videók és lépésenkénti leírások — egy-egy funkcióhoz, 20–60 másodpercben.",
+    lead: "Lépésenkénti képes bemutatók és leírások — egy-egy funkcióhoz, pár perc alatt.",
     searchPlaceholder: "Mit szeretnél megcsinálni?",
     search: "Keresés",
     roleFilter: "Szűrés szerep szerint",
@@ -2780,6 +2780,10 @@ const hu = {
     steps: "Lépések",
     stepsHint: "Kattints egy lépésre: oda ugrik a videó",
     stepsHintText: "A videó hamarosan elkészül; addig a lépések szövege segít.",
+    stepsHintSlides: "Kattints egy lépésre: oda lapoz a bemutató",
+    stepsCount: "{count} lépés",
+    slidesLabel: "Képes bemutató",
+    slides: { carousel: "képes bemutató", prev: "Előző lépés", next: "Következő lépés" },
     jumpTo: "Ugrás ide: {time}",
     details: "Részletesen",
     tip: "Jó tudni",

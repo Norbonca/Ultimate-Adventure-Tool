@@ -35,6 +35,7 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   minimize: L.Minimize,
   pause: L.Pause,
   play: L.Play,
+  presentation: L.Presentation,
   "rotate-ccw": L.RotateCcw,
   "video-off": L.VideoOff,
   // M22 Trip Ideas (Ikon Bank 6.6)

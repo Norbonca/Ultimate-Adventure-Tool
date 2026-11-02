@@ -203,6 +203,7 @@ export {
   Minimize,
   Pause,
   Play,
+  Presentation,
   RotateCcw,
   VideoOff,
 } from 'lucide-react';

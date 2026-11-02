@@ -7,7 +7,7 @@
  * `tutorial_anchors`, spec gap mátrix) az admin-felülettel együtt jön; addig ez a forrás, a
  * `lib/tutorials/index.ts` lekérdezései mögé zárva, hogy a csere ne érintse a felületet.
  *
- * Fájlok: plakát `public/tutorials/posters/<slug>.jpg`, videó `public/tutorials/videos/<slug>.mp4`
+ * Fájlok: képes bemutató `public/tutorials/slides/<slug>/<n>.jpg` (n = lépés, 1-től), plakát `public/tutorials/posters/<slug>.jpg`, videó `public/tutorials/videos/<slug>.mp4`
  * (csak ha `hasVideo`), felirat a lépésekből: `/api/v1/tutorials/<slug>/captions/<locale>` (WebVTT).
  * A lépések `at` értéke (mp) a videó időbélyege: a lépés felirata eddig a pillanattól a
  * következő lépésig látszik, és a lépésre kattintva ide ugrik a lejátszás.
@@ -45,6 +45,8 @@ export interface Tutorial {
   featured?: boolean;
   /** Van-e már feltöltött videó; ha nincs, a lépések szövege és a plakát látszik. */
   hasVideo: boolean;
+  /** Képes bemutató (lépésenként egy kép: public/tutorials/slides/<slug>/<n>.jpg) — a videó helyett (2026-11-02). */
+  hasSlides: boolean;
 }
 
 export const TUTORIALS: Tutorial[] = [
@@ -86,6 +88,7 @@ export const TUTORIALS: Tutorial[] = [
     tryHref: "/trips/new",
     updated: "2026-11",
     hasVideo: false,
+    hasSlides: true,
   },
   {
     slug: "uj-idopont",
@@ -123,6 +126,7 @@ export const TUTORIALS: Tutorial[] = [
     tryHref: "/trips",
     updated: "2026-11",
     hasVideo: false,
+    hasSlides: true,
   },
   {
     slug: "jelentkezok-elbiralasa",
@@ -160,6 +164,7 @@ export const TUTORIALS: Tutorial[] = [
     tryHref: "/trips",
     updated: "2026-11",
     hasVideo: false,
+    hasSlides: true,
   },
   {
     slug: "menetrend-teendok",
@@ -199,6 +204,7 @@ export const TUTORIALS: Tutorial[] = [
     tryHref: "/trips",
     updated: "2026-11",
     hasVideo: false,
+    hasSlides: true,
   },
   {
     slug: "kozos-koltseg",
@@ -236,6 +242,7 @@ export const TUTORIALS: Tutorial[] = [
     tryHref: "/trips",
     updated: "2026-11",
     hasVideo: false,
+    hasSlides: true,
   },
   {
     slug: "kiegyenlites",
@@ -273,6 +280,7 @@ export const TUTORIALS: Tutorial[] = [
     tryHref: "/trips",
     updated: "2026-11",
     hasVideo: false,
+    hasSlides: true,
   },
   {
     slug: "kereses-es-szures",
@@ -309,6 +317,7 @@ export const TUTORIALS: Tutorial[] = [
     tryHref: "/",
     updated: "2026-11",
     hasVideo: false,
+    hasSlides: true,
   },
   {
     slug: "3d-terkep",
@@ -341,6 +350,7 @@ export const TUTORIALS: Tutorial[] = [
     tryHref: "/",
     updated: "2026-11",
     hasVideo: false,
+    hasSlides: true,
   },
   {
     slug: "jelentkezes-idopontra",
@@ -377,6 +387,7 @@ export const TUTORIALS: Tutorial[] = [
     tryHref: "/",
     updated: "2026-11",
     hasVideo: false,
+    hasSlides: true,
   },
   {
     slug: "otlet-kituzese",
@@ -409,5 +420,6 @@ export const TUTORIALS: Tutorial[] = [
     tryHref: "/ideas/new",
     updated: "2026-11",
     hasVideo: false,
+    hasSlides: true,
   },
 ];

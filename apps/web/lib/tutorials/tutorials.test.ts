@@ -51,6 +51,8 @@ describe("M211 tutorial content", () => {
       expect(t.related, t.slug).not.toContain(t.slug);
       expect(existsSync(join(PUBLIC, "tutorials/posters", `${t.slug}.jpg`)), `${t.slug} poster`).toBe(true);
       if (t.hasVideo) expect(existsSync(join(PUBLIC, "tutorials/videos", `${t.slug}.mp4`)), `${t.slug} video`).toBe(true);
+      if (t.hasSlides)
+        t.steps.forEach((_, i) => expect(existsSync(join(PUBLIC, "tutorials/slides", t.slug, `${i + 1}.jpg`)), `${t.slug} slide ${i + 1}`).toBe(true));
     }
   });
 

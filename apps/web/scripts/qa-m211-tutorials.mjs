@@ -70,6 +70,18 @@ for (const [w, locale] of [[1440, "hu"], [390, "hu"], [1440, "en"]]) {
   check(`adatlap ${w} ${locale}: cím`, h1 === (locale === "en" ? "Recording a shared cost" : "Közös költség rögzítése"), h1);
   check(`adatlap ${w} ${locale}: 5 lépés, leírás, felirat szövege`, (await p.locator('[data-testid^="tutorial-step-"]').count()) === 5 && (await p.locator("#leiras").count()) === 1 && (await p.getByTestId("tutorial-transcript").count()) === 1);
   check(`adatlap ${w} ${locale}: nincs vízszintes görgetés`, await noHScroll(p));
+  if (w === 1440 && locale === "hu") {
+    const slides = p.getByTestId("tutorial-slides");
+    check("képes bemutató: megjelenik, 1. dia", (await slides.getAttribute("data-index")) === "0");
+    await p.getByTestId("tutorial-slides-next").click();
+    check("képes bemutató: Következő → 2. dia", (await slides.getAttribute("data-index")) === "1");
+    await p.getByTestId("tutorial-step-4").click();
+    check("képes bemutató: a 4. lépésre kattintva a 4. dia", (await slides.getAttribute("data-index")) === "3");
+    await slides.focus();
+    await p.keyboard.press("ArrowLeft");
+    check("képes bemutató: ← billentyű visszalapoz", (await slides.getAttribute("data-index")) === "2");
+    check("képes bemutató: a felirat a lépés szövege", (await p.getByTestId("tutorial-slides-caption").textContent())?.includes("Add meg a megnevezést") ?? false);
+  }
   await p.getByTestId("tutorial-transcript").locator("summary").click();
   await p.screenshot({ path: `${OUT}/s2-adatlap-${w}-${locale}.png`, fullPage: true });
   await p.close();

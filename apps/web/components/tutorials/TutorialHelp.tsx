@@ -63,7 +63,7 @@ export function TutorialHelp({ anchor, variant = "link", className = "" }: Tutor
         >
           <Icon name="circle-play" size={16} aria-hidden className="text-accent" />
           {t("tutorials.help")}
-          {single && <span className="text-xs font-medium text-ink-muted">{formatTime(single.duration)}</span>}
+          {single && <span className="text-xs font-medium text-ink-muted">{single.hasVideo ? formatTime(single.duration) : t("tutorials.stepsCount", { count: single.steps.length })}</span>}
         </button>
       )}
       {open && (
@@ -174,7 +174,9 @@ function HelpDialog({ tutorials, onClose }: { tutorials: Tutorial[]; onClose: ()
                   {loc(selected.title, locale)}
                 </h2>
                 <p className="text-xs font-medium text-ink-muted sm:text-[13px]">
-                  {formatTime(selected.duration)} · {t("tutorials.captionLanguages", { languages: tr(`tutorials.language.${asTutorialLocale(locale)}`) })}
+                  {selected.hasVideo
+                    ? `${formatTime(selected.duration)} · ${t("tutorials.captionLanguages", { languages: tr(`tutorials.language.${asTutorialLocale(locale)}`) })}`
+                    : `${t("tutorials.slidesLabel")} · ${t("tutorials.stepsCount", { count: selected.steps.length })}`}
                 </p>
               </div>
               {closeButton}
@@ -235,7 +237,7 @@ function HelpDialog({ tutorials, onClose }: { tutorials: Tutorial[]; onClose: ()
                       <span className="text-base font-semibold text-ink">{loc(tut.title, locale)}</span>
                       <span className="line-clamp-2 text-sm text-ink-secondary">{loc(tut.summary, locale)}</span>
                       <span className="text-xs font-semibold text-ink-muted">
-                        {formatTime(tut.duration)} · {t("tutorials.withCaptions")}
+                        {tut.hasVideo ? `${formatTime(tut.duration)} · ${t("tutorials.withCaptions")}` : `${t("tutorials.slidesLabel")} · ${t("tutorials.stepsCount", { count: tut.steps.length })}`}
                       </span>
                     </span>
                     <Icon name="chevron-right" size={20} aria-hidden className="shrink-0 text-ink-muted" />

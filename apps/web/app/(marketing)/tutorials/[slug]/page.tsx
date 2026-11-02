@@ -13,7 +13,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { Icon } from "@/components/Icon";
 import { TutorialCard } from "@/components/tutorials/TutorialCard";
 import { TutorialViewer } from "@/components/tutorials/TutorialViewer";
-import { asTutorialLocale, formatTime, getTutorial, listTutorials, loc, posterUrl, relatedTutorials } from "@/lib/tutorials";
+import { asTutorialLocale, formatTime, getTutorial, listTutorials, loc, posterUrl, relatedTutorials, type Tutorial } from "@/lib/tutorials";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -51,6 +51,8 @@ export default async function TutorialDetailPage({ params }: PageProps) {
   const tryLabel = tutorial.role === "organizer" ? t("tutorials.tryIt") : t("tutorials.tryItTraveler");
   const related = relatedTutorials(tutorial);
   const captionsLabel = t("tutorials.captionLanguages", { languages: t(lang === "en" ? "tutorials.language.en" : "tutorials.language.hu") });
+  const badgeFor = (x: Tutorial) => (x.hasVideo ? { icon: "captions", label: captionsLabel } : { icon: "presentation", label: t("tutorials.slidesLabel") });
+  const lengthFor = (x: Tutorial) => (x.hasVideo ? formatTime(x.duration) : t("tutorials.stepsCount", { count: x.steps.length }));
 
   const tryButton = (extra: string) => (
     <Link href={tutorial.tryHref} className={`inline-flex h-12 items-center justify-center gap-2 rounded-trevu bg-accent px-5 text-[15px] font-semibold text-accent-on hover:bg-accent-hover ${extra}`} data-testid="tutorial-try">
@@ -95,13 +97,13 @@ export default async function TutorialDetailPage({ params }: PageProps) {
           <h1 className="text-[26px] font-bold leading-tight text-ink md:text-[44px]">{loc(tutorial.title, locale)}</h1>
           <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] font-medium text-ink-muted md:text-sm">
             <span className="inline-flex items-center gap-1.5">
-              <Icon name="timer" size={15} aria-hidden />
-              {formatTime(tutorial.duration)}
+              <Icon name={tutorial.hasVideo ? "timer" : "presentation"} size={15} aria-hidden />
+              {tutorial.hasVideo ? formatTime(tutorial.duration) : t("tutorials.slidesLabel")}
             </span>
             <span aria-hidden>·</span>
             <span className="inline-flex items-center gap-1.5">
-              <Icon name="captions" size={15} aria-hidden />
-              {t("tutorials.captionLanguages", { languages })}
+              <Icon name={tutorial.hasVideo ? "captions" : "file-text"} size={15} aria-hidden />
+              {tutorial.hasVideo ? t("tutorials.captionLanguages", { languages }) : t("tutorials.stepsCount", { count: tutorial.steps.length })}
             </span>
             <span aria-hidden className="hidden md:inline">
               ·
@@ -162,7 +164,7 @@ export default async function TutorialDetailPage({ params }: PageProps) {
               <ul className="flex flex-col gap-4">
                 {related.map((r) => (
                   <li key={r.slug}>
-                    <TutorialCard tutorial={r} locale={locale} roleLabel={roleLabel(r.role)} captionsLabel={captionsLabel} />
+                    <TutorialCard tutorial={r} locale={locale} roleLabel={roleLabel(r.role)} badge={badgeFor(r)} lengthLabel={lengthFor(r)} />
                   </li>
                 ))}
               </ul>

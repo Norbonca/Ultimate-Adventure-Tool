@@ -14,6 +14,8 @@ export const loc = (value: Localized, locale: string): string => value[asTutoria
 
 export const posterUrl = (slug: string) => `/tutorials/posters/${slug}.jpg`;
 export const videoUrl = (slug: string) => `/tutorials/videos/${slug}.mp4`;
+/** A bemutató diája (index 0-tól; a fájlnév 1-től). */
+export const slideUrl = (slug: string, index: number) => `/tutorials/slides/${slug}/${index + 1}.jpg`;
 export const captionsUrl = (slug: string, locale: TutorialLocale) => `/api/v1/tutorials/${slug}/captions/${locale}`;
 export const tutorialHref = (slug: string) => `/tutorials/${slug}`;
 

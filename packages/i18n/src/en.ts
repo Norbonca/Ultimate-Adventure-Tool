@@ -2724,10 +2724,10 @@ const en: TranslationKeys = {
   // ============================================================================
   tutorials: {
     metaTitle: "Tutorials",
-    metaDescription: "Short captioned videos and step-by-step guides on using Trevu.",
+    metaDescription: "Step-by-step illustrated guides on using Trevu.",
     eyebrow: "Tutorials",
     title: "How to use Trevu",
-    lead: "Short captioned videos and step-by-step guides — one feature at a time, in 20–60 seconds.",
+    lead: "Step-by-step illustrated guides — one feature at a time, in a few minutes.",
     searchPlaceholder: "What would you like to do?",
     search: "Search",
     roleFilter: "Filter by role",
@@ -2750,6 +2750,10 @@ const en: TranslationKeys = {
     steps: "Steps",
     stepsHint: "Click a step to jump to it in the video",
     stepsHintText: "The video is coming soon; until then, the steps below will guide you.",
+    stepsHintSlides: "Click a step to jump to it in the slideshow",
+    stepsCount: "{count} steps",
+    slidesLabel: "Slideshow",
+    slides: { carousel: "slideshow", prev: "Previous step", next: "Next step" },
     jumpTo: "Jump to {time}",
     details: "In detail",
     tip: "Good to know",
