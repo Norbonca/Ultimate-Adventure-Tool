@@ -329,7 +329,7 @@ export function EditTripForm({
 
       {/* ── Sticky Footer ── */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-navy-200 z-30">
-        <div className="px-6 sm:px-12 lg:px-[120px] py-4 flex items-center justify-between gap-3">
+        <div className="px-4 sm:px-12 lg:px-[120px] py-4 flex flex-col items-stretch gap-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
           <div className="flex items-center gap-2 min-h-[20px]">
             {saveStatus === "saved" && (
               <>
@@ -348,7 +348,7 @@ export function EditTripForm({
           <div className="flex items-center gap-3">
             <Link
               href={`/trips/${slug}`}
-              className="px-5 py-2.5 text-sm font-semibold text-navy-700 bg-white border border-navy-300 rounded-xl hover:bg-navy-50 transition-colors"
+              className="hidden sm:inline-flex px-5 py-2.5 text-sm font-semibold text-navy-700 bg-white border border-navy-300 rounded-xl hover:bg-navy-50 transition-colors"
             >
               {t("trips.wizard.cancel")}
             </Link>
@@ -356,17 +356,23 @@ export function EditTripForm({
               type="button"
               onClick={handleSave}
               disabled={saveStatus === "saving" || saveStatus === "publishing"}
+              aria-label={saveStatus === "saving" ? t("trips.edit.saving") : t("trips.edit.saveChanges")}
               className={
                 isDraft
-                  ? "inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-navy-700 bg-white border border-navy-300 rounded-xl hover:bg-navy-50 transition-colors disabled:opacity-50"
-                  : "inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-trevu-600 rounded-xl hover:bg-trevu-700 transition-colors disabled:opacity-50"
+                  ? "flex-1 sm:flex-none min-h-11 sm:min-h-0 inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-navy-700 bg-white border border-navy-300 rounded-xl hover:bg-navy-50 transition-colors disabled:opacity-50"
+                  : "flex-1 sm:flex-none min-h-11 sm:min-h-0 inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-trevu-600 border border-transparent rounded-xl hover:bg-trevu-700 transition-colors disabled:opacity-50"
               }
             >
               <Icon name="save" size={15} />
-              <span>
-                {saveStatus === "saving"
-                  ? t("trips.edit.saving")
-                  : t("trips.edit.saveChanges")}
+              <span aria-hidden="true">
+                {saveStatus === "saving" ? (
+                  t("trips.edit.saving")
+                ) : (
+                  <>
+                    <span className="sm:hidden">{t("common.save")}</span>
+                    <span className="hidden sm:inline">{t("trips.edit.saveChanges")}</span>
+                  </>
+                )}
               </span>
             </button>
             {isDraft && (
@@ -374,7 +380,7 @@ export function EditTripForm({
                 type="button"
                 onClick={handlePublish}
                 disabled={saveStatus === "saving" || saveStatus === "publishing"}
-                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-trevu-600 rounded-xl hover:bg-trevu-700 transition-colors disabled:opacity-50"
+                className="flex-1 sm:flex-none min-h-11 sm:min-h-0 inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-trevu-600 border border-transparent rounded-xl hover:bg-trevu-700 transition-colors disabled:opacity-50"
               >
                 <Icon name="rocket" size={15} />
                 <span>
