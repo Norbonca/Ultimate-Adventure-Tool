@@ -374,10 +374,11 @@ export async function publishTrip(
     })
     .eq("id", tripId)
     .eq("organizer_id", user.id)
+    .eq("status", "draft")
     .select("slug")
-    .single();
+    .maybeSingle();
 
-  if (error) {
+  if (error || !data) {
     console.error("Publish error:", error);
     return { slug: "", error: t("errors.saveFailed") };
   }

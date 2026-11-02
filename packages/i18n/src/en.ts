@@ -928,6 +928,8 @@ const en: TranslationKeys = {
       statusPublished: "Published",
       statusDraft: "Draft",
       draftSaved: "Draft saved",
+      publish: "Publish",
+      publishing: "Publishing…",
       tabs: {
         basicInfo: "Basic info",
         categoryDetails: "Category details",
