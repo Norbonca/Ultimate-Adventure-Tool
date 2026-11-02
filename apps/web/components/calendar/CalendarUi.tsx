@@ -52,7 +52,7 @@ export function CalendarAlerts({ items, className = "" }: { items: CalendarAlert
       {items.map((a) => {
         const s = ALERT_STYLE[a.severity];
         return (
-          <li key={a.id} className={`flex items-start gap-3 rounded-xl p-3.5 ${s.box}`} data-testid={`calendar-alert-${a.id.split(":")[0]}`}>
+          <li key={a.id} className={`flex items-start gap-3 rounded-xl p-3.5 ${s.box}`} data-surface="day" data-testid={`calendar-alert-${a.id.split(":")[0]}`}>
             <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white ${s.icon}`}>
               <Icon name={a.icon} size={18} aria-hidden />
             </span>

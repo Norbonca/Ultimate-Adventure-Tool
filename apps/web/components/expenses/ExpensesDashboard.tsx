@@ -120,8 +120,8 @@ export function ExpensesDashboard({ view, locale }: { view: ExpensesView; locale
             <Kpi label={t("expenses.openSettlements")} value={String(view.transfers.length)} sub={tr("expenses.awaitingConfirmation", { count: awaiting })} />
           </div>
 
-          <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_380px] lg:gap-8">
-            <section aria-labelledby="exp-items">
+          <div className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-8">
+            <section aria-labelledby="exp-items" className="min-w-0">
               <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
                 <h2 id="exp-items" className="text-lg font-semibold text-navy-900 lg:text-xl">{t("expenses.items")}</h2>
                 <div className="flex flex-wrap gap-2">
@@ -212,12 +212,12 @@ function ExpenseRow({ e, cur, locale, names, viewerId, editable, onOpen }: {
         <span className="block truncate text-[15px] font-semibold text-navy-900">{e.title}</span>
         <span className="block truncate text-[13px] text-navy-500">{who} · {dateLabel(e.date, locale)}<span className="hidden sm:inline"> · {split}</span></span>
       </span>
-      <span className="flex shrink-0 flex-col items-end gap-0.5">
+      <span className="flex max-w-[55%] shrink-0 flex-col items-end gap-0.5 text-right">
         <span className="font-mono text-[15px] font-bold text-navy-900">
           {e.amountSettlement ? money(decimalToCents(e.amountSettlement), cur, locale) : "—"}
         </span>
         {foreign && (
-          <span className={`inline-flex items-center gap-1 text-xs ${warn ? "text-amber-700" : "text-navy-500"}`}>
+          <span className={`inline-flex flex-wrap items-center justify-end gap-1 text-xs ${warn ? "text-amber-700" : "text-navy-500"}`}>
             {warn && <Icon name="alert-triangle" size={12} aria-hidden />}
             {money(decimalToCents(e.amount), e.currency, locale)}
             {e.fxQuality === "stale" ? ` · ${t("expenses.lastKnownRate")}` : e.fxQuality === "none" ? ` · ${t("expenses.conversionPending")}` : ""}

@@ -8,6 +8,7 @@ import type { CategoryToken } from "@/components/discover/TripBand";
 import { CATEGORY_DISPLAY } from "@/lib/categories";
 import { formatWindow } from "./window";
 import type { IdeaListItem, IdeaStatus } from "./types";
+import { pickCategoryCovers, type CoverRow } from "./covers";
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -74,11 +75,9 @@ export function ownerText(idea: IdeaListItem, t: T): string | null {
   return name ? t("ideas.common.ownerIdea", { name }) : null;
 }
 
-/** Kategória-borítóképek (ref_cover_images, az első aktív kategóriánként). */
+/** Kategória-borítóképek (ref_cover_images): kategóriánként egy, kurált forrás előnyben — lásd ./covers. */
 export async function getCategoryCovers(): Promise<Record<string, string>> {
   const supabase = await createClient();
-  const { data } = await supabase.from("ref_cover_images").select("category_id, url").eq("is_active", true).not("category_id", "is", null).order("is_featured", { ascending: false });
-  const map: Record<string, string> = {};
-  for (const r of (data ?? []) as { category_id: string; url: string }[]) if (!map[r.category_id]) map[r.category_id] = r.url;
-  return map;
+  const { data } = await supabase.from("ref_cover_images").select("category_id, url, source, is_featured, sort_order").eq("is_active", true).not("category_id", "is", null);
+  return pickCategoryCovers((data ?? []) as CoverRow[]);
 }

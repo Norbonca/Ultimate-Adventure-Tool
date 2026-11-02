@@ -159,6 +159,7 @@ export function ApplicationsManager({ tripId, initial }: ApplicationsManagerProp
           <div
             key={p.id}
             className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-3"
+            data-surface="day"
             data-testid="application-card"
           >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">

@@ -100,7 +100,7 @@ export function ExpenseSheet({ view, locale, expense, canDelete, onClose, onSave
       <form
         onSubmit={submit}
         onClick={(e) => e.stopPropagation()}
-        className="max-h-[92vh] w-full overflow-y-auto rounded-t-[20px] bg-white px-4 pb-7 pt-2.5 lg:max-w-[560px] lg:rounded-2xl lg:p-7"
+        className="max-h-[92vh] w-full min-w-0 overflow-y-auto rounded-t-[20px] bg-white px-4 pb-7 pt-2.5 lg:max-w-[560px] lg:rounded-2xl lg:p-7"
         data-testid="expense-sheet"
       >
         <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-navy-300 lg:hidden" aria-hidden />
@@ -118,11 +118,11 @@ export function ExpenseSheet({ view, locale, expense, canDelete, onClose, onSave
             <input id="exp-title" required maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} className={input} />
           </div>
           <div className="flex items-end gap-3">
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
               <label htmlFor="exp-amount" className={label}>{t("expenses.form.amount")}</label>
               <input id="exp-amount" inputMode="decimal" required value={amount} onChange={(e) => setAmount(e.target.value)} aria-invalid={amountError} className={`${input} font-mono ${amountError ? "border-red-500" : ""}`} />
             </div>
-            <div className="w-32 lg:w-44">
+            <div className="w-32 shrink-0 lg:w-44">
               <label htmlFor="exp-currency" className={label}>{t("expenses.form.currency")}</label>
               <CurrencySelect id="exp-currency" value={currency} onChange={setCurrency} className={input} />
             </div>
@@ -132,13 +132,13 @@ export function ExpenseSheet({ view, locale, expense, canDelete, onClose, onSave
           <FxBand fx={fx} currency={currency} cur={cur} locale={locale} settlementCents={settlementCents} />
 
           <div className="flex gap-3">
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
               <label htmlFor="exp-cat" className={label}>{t("expenses.form.category")}</label>
               <select id="exp-cat" value={category} onChange={(e) => setCategory(e.target.value as ExpenseCategory)} className={input}>
                 {EXPENSE_CATEGORIES.map((c) => <option key={c} value={c}>{tr(CATEGORY_KEY[c])}</option>)}
               </select>
             </div>
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
               <label htmlFor="exp-date" className={label}>{t("expenses.form.date")}</label>
               <input id="exp-date" type="date" required value={date} onChange={(e) => setDate(e.target.value)} className={input} />
             </div>
@@ -151,7 +151,7 @@ export function ExpenseSheet({ view, locale, expense, canDelete, onClose, onSave
           </div>
 
           <fieldset>
-            <div className="mb-2 flex items-center justify-between gap-3">
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <legend className="text-xs font-medium text-navy-500">{tr("expenses.form.splitPeople", { count: people.length })}</legend>
               <div className="flex rounded-chip bg-navy-100 p-0.5" role="radiogroup">
                 {(["equal", "custom", "percentage"] as SplitType[]).map((s) => (
