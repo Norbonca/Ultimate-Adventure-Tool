@@ -17,7 +17,7 @@ import {
   MapPin,
   Zap,
   Wallet,
-  WifiOff,
+  Globe,
   Mountain,
   Triangle,
   Waves,
@@ -27,10 +27,10 @@ import {
   Snowflake,
   Compass,
   Users,
-  Shield,
-  Package,
-  CloudSun,
-  Plane,
+  ListChecks,
+  CalendarDays,
+  Lightbulb,
+  Map,
   Languages,
 } from '@/lib/icons';
 import { useTranslation } from '@/lib/i18n/useTranslation';
@@ -94,34 +94,34 @@ export default function HomePage() {
 
   const secondaryFeatures = [
     {
-      name: t('landing.secondaryCommunity'),
+      name: t('landing.secondaryCrew'),
       icon: Users,
       color: '#0D9488',
-      desc: t('landing.secondaryCommunityDesc'),
+      desc: t('landing.secondaryCrewDesc'),
     },
     {
-      name: t('landing.secondarySafety'),
-      icon: Shield,
-      color: '#FB7185',
-      desc: t('landing.secondarySafetyDesc'),
-    },
-    {
-      name: t('landing.secondaryPacking'),
-      icon: Package,
+      name: t('landing.secondaryTimeline'),
+      icon: ListChecks,
       color: '#FBBF24',
-      desc: t('landing.secondaryPackingDesc'),
+      desc: t('landing.secondaryTimelineDesc'),
     },
     {
-      name: t('landing.secondaryWeather'),
-      icon: CloudSun,
+      name: t('landing.secondaryCalendar'),
+      icon: CalendarDays,
       color: '#06B6D4',
-      desc: t('landing.secondaryWeatherDesc'),
+      desc: t('landing.secondaryCalendarDesc'),
     },
     {
-      name: t('landing.secondaryBooking'),
-      icon: Plane,
+      name: t('landing.secondaryIdeas'),
+      icon: Lightbulb,
+      color: '#FB7185',
+      desc: t('landing.secondaryIdeasDesc'),
+    },
+    {
+      name: t('landing.secondaryMap'),
+      icon: Map,
       color: '#A78BFA',
-      desc: t('landing.secondaryBookingDesc'),
+      desc: t('landing.secondaryMapDesc'),
     },
     {
       name: t('landing.secondaryLanguages'),
@@ -747,7 +747,8 @@ export default function HomePage() {
           font-weight: 600;
           cursor: pointer;
           transition: background 0.2s;
-          margin-bottom: 2rem;
+          display: inline-block;
+          margin-bottom: 1.25rem;
         }
 
         .btn-final-cta:hover {
@@ -1178,7 +1179,7 @@ export default function HomePage() {
                 className="feature-icon-box"
                 style={{ backgroundColor: '#F3E8FF' }}
               >
-                <WifiOff size={32} color="#A78BFA" />
+                <Globe size={32} color="#A78BFA" />
               </div>
               <h3 className="feature-headline">{t('landing.feature3Title')}</h3>
               <p className="feature-description">
@@ -1263,11 +1264,11 @@ export default function HomePage() {
               <div className="stat-label">{t('landing.statCategories')}</div>
             </div>
             <div className="stat-item">
-              <div className="stat-number">16+</div>
+              <div className="stat-number">9</div>
               <div className="stat-label">{t('landing.statServices')}</div>
             </div>
             <div className="stat-item">
-              <div className="stat-number">7</div>
+              <div className="stat-number">2</div>
               <div className="stat-label">{t('landing.statLanguages')}</div>
             </div>
           </div>
