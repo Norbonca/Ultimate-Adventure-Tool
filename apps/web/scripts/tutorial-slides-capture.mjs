@@ -181,11 +181,6 @@ const TUTORIALS = [
     ["/trips", demandTab, [txt(/csatlakozó|fő/)]],
     ["/trips", demandTab, [txt(/Megszervezem/)]],
   ]],
-  ["regisztracio", null, [
-    ["/register", null, [css("h2")]],
-    ["/register", null, [css('form input[type="email"]'), css('form input[type="password"]')]],
-    ["/register", null, [css('form button[type="submit"]')]],
-  ]],
   ["keszsegek-es-erdeklodes", "dora", [
     ["/settings/interests", null, [css("h1")]],
     ["/settings/interests", null, [txt(/^Túrázás$/)]],

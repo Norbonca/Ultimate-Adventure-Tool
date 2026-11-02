@@ -6,7 +6,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getServerT } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
@@ -43,6 +43,7 @@ export default async function TutorialDetailPage({ params }: PageProps) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  if (!user) redirect("/login"); // M211: az útmutató csak belépett felhasználónak szól
 
   const lang = asTutorialLocale(locale);
   const roleLabel = (r: string) => (r === "organizer" ? t("tutorials.forOrganizers") : t("tutorials.forTravelers"));
@@ -65,11 +66,6 @@ export default async function TutorialDetailPage({ params }: PageProps) {
     <div data-surface="night" className="min-h-screen bg-canvas pb-24 text-ink lg:pb-0">
       <AppHeader
         user={user ? { email: user.email ?? "", displayName: user.user_metadata?.full_name } : null}
-        anchors={[
-          { label: t("nav.discover"), href: "/" },
-          { label: t("nav.pricing"), href: "/pricing" },
-          { label: t("nav.community"), href: "/community" },
-        ]}
       />
 
       <main className="mx-auto flex max-w-7xl flex-col gap-8 px-4 pb-16 pt-5 md:px-8 md:pt-8">

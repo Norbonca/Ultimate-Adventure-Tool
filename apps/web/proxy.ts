@@ -34,7 +34,7 @@ export async function proxy(request: NextRequest) {
   // /trips/[slug] (detail) NYILVÁNOS — Discover-ről kattintható, nem kell auth.
   // /trips (lista), /trips/new és /trips/[slug]/{edit|manage|participant} védett.
   const pathname = request.nextUrl.pathname;
-  const protectedPaths = ["/dashboard", "/profile", "/settings", "/admin"];
+  const protectedPaths = ["/dashboard", "/profile", "/settings", "/admin", "/tutorials"]; // M211: útmutató csak belépve
   const publicAdminPaths = ["/admin/login"];
   const isPublicAdmin = publicAdminPaths.some((p) => pathname.startsWith(p));
 

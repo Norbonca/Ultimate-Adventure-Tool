@@ -657,38 +657,6 @@ export const TUTORIALS: Tutorial[] = [
     hasSlides: true,
   },
   {
-    slug: "regisztracio",
-    role: "traveler",
-    topic: { hu: "Első lépések", en: "Getting started" },
-    title: { hu: "Regisztráció", en: "Signing up" },
-    summary: {
-      hu: "Név, e-mail-cím, jelszó — utána a profilodban beállítod az országodat és időzónádat.",
-      en: "Name, email, password — then set your country and time zone in your profile.",
-    },
-    body: {
-      hu: [
-        "A regisztrációhoz a neved, az e-mail-címed és egy jelszó kell. A megerősítő levélben lévő linkkel aktiválod a fiókodat.",
-        "Utána érdemes a profilodban beállítani az országodat: ebből tudja a Trevu, hogy a túrák idején nálad ünnep vagy iskolai szünet lesz-e.",
-      ],
-      en: [
-        "To sign up you need your name, email address and a password. Activate your account with the link in the confirmation email.",
-        "Then set your country in your profile: this is how Trevu knows whether a trip falls on a holiday or school break where you live.",
-      ],
-    },
-    steps: [
-      { at: 0, text: { hu: "Nyisd meg a Regisztráció oldalt", en: "Open the Sign up page" } },
-      { at: 5, text: { hu: "Add meg a neved, az e-mail-címed és a jelszavad", en: "Enter your name, email and password" } },
-      { at: 13, text: { hu: "Aktiváld a fiókot a megerősítő levél linkjével", en: "Activate your account with the link in the email" } },
-    ],
-    duration: 20,
-    anchors: ["auth.register"],
-    related: ["keszsegek-es-erdeklodes", "kereses-es-szures"],
-    tryHref: "/register",
-    updated: "2026-11",
-    hasVideo: false,
-    hasSlides: true,
-  },
-  {
     slug: "keszsegek-es-erdeklodes",
     role: "traveler",
     topic: { hu: "Profil", en: "Profile" },
@@ -714,7 +682,7 @@ export const TUTORIALS: Tutorial[] = [
     ],
     duration: 25,
     anchors: ["settings.skills"],
-    related: ["regisztracio", "mire-varnak"],
+    related: ["mire-varnak"],
     tryHref: "/settings/interests",
     updated: "2026-11",
     hasVideo: false,
