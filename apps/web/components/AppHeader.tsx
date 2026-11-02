@@ -43,6 +43,7 @@ const NAV_ITEMS = [
 const INTERNAL_NAV = [
   { key: "nav.tripPlanner", href: "/trips" },
   { key: "nav.community", href: "/community" },
+  { key: "nav.tutorials", href: "/tutorials" }, // M211 — csak belépve
 ] as const;
 
 // ── Component ─────────────────────────────────────────────────────
@@ -140,7 +141,7 @@ export function AppHeader({ anchors, user }: AppHeaderProps) {
           {/* Dropdown menu */}
           {menuOpen && (
             <div className="absolute top-full left-0 mt-1 w-52 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 z-50 night:bg-surface night:border-line night:shadow-none">
-              {NAV_ITEMS.map((item) => {
+              {NAV_ITEMS.filter((item) => isLoggedIn || item.href !== "/tutorials").map((item) => {
                 const Icon = item.icon;
                 return (
                   <Link

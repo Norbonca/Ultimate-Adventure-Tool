@@ -19,7 +19,7 @@ const check = (name, ok, extra = "") => {
 const browser = await chromium.launch();
 const errors = [];
 
-async function page(width, locale = "hu") {
+async function page(width, locale = "hu", who = null) {
   const ctx = await browser.newContext({ viewport: { width, height: width < 600 ? 844 : 900 }, deviceScaleFactor: 1 });
   await ctx.addCookies([{ name: "trevu-locale", value: locale, url: BASE }]);
   const p = await ctx.newPage();
@@ -27,6 +27,7 @@ async function page(width, locale = "hu") {
     if (m.type() === "error" && !/Download the React DevTools|favicon|_vercel|sentry/i.test(m.text())) errors.push(`${p.url()} :: ${m.text().slice(0, 200)}`);
   });
   p.on("pageerror", (e) => errors.push(`${p.url()} :: pageerror ${e.message.slice(0, 200)}`));
+  if (who) await login(p, who);
   return p;
 }
 
@@ -39,9 +40,25 @@ async function login(p, who) {
 
 const noHScroll = async (p) => p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
 
+// 0) Kijelentkezve az útmutató nem érhető el (Norbert 2026-11-02: csak belépett felhasználónak)
+{
+  const p = await page(1440);
+  await p.goto(BASE + "/tutorials/kozos-koltseg", { waitUntil: "networkidle", timeout: 120000 });
+  check("kijelentkezve: /tutorials/… → belépés", new URL(p.url()).pathname === "/login");
+  for (const [url] of [["/", "help-discover"], ["/ideas", "help-ideas"], ["/ideas/vitorlassal-a-balti-tengeren-demo", "help-idea.detail"], [`/trips/${BASE_TRIP}`, "help-trip.apply"]]) {
+    await p.goto(BASE + url, { waitUntil: "networkidle", timeout: 120000 });
+    await p.waitForTimeout(800);
+    check(`kijelentkezve ${url}: nincs súgó`, (await p.locator('[data-testid^="help-"]').count()) === 0);
+  }
+  await p.goto(BASE + "/", { waitUntil: "networkidle" });
+  await p.locator("header button").first().click();
+  check("kijelentkezve: a T▾ menüben nincs Útmutatók", (await p.locator('a[href="/tutorials"]').count()) === 0);
+  await p.close();
+}
+
 // 1) Lista 1440 / 390
 for (const w of [1440, 390]) {
-  const p = await page(w);
+  const p = await page(w, "hu", "dora");
   await p.goto(BASE + "/tutorials", { waitUntil: "networkidle", timeout: 120000 });
   check(`/tutorials ${w}: kiemelt + két csoport`, (await p.getByTestId("tutorials-featured").count()) === 1 && (await p.getByTestId("tutorials-group-organizer").count()) === 1 && (await p.getByTestId("tutorials-group-traveler").count()) === 1);
   check(`/tutorials ${w}: nincs vízszintes görgetés`, await noHScroll(p));
@@ -51,7 +68,7 @@ for (const w of [1440, 390]) {
 
 // 2) Szűrők és üres állapot
 {
-  const p = await page(1440);
+  const p = await page(1440, "hu", "dora");
   await p.goto(BASE + "/tutorials?role=traveler", { waitUntil: "networkidle" });
   check("szerepszűrő: csak túrázóknak", (await p.getByTestId("tutorials-group-organizer").count()) === 0 && (await p.getByTestId("tutorials-featured").count()) === 0);
   await p.goto(BASE + "/tutorials?q=koltseg", { waitUntil: "networkidle" });
@@ -64,7 +81,7 @@ for (const w of [1440, 390]) {
 
 // 3) Adatlap 1440 / 390 + EN
 for (const [w, locale] of [[1440, "hu"], [390, "hu"], [1440, "en"]]) {
-  const p = await page(w, locale);
+  const p = await page(w, locale, "dora");
   await p.goto(BASE + "/tutorials/kozos-koltseg", { waitUntil: "networkidle", timeout: 120000 });
   const h1 = (await p.locator("h1").first().textContent())?.trim();
   check(`adatlap ${w} ${locale}: cím`, h1 === (locale === "en" ? "Recording a shared cost" : "Közös költség rögzítése"), h1);
@@ -154,6 +171,9 @@ for (const w of [1440, 390]) {
     await p.goto(BASE + url, { waitUntil: "networkidle", timeout: 120000 });
     check(`belépési pont ${url}: ${id}`, (await p.getByTestId(id).count()) >= 1);
   }
+  // Fejléc: belépve a középső menüben is ott az Útmutatók
+  await p.goto(BASE + "/trips", { waitUntil: "networkidle" });
+  check("belépve: fejléc-menü Útmutatók", (await p.locator('header nav a[href="/tutorials"]').count()) >= 1);
   // T▾ menü
   await p.goto(BASE + "/tutorials", { waitUntil: "networkidle" });
   await p.getByRole("button", { name: /menü|menu/i }).first().click();

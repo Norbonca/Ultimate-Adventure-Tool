@@ -7,7 +7,7 @@
  *
  * Szabályok (spec K-2…K-5): a link csak akkor jelenik meg, ha van útmutató a horgonyhoz;
  * nincs automatikus lejátszás; a fókusz az ablakban marad, Esc / X / háttér zár, és a fókusz
- * visszakerül a linkre; a teljes útmutató új lapon nyílik.
+ * visszakerül a linkre; a teljes útmutató új lapon nyílik. Csak bejelentkezve jelenik meg.
  */
 
 import Image from "next/image";
@@ -17,6 +17,7 @@ import { Icon } from "@/components/Icon";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { asTutorialLocale, formatTime, loc, posterUrl, tutorialHref, tutorialsForAnchor, type Tutorial } from "@/lib/tutorials";
 import { TutorialViewer } from "./TutorialViewer";
+import { useIsLoggedIn } from "@/lib/auth/useIsLoggedIn";
 
 interface TutorialHelpProps {
   /** Funkció-horgony, pl. `expenses`, `trip.applications` (lib/tutorials/content.ts). */
@@ -32,8 +33,10 @@ export function TutorialHelp({ anchor, variant = "link", className = "" }: Tutor
   const tutorials = tutorialsForAnchor(anchor);
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  // Az útmutatók csak belépett felhasználónak szólnak (Norbert 2026-11-02): kijelentkezve nincs súgó.
+  const loggedIn = useIsLoggedIn();
 
-  if (tutorials.length === 0) return null;
+  if (!loggedIn || tutorials.length === 0) return null;
   const single = tutorials.length === 1 ? tutorials[0] : null;
   const label = single ? t("tutorials.helpFor", { title: loc(single.title, locale) }) : t("tutorials.helpIcon");
 

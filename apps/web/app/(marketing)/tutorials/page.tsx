@@ -7,6 +7,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import { getServerT } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
 import { Icon } from "@/components/Icon";
@@ -31,6 +32,7 @@ export default async function TutorialsPage({ searchParams }: PageProps) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  if (!user) redirect("/login"); // M211: az útmutató csak belépett felhasználónak szól
 
   const q = one(sp.q).slice(0, 80);
   const roleParam = one(sp.role);
@@ -69,11 +71,6 @@ export default async function TutorialsPage({ searchParams }: PageProps) {
     <div data-surface="night" className="min-h-screen bg-canvas text-ink">
       <AppHeader
         user={user ? { email: user.email ?? "", displayName: user.user_metadata?.full_name } : null}
-        anchors={[
-          { label: t("nav.discover"), href: "/" },
-          { label: t("nav.pricing"), href: "/pricing" },
-          { label: t("nav.community"), href: "/community" },
-        ]}
       />
 
       <main className="mx-auto flex max-w-7xl flex-col gap-10 px-4 pb-16 pt-8 md:gap-12 md:px-8 md:pt-14">
