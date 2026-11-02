@@ -1049,11 +1049,7 @@ export default function HomePage() {
       `}</style>
 
       <div data-surface="night" className="contents">
-        <AppHeader anchors={[
-          { label: t('nav.discover'), href: '/' },
-          { label: t('nav.pricing'), href: '/pricing' },
-          { label: t('nav.community'), href: '/community' },
-        ]} />
+        <AppHeader />
       </div>
 
       {/* HERO — Brand Guide v2 §5 (Night), igazítva a Discover herójához.

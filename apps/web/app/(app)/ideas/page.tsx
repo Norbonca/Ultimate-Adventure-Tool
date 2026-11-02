@@ -62,7 +62,7 @@ export default async function IdeasBoardPage({ searchParams }: PageProps) {
 
   return (
     <div data-surface="night" className="min-h-screen bg-canvas text-ink">
-      <AppHeader user={user ? { email: user.email ?? "", displayName: user.user_metadata?.full_name } : null} anchors={[{ label: t("nav.discover"), href: "/" }, { label: t("nav.pricing"), href: "/pricing" }, { label: t("nav.community"), href: "/community" }]} />
+      <AppHeader user={user ? { email: user.email ?? "", displayName: user.user_metadata?.full_name } : null} />
 
       {/* HERO — D22 EQOlq R7kD1o */}
       <section className="relative overflow-hidden bg-canvas" data-testid="ideas-hero">
