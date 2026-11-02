@@ -1,0 +1,101 @@
+/* M211b — a bemutató mozgásai (D09 „M211b — Bemutató lejátszó”).
+   Minden belépő elem a dia váltásakor újraindul (a dia `key`-je az indexe).
+   A `--d` a lépcsőzés késleltetése. Mozgáscsökkentésnél nincs mozgás. */
+
+.stage {
+  animation: stageIn 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.rise {
+  animation: rise 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+
+.pop {
+  animation: pop 650ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+
+.shot {
+  animation: shotIn 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--d, 200ms);
+}
+
+.phone {
+  animation: phoneIn 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--d, 450ms);
+}
+
+.kenburns {
+  animation: kenburns 14s ease-out both;
+}
+
+.drift {
+  animation: drift 9s ease-in-out infinite alternate;
+}
+
+.progressFill {
+  transform-origin: left center;
+  animation: fill linear both;
+}
+
+.paused .progressFill,
+.paused .drift {
+  animation-play-state: paused;
+}
+
+.glow {
+  animation: glow 2.6s ease-in-out infinite;
+}
+
+@keyframes stageIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes pop {
+  from { opacity: 0; transform: translateY(16px) scale(0.92); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes shotIn {
+  from { opacity: 0; transform: translateX(72px) rotate(1.5deg) scale(1.04); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes phoneIn {
+  from { opacity: 0; transform: translateY(80px) rotate(-4deg); }
+  to { opacity: 1; transform: rotate(-2deg); }
+}
+
+@keyframes kenburns {
+  from { transform: scale(1.12) translate(1.5%, 1%); }
+  to { transform: scale(1) translate(0, 0); }
+}
+
+@keyframes drift {
+  from { transform: translateY(0); }
+  to { transform: translateY(-10px); }
+}
+
+@keyframes fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.45); }
+  50% { box-shadow: 0 0 0 14px rgba(45, 212, 191, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage, .rise, .pop, .shot, .phone, .kenburns, .drift, .glow {
+    animation: none !important;
+  }
+  .phone { transform: rotate(-2deg); }
+}

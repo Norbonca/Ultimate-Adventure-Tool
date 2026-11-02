@@ -2722,6 +2722,24 @@ const en: TranslationKeys = {
   // ============================================================================
   // M211 — Tutorials (D21)
   // ============================================================================
+  presentation: {
+    metaTitle: "Trevu for organizers — presentation",
+    metaDescription: "Listing, applicants, tasks and shared costs on one platform: the Trevu presentation for adventure trip organizers.",
+    label: "for organizers",
+    counter: "{n} / {total}",
+    controls: "Presentation controls",
+    prev: "Previous slide",
+    next: "Next slide",
+    play: "Play",
+    pause: "Pause",
+    close: "Close and return to the home page",
+    hint: "← → keys · space: pause",
+    register: "Sign up",
+    discover: "Explore trips",
+    promoEyebrow: "For organizers",
+    promoCta: "Watch the presentation",
+    promoMeta: "{count} slides · about {minutes} min",
+  },
   tutorials: {
     groups: {
       listing: "Listing",

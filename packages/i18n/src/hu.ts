@@ -2752,6 +2752,24 @@ const hu = {
   // ============================================================================
   // M211 — Útmutatók (D21)
   // ============================================================================
+  presentation: {
+    metaTitle: "A Trevu szervezőknek — bemutató",
+    metaDescription: "Meghirdetés, jelentkezők, teendők és közös költségek egy felületen: a Trevu bemutatója kalandtúra-szervezőknek.",
+    label: "szervezőknek",
+    counter: "{n} / {total}",
+    controls: "A bemutató vezérlése",
+    prev: "Előző dia",
+    next: "Következő dia",
+    play: "Lejátszás",
+    pause: "Szünet",
+    close: "Bezárás, vissza a nyitóoldalra",
+    hint: "← → billentyűk · szóköz: szünet",
+    register: "Regisztrálok",
+    discover: "Túrák felfedezése",
+    promoEyebrow: "Szervezőknek",
+    promoCta: "Nézd meg a bemutatót",
+    promoMeta: "{count} dia · kb. {minutes} perc",
+  },
   tutorials: {
     groups: {
       listing: "Meghirdetés",

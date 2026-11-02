@@ -35,6 +35,7 @@ import {
 } from '@/lib/icons';
 import { useTranslation } from '@/lib/i18n/useTranslation';
 import { AppHeader } from '@/components/AppHeader';
+import { PresentationPromo } from '@/components/presentation/PresentationPromo';
 import { BrandIcon } from '@/lib/brand-icons';
 
 export default function HomePage() {
@@ -1103,6 +1104,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* M211b — promó blokk a szervezői bemutatóhoz (D09 „M211b — Promó blokk”). */}
+      <PresentationPromo />
 
       {/* Problem Section */}
       <section className="problem">
