@@ -390,8 +390,8 @@ export const SLIDES: Slide[] = [
     eyebrow: l("Próbáld ki", "Try it"),
     title: l("Hirdesd meg az első túrádat", "List your first trip"),
     lead: l(
-      "Regisztrálj, és a varázsló végigvezet az első meghirdetésen. Ma minden funkció ingyenes.",
-      "Sign up and the wizard walks you through your first listing. Every feature is free today.",
+      "Regisztrálj, és a varázsló végigvezet az első meghirdetésen.",
+      "Sign up and the wizard walks you through your first listing.",
     ),
     image: "/discover/hero.jpg",
   },
