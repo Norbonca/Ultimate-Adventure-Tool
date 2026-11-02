@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { TutorialHelp } from "@/components/tutorials/TutorialHelp";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -478,7 +479,11 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
             {/* M23 V1.1 — Naptár és időzóna (S11; design D02 KpgDv `YWRQn`) */}
             {calendarAlerts.length > 0 && (
               <div className="bg-white rounded-2xl border border-navy-200 p-6" data-testid="trip-calendar-section">
-                <h2 className="text-lg font-bold text-navy-900 mb-1">{t("calendar.section.title")}</h2>
+                <div className="mb-1 flex items-center justify-between gap-3">
+                  <h2 className="text-lg font-bold text-navy-900">{t("calendar.section.title")}</h2>
+                  {/* M211 — súgó (D21) */}
+                  <TutorialHelp anchor="trip.calendar" variant="icon" />
+                </div>
                 <p className="text-xs text-navy-400 mb-4">
                   {tripCalendar?.viewer.country
                     ? t("calendar.section.viewerCalendar", { country: countryName(tripCalendar.viewer.country, locale) })

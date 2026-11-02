@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { TutorialHelp } from "@/components/tutorials/TutorialHelp";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { fetchMyTrips } from "./actions";
@@ -101,6 +102,8 @@ export default async function MyTripsPage({
           <h1 className="text-2xl font-extrabold text-navy-900 mr-auto">
             {t("trips.myTripsTitle")}
           </h1>
+          {/* M211 — súgó (D21; választó) */}
+          <TutorialHelp anchor="trips.list" variant="icon" />
           <form method="GET" className="relative">
             {tab !== "active" && <input type="hidden" name="tab" value={tab} />}
             <Icon

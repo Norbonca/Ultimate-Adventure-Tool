@@ -4,6 +4,7 @@
 // BR-M02-009: draft → delete; published without applicants → soft delete (30 days); with applicants → cancel.
 
 import { useState } from "react";
+import { TutorialHelp } from "@/components/tutorials/TutorialHelp";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { Button, Dialog } from "@/components/ui";
@@ -104,9 +105,13 @@ export function TripDangerZone({ tripId, slug, title, status }: TripDangerZonePr
 
   return (
     <section className="mt-8 pt-6 border-t border-navy-200" aria-labelledby="trip-danger-title">
-      <h3 id="trip-danger-title" className="text-base font-semibold text-navy-900 mb-3">
+      <div className="flex items-center justify-between gap-3">
+        <h3 id="trip-danger-title" className="text-base font-semibold text-navy-900 mb-3">
         {t("trips.deletion.sectionTitle")}
       </h3>
+        {/* M211 — súgó (D21) */}
+        <TutorialHelp anchor="trip.cancel" variant="icon" />
+      </div>
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 rounded-xl border border-coral bg-[var(--color-danger-subtle)] px-5 py-4">
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-navy-900">{t("trips.deletion.rowTitle")}</p>

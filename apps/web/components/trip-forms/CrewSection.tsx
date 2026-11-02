@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { TutorialHelp } from "@/components/tutorials/TutorialHelp";
 import type { WizardFormData } from "@/app/(app)/trips/types";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { Icon } from "@/components/Icon";
@@ -36,6 +37,8 @@ export function CrewSection({ data, onChange, membersSlot, applicationsSlot, sta
 
   return (
     <div className="space-y-6">
+      {/* M211 — súgó (D21; több útmutató → választó) */}
+      <div className="flex justify-end"><TutorialHelp anchor="trip.crew" /></div>
       {/* STAFF SEATS section (edit mode only — szervezői helyek) */}
       {staffSeatsSlot && (
         <div>

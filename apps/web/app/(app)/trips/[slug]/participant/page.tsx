@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { TutorialHelp } from "@/components/tutorials/TutorialHelp";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import {
@@ -95,7 +96,11 @@ export default async function ParticipantDashboardPage({ params }: ParticipantPa
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold text-navy-900">{trip.title}</h1>
+              <div className="flex items-center gap-3">
+                <h1 className="text-xl font-bold text-navy-900">{trip.title}</h1>
+                {/* M211 — súgó (D21) */}
+                <TutorialHelp anchor="trip.participant" />
+              </div>
               <div className="flex items-center gap-4 mt-2 text-sm text-navy-500">
                 {catDisplay && (
                   <span className="flex items-center gap-1 bg-navy-50 px-2 py-0.5 rounded-lg text-xs font-medium">
