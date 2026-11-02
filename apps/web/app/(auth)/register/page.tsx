@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { TutorialHelp } from "@/components/tutorials/TutorialHelp";
 import { BrandIcon } from "@/lib/brand-icons";
 import { createClient } from "@/lib/supabase/client";
 import { authErrorKey } from "@/lib/auth-error";
@@ -125,7 +126,11 @@ export default function RegisterPage() {
         <div className="w-full max-w-[420px] space-y-7">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-navy-900">{t('auth.registerTitle')}</h2>
-            <LanguageSwitcher />
+            <div className="flex items-center gap-2">
+              {/* M211 — súgó (D21) */}
+              <TutorialHelp anchor="auth.register" variant="icon" />
+              <LanguageSwitcher />
+            </div>
           </div>
 
           {error && (

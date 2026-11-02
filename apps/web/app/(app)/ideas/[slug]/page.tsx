@@ -5,6 +5,7 @@
  */
 
 import type { Metadata } from "next";
+import { TutorialHelp } from "@/components/tutorials/TutorialHelp";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -178,6 +179,8 @@ export default async function IdeaDetailPage({ params }: Props) {
               <div className="flex justify-between"><span className="text-navy-500">{t("ideas.form.visibility")}</span><span className="font-medium text-navy-700">{t(`ideas.visibility.${idea.visibility}`)}</span></div>
             </div>
             <IdeaActions ideaId={idea.id} slug={idea.slug} joinable={joinable} isOwner={isOwner} userId={rel.userId} member={rel.member} offered={rel.offered} reported={rel.reported} windowMonths={months} layout="card" />
+            {/* M211 — súgó (D21) */}
+            <div className="flex justify-center"><TutorialHelp anchor="idea.detail" /></div>
           </div>
           <div className="rounded-2xl border border-navy-200 bg-white p-5" data-testid="idea-members">
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-navy-400">{t("ideas.detail.members")}</h3>

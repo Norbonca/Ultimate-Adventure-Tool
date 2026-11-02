@@ -142,6 +142,18 @@ for (const w of [1440, 390]) {
   }
   await p.goto(BASE + `/trips/${BASE_TRIP}/manage`, { waitUntil: "networkidle", timeout: 120000 });
   check("Menetrend: help-trip.timeline", (await p.getByTestId("help-trip.timeline").count()) >= 1);
+  // Választó (S4): a Csapat fülhöz két útmutató tartozik
+  await p.goto(BASE + `/trips/${BASE_TRIP}/edit`, { waitUntil: "networkidle", timeout: 120000 });
+  await p.getByRole("button", { name: "Csapat", exact: true }).first().click();
+  await p.getByTestId("help-trip.crew").first().click();
+  check("választó: több útmutatónál lista jelenik meg", await p.getByTestId("help-chooser").isVisible());
+  await p.getByTestId("help-chooser").getByRole("button").first().click();
+  check("választó: a kiválasztott útmutató megnyílik képes bemutatóval", (await p.getByTestId("tutorial-slides").count()) === 1);
+  await p.keyboard.press("Escape");
+  for (const [url, id] of [[`/trips/${BASE_TRIP}/participant`, "help-trip.participant"], ["/settings/skills", "help-settings.skills"], ["/trips", "help-trips.list"], ["/trips/nepal-annapurna-base-camp-trek", "help-trip.calendar"], ["/ideas/vitorlassal-a-balti-tengeren-demo", "help-idea.detail"]]) {
+    await p.goto(BASE + url, { waitUntil: "networkidle", timeout: 120000 });
+    check(`belépési pont ${url}: ${id}`, (await p.getByTestId(id).count()) >= 1);
+  }
   // T▾ menü
   await p.goto(BASE + "/tutorials", { waitUntil: "networkidle" });
   await p.getByRole("button", { name: /menü|menu/i }).first().click();

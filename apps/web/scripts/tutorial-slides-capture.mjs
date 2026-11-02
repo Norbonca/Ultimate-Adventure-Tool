@@ -69,6 +69,10 @@ const globeOpen = async (p) => { await tid("view-toggle-globe")(p).click(); awai
 const globeCard = async (p) => { await globeOpen(p); await txt(/Teide/)(p).click({ force: true }); await p.waitForTimeout(2500); };
 const openMilestone = async (p) => { await txt(/Publikálás és promóció/)(p).click(); await settle(p, 1000); };
 
+const editTab = (name) => async (p) => { await p.getByRole("button", { name, exact: true }).first().click(); await settle(p, 1200); };
+const settingsDanger = async (p) => { await editTab("Beállítások")(p); await into(p, css("#trip-danger-title")(p), 260); };
+const demandTab = async (p) => { await txt(/Mire várnak/)(p).click(); await settle(p, 1500); };
+const openJoin = async (p) => { await role("button", /Csatlakozom/)(p).click(); await settle(p, 1000); };
 // [slug, felhasználó, [[útvonal, előkészítés|null, kiemelés(ek)], …]] — a lépések sorrendje = content.ts lépései
 const TUTORIALS = [
   ["kozos-koltseg", "dora", [
@@ -137,6 +141,75 @@ const TUTORIALS = [
     ["/ideas", null, [tid("ideas-new")]],
     ["/ideas/new", null, [css("#idea-title"), css("#idea-category")]],
     ["/ideas/new", async (p) => { await into(p, tid("idea-submit")(p), 300); }, [tid("idea-submit")]],
+  ]],
+  ["szerepek-es-stabhelyek", "dora", [
+    [`/trips/${BASE_TRIP}/edit`, null, [role("button", /^Csapat$/)]],
+    [`/trips/${BASE_TRIP}/edit`, editTab("Csapat"), [txt(/Pozíció hozzáadása/)]],
+    [`/trips/${BASE_TRIP}/edit`, editTab("Csapat"), [txt(/SZERVEZŐI HELYEK/)]],
+    [`/trips/${BASE_TRIP}/edit`, editTab("Csapat"), [tid("member-row")]],
+  ]],
+  ["check-in", "dora", [
+    [`/trips/${BASE_TRIP}/edit`, null, [role("button", /^Csapat$/)]],
+    [`/trips/${BASE_TRIP}/edit`, editTab("Csapat"), [tid("member-row")]],
+    [`/trips/${BASE_TRIP}/edit`, editTab("Csapat"), [role("button", /^Check-in$/)]],
+  ]],
+  ["boritokep", "dora", [
+    [`/trips/${BASE_TRIP}/edit`, null, [role("button", /^Képek$/)]],
+    [`/trips/${BASE_TRIP}/edit`, editTab("Képek"), [txt(/Borítókép/)]],
+    [`/trips/${BASE_TRIP}/edit`, editTab("Képek"), [txt(/Kártyakép|kártya/i)]],
+    [`/trips/${BASE_TRIP}/edit`, editTab("Képek"), [role("button", /Mentés|Változtatások mentése/)]],
+  ]],
+  ["tura-beallitasok", "dora", [
+    [`/trips/${BASE_TRIP}/edit`, null, [role("button", /^Beállítások$/)]],
+    [`/trips/${BASE_TRIP}/edit`, editTab("Beállítások"), [txt(/Láthatóság/), txt(/Jelentkezés jóváhagyást igényel/)]],
+    [`/trips/${BASE_TRIP}/edit`, editTab("Beállítások"), [txt(/CSAPAT FELÉPÍTÉS/), txt(/Vendégek \(jelentkezhetnek\)/)]],
+    [`/trips/${BASE_TRIP}/edit`, editTab("Beállítások"), [txt(/Ár \/ fő|Ár\/fő|ÁRAZÁS|Árazás/)]],
+  ]],
+  ["koltseg-beallitasok", "dora", [
+    [`/trips/${EXP_TRIP}/edit`, editTab("Beállítások"), [tid("trip-fx-settings")]],
+    [`/trips/${EXP_TRIP}/edit`, async (p) => { await editTab("Beállítások")(p); await into(p, tid("trip-fx-settings")(p), 140); }, [css('[data-testid="trip-fx-settings"] select')]],
+    [`/trips/${EXP_TRIP}/edit`, async (p) => { await editTab("Beállítások")(p); await into(p, tid("trip-fx-settings")(p), 140); }, [txt(/A résztvevők is rögzíthetnek költséget/)]],
+  ]],
+  ["tura-lemondasa", "dora", [
+    [`/trips/${BASE_TRIP}/edit`, settingsDanger, [css("#trip-danger-title")]],
+    [`/trips/${BASE_TRIP}/edit`, settingsDanger, [role("button", /Túra törlése/)]],
+    [`/trips/${BASE_TRIP}/edit`, settingsDanger, [css('section[aria-labelledby="trip-danger-title"] > div:last-child')]],
+  ]],
+  ["mire-varnak", "dora", [
+    ["/trips", null, [css("h1")]],
+    ["/trips", null, [txt(/Mire várnak/)]],
+    ["/trips", demandTab, [txt(/csatlakozó|fő/)]],
+    ["/trips", demandTab, [txt(/Megszervezem/)]],
+  ]],
+  ["regisztracio", null, [
+    ["/register", null, [css("h2")]],
+    ["/register", null, [css('form input[type="email"]'), css('form input[type="password"]')]],
+    ["/register", null, [css('form button[type="submit"]')]],
+  ]],
+  ["keszsegek-es-erdeklodes", "dora", [
+    ["/settings/interests", null, [css("h1")]],
+    ["/settings/interests", null, [txt(/^Túrázás$/)]],
+    ["/settings/skills", null, [css("h1")]],
+  ]],
+  ["jelentkezes-allapota", "bence", [
+    [`/trips/${BASE_TRIP}`, null, [css("h1")]],
+    [`/trips/${BASE_TRIP}`, async (p) => { await into(p, css("#trip-apply")(p), 120); }, [txt(/Függőben/)]],
+    [`/trips/${BASE_TRIP}`, async (p) => { await into(p, css("#trip-apply")(p), 120); }, [txt(/megjegyzés/i)]],
+  ]],
+  ["resztvevoi-menetrend", "lili", [
+    [`/trips/${BASE_TRIP}/participant`, null, [css("h1")]],
+    [`/trips/${BASE_TRIP}/participant`, null, [txt(/Feladataim/)]],
+    [`/trips/${BASE_TRIP}/participant`, async (p) => { await into(p, txt(/^Menetrend$/)(p), 120); }, [txt(/^Menetrend$/)]],
+  ]],
+  ["naptar-es-idozona", "dora", [
+    ["/trips/nepal-annapurna-base-camp-trek", null, [txt(/szünet|hosszú hétvége|munkaszüneti/i)]],
+    ["/trips/nepal-annapurna-base-camp-trek", null, [tid("trip-calendar-section")]],
+    ["/trips/nepal-annapurna-base-camp-trek", null, [css('[data-testid="trip-calendar-section"] ul, [data-testid="trip-calendar-section"] [role="list"]')]],
+  ]],
+  ["otlet-csatlakozas", "mate", [
+    ["/ideas/vitorlassal-a-balti-tengeren-demo", null, [css("h1")]],
+    ["/ideas/vitorlassal-a-balti-tengeren-demo", null, [role("button", /Csatlakoz/)]],
+    ["/ideas/vitorlassal-a-balti-tengeren-demo", openJoin, [css('[role="dialog"]')]],
   ]],
 ];
 

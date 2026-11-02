@@ -5,6 +5,7 @@
  * Saját mentés gombbal — a varázsló űrlapjától független.
  */
 import { useState, useTransition } from "react";
+import { TutorialHelp } from "@/components/tutorials/TutorialHelp";
 import { Icon } from "@/components/Icon";
 import { CurrencySelect } from "@/components/trip-forms/CurrencySelect";
 import { Toggle } from "@/components/ui/Toggle";
@@ -47,7 +48,11 @@ export function TripFxSettings(p: TripFxSettingsProps) {
   const input = "h-11 w-full rounded-trevu border border-navy-200 bg-white px-3.5 text-sm text-navy-900 disabled:bg-navy-50 disabled:text-navy-400";
   return (
     <section className="rounded-2xl border border-navy-200 bg-white p-6" data-testid="trip-fx-settings">
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-navy-400">{t("expenses.settings.title")}</h3>
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-navy-400">{t("expenses.settings.title")}</h3>
+        {/* M211 — súgó (D21) */}
+        <TutorialHelp anchor="expenses.settings" variant="icon" />
+      </div>
       <p className="mt-2 text-sm text-navy-600">{t("expenses.settings.lead")}</p>
       {p.locked && (
         <p className="mt-3 flex items-start gap-2 rounded-trevu bg-navy-50 px-3 py-2 text-[13px] text-navy-600"><Icon name="lock" size={16} className="mt-0.5 shrink-0" aria-hidden />{t("expenses.settings.locked")}</p>
