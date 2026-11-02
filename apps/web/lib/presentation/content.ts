@@ -9,6 +9,8 @@ export type L = Record<Lang, string>;
 
 export interface Card {
   n?: string;
+  /** Képernyőkép a kártyán (D09 / diasor 2–3. dia). */
+  img?: string;
   icon?: "lock" | "users" | "clock" | "badge-check";
   title: L;
   text: L;
@@ -40,6 +42,8 @@ export interface SplitSlide extends Base {
   image: string;
   phone?: string;
   badge?: L;
+  /** Szerepek túratípusonként (csapat dia). */
+  roles?: { type: L; roles: L }[];
 }
 
 export interface PhonesSlide extends Base {
@@ -47,6 +51,9 @@ export interface PhonesSlide extends Base {
   lead: L;
   bullets: L[];
   phones: { src: string; alt: L }[];
+  badge?: L;
+  /** Felirat a telefonok között (offline dia). */
+  caption?: L;
 }
 
 export type Slide = CoverSlide | CardsSlide | SplitSlide | PhonesSlide;
@@ -75,11 +82,11 @@ export const SLIDES: Slide[] = [
     eyebrow: l("Mi a Trevu a szervezőnek?", "What is Trevu for organizers?"),
     title: l("Egy felület a meghirdetéstől az elszámolásig", "One platform from listing to settling up"),
     cards: [
-      { n: "1", title: l("Meghirdetés", "Listing"), text: l("Varázsló, több időpont, a helyszín ideje", "Wizard, multiple dates, local time at the destination") },
-      { n: "2", title: l("Jelentkezők", "Applicants"), text: l("Üzenet, elbírálás, várólista", "Message, review, waitlist") },
-      { n: "3", title: l("Csapat", "Crew"), text: l("Szerepek, stábhelyek, check-in", "Roles, crew seats, check-in") },
-      { n: "4", title: l("Teendők", "Tasks"), text: l("Fázisok, mérföldkövek, feladatok", "Phases, milestones, tasks") },
-      { n: "5", title: l("Költségek", "Costs"), text: l("Több pénznem, kiegyenlítés", "Multiple currencies, settling up") },
+      { n: "1", img: img("04-varazslo.jpg"), title: l("Meghirdetés", "Listing"), text: l("Varázsló, több időpont, a helyszín ideje", "Wizard, multiple dates, local time at the destination") },
+      { n: "2", img: img("06-jelentkezok.jpg"), title: l("Jelentkezők", "Applicants"), text: l("Üzenet, elbírálás, várólista", "Message, review, waitlist") },
+      { n: "3", img: img("21-szervezocsapat.jpg"), title: l("Csapat", "Crew"), text: l("Szerepek, stábhelyek, check-in", "Roles, crew seats, check-in") },
+      { n: "4", img: img("07-idovonal.jpg"), title: l("Teendők", "Tasks"), text: l("Fázisok, mérföldkövek, feladatok", "Phases, milestones, tasks") },
+      { n: "5", img: img("08a-koltsegek.jpg"), title: l("Költségek", "Costs"), text: l("Több pénznem, kiegyenlítés", "Multiple currencies, settling up") },
     ],
   },
   {
@@ -90,15 +97,15 @@ export const SLIDES: Slide[] = [
     eyebrow: l("Egy felület, kilenc szolgáltatás", "One platform, nine services"),
     title: l("Minden, ami egy túra szervezéséhez kell", "Everything you need to organize a trip"),
     cards: [
-      { title: l("Felfedezés és 3D térkép", "Discover and 3D map"), text: l("Itt talál rád a résztvevő", "Where participants find you") },
-      { title: l("Meghirdetés varázslóval", "Listing with a wizard"), text: l("Négy lépés, sablonból is", "Four steps, from a template too") },
-      { title: l("Túrasorozat", "Trip series"), text: l("Egy túra, több időpont", "One trip, multiple dates") },
-      { title: l("Jelentkezők", "Applicants"), text: l("Üzenet, elbírálás, várólista", "Message, review, waitlist") },
-      { title: l("Csapat", "Crew"), text: l("Szerepek, stábhelyek, check-in", "Roles, crew seats, check-in") },
-      { title: l("Menetrend", "Timeline"), text: l("Fázisok, mérföldkövek, feladatok", "Phases, milestones, tasks") },
-      { title: l("Közös költségek", "Shared costs"), text: l("Több pénznem, kiegyenlítés", "Multiple currencies, settling up") },
-      { title: l("Naptár és időzóna", "Calendar and time zone"), text: l("Ünnepek és időeltérés előre jelezve", "Holidays and time differences flagged in advance") },
-      { title: l("Ötletbörze", "Idea board"), text: l("Látod, mire várnak a kalandorok", "See what adventurers are waiting for") },
+      { img: img("12-3d-terkep.jpg"), title: l("Felfedezés és 3D térkép", "Discover and 3D map"), text: l("Itt talál rád a résztvevő", "Where participants find you") },
+      { img: img("04-varazslo.jpg"), title: l("Meghirdetés varázslóval", "Listing with a wizard"), text: l("Négy lépés, sablonból is", "Four steps, from a template too") },
+      { img: img("05b-uj-idopont.jpg"), title: l("Túrasorozat", "Trip series"), text: l("Egy túra, több időpont", "One trip, multiple dates") },
+      { img: img("06-jelentkezok.jpg"), title: l("Jelentkezők", "Applicants"), text: l("Üzenet, elbírálás, várólista", "Message, review, waitlist") },
+      { img: img("21-szervezocsapat.jpg"), title: l("Csapat", "Crew"), text: l("Szerepek, stábhelyek, check-in", "Roles, crew seats, check-in") },
+      { img: img("07-idovonal.jpg"), title: l("Menetrend", "Timeline"), text: l("Fázisok, mérföldkövek, feladatok", "Phases, milestones, tasks") },
+      { img: img("08a-koltsegek.jpg"), title: l("Közös költségek", "Shared costs"), text: l("Több pénznem, kiegyenlítés", "Multiple currencies, settling up") },
+      { img: img("09b-naptar-figyelmeztetes.jpg"), title: l("Naptár és időzóna", "Calendar and time zone"), text: l("Ünnepek és időeltérés előre jelezve", "Holidays and time differences flagged in advance") },
+      { img: img("10a-otletborze.jpg"), title: l("Ötletbörze", "Idea board"), text: l("Látod, mire várnak a kalandorok", "See what adventurers are waiting for") },
     ],
   },
   {
@@ -147,10 +154,32 @@ export const SLIDES: Slide[] = [
     ),
     bullets: [
       l("Elfogadás, várólista, elutasítás indoklással", "Accept, waitlist, or decline with a reason"),
-      l("Szerepek: skipper, elsősegélynyújtó…", "Roles: skipper, first aider…"),
-      l("Stábhelyek és check-in a túrán", "Crew seats and check-in on the trip"),
+      l("Check-in a túra napján", "Check-in on the day of the trip"),
+    ],
+    roles: [
+      { type: l("Vitorlás túra", "Sailing trip"), roles: l("skipper, fedélzetmester, hajószakács", "skipper, deckhand, ship's cook") },
+      { type: l("Hegyi túra", "Mountain hike"), roles: l("túravezető, elsősegélynyújtó, zárótag", "guide, first aider, sweeper") },
+      { type: l("Kerékpártúra", "Cycling tour"), roles: l("túravezető, szerelő, kísérőautó-sofőr", "guide, mechanic, support-vehicle driver") },
+      { type: l("Búvártúra", "Diving trip"), roles: l("merülésvezető, búvároktató", "dive leader, diving instructor") },
     ],
     image: img("06-jelentkezok.jpg"),
+  },
+  {
+    id: "szervezocsapat",
+    kind: "split",
+    tone: "dark",
+    eyebrow: l("Szervezőcsapat", "Organizer team"),
+    title: l("A szervezőcsapatod a túrához rendelve", "Your organizer team, assigned to the trip"),
+    lead: l(
+      "A vendéghelyek mellett szervezői helyeket is nyitsz, és ezeket te töltöd be – jelentkezés nélkül.",
+      "Next to guest seats you open organizer seats, and you fill them yourself – no application needed.",
+    ),
+    bullets: [
+      l("Túravezetők, skipperek és segítők a saját pozíciójukkal", "Guides, skippers and helpers, each with their own position"),
+      l("Magadat is hozzárendelheted egy szervezői helyhez", "You can assign yourself to an organizer seat too"),
+      l("A vendégek és a szervezők létszáma külön látszik", "Guest and organizer headcounts are shown separately"),
+    ],
+    image: img("21-szervezocsapat.jpg"),
   },
   {
     id: "idovonal",
@@ -316,6 +345,29 @@ export const SLIDES: Slide[] = [
     ],
   },
   {
+    id: "offline",
+    kind: "phones",
+    tone: "dark",
+    badge: l("Natív alkalmazás · hamarosan", "Native app · coming soon"),
+    eyebrow: l("Natív alkalmazás", "Native app"),
+    title: l("A túrád a zsebedben, térerő nélkül is", "Your trip in your pocket, even without signal"),
+    lead: l(
+      "Az app letölti a túrát a telefonodra: a hegyen, a vízen és az erdő mélyén is minden kéznél van.",
+      "The app downloads the trip to your phone: on the mountain, on the water and deep in the forest, everything is at hand.",
+    ),
+    bullets: [
+      l("Útiterv, résztvevők és kontaktok hálózat nélkül is", "Itinerary, participants and contacts without a network"),
+      l("Költséget és check-int a terepen is rögzítesz", "Record costs and check-ins out in the field"),
+      l("Letölthető térképek a túra útvonaláról", "Downloadable maps of the trip route"),
+      l("Automatikus szinkron, amint újra van hálózat", "Automatic sync as soon as you're back online"),
+    ],
+    caption: l("Offline is minden elérhető", "Everything available offline too"),
+    phones: [
+      { src: img("15a-mobil-turaoldal.jpg"), alt: l("Telefonon a Split vitorlás túra oldala", "The Split sailing trip page on a phone") },
+      { src: img("15b-mobil-allapot.jpg"), alt: l("Telefonon a jelentkezés állapota a túra oldalán", "Application status on the trip page, on a phone") },
+    ],
+  },
+  {
     id: "kovetkezik",
     kind: "cards",
     tone: "dark",
@@ -330,25 +382,6 @@ export const SLIDES: Slide[] = [
       { title: l("Saját arculatú oldal", "Your own branded page"), text: l("A te színeid és logód, a Trevu oldalszerkezetén", "Your colours and logo on Trevu's page structure") },
       { title: l("Értesítések", "Notifications"), text: l("E-mail és jelzés a felületen", "Email and in-app alerts") },
     ],
-  },
-  {
-    id: "csomagok",
-    kind: "split",
-    tone: "dark",
-    badge: l("Most minden funkció ingyenes", "Every feature is free right now"),
-    eyebrow: l("Csomagok", "Plans"),
-    title: l("Személyes használatra ingyenes", "Free for personal use"),
-    lead: l(
-      "Előfizetést az fizet, aki üzletszerűen szervez. Költségmegosztó túrákhoz a Trevu ingyenes.",
-      "Only those who organize commercially pay a subscription. For cost-sharing trips Trevu is free.",
-    ),
-    bullets: [
-      l("Kalandor: ingyen", "Adventurer: free"),
-      l("Túravezető: 9,90 €/hó", "Guide: €9.90/month"),
-      l("Expedíció: 39,90 €/hó", "Expedition: €39.90/month"),
-      l("Bázistábor: egyedi ár", "Basecamp: custom pricing"),
-    ],
-    image: img("20-arazas.jpg"),
   },
   {
     id: "zaras",

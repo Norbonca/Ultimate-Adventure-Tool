@@ -267,11 +267,19 @@ function SlideView({ slide, tx, t }: { slide: Slide; tx: (v: L) => string; t: TF
       <section data-surface={surface} className={`${s.stage} absolute inset-0 overflow-y-auto bg-canvas text-ink`} data-testid={`slide-${slide.id}`}>
         <div className="mx-auto grid min-h-full max-w-7xl items-center gap-8 px-5 py-8 md:grid-cols-[5fr_7fr] md:gap-14 md:px-16">
           <TextBlock slide={slide} tx={tx} />
-          <div className="flex justify-center gap-3 md:gap-8">
+          <div className="flex items-center justify-center gap-3 md:gap-8">
             {slide.phones.map((p, i) => (
-              <div key={p.src} className={`${s.phone} w-[30%] max-w-[230px]`} style={delay(300 + i * 160)}>
-                <div className={s.drift} style={{ animationDelay: `${i * 0.8}s` }}>
-                  <Image src={p.src} alt={tx(p.alt)} width={600} height={1298} sizes="(min-width: 768px) 230px, 30vw" className="h-auto w-full rounded-[22px] border border-line shadow-2xl" />
+              <div key={p.src} className="contents">
+                {slide.caption && i === 1 && (
+                  <p className={`${s.pop} max-w-[180px] rounded-2xl border border-line bg-surface px-4 py-3 text-center text-sm font-bold text-ink md:text-lg`} style={delay(520)}>
+                    <Icon name="wifi-off" size={28} aria-hidden className="mx-auto mb-2 block text-accent" />
+                    {tx(slide.caption)}
+                  </p>
+                )}
+                <div className={`${s.phone} w-[30%] max-w-[230px]`} style={delay(300 + i * 160)}>
+                  <div className={s.drift} style={{ animationDelay: `${i * 0.8}s` }}>
+                    <Image src={p.src} alt={tx(p.alt)} width={600} height={1298} sizes="(min-width: 768px) 230px, 30vw" className="h-auto w-full rounded-[22px] border border-line shadow-2xl" />
+                  </div>
                 </div>
               </div>
             ))}
@@ -305,12 +313,12 @@ function SlideView({ slide, tx, t }: { slide: Slide; tx: (v: L) => string; t: TF
 function TextBlock({ slide, tx }: { slide: Extract<Slide, { kind: "split" | "phones" }>; tx: (v: L) => string }) {
   return (
     <div className="flex flex-col gap-4 md:gap-6">
-      {slide.kind === "split" && slide.badge && (
+      {slide.badge && (
         <p className={`${s.pop} self-start rounded-full bg-[var(--color-primary-subtle)] px-4 py-1.5 text-sm font-bold text-accent md:text-base`} style={delay(0)}>
           {tx(slide.badge)}
         </p>
       )}
-      <Eyebrow d={60}>{tx(slide.eyebrow)}</Eyebrow>
+      {!slide.badge && <Eyebrow d={60}>{tx(slide.eyebrow)}</Eyebrow>}
       <h2 className={`${s.rise} text-3xl font-extrabold leading-tight md:text-5xl`} style={delay(140)}>
         {tx(slide.title)}
       </h2>
@@ -327,13 +335,29 @@ function TextBlock({ slide, tx }: { slide: Extract<Slide, { kind: "split" | "pho
           </li>
         ))}
       </ul>
+      {slide.kind === "split" && slide.roles && (
+        <div className={`${s.rise} rounded-2xl border border-line bg-surface p-4 md:p-5`} style={delay(360 + slide.bullets.length * 110)} data-testid="presentation-roles">
+          <p className="mb-2 text-sm font-bold text-accent md:text-base">{tx({ hu: "Szerepek túratípusonként", en: "Roles by trip type" })}</p>
+          <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm md:text-base">
+            {slide.roles.map((r, i) => (
+              <div key={i} className="contents">
+                <dt className="font-bold text-ink">{tx(r.type)}</dt>
+                <dd className="text-ink-body">{tx(r.roles)}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      )}
     </div>
   );
 }
 
 function CardView({ card, tx, d }: { card: Card; tx: (v: L) => string; d: number }) {
   return (
-    <div className={`${s.pop} flex gap-4 rounded-2xl border border-line bg-surface p-5 md:p-7 ${card.icon ? "flex-row items-start" : "flex-col"}`} style={delay(d)}>
+    <div className={`${s.pop} flex gap-4 rounded-2xl border border-line bg-surface ${card.img && !card.n ? "p-3 md:p-4" : "p-5 md:p-7"} ${card.icon || (card.img && !card.n) ? "flex-row items-center" : "flex-col"}`} style={delay(d)}>
+      {card.img && (
+        <Image src={card.img} alt="" width={1600} height={1000} sizes="(min-width: 768px) 240px, 40vw" className={`h-auto shrink-0 rounded-xl border border-line ${card.n ? "w-full" : "w-[40%] max-w-[176px]"}`} />
+      )}
       {card.n && <p className="text-4xl font-extrabold text-accent md:text-5xl">{card.n}</p>}
       {card.icon && (
         <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-subtle)] text-accent">
@@ -341,8 +365,8 @@ function CardView({ card, tx, d }: { card: Card; tx: (v: L) => string; d: number
         </span>
       )}
       <div className="flex flex-col gap-2">
-        <h3 className="text-lg font-bold md:text-2xl">{tx(card.title)}</h3>
-        <p className="text-sm leading-relaxed text-ink-body md:text-lg">{tx(card.text)}</p>
+        <h3 className={`font-bold ${card.img && !card.n ? "text-base md:text-xl" : "text-lg md:text-2xl"}`}>{tx(card.title)}</h3>
+        <p className={`text-sm leading-relaxed text-ink-body ${card.img && !card.n ? "md:text-base" : "md:text-lg"}`}>{tx(card.text)}</p>
       </div>
     </div>
   );
