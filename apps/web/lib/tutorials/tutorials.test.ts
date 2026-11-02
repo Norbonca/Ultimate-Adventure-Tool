@@ -11,6 +11,10 @@ import {
   listTutorials,
   relatedTutorials,
   tutorialsForAnchor,
+  TUTORIAL_GROUPS,
+  TUTORIAL_META,
+  tutorialGroup,
+  tutorialTags,
 } from "./index";
 
 const PUBLIC = join(__dirname, "../../public");
@@ -54,6 +58,19 @@ describe("M211 tutorial content", () => {
       if (t.hasSlides)
         t.steps.forEach((_, i) => expect(existsSync(join(PUBLIC, "tutorials/slides", t.slug, `${i + 1}.jpg`)), `${t.slug} slide ${i + 1}`).toBe(true));
     }
+  });
+
+  it("puts every tutorial in a group with at least one tag, and filters by tag", () => {
+    for (const t of all) {
+      expect(TUTORIAL_META[t.slug], t.slug).toBeDefined();
+      expect(TUTORIAL_GROUPS).toContain(tutorialGroup(t.slug));
+      expect(tutorialTags(t.slug).length, t.slug).toBeGreaterThan(0);
+    }
+    expect(Object.keys(TUTORIAL_META).every((slug) => all.some((t) => t.slug === slug))).toBe(true);
+    const money = filterTutorials({ tag: "money" }, "hu").map((t) => t.slug);
+    expect(money).toContain("kozos-koltseg");
+    expect(money).not.toContain("3d-terkep");
+    expect(filterTutorials({ tag: "money", role: "traveler" }, "hu")).toHaveLength(0);
   });
 
   it("has exactly one featured tutorial", () => {

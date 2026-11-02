@@ -16,9 +16,11 @@ interface TutorialCardProps {
   badge: { icon: string; label: string };
   /** Jobb alsó címke (videó hossza vagy lépések száma). */
   lengthLabel: string;
+  /** Címkék feliratai (D21 jegyzet `MsQJJ`). */
+  tags?: string[];
 }
 
-export function TutorialCard({ tutorial, locale, roleLabel, badge, lengthLabel }: TutorialCardProps) {
+export function TutorialCard({ tutorial, locale, roleLabel, badge, lengthLabel, tags = [] }: TutorialCardProps) {
   return (
     <Link
       href={tutorialHref(tutorial.slug)}
@@ -42,6 +44,15 @@ export function TutorialCard({ tutorial, locale, roleLabel, badge, lengthLabel }
         </span>
         <span className="text-[15px] font-semibold leading-snug text-ink group-hover:text-accent sm:text-lg">{loc(tutorial.title, locale)}</span>
         <span className="hidden text-sm leading-relaxed text-ink-secondary sm:line-clamp-2">{loc(tutorial.summary, locale)}</span>
+        {tags.length > 0 && (
+          <span className="mt-1 flex flex-wrap gap-1.5" data-testid={`tutorial-tags-${tutorial.slug}`}>
+            {tags.map((tag) => (
+              <span key={tag} className="rounded-full border border-line px-2 py-0.5 text-[11px] font-semibold text-ink-secondary">
+                {tag}
+              </span>
+            ))}
+          </span>
+        )}
       </span>
     </Link>
   );

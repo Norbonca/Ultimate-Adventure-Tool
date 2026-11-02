@@ -2723,6 +2723,27 @@ const en: TranslationKeys = {
   // M211 — Tutorials (D21)
   // ============================================================================
   tutorials: {
+    groups: {
+      listing: "Listing",
+      crew: "Applicants and crew",
+      timeline: "Timeline",
+      costs: "Costs",
+      discover: "Discover and apply",
+      ideas: "Idea board",
+      profile: "Profile",
+    },
+    tagFilter: "Tags",
+    tagAll: "All",
+    tags: {
+      firstSteps: "First steps",
+      dates: "Dates",
+      money: "Money and costs",
+      team: "Crew",
+      settings: "Settings",
+      map: "Map and search",
+      community: "Community",
+      tasks: "Tasks",
+    },
     metaTitle: "Tutorials",
     metaDescription: "Step-by-step illustrated guides on using Trevu.",
     eyebrow: "Tutorials",

@@ -81,7 +81,11 @@ export default async function IdeaDetailPage({ params }: Props) {
               {underReview && <span className="inline-flex items-center gap-1.5 rounded-chip bg-[var(--color-warning-subtle)] px-2.5 py-1 text-xs font-semibold text-[var(--color-warning-text)]"><Icon name="flag" size={12} />{t("ideas.detail.underReview")}</span>}
               {!joinable && !underReview && <span className="inline-flex items-center gap-1.5 rounded-chip bg-glass px-2.5 py-1 text-xs font-semibold text-ink"><Icon name="x-circle" size={12} />{st.label}</span>}
             </div>
-            <h1 className="text-[30px] font-extrabold leading-[1.1] tracking-[-0.02em] text-ink [text-wrap:balance] md:text-hero-display">{idea.title}</h1>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <h1 className="text-[30px] font-extrabold leading-[1.1] tracking-[-0.02em] text-ink [text-wrap:balance] md:text-hero-display">{idea.title}</h1>
+              {/* M211 — súgó a cím mellett (D21 elhelyezési szabály) */}
+              <TutorialHelp anchor="idea.detail" />
+            </div>
             <p className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm font-medium text-ink-body">
               <span className="inline-flex items-center gap-1.5"><Icon name="map-pin" size={16} className="text-ink-secondary" />{destinationsText(idea, tr, false)}</span>
               <span className="inline-flex items-center gap-1.5"><Icon name="calendar-range" size={16} className="text-ink-secondary" />{windowText(idea, tr, locale)}</span>
@@ -179,8 +183,6 @@ export default async function IdeaDetailPage({ params }: Props) {
               <div className="flex justify-between"><span className="text-navy-500">{t("ideas.form.visibility")}</span><span className="font-medium text-navy-700">{t(`ideas.visibility.${idea.visibility}`)}</span></div>
             </div>
             <IdeaActions ideaId={idea.id} slug={idea.slug} joinable={joinable} isOwner={isOwner} userId={rel.userId} member={rel.member} offered={rel.offered} reported={rel.reported} windowMonths={months} layout="card" />
-            {/* M211 — súgó (D21) */}
-            <div className="flex justify-center"><TutorialHelp anchor="idea.detail" /></div>
           </div>
           <div className="rounded-2xl border border-navy-200 bg-white p-5" data-testid="idea-members">
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-navy-400">{t("ideas.detail.members")}</h3>

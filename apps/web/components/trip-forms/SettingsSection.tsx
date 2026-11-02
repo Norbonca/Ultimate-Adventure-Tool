@@ -1,7 +1,6 @@
 "use client";
 
 import type { WizardFormData } from "@/app/(app)/trips/types";
-import { TutorialHelp } from "@/components/tutorials/TutorialHelp";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import type { TranslationKey } from "@uat/i18n";
 import { Icon } from "@/components/Icon";
@@ -24,8 +23,6 @@ export function SettingsSection({ data, onChange }: SettingsSectionProps) {
 
   return (
     <div className="space-y-6">
-      {/* M211 — súgó (D21) */}
-      <div className="flex justify-end"><TutorialHelp anchor="trip.settings" /></div>
       {/* Visibility */}
       <div>
         <label className="block text-sm font-semibold text-navy-700 mb-3">

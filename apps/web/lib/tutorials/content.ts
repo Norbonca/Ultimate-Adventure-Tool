@@ -159,7 +159,7 @@ export const TUTORIALS: Tutorial[] = [
       { at: 32, text: { hu: "Elutasításnál írj rövid indoklást", en: "When rejecting, add a short reason" } },
     ],
     duration: 41,
-    anchors: ["trip.applications"],
+    anchors: ["trip.applications", "trip.crew"],
     related: ["uj-idopont", "menetrend-teendok"],
     tryHref: "/trips",
     updated: "2026-11",

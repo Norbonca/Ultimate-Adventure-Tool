@@ -428,8 +428,6 @@ export default function DiscoverClient({
 
   const viewToggle = (
     <div className="flex shrink-0 items-center gap-2">
-    {/* M211 — súgó (D21): a nézethez illő útmutató */}
-    <TutorialHelp anchor={viewMode === 'globe' ? 'discover.map' : 'discover'} variant="icon" />
     <div
       role="group"
       aria-label={t('discover.viewToggleLabel')}
@@ -479,11 +477,15 @@ export default function DiscoverClient({
         <main id="discover-results">
           {/* A gömb a saját szűrőit adja (discover-view-toggle.md), ezért itt csak a darabszám és a váltó. */}
           <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-8">
-            <p className="text-sm font-medium text-ink" data-testid="discover-count">
-              {trips.length === 0
-                ? t('discover.noTripsYet')
-                : t('discover.tripsAvailable').replace('{count}', String(trips.length))}
-            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="text-sm font-medium text-ink" data-testid="discover-count">
+                {trips.length === 0
+                  ? t('discover.noTripsYet')
+                  : t('discover.tripsAvailable').replace('{count}', String(trips.length))}
+              </p>
+              {/* M211 — súgó a címsor mellett (D21 elhelyezési szabály) */}
+              <TutorialHelp anchor="discover.map" />
+            </div>
             {viewToggle}
           </div>
           <GlobeDiscover />
@@ -628,11 +630,15 @@ export default function DiscoverClient({
 
           <main id="discover-results" className="mx-auto max-w-7xl px-4 pb-10 md:px-[120px] md:pb-16">
             <div className="flex items-center justify-between pb-3 md:pb-4">
-              <p className="text-base font-medium text-ink md:text-lg" data-testid="discover-count">
-                {filteredTrips.length === 0
-                  ? t('discover.noTripsYet')
-                  : t('discover.tripsAvailable').replace('{count}', String(cards.length))}
-              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="text-base font-medium text-ink md:text-lg" data-testid="discover-count">
+                  {filteredTrips.length === 0
+                    ? t('discover.noTripsYet')
+                    : t('discover.tripsAvailable').replace('{count}', String(cards.length))}
+                </p>
+                {/* M211 — súgó a címsor mellett (D21 elhelyezési szabály) */}
+                <TutorialHelp anchor="discover" />
+              </div>
               <label className="hidden items-center gap-2 text-sm text-ink-secondary md:flex">
                 <span>{t('discover.sortLabel')}:</span>
                 <select

@@ -20,10 +20,14 @@ import { TripFxSettings, type TripFxSettingsProps } from "@/components/expenses/
 import { CrewSection } from "@/components/trip-forms/CrewSection";
 import { StaffSeatsManager } from "@/components/trip-forms/StaffSeatsManager";
 import { ApplicationsManager, CrewMembersList } from "@/components/trip-forms/ApplicationsManager";
+import { TutorialHelp } from "@/components/tutorials/TutorialHelp";
 import { TripTimelineClient } from "@/components/TripTimelineClient";
 import { Icon } from "@/components/Icon";
 
 type TabKey = "basic" | "category" | "images" | "settings" | "timeline" | "crew";
+
+/** M211 — fülenkénti útmutató-horgony (a Menetrend fül saját súgót ad a címe mellett). */
+const TAB_HELP: Partial<Record<TabKey, string>> = { images: "trip.images", settings: "trip.settings", crew: "trip.crew" };
 
 interface CategoryDisplayInfo {
   emoji: string;
@@ -245,7 +249,7 @@ export function EditTripForm({
             staffSeatsSlot={
               <StaffSeatsManager tripId={trip.id} totalSeats={formData.staff_seats || 0} />
             }
-            applicationsSlot={<ApplicationsManager tripId={trip.id} />}
+            applicationsSlot={<ApplicationsManager tripId={trip.id} showHelp={false} />}
             membersSlot={<CrewMembersList tripId={trip.id} />}
           />
         );
@@ -287,9 +291,13 @@ export function EditTripForm({
           </span>
         </div>
 
-        <h1 className="text-2xl sm:text-3xl font-bold text-navy-900">
-          {t("trips.edit.pageTitle")}
-        </h1>
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-2xl sm:text-3xl font-bold text-navy-900">
+            {t("trips.edit.pageTitle")}
+          </h1>
+          {/* M211 — súgó a cím mellett, a megnyitott fülhöz (D21 elhelyezési szabály) */}
+          {TAB_HELP[activeTab] && <TutorialHelp anchor={TAB_HELP[activeTab]!} />}
+        </div>
         <p className="text-sm text-navy-500 mt-1">{trip.title}</p>
       </section>
 

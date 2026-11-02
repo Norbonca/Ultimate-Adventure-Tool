@@ -22,13 +22,12 @@ import { useIsLoggedIn } from "@/lib/auth/useIsLoggedIn";
 interface TutorialHelpProps {
   /** Funkció-horgony, pl. `expenses`, `trip.applications` (lib/tutorials/content.ts). */
   anchor: string;
-  variant?: "link" | "icon";
   className?: string;
 }
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select, textarea, video[controls], [tabindex]:not([tabindex="-1"])';
 
-export function TutorialHelp({ anchor, variant = "link", className = "" }: TutorialHelpProps) {
+export function TutorialHelp({ anchor, className = "" }: TutorialHelpProps) {
   const { t, locale } = useTranslation();
   const tutorials = tutorialsForAnchor(anchor);
   const [open, setOpen] = useState(false);
@@ -42,33 +41,20 @@ export function TutorialHelp({ anchor, variant = "link", className = "" }: Tutor
 
   return (
     <>
-      {variant === "icon" ? (
-        <button
-          ref={triggerRef}
-          type="button"
-          onClick={() => setOpen(true)}
-          aria-label={label}
-          aria-haspopup="dialog"
-          className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ghost text-ink hover:bg-ghost-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent ${className}`}
-          data-testid={`help-${anchor}`}
-        >
-          <Icon name="circle-question-mark" size={20} aria-hidden />
-        </button>
-      ) : (
-        <button
-          ref={triggerRef}
-          type="button"
-          onClick={() => setOpen(true)}
-          aria-label={label}
-          aria-haspopup="dialog"
-          className={`inline-flex min-h-9 items-center gap-2 rounded-full bg-ghost px-3 py-1.5 text-sm font-semibold text-ink hover:bg-ghost-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent ${className}`}
-          data-testid={`help-${anchor}`}
-        >
-          <Icon name="circle-play" size={16} aria-hidden className="text-accent" />
-          {t("tutorials.help")}
-          {single && <span className="text-xs font-medium text-ink-muted">{single.hasVideo ? formatTime(single.duration) : t("tutorials.stepsCount", { count: single.steps.length })}</span>}
-        </button>
-      )}
+      {/* Egyetlen megjelenés mindenhol (D21 `qCg43` HelpLink, 2026-11-02): kompakt „Hogyan működik?”
+          a cím mellett; a látható pirula 36 px, az érintési felület 44 px. */}
+      <button
+        ref={triggerRef}
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label={label}
+        aria-haspopup="dialog"
+        className={`relative inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-line bg-ghost px-3 text-sm font-semibold text-ink transition-colors after:absolute after:-inset-1 after:content-[''] hover:border-accent hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent ${className}`}
+        data-testid={`help-${anchor}`}
+      >
+        <Icon name="circle-play" size={16} aria-hidden className="text-accent" />
+        {t("tutorials.help")}
+      </button>
       {open && (
         <HelpDialog
           tutorials={tutorials}

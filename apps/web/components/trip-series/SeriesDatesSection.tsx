@@ -87,15 +87,17 @@ export function SeriesDatesSection({ rows, currentTripId, isOrganizer, organizer
     <section id="idopontok" className="scroll-mt-24 bg-white rounded-2xl border border-navy-200 p-6" data-testid="trip-series-dates">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="flex items-center gap-2 text-lg font-bold text-navy-900">
-            <Icon name="calendar-days" size={20} className="text-trevu-700" />
-            {t("series.datesTitle")}
-          </h2>
+          <div className="flex flex-wrap items-center gap-3">
+            <h2 className="flex items-center gap-2 text-lg font-bold text-navy-900">
+              <Icon name="calendar-days" size={20} className="text-trevu-700" />
+              {t("series.datesTitle")}
+            </h2>
+            {/* M211 — súgó a cím mellett (D21): szervezőnek az új időpont, látogatónak a jelentkezés */}
+            <TutorialHelp anchor={isOrganizer ? "series.addDate" : "trip.apply"} />
+          </div>
           <p className="mt-1 text-sm text-navy-500">{isOrganizer ? t("series.orgSubtitle") : t("series.datesSubtitle")}</p>
         </div>
         <div className="flex items-center gap-2">
-          {/* M211 — súgó (D21 `ggGyk`): szervezőnek az új időpont, látogatónak a jelentkezés */}
-          <TutorialHelp anchor={isOrganizer ? "series.addDate" : "trip.apply"} variant="icon" />
           {isOrganizer && organizer && (
             <Button variant="outline" icon="calendar-plus" onClick={() => setAddOpen(true)} data-testid="series-add-date">
               {t("series.addDate")}

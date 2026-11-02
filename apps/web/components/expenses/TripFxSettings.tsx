@@ -48,10 +48,10 @@ export function TripFxSettings(p: TripFxSettingsProps) {
   const input = "h-11 w-full rounded-trevu border border-navy-200 bg-white px-3.5 text-sm text-navy-900 disabled:bg-navy-50 disabled:text-navy-400";
   return (
     <section className="rounded-2xl border border-navy-200 bg-white p-6" data-testid="trip-fx-settings">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-navy-400">{t("expenses.settings.title")}</h3>
         {/* M211 — súgó (D21) */}
-        <TutorialHelp anchor="expenses.settings" variant="icon" />
+        <TutorialHelp anchor="expenses.settings" />
       </div>
       <p className="mt-2 text-sm text-navy-600">{t("expenses.settings.lead")}</p>
       {p.locked && (

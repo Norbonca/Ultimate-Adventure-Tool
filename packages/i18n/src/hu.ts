@@ -2753,6 +2753,27 @@ const hu = {
   // M211 — Útmutatók (D21)
   // ============================================================================
   tutorials: {
+    groups: {
+      listing: "Meghirdetés",
+      crew: "Jelentkezők és csapat",
+      timeline: "Menetrend",
+      costs: "Költségek",
+      discover: "Felfedezés és jelentkezés",
+      ideas: "Ötletbörze",
+      profile: "Profil",
+    },
+    tagFilter: "Címkék",
+    tagAll: "Összes",
+    tags: {
+      firstSteps: "Első lépések",
+      dates: "Időpontok",
+      money: "Pénz és költségek",
+      team: "Csapat",
+      settings: "Beállítások",
+      map: "Térkép és keresés",
+      community: "Közösség",
+      tasks: "Teendők",
+    },
     metaTitle: "Útmutatók",
     metaDescription: "Lépésenkénti képes bemutatók és leírások a Trevu használatáról.",
     eyebrow: "Útmutatók",

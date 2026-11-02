@@ -12,7 +12,7 @@ import { getServerT } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
 import { Icon } from "@/components/Icon";
 import { TutorialCard } from "@/components/tutorials/TutorialCard";
-import { filterTutorials, formatTime, listTutorials, loc, posterUrl, tutorialHref, type Tutorial, type TutorialRole } from "@/lib/tutorials";
+import { TUTORIAL_GROUPS, TUTORIAL_TAGS, filterTutorials, formatTime, isTutorialTag, listTutorials, loc, posterUrl, tutorialGroup, tutorialHref, tutorialTags, type Tutorial, type TutorialRole, type TutorialTag } from "@/lib/tutorials";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getServerT();
@@ -37,27 +37,27 @@ export default async function TutorialsPage({ searchParams }: PageProps) {
   const q = one(sp.q).slice(0, 80);
   const roleParam = one(sp.role);
   const role: TutorialRole | null = roleParam === "organizer" || roleParam === "traveler" ? roleParam : null;
-  const results = filterTutorials({ q, role }, locale);
-  const featured = !q && role !== "traveler" ? listTutorials().find((x) => x.featured) ?? null : null;
+  const tagParam = one(sp.tag);
+  const tag: TutorialTag | null = isTutorialTag(tagParam) ? tagParam : null;
+  const results = filterTutorials({ q, role, tag }, locale);
+  const featured = !q && !tag && role !== "traveler" ? listTutorials().find((x) => x.featured) ?? null : null;
   const rest = results.filter((x) => x.slug !== featured?.slug);
-  const groups = (
-    [
-      { role: "organizer" as const, title: t("tutorials.roleOrganizer") },
-      { role: "traveler" as const, title: t("tutorials.roleTraveler") },
-    ]
-  )
-    .map((g) => ({ ...g, items: rest.filter((x) => x.role === g.role) }))
-    .filter((g) => g.items.length > 0);
+  // Csoportok (D21 jegyzet `MsQJJ`): a lista szakaszai rögzített sorrendben.
+  const groups = TUTORIAL_GROUPS.map((key) => ({ key, title: t(`tutorials.groups.${key}`), items: rest.filter((x) => tutorialGroup(x.slug) === key) })).filter(
+    (g) => g.items.length > 0,
+  );
+  const tagLabel = (k: TutorialTag) => t(`tutorials.tags.${k}`);
 
   const roleLabel = (r: TutorialRole) => (r === "organizer" ? t("tutorials.forOrganizers") : t("tutorials.forTravelers"));
   const captionsLabel = t("tutorials.captionLanguages", { languages: t(locale === "en" ? "tutorials.language.en" : "tutorials.language.hu") });
   const badgeFor = (x: Tutorial) => (x.hasVideo ? { icon: "captions", label: captionsLabel } : { icon: "presentation", label: t("tutorials.slidesLabel") });
   const lengthFor = (x: Tutorial) => (x.hasVideo ? formatTime(x.duration) : t("tutorials.stepsCount", { count: x.steps.length }));
-  const link = (patch: { q?: string | null; role?: string | null }) => {
+  const link = (patch: { q?: string | null; role?: string | null; tag?: string | null }) => {
     const p = new URLSearchParams();
-    const next = { q: q || null, role: role as string | null, ...patch };
+    const next = { q: q || null, role: role as string | null, tag: tag as string | null, ...patch };
     if (next.q) p.set("q", next.q);
     if (next.role) p.set("role", next.role);
+    if (next.tag) p.set("tag", next.tag);
     const s = p.toString();
     return `/tutorials${s ? `?${s}` : ""}`;
   };
@@ -82,6 +82,7 @@ export default async function TutorialsPage({ searchParams }: PageProps) {
           <div className="mt-2 flex flex-col gap-3 md:flex-row md:items-center">
             <form action="/tutorials" role="search" className="flex min-w-0 items-center gap-2 rounded-full border border-line bg-surface px-4 py-1.5 md:w-[520px]">
               {role && <input type="hidden" name="role" value={role} />}
+              {tag && <input type="hidden" name="tag" value={tag} />}
               <Icon name="search" size={18} aria-hidden className="shrink-0 text-ink-muted" />
               <input
                 name="q"
@@ -112,6 +113,23 @@ export default async function TutorialsPage({ searchParams }: PageProps) {
               })}
             </nav>
           </div>
+          {/* Címkék — D21 `Pfr9d`; egy választható, a keresővel és a szereppel együtt szűkít */}
+          <nav className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:flex-wrap md:overflow-visible md:px-0" aria-label={t("tutorials.tagFilter")} data-testid="tutorials-tags">
+            {[null, ...TUTORIAL_TAGS].map((k) => {
+              const active = tag === k;
+              return (
+                <Link
+                  key={k ?? "all"}
+                  href={link({ tag: k })}
+                  aria-current={active ? "page" : undefined}
+                  data-testid={`tutorials-tag-${k ?? "all"}`}
+                  className={`inline-flex h-9 shrink-0 items-center rounded-full px-3.5 text-[13px] font-semibold transition-colors ${active ? "bg-accent text-accent-on" : "border border-line bg-ghost text-ink-secondary hover:border-accent hover:text-ink"}`}
+                >
+                  {k ? tagLabel(k) : t("tutorials.tagAll")}
+                </Link>
+              );
+            })}
+          </nav>
         </section>
 
         {/* KEZDD ITT — kiemelt útmutató */}
@@ -170,9 +188,9 @@ export default async function TutorialsPage({ searchParams }: PageProps) {
           </section>
         ) : (
           groups.map((g) => (
-            <section key={g.role} className="flex flex-col gap-4" aria-labelledby={`tutorials-${g.role}`} data-testid={`tutorials-group-${g.role}`}>
+            <section key={g.key} className="flex flex-col gap-4" aria-labelledby={`tutorials-${g.key}`} data-testid={`tutorials-group-${g.key}`}>
               <div className="flex items-baseline justify-between gap-3">
-                <h2 id={`tutorials-${g.role}`} className="text-xl font-bold text-ink md:text-2xl">
+                <h2 id={`tutorials-${g.key}`} className="text-xl font-bold text-ink md:text-2xl">
                   {g.title}
                 </h2>
                 <span className="text-sm text-ink-muted">{t("tutorials.count", { count: g.items.length })}</span>
@@ -180,7 +198,7 @@ export default async function TutorialsPage({ searchParams }: PageProps) {
               <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
                 {g.items.map((item) => (
                   <li key={item.slug}>
-                    <TutorialCard tutorial={item} locale={locale} roleLabel={roleLabel(item.role)} badge={badgeFor(item)} lengthLabel={lengthFor(item)} />
+                    <TutorialCard tutorial={item} locale={locale} roleLabel={roleLabel(item.role)} badge={badgeFor(item)} lengthLabel={lengthFor(item)} tags={tutorialTags(item.slug).map(tagLabel)} />
                   </li>
                 ))}
               </ul>

@@ -60,7 +60,7 @@ const noHScroll = async (p) => p.evaluate(() => document.documentElement.scrollW
 for (const w of [1440, 390]) {
   const p = await page(w, "hu", "dora");
   await p.goto(BASE + "/tutorials", { waitUntil: "networkidle", timeout: 120000 });
-  check(`/tutorials ${w}: kiemelt + két csoport`, (await p.getByTestId("tutorials-featured").count()) === 1 && (await p.getByTestId("tutorials-group-organizer").count()) === 1 && (await p.getByTestId("tutorials-group-traveler").count()) === 1);
+  check(`/tutorials ${w}: kiemelt + 7 csoport + címkék`, (await p.getByTestId("tutorials-featured").count()) === 1 && (await p.locator('[data-testid^="tutorials-group-"]').count()) === 7 && (await p.locator('[data-testid^="tutorials-tag-"]').count()) === 9);
   check(`/tutorials ${w}: nincs vízszintes görgetés`, await noHScroll(p));
   await p.screenshot({ path: `${OUT}/s1-lista-${w}.png`, fullPage: true });
   await p.close();
@@ -70,7 +70,11 @@ for (const w of [1440, 390]) {
 {
   const p = await page(1440, "hu", "dora");
   await p.goto(BASE + "/tutorials?role=traveler", { waitUntil: "networkidle" });
-  check("szerepszűrő: csak túrázóknak", (await p.getByTestId("tutorials-group-organizer").count()) === 0 && (await p.getByTestId("tutorials-featured").count()) === 0);
+  check("szerepszűrő: csak túrázóknak", (await p.getByTestId("tutorials-group-listing").count()) === 0 && (await p.getByTestId("tutorials-group-discover").count()) === 1 && (await p.getByTestId("tutorials-featured").count()) === 0);
+  await p.goto(BASE + "/tutorials?tag=money", { waitUntil: "networkidle" });
+  check("címkeszűrő: Pénz és költségek → csak a Költségek és a Meghirdetés csoport", (await p.getByTestId("tutorials-group-costs").count()) === 1 && (await p.getByTestId("tutorials-group-discover").count()) === 0 && (await p.getByTestId("tutorials-tag-money").getAttribute("aria-current")) === "page");
+  await p.goto(BASE + "/tutorials?tag=money&role=traveler", { waitUntil: "networkidle" });
+  check("címke + szerep együtt szűkít: üres állapot", (await p.getByTestId("tutorials-empty").count()) === 1);
   await p.goto(BASE + "/tutorials?q=koltseg", { waitUntil: "networkidle" });
   check("keresés ékezet nélkül: „koltseg” → Közös költség", (await p.getByTestId("tutorial-card-kozos-koltseg").count()) === 1);
   await p.goto(BASE + "/tutorials?q=zzzz", { waitUntil: "networkidle" });
