@@ -99,11 +99,13 @@ export default async function MyTripsPage({
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* ── Fejsor: cím + kereső + Új túra ── */}
         <div className="flex flex-wrap items-center gap-4 mb-6">
-          <h1 className="text-2xl font-extrabold text-navy-900 mr-auto">
-            {t("trips.myTripsTitle")}
-          </h1>
-          {/* M211 — súgó (D21; választó) */}
-          <TutorialHelp anchor="trips.list" variant="icon" />
+          <div className="mr-auto flex flex-wrap items-center gap-3">
+            <h1 className="text-2xl font-extrabold text-navy-900">
+              {t("trips.myTripsTitle")}
+            </h1>
+            {/* M211 — súgó a cím mellett (D21; választó) */}
+            <TutorialHelp anchor="trips.list" />
+          </div>
           <form method="GET" className="relative">
             {tab !== "active" && <input type="hidden" name="tab" value={tab} />}
             <Icon

@@ -105,12 +105,12 @@ export function TripDangerZone({ tripId, slug, title, status }: TripDangerZonePr
 
   return (
     <section className="mt-8 pt-6 border-t border-navy-200" aria-labelledby="trip-danger-title">
-      <div className="flex items-center justify-between gap-3">
-        <h3 id="trip-danger-title" className="text-base font-semibold text-navy-900 mb-3">
+      <div className="mb-3 flex flex-wrap items-center gap-3">
+        <h3 id="trip-danger-title" className="text-base font-semibold text-navy-900">
         {t("trips.deletion.sectionTitle")}
       </h3>
         {/* M211 — súgó (D21) */}
-        <TutorialHelp anchor="trip.cancel" variant="icon" />
+        <TutorialHelp anchor="trip.cancel" />
       </div>
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 rounded-xl border border-coral bg-[var(--color-danger-subtle)] px-5 py-4">
         <div className="flex-1 min-w-0">

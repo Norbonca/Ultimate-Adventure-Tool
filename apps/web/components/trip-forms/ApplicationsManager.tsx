@@ -101,7 +101,7 @@ const btnSecondary = `${btnBase} border border-navy-200 bg-white text-navy-700 h
 const btnDangerOutline = `${btnBase} border border-navy-200 bg-white text-red-600 hover:bg-red-50`;
 const btnDanger = `${btnBase} bg-red-500 text-white hover:bg-red-600`;
 
-export function ApplicationsManager({ tripId, initial }: ApplicationsManagerProps) {
+export function ApplicationsManager({ tripId, initial, showHelp = true }: ApplicationsManagerProps & { showHelp?: boolean }) {
   const { t, locale } = useTranslation();
   const router = useRouter();
   const [rows, setRows] = useParticipants(tripId, initial);
@@ -149,7 +149,7 @@ export function ApplicationsManager({ tripId, initial }: ApplicationsManagerProp
   return (
     <div className="space-y-2">
       {/* M211 — súgó a funkcióban (D21 `ggGyk`, választó: `e9ero8`) */}
-      {pending.length > 0 && (
+      {showHelp && pending.length > 0 && (
         <div className="flex justify-end">
           <TutorialHelp anchor="trip.applications" />
         </div>

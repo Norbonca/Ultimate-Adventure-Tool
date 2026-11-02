@@ -4,6 +4,9 @@
  */
 
 import { TUTORIALS, type Localized, type Tutorial, type TutorialLocale, type TutorialRole } from "./content";
+import { tutorialTags, type TutorialTag } from "./taxonomy";
+
+export * from "./taxonomy";
 
 export type { Localized, Tutorial, TutorialLocale, TutorialRole, TutorialStep } from "./content";
 
@@ -46,6 +49,7 @@ export const normalizeSearch = (value: string) =>
 export interface TutorialFilter {
   q?: string | null;
   role?: TutorialRole | null;
+  tag?: TutorialTag | null;
 }
 
 export function filterTutorials(filter: TutorialFilter, locale: string): Tutorial[] {
@@ -53,6 +57,7 @@ export function filterTutorials(filter: TutorialFilter, locale: string): Tutoria
   const words = q.split(/\s+/).filter(Boolean);
   return TUTORIALS.filter((t) => {
     if (filter.role && t.role !== filter.role) return false;
+    if (filter.tag && !tutorialTags(t.slug).includes(filter.tag)) return false;
     if (words.length === 0) return true;
     const hay = normalizeSearch(
       [loc(t.title, locale), loc(t.summary, locale), loc(t.topic, locale), ...t.steps.map((s) => loc(s.text, locale))].join(" "),

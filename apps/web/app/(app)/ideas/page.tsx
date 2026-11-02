@@ -70,7 +70,11 @@ export default async function IdeasBoardPage({ searchParams }: PageProps) {
         <div aria-hidden className="absolute inset-0 bg-hero-scrim-mobile md:bg-hero-scrim" />
         <div className="relative mx-auto flex min-h-[320px] max-w-7xl flex-col justify-end gap-4 px-5 pb-8 pt-24 md:min-h-[420px] md:px-8 md:pb-10">
           <p className="text-sm font-medium text-ink-secondary">{t("ideas.board.stats", { count: total })}</p>
-          <h1 className="max-w-[720px] text-hero-display-mobile text-ink [text-wrap:balance] md:text-hero-display">{t("ideas.board.title")}</h1>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <h1 className="max-w-[720px] text-hero-display-mobile text-ink [text-wrap:balance] md:text-hero-display">{t("ideas.board.title")}</h1>
+            {/* M211 — súgó a cím mellett (D21 elhelyezési szabály) */}
+            <TutorialHelp anchor="ideas" />
+          </div>
           <p className="hidden max-w-[720px] text-lg text-ink-body md:block">{t("ideas.board.subtitle")}</p>
           <form action="/ideas" className="flex max-w-[720px] items-center gap-2 rounded-full border border-line bg-surface/80 px-4 py-2 backdrop-blur" role="search">
             {filters.category && <input type="hidden" name="category" value={filters.category} />}
@@ -100,8 +104,6 @@ export default async function IdeasBoardPage({ searchParams }: PageProps) {
             })}
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            {/* M211 — súgó (D21) */}
-            <TutorialHelp anchor="ideas" variant="icon" />
             <div className="inline-flex rounded-trevu bg-ghost p-1" role="group" aria-label={t("ideas.board.intentFilter")}>
               {intents.map((i) => (
                 <Link key={i.key ?? "all"} href={link({ intent: i.key, offer: null, page: null })} className={`inline-flex h-8 items-center gap-1.5 rounded-[8px] px-3 text-xs font-semibold ${filters.intent === i.key && !filters.hasOffer ? "bg-surface text-ink" : "text-ink-secondary"}`}>

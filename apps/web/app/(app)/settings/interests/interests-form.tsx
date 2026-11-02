@@ -150,12 +150,12 @@ export function InterestsForm({ categories, subDisciplines, initialInterests, in
 
   return (
     <div className="rounded-2xl border border-navy-200 bg-white p-8">
-      <div className="mb-2 flex items-center justify-between gap-3">
+      <div className="mb-2 flex flex-wrap items-center gap-3">
         <h1 className="text-[22px] font-bold text-navy-900">
           {t('settings.interests.title')}
         </h1>
         {/* M211 — súgó (D21) */}
-        <TutorialHelp anchor="settings.skills" variant="icon" />
+        <TutorialHelp anchor="settings.skills" />
       </div>
       <p className="text-sm text-navy-500 leading-relaxed mb-2">
         {t('settings.interests.description')}
