@@ -85,7 +85,7 @@ export const SLIDES: Slide[] = [
   {
     id: "terkep",
     kind: "cards",
-    tone: "light",
+    tone: "dark",
     columns: 3,
     eyebrow: l("Egy felület, kilenc szolgáltatás", "One platform, nine services"),
     title: l("Minden, ami egy túra szervezéséhez kell", "Everything you need to organize a trip"),
@@ -104,7 +104,7 @@ export const SLIDES: Slide[] = [
   {
     id: "varazslo",
     kind: "split",
-    tone: "light",
+    tone: "dark",
     eyebrow: l("Túraszervezés", "Trip organizing"),
     title: l("Túra létrehozása varázslóval", "Create a trip with the wizard"),
     lead: l(
@@ -121,7 +121,7 @@ export const SLIDES: Slide[] = [
   {
     id: "sorozat",
     kind: "split",
-    tone: "light",
+    tone: "dark",
     eyebrow: l("Túrasorozat", "Trip series"),
     title: l("Ugyanaz a túra, több időpontban", "The same trip on multiple dates"),
     lead: l(
@@ -138,7 +138,7 @@ export const SLIDES: Slide[] = [
   {
     id: "csapat",
     kind: "split",
-    tone: "light",
+    tone: "dark",
     eyebrow: l("Csapat és jelentkezők", "Crew and applicants"),
     title: l("Te döntöd el, ki jön a túrára", "You decide who joins the trip"),
     lead: l(
@@ -155,7 +155,7 @@ export const SLIDES: Slide[] = [
   {
     id: "idovonal",
     kind: "split",
-    tone: "light",
+    tone: "dark",
     eyebrow: l("Menetrend", "Timeline"),
     title: l("Minden teendő a helyén", "Every task in its place"),
     lead: l(
@@ -172,7 +172,7 @@ export const SLIDES: Slide[] = [
   {
     id: "koltsegek",
     kind: "split",
-    tone: "light",
+    tone: "dark",
     eyebrow: l("Költségmegosztás", "Cost sharing"),
     title: l("Közös költségek, átláthatóan", "Shared costs, crystal clear"),
     lead: l(
@@ -190,7 +190,7 @@ export const SLIDES: Slide[] = [
   {
     id: "naptar",
     kind: "split",
-    tone: "light",
+    tone: "dark",
     eyebrow: l("Naptár és időzóna", "Calendar and time zone"),
     title: l("Ünnepek és időzónák, előre jelezve", "Holidays and time zones, flagged in advance"),
     lead: l(
@@ -207,7 +207,7 @@ export const SLIDES: Slide[] = [
   {
     id: "otletborze",
     kind: "split",
-    tone: "light",
+    tone: "dark",
     eyebrow: l("Ötletbörze", "Idea board"),
     title: l("Megmutatja, mire várnak a kalandorok", "Shows what adventurers are waiting for"),
     lead: l(
@@ -225,7 +225,7 @@ export const SLIDES: Slide[] = [
   {
     id: "felfedezes",
     kind: "split",
-    tone: "light",
+    tone: "dark",
     eyebrow: l("Felfedezés", "Discover"),
     title: l("Itt talál rád a résztvevő", "Where participants find you"),
     lead: l(
@@ -256,7 +256,7 @@ export const SLIDES: Slide[] = [
   {
     id: "turaoldal",
     kind: "split",
-    tone: "light",
+    tone: "dark",
     eyebrow: l("Túraoldal és jelentkezés", "Trip page and applying"),
     title: l("Jelentkezés a választott időpontra", "Apply for the chosen date"),
     lead: l(
@@ -273,7 +273,7 @@ export const SLIDES: Slide[] = [
   {
     id: "profil",
     kind: "split",
-    tone: "light",
+    tone: "dark",
     eyebrow: l("Profil", "Profile"),
     title: l("Érdeklődés és tapasztalat a profilban", "Interests and experience in your profile"),
     lead: l("Kategóriánként és alkategóriánként, kezdőtől profiig.", "By category and subcategory, from beginner to pro."),
@@ -304,7 +304,7 @@ export const SLIDES: Slide[] = [
   {
     id: "biztonsag",
     kind: "cards",
-    tone: "light",
+    tone: "dark",
     columns: 2,
     eyebrow: l("Biztonság és adatkezelés", "Security and data handling"),
     title: l("Minden adatot csak az lát, akire tartozik", "Every piece of data is visible only to those it concerns"),
@@ -318,7 +318,7 @@ export const SLIDES: Slide[] = [
   {
     id: "kovetkezik",
     kind: "cards",
-    tone: "light",
+    tone: "dark",
     columns: 3,
     eyebrow: l("Fejlesztési terv", "Roadmap"),
     title: l("Ami még jön", "What's coming next"),
@@ -334,7 +334,7 @@ export const SLIDES: Slide[] = [
   {
     id: "csomagok",
     kind: "split",
-    tone: "light",
+    tone: "dark",
     badge: l("Most minden funkció ingyenes", "Every feature is free right now"),
     eyebrow: l("Csomagok", "Plans"),
     title: l("Személyes használatra ingyenes", "Free for personal use"),
