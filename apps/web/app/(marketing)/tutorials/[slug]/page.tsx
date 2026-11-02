@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale } = await getServerT();
   const title = loc(tutorial.title, locale);
   const description = loc(tutorial.summary, locale);
-  return { title, description, openGraph: { title, description, images: [posterUrl(tutorial.slug)] } };
+  return { title, description, robots: { index: false, follow: false }, openGraph: { title, description, images: [posterUrl(tutorial.slug)] } };
 }
 
 export default async function TutorialDetailPage({ params }: PageProps) {

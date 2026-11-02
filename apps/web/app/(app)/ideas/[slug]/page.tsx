@@ -4,6 +4,7 @@
  * az „nem található” (E-M22-041) — az adat nem szivárog.
  */
 
+import { pageMeta } from "@/lib/seo";
 import type { Metadata } from "next";
 import { TutorialHelp } from "@/components/tutorials/TutorialHelp";
 import Link from "next/link";
@@ -32,7 +33,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const idea = await getIdeaBySlug(slug);
   if (!idea) return { title: "Ötletbörze" };
   const noindex = idea.visibility !== "public";
-  return { title: idea.title, description: idea.description?.slice(0, 160) ?? undefined, robots: noindex ? { index: false, follow: false } : undefined };
+  return pageMeta({
+    title: idea.title,
+    description: idea.description?.slice(0, 160) || "Túraötlet a Trevu Ötletbörzéjén — csatlakozz, vagy szervezd meg.",
+    path: `/ideas/${slug}`,
+    type: "article",
+    noindex,
+  });
 }
 
 export default async function IdeaDetailPage({ params }: Props) {

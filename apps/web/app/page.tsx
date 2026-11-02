@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { pageMeta, SITE_NAME } from "@/lib/seo";
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORY_DISPLAY, DIFFICULTY_LEVELS } from "@/lib/categories";
 import {
@@ -8,11 +9,13 @@ import {
 } from "@/lib/discover-view";
 import DiscoverClient from "./discover-client";
 
-export const metadata = {
-  title: "Trevu — Adventure Trip Planner",
+export const metadata = pageMeta({
+  title: `${SITE_NAME} — Túrák felfedezése`,
+  absoluteTitle: true,
   description:
-    "Browse and organize adventure trips across Central Europe. Hiking, climbing, sailing, cycling and more.",
-};
+    "Kis csoportos kalandtúrák 8 kategóriában: keress hely, idő és túratípus szerint, csempe-, lista- vagy 3D-térképnézetben, és jelentkezz a választott időpontra.",
+  path: "/",
+});
 
 async function fetchPublishedTrips() {
   const supabase = await createClient();

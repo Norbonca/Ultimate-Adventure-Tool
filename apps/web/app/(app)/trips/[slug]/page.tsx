@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import { TutorialHelp } from "@/components/tutorials/TutorialHelp";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
@@ -39,22 +40,15 @@ export async function generateMetadata({ params }: TripDetailPageProps): Promise
 
   const cover = (trip.cover_image_url as string | null) || null;
 
-  return {
+  const isPublic = trip.status === "published" && trip.visibility === "public";
+  return pageMeta({
     title: trip.title as string,
     description,
-    openGraph: {
-      title: trip.title as string,
-      description,
-      type: "article",
-      ...(cover ? { images: [{ url: cover, width: 1200, height: 630, alt: trip.title as string }] } : {}),
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: trip.title as string,
-      description,
-      ...(cover ? { images: [cover] } : {}),
-    },
-  };
+    path: `/trips/${slug}`,
+    type: "article",
+    ...(cover ? { image: { url: cover, alt: trip.title as string } } : {}),
+    noindex: !isPublic,
+  });
 }
 
 export default async function TripDetailPage({ params }: TripDetailPageProps) {

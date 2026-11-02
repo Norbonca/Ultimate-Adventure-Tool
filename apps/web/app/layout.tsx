@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from "@/lib/seo";
 import "@/styles/globals.css";
 import { cookies } from "next/headers";
 import type { Locale } from "@uat/i18n";
@@ -11,11 +12,11 @@ const SITE_URL =
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Trevu — Trek Beyond Ordinary",
+    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
     template: "%s · Trevu",
   },
-  description:
-    "Discover, plan, and share unforgettable outdoor adventures. Trevu connects adventurers with expert-led trips across hiking, climbing, sailing, and more.",
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
   keywords: [
     "trevu",
     "adventure",
@@ -28,19 +29,17 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     type: "website",
-    siteName: "Trevu",
-    title: "Trevu — Trek Beyond Ordinary",
-    description:
-      "Discover, plan, and share unforgettable outdoor adventures. Trevu connects adventurers with expert-led trips across hiking, climbing, sailing, and more.",
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
     url: SITE_URL,
     locale: "hu_HU",
     alternateLocale: ["en_US"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Trevu — Trek Beyond Ordinary",
-    description:
-      "Discover, plan, and share unforgettable outdoor adventures.",
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
   },
   robots: {
     index: true,

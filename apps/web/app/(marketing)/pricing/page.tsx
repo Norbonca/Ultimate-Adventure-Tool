@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/Button";
+import { pageMeta } from "@/lib/seo";
 import { getServerT } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
 import { Icon } from "@/components/Icon";
@@ -15,6 +16,12 @@ const TIERS: Tier[] = [
   { key: "business",   ctaHref: "/get-started?tier=business" },
   { key: "enterprise", ctaHref: "mailto:hello@ttvk.hu" },
 ];
+
+export const metadata = pageMeta({
+  title: "Árazás",
+  description: "Személyes használatra ingyenes. Előfizetést az fizet, aki üzletszerűen szervez; költségmegosztó túrákhoz a Trevu ingyenes.",
+  path: "/pricing",
+});
 
 export default async function PricingPage() {
   const { t } = await getServerT();
