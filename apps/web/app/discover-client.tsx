@@ -52,6 +52,8 @@ import { buildTripSearchText, createTripSearch } from '@/lib/trip-search';
 import { matchesAdvanced, NO_FILTERS, type AdvancedFilters, type Choice } from '@/lib/discover-filters';
 import { groupTripsForDiscover, todayUtc, type DiscoverCard } from '@/lib/trip-series';
 import { TutorialHelp } from '@/components/tutorials/TutorialHelp';
+import { PresentationPromo } from '@/components/presentation/PresentationPromo';
+import { useAuthState } from '@/lib/auth/useAuthState';
 
 // The globe (d3-geo + tiles) only runs in the browser and is a large chunk —
 // load it on demand so the list view never pays for it.
@@ -184,6 +186,7 @@ export default function DiscoverClient({
   initialView = DEFAULT_DISCOVER_VIEW,
 }: DiscoverClientProps) {
   const { t, locale } = useTranslation();
+  const auth = useAuthState(); // M211b: a promó blokk csak kijelentkezve
   const intlLocale = locale === 'en' ? 'en-US' : 'hu-HU';
 
   const [viewMode, setViewMode] = useState<DiscoverView>(initialView);
@@ -811,6 +814,9 @@ export default function DiscoverClient({
           </main>
         </>
       )}
+
+      {/* M211b — promó blokk a szervezői bemutatóhoz: csak kijelentkezett látogatónak (D09 „M211b — Promó blokk”). */}
+      {viewMode !== 'globe' && auth === 'out' && <PresentationPromo />}
 
       {/* CTA — Night sáv, Dawn Gradient gomb. Norbert 2026-09-16: az alsó fehér (Day) sáv megszűnik.
           3D térkép nézetben nincs: ott a térkép a teljes képernyőt kitölti, és az oldal nem görgethető
