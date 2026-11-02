@@ -174,7 +174,7 @@ export const SLIDES: Slide[] = [
     kind: "split",
     tone: "light",
     eyebrow: l("Költségmegosztás", "Cost sharing"),
-    title: l("Közös költségek, vita nélkül", "Shared costs, no arguments"),
+    title: l("Közös költségek, átláthatóan", "Shared costs, crystal clear"),
     lead: l(
       "Ki mit fizetett, és ki kinek mennyivel tartozik – a túra pénznemében.",
       "Who paid for what, and who owes whom how much – in the trip's currency.",
