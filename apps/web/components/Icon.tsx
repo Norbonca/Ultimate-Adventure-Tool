@@ -165,8 +165,12 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   siren: L.Siren,
   star: L.Star,
   // admin
+  activity: L.Activity,
   "bar-chart-3": L.BarChart3,
+  "calendar-clock": L.CalendarClock,
   database: L.Database,
+  "hard-drive": L.HardDrive,
+  server: L.Server,
   "settings-2": L.Settings2,
   shield: L.Shield,
   "shield-check": L.ShieldCheck,

@@ -78,14 +78,6 @@ export default async function DashboardPage() {
             </p>
           </div>
         </div>
-
-        {/* Status */}
-        <div className="p-4 rounded-xl bg-trevu-50 border border-trevu-200">
-          <p className="text-sm text-trevu-800">
-            <span className="font-semibold">{t('dashboard.systemStatus')}:</span>{" "}
-            {t('dashboard.systemStatusText')}
-          </p>
-        </div>
       </div>
     </main>
   );

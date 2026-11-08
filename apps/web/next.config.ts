@@ -1,9 +1,31 @@
 import type { NextConfig } from "next";
+import { readdirSync } from "node:fs";
+import { join } from "node:path";
 import { withSentryConfig } from "@sentry/nextjs";
+
+/**
+ * M151 Rendszerállapot: a telepített kód migrációs fájljainak verziói buildkor rögzítve
+ * („001,002,…”) — az admin ezt veti össze az éles adatbázis lefutott migrációival.
+ * Ha a mappa nem érhető el (pl. a build csak az apps/web-et látja), üres → „nem ellenőrizhető”.
+ */
+function listMigrationVersions(): string {
+  try {
+    return readdirSync(join(process.cwd(), "../../supabase/migrations"))
+      .filter((f) => /^\d+_.+\.sql$/.test(f))
+      .map((f) => f.split("_")[0])
+      .sort()
+      .join(",");
+  } catch {
+    return "";
+  }
+}
 
 const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: false,
+  },
+  env: {
+    TREVU_EXPECTED_MIGRATIONS: listMigrationVersions(),
   },
   async redirects() {
     return [

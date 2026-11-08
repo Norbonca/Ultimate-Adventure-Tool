@@ -27,7 +27,7 @@ export default async function AdminLayout({
   };
 
   return (
-    <div data-surface="day" className="flex min-h-screen bg-slate-900">
+    <div data-surface="day" className="flex min-h-screen flex-col bg-slate-900 md:flex-row">
       <AdminSidebar user={sidebarUser} />
       <main className="flex-1 bg-slate-50 overflow-auto">
         {children}
