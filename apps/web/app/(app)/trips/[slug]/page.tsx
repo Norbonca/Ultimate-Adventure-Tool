@@ -23,6 +23,8 @@ import { CalendarAlerts, CalendarBadge, DualTime } from "@/components/calendar/C
 import { CoverImage } from "@/components/ui/CoverImage";
 import { fetchTripBySlugForAdmin } from "@/lib/admin-auth";
 import { getIdeaForTrip } from "@/lib/ideas/queries";
+import { ShareButton } from "@/components/share/ShareButton";
+import { isTripPublic, plainExcerpt, tripOgImagePath } from "@/lib/share/trip-share";
 
 interface TripDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -33,20 +35,21 @@ export async function generateMetadata({ params }: TripDetailPageProps): Promise
   const trip = (await fetchTripBySlug(slug)) ?? (await fetchTripBySlugForAdmin(slug));
   if (!trip) return {};
 
+  // FR-M02-010: formázásmentes, ≤ 200 karakteres leírás; a túra saját megosztóképe (1200×630).
   const description =
-    (trip.short_description as string | null) ||
-    (typeof trip.description === "string" ? trip.description.slice(0, 200) : null) ||
+    plainExcerpt(trip.short_description as string | null) ||
+    plainExcerpt(typeof trip.description === "string" ? trip.description : null) ||
     "Fedezd fel ezt a kalandot a Trevu-n.";
 
-  const cover = (trip.cover_image_url as string | null) || null;
-
-  const isPublic = trip.status === "published" && trip.visibility === "public";
+  const isPublic = isTripPublic(trip);
   return pageMeta({
     title: trip.title as string,
     description,
     path: `/trips/${slug}`,
     type: "article",
-    ...(cover ? { image: { url: cover, alt: trip.title as string } } : {}),
+    ...(isPublic
+      ? { image: { url: tripOgImagePath(slug, trip.updated_at as string | null), width: 1200, height: 630, alt: trip.title as string } }
+      : {}),
     noindex: !isPublic,
   });
 }
@@ -301,8 +304,17 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
             <Icon name="camera" size={12} className="-mt-0.5 mr-1 inline" />{t("imagePicker.ownPhoto")}
           </span>
         )}
-        <div className="relative mx-auto max-w-7xl px-5 pt-3 md:px-[120px]">
+        {/* Felső sáv: Vissza + Megosztás (FR-M02-010; terv: #ScGu5 1440, #TWPUa 390) */}
+        <div className="relative mx-auto flex max-w-7xl items-center justify-between gap-3 px-5 pt-3 md:px-[120px]">
           <BackButtonNight fallback="/" label={t('common.back')} />
+          {isTripPublic(trip) && (
+            <ShareButton
+              slug={slug}
+              title={trip.title as string}
+              imageUrl={trip.cover_image_url as string | null}
+              metaLine={[startDate && (endDate && startDate !== endDate ? `${startDate} – ${endDate}` : startDate), [trip.location_city, trip.location_country].filter(Boolean).join(", ")].filter(Boolean).join(" · ")}
+            />
+          )}
         </div>
         <div className="relative mx-auto flex min-h-[300px] max-w-7xl flex-col justify-end gap-6 px-5 pb-8 pt-6 md:min-h-[460px] md:flex-row md:items-end md:justify-between md:px-[120px] md:pb-12">
           <div className="flex max-w-[760px] flex-col gap-3.5">

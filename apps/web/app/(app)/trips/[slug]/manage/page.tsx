@@ -13,6 +13,7 @@ import { getServerT, getServerLocale } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
 import { BackButton } from "@/components/BackButton";
 import { TripShareButton } from "@/components/TripShareButton";
+import { isTripPublic } from "@/lib/share/trip-share";
 import { TripTimelineClient } from "@/components/TripTimelineClient";
 import { Icon } from "@/components/Icon";
 import { formatMoney } from "@/lib/currency";
@@ -170,7 +171,7 @@ export default async function TripManagePage({ params }: ManagePageProps) {
             >
               <Icon name="pencil" size={15} /> {t("trips.manage.editTrip")}
             </Link>
-            <TripShareButton slug={slug} title={trip.title} />
+            <TripShareButton slug={slug} title={trip.title} isPublic={isTripPublic(trip)} imageUrl={trip.cover_image_url ?? null} />
             <Link
               href={`/trips/${slug}`}
               className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm font-medium text-navy-600 bg-white border border-navy-200 rounded-xl hover:bg-navy-50 transition-colors"
