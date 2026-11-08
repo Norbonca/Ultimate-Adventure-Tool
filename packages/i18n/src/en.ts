@@ -854,10 +854,38 @@ const en: TranslationKeys = {
       removed: "Removed",
     },
 
+    // Trip sharing (FR-M02-010; D02 bXK2G)
+    share: {
+      button: "Share",
+      title: "Share this trip",
+      close: "Close",
+      copy: "Copy link",
+      copied: "Copied",
+      copiedStatus: "Link copied — paste it anywhere.",
+      copyFailed: "Couldn't copy automatically. Select the link and copy it.",
+      linkLabel: "Trip link",
+      hint: "People who click the shared link land on the trip page.",
+      notPublicHint: "This trip isn't public yet: the link only opens for people with access.",
+      more: "More",
+      openIn: "Share on {platform} (opens in a new tab)",
+      message: "{title} — check it out on Trevu!",
+      emailSubject: "Trip tip: {title}",
+      platform: {
+        facebook: "Facebook",
+        whatsapp: "WhatsApp",
+        x: "X",
+        telegram: "Telegram",
+        email: "Email",
+      },
+      og: {
+        free: "Free",
+        perPerson: "/ person",
+        days: "{count} days",
+        alt: "{title} — a trip on Trevu",
+      },
+    },
+
     manage: {
-      linkCopied: "Link copied.",
-      copyLinkManually: "Could not copy. Select and copy the link below.",
-      tripLink: "Trip link",
       timeline: "Trip Timeline",
       addPhase: "+ Add Phase",
       crewProgress: "Crew Progress",

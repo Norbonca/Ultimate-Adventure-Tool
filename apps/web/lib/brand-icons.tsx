@@ -4,13 +4,22 @@
  * (CC0) React-csomagja. A Google „G” az egyetlen saját SVG: a Simple Icons Google-jele egyszínű, a bejelentkező
  * gomb a hivatalos négyszínű jelet használja (Google identity guidelines).
  *
- * Kulcsok (Icon Bank 0.6 „Márkaikonok”): brand.facebook · brand.instagram · brand.x · brand.youtube · brand.google
+ * Kulcsok (Icon Bank 1.2b „Márkaikonok”): brand.facebook · brand.instagram · brand.x · brand.youtube · brand.google ·
+ * brand.whatsapp · brand.telegram (túramegosztás, FR-M02-010)
  * Használat: <BrandIcon name="brand.instagram" size={20} className="…" />
  */
 
-import { SiFacebook, SiInstagram, SiX, SiYoutube, type IconType } from "@icons-pack/react-simple-icons";
+import { SiFacebook, SiInstagram, SiTelegram, SiWhatsapp, SiX, SiYoutube, type IconType } from "@icons-pack/react-simple-icons";
 
-export const BRAND_ICON_KEYS = ["brand.facebook", "brand.instagram", "brand.x", "brand.youtube", "brand.google"] as const;
+export const BRAND_ICON_KEYS = [
+  "brand.facebook",
+  "brand.instagram",
+  "brand.x",
+  "brand.youtube",
+  "brand.google",
+  "brand.whatsapp",
+  "brand.telegram",
+] as const;
 export type BrandIconName = (typeof BRAND_ICON_KEYS)[number];
 
 function GoogleMark({ size = 20, className }: { size?: number; className?: string }) {
@@ -29,6 +38,8 @@ const SIMPLE: Record<Exclude<BrandIconName, "brand.google">, IconType> = {
   "brand.instagram": SiInstagram,
   "brand.x": SiX,
   "brand.youtube": SiYoutube,
+  "brand.whatsapp": SiWhatsapp,
+  "brand.telegram": SiTelegram,
 };
 
 interface BrandIconProps {

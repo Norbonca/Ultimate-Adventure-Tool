@@ -875,11 +875,39 @@ const hu = {
       removed: "Eltávolítva",
     },
 
+    // Túramegosztás (FR-M02-010; D02 bXK2G)
+    share: {
+      button: "Megosztás",
+      title: "Túra megosztása",
+      close: "Bezárás",
+      copy: "Link másolása",
+      copied: "Másolva",
+      copiedStatus: "Link másolva — beillesztheted bárhová.",
+      copyFailed: "Nem sikerült automatikusan másolni. Jelöld ki a linket, és másold ki.",
+      linkLabel: "A túra linkje",
+      hint: "A megosztott linkre kattintók a túra oldalára érkeznek.",
+      notPublicHint: "A túra még nem nyilvános: a link csak a jogosultaknak nyílik meg.",
+      more: "Továbbiak",
+      openIn: "Megosztás: {platform} (új lapon nyílik)",
+      message: "{title} — nézd meg a Trevu-n!",
+      emailSubject: "Túraajánló: {title}",
+      platform: {
+        facebook: "Facebook",
+        whatsapp: "WhatsApp",
+        x: "X",
+        telegram: "Telegram",
+        email: "E-mail",
+      },
+      og: {
+        free: "Ingyenes",
+        perPerson: "/ fő",
+        days: "{count} nap",
+        alt: "{title} — túra a Trevu-n",
+      },
+    },
+
     // Organizer dashboard (/trips/[slug]/manage)
     manage: {
-      linkCopied: "A link a vágólapra került.",
-      copyLinkManually: "A másolás nem sikerült. Jelöld ki és másold ki a linket.",
-      tripLink: "Túra linkje",
       timeline: "Túra menetrend",
       addPhase: "+ Fázis hozzáadása",
       crewProgress: "Legénység állapota",

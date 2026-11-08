@@ -216,3 +216,41 @@ export {
 // `lib/brand-icons.tsx` (Simple Icons), Icon Bank 0.6. Nem innen exportáljuk, hogy a kapu egyértelmű maradjon.
 
 export type { LucideIcon } from 'lucide-react';
+
+// ── Ikon-geometria szerveroldali rajzoláshoz (ImageResponse, FR-M02-010) ──────
+// A lucide-react komponensei kliens-komponensek, a megosztókép (app/og/trips/[slug]) nem hívhatja őket;
+// ott az ikonmodul nyers geometriáját (`__iconData.node`) rajzoljuk <svg>-ként. Csak az itt felsorolt
+// kulcsok érhetők el: a megosztókép metasora és a kategóriák ikonjai (lib/categories.ts).
+import * as IcCalendar from 'lucide-react/icons/calendar';
+import * as IcMapPin from 'lucide-react/icons/map-pin';
+import * as IcHourglass from 'lucide-react/icons/hourglass';
+import * as IcBike from 'lucide-react/icons/bike';
+import * as IcCompass from 'lucide-react/icons/compass';
+import * as IcFootprints from 'lucide-react/icons/footprints';
+import * as IcGauge from 'lucide-react/icons/gauge';
+import * as IcMountain from 'lucide-react/icons/mountain';
+import * as IcPersonStanding from 'lucide-react/icons/person-standing';
+import * as IcSnowflake from 'lucide-react/icons/snowflake';
+import * as IcWaves from 'lucide-react/icons/waves';
+
+export type IconNode = [string, Record<string, string>][];
+
+const SVG_ICON_MODULES: Record<string, unknown> = {
+  calendar: IcCalendar,
+  'map-pin': IcMapPin,
+  hourglass: IcHourglass,
+  bike: IcBike,
+  compass: IcCompass,
+  footprints: IcFootprints,
+  gauge: IcGauge,
+  mountain: IcMountain,
+  'person-standing': IcPersonStanding,
+  snowflake: IcSnowflake,
+  waves: IcWaves,
+};
+
+/** A kulcs lucide-geometriája (24×24-es viewBox), vagy null, ha a kulcs nincs a fenti listában. */
+export function iconSvgNode(name: string): IconNode | null {
+  const mod = SVG_ICON_MODULES[name] as { __iconData?: { node?: IconNode } } | undefined;
+  return mod?.__iconData?.node ?? null;
+}
