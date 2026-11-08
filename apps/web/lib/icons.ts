@@ -231,7 +231,9 @@ import * as IcGauge from 'lucide-react/icons/gauge';
 import * as IcMountain from 'lucide-react/icons/mountain';
 import * as IcPersonStanding from 'lucide-react/icons/person-standing';
 import * as IcSnowflake from 'lucide-react/icons/snowflake';
-import * as IcWaves from 'lucide-react/icons/waves';
+// A lucide 1.x `waves` modulja csak álnév (`export { default } from './waves-horizontal.mjs'`),
+// geometriát nem exportál — a kanonikus modulból vesszük.
+import * as IcWaves from 'lucide-react/icons/waves-horizontal';
 
 export type IconNode = [string, Record<string, string>][];
 
@@ -249,7 +251,10 @@ const SVG_ICON_MODULES: Record<string, unknown> = {
   waves: IcWaves,
 };
 
-/** A kulcs lucide-geometriája (24×24-es viewBox), vagy null, ha a kulcs nincs a fenti listában. */
+/**
+ * A kulcs lucide-geometriája (24×24-es viewBox), vagy null, ha a kulcs nincs a fenti listában.
+ * Új kulcsnál a modul legyen kanonikus (saját `__iconData`), ne álnév — a `test/unit/icon-svg-node.test.ts` ellenőrzi.
+ */
 export function iconSvgNode(name: string): IconNode | null {
   const mod = SVG_ICON_MODULES[name] as { __iconData?: { node?: IconNode } } | undefined;
   return mod?.__iconData?.node ?? null;
