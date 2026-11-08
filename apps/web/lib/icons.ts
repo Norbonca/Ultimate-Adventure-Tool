@@ -158,8 +158,12 @@ export {
   Star,
 
   // ── Admin (§11) ───────────────────────────────────────────────
+  Activity,
   BarChart3,
+  CalendarClock,
   Database,
+  HardDrive,
+  Server,
   Settings2,
   Shield,
   ShieldCheck,

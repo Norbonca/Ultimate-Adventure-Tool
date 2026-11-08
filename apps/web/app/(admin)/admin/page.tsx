@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getServerT } from "@/lib/i18n/server";
 import { getAdminStats } from "./actions";
 import { Icon } from "@/components/Icon";
+import { SystemStatusStrip } from "@/components/admin/system-status/SystemStatusStrip";
 
 export default async function AdminDashboardPage() {
   const { t } = await getServerT();
@@ -78,6 +79,9 @@ export default async function AdminDashboardPage() {
           {t("admin.dashboard.subtitle")}
         </p>
       </div>
+
+      {/* M151 Rendszerállapot — design/D15_Admin.pen#sF2Ao (sáv: #Q3MGZ9, mobil: #tbHY4) */}
+      <SystemStatusStrip />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">

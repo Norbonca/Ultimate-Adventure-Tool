@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/useTranslation";
@@ -31,6 +32,7 @@ interface NavGroup {
 export function AdminSidebar({ user }: AdminSidebarProps) {
   const pathname = usePathname();
   const { t } = useTranslation();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const navGroups: NavGroup[] = [
     {
@@ -50,7 +52,8 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
         { key: "overview", label: t("admin.nav.overview"), href: "/admin", icon: "layout-dashboard" },
         { key: "traffic", label: t("admin.nav.traffic"), href: "/admin/traffic", icon: "trending-up", comingSoon: true },
         { key: "finance", label: t("admin.nav.finance"), href: "/admin/finance", icon: "wallet", comingSoon: true },
-        { key: "performance", label: t("admin.nav.performance"), href: "/admin/performance", icon: "zap", comingSoon: true },
+        // M151 — a „Teljesítmény” (p95, hibaarány) V2; az állapot V1-e él (design/D15_Admin.pen#ihHfu)
+        { key: "system", label: t("admin.nav.system"), href: "/admin/system", icon: "activity" },
       ],
     },
     {
@@ -78,7 +81,30 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
     : user?.displayName || user?.email || "";
 
   return (
-    <aside className="w-60 min-h-screen bg-slate-900 flex flex-col flex-shrink-0">
+    <>
+      {/* M151 — mobil felső sáv (design/D15_Admin.pen#oDiPb): 768 px alatt az oldalsáv fiókként nyílik */}
+      <div className="sticky top-0 z-30 flex h-14 items-center gap-3 bg-slate-900 px-4 md:hidden">
+        <button
+          type="button"
+          onClick={() => setMenuOpen(true)}
+          aria-expanded={menuOpen}
+          aria-controls="admin-sidebar"
+          className="-ml-2 flex h-11 w-11 items-center justify-center rounded-md text-white"
+        >
+          <Icon name="menu" size={22} label={t("admin.header.openMenu")} />
+        </button>
+        <span className="text-[15px] font-semibold text-white">{t("admin.header.title")}</span>
+      </div>
+      {menuOpen && (
+        <div className="fixed inset-0 z-40 bg-slate-950/60 md:hidden" aria-hidden="true" onClick={() => setMenuOpen(false)} />
+      )}
+    <aside
+      id="admin-sidebar"
+      className={`${menuOpen ? "fixed inset-y-0 left-0 z-50 flex" : "hidden"} w-60 min-h-screen bg-slate-900 flex-col flex-shrink-0 md:static md:flex`}
+      onClick={(e) => {
+        if ((e.target as HTMLElement).closest("a")) setMenuOpen(false);
+      }}
+    >
       {/* Logo */}
       <div className="px-4 py-5 border-b border-white/10">
         <div className="flex items-center gap-2">
@@ -88,6 +114,13 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
           <span className="text-white font-semibold text-sm tracking-wide">
             {t("admin.header.title")}
           </span>
+          <button
+            type="button"
+            onClick={() => setMenuOpen(false)}
+            className="ml-auto flex h-11 w-11 items-center justify-center rounded-md text-slate-400 hover:text-white md:hidden"
+          >
+            <Icon name="x" size={20} label={t("admin.header.closeMenu")} />
+          </button>
         </div>
       </div>
 
@@ -161,5 +194,6 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
         </div>
       </div>
     </aside>
+    </>
   );
 }
