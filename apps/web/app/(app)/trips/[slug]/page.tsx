@@ -352,16 +352,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
               )}
             </p>
           </div>
-          <div className="hidden flex-col items-end gap-2.5 md:flex">
-            <span className="text-2xl font-semibold text-ink">
-              {trip.price_amount ? `${Number(trip.price_amount).toFixed(0)} ${trip.price_currency} / ${t("trips.detail.perPerson")}` : t("trips.detail.free")}
-            </span>
-            {!isCancelled && (
-              <a href="#trip-apply" className="inline-flex h-12 items-center rounded-trevu bg-accent px-6 text-base font-semibold text-accent-on hover:bg-accent-hover focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]">
-                {isOrganizer ? t("trips.detail.edit") : t("trips.detail.apply")}
-              </a>
-            )}
-          </div>
+          {/* Nincs ár és gomb a heróban: az oldalsó #trip-apply doboz (ár, Jelentkezem / állapot / Szerkesztés) egyszerre látszik vele — Norbert, 2026-11-02. Mobilon és tableten a ragadós sáv mutatja. */}
         </div>
       </section>
 
