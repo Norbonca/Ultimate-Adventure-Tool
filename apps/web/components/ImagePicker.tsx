@@ -210,7 +210,7 @@ export function ImagePicker({
                   {currentSource === "user_upload"
                     ? t("imagePicker.ownPhoto")
                     : currentSource === "oauth"
-                    ? "OAuth"
+                    ? t("imagePicker.oauthSource")
                     : t("imagePicker.avatar.monogramDefault")}
                 </p>
               </div>

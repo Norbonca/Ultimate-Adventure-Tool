@@ -1,59 +1,37 @@
 import type { Metadata } from "next";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from "@/lib/seo";
+import { SITE_NAME, ogLocale } from "@/lib/seo";
 import "@/styles/globals.css";
-import { cookies } from "next/headers";
-import type { Locale } from "@uat/i18n";
+import { getServerT } from "@/lib/i18n/server";
+import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_APP_URL?.startsWith("http")
     ? process.env.NEXT_PUBLIC_APP_URL
     : "https://www.ttvk.hu";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: {
-    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
-    template: "%s · Trevu",
-  },
-  description: SITE_DESCRIPTION,
-  applicationName: SITE_NAME,
-  keywords: [
-    "trevu",
-    "adventure",
-    "túra",
-    "kaland",
-    "utazás",
-    "hiking",
-    "climbing",
-    "sailing",
-  ],
-  openGraph: {
-    type: "website",
-    siteName: SITE_NAME,
-    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
-    description: SITE_DESCRIPTION,
-    url: SITE_URL,
-    locale: "hu_HU",
-    alternateLocale: ["en_US"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
-    description: SITE_DESCRIPTION,
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+/** A gyökér metaadata az olvasó nyelvén (Norbert, 2026-11-09). */
+export async function generateMetadata(): Promise<Metadata> {
+  const { t, locale } = await getServerT();
+  const title = `${SITE_NAME} — ${t("metadata.siteTagline")}`;
+  const description = t("metadata.siteDescription");
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: { default: title, template: `%s · ${SITE_NAME}` },
+    description,
+    applicationName: SITE_NAME,
+    keywords: t("metadata.keywords").split(",").map((k) => k.trim()).filter(Boolean),
+    openGraph: { type: "website", siteName: SITE_NAME, title, description, url: SITE_URL, ...ogLocale(locale) },
+    twitter: { card: "summary_large_image", title, description },
+    robots: { index: true, follow: true },
+  };
+}
 
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const locale = (cookieStore.get("trevu-locale")?.value as Locale) || "hu";
+  const { locale } = await getServerT();
 
   return (
     <html lang={locale}>
@@ -73,7 +51,7 @@ export default async function RootLayout({
         data-surface="night"
         className="min-h-screen bg-canvas text-ink antialiased"
       >
-        {children}
+        <LocaleProvider locale={locale}>{children}</LocaleProvider>
       </body>
     </html>
   );

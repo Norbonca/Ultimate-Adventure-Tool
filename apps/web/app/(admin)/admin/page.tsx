@@ -5,13 +5,14 @@ import { Icon } from "@/components/Icon";
 import { SystemStatusStrip } from "@/components/admin/system-status/SystemStatusStrip";
 
 export default async function AdminDashboardPage() {
-  const { t } = await getServerT();
+  const { t, locale } = await getServerT();
+  const intlLocale = locale === "en" ? "en-US" : "hu-HU";
   const stats = await getAdminStats();
 
   const kpiCards = [
     {
       label: t("admin.dashboard.totalUsers"),
-      value: stats.totalUsers.toLocaleString(),
+      value: stats.totalUsers.toLocaleString(intlLocale),
       trend: "+2.5%",
       trendUp: true,
       icon: "users",
@@ -20,7 +21,7 @@ export default async function AdminDashboardPage() {
     },
     {
       label: t("admin.dashboard.newSignups"),
-      value: stats.newSignups.toLocaleString(),
+      value: stats.newSignups.toLocaleString(intlLocale),
       trend: "+4.2%",
       trendUp: true,
       icon: "sparkles",
@@ -29,7 +30,7 @@ export default async function AdminDashboardPage() {
     },
     {
       label: t("admin.dashboard.activeTrips"),
-      value: stats.activeTrips.toLocaleString(),
+      value: stats.activeTrips.toLocaleString(intlLocale),
       trend: "+1.8%",
       trendUp: true,
       icon: "backpack",
@@ -133,7 +134,7 @@ export default async function AdminDashboardPage() {
           </div>
           <div className="h-48 flex items-center justify-center bg-slate-50 rounded-lg">
             <p className="text-slate-400 text-sm">
-              {t("admin.comingSoon")} — M04 Payment modul
+              {t("admin.comingSoon")} — {t("admin.dashboard.revenueModuleNote")}
             </p>
           </div>
         </div>
@@ -153,9 +154,9 @@ export default async function AdminDashboardPage() {
           </div>
           <div className="space-y-3">
             {[
-              { text: "Új felhasználó regisztrált", time: "5 perce", icon: "user-circle" },
-              { text: "Túra publikálva", time: "12 perce", icon: "backpack" },
-              { text: "Regisztráció megerősítve", time: "28 perce", icon: "check-circle-2" },
+              { text: t("admin.dashboard.demoNewUser"), time: t("admin.dashboard.minutesAgo", { count: 5 }), icon: "user-circle" },
+              { text: t("admin.dashboard.demoTripPublished"), time: t("admin.dashboard.minutesAgo", { count: 12 }), icon: "backpack" },
+              { text: t("admin.dashboard.demoRegistrationConfirmed"), time: t("admin.dashboard.minutesAgo", { count: 28 }), icon: "check-circle-2" },
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-2.5">
                 <Icon name={item.icon} size={16} className="mt-0.5 text-slate-500" />

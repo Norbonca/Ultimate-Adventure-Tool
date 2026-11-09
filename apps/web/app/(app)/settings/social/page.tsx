@@ -132,7 +132,7 @@ export default function SocialPage() {
                     {initials}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-navy-800">{user.display_name ?? "User"}</p>
+                    <p className="text-sm font-semibold text-navy-800">{user.display_name ?? t("common.user")}</p>
                     <p className="text-xs text-navy-400">@{user.slug ?? user.id.slice(0, 8)}</p>
                   </div>
                 </div>

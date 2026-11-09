@@ -10,6 +10,7 @@ const en: TranslationKeys = {
   // Common
   // ============================================================================
   common: {
+    you: "you",
     retry: "Try again",
     appName: "Trevu",
     appTagline: "Trek beyond ordinary",
@@ -57,6 +58,8 @@ const en: TranslationKeys = {
   // Errors & Notifications
   // ============================================================================
   errors: {
+    unexpectedTitle: "Something went wrong",
+    reportedAutomatically: "The error has been reported automatically.",
     generic: "Something went wrong. Please try again.",
     networkError: "Network error. Please check your connection.",
     notFound: "Page not found.",
@@ -105,6 +108,7 @@ const en: TranslationKeys = {
   // Auth
   // ============================================================================
   auth: {
+    cannotVerifyPassword: "The current password cannot be verified.",
     errors: {
       invalidCredentials: "Invalid email or password.",
       userAlreadyExists: "An account with this email already exists. Please log in.",
@@ -240,6 +244,9 @@ const en: TranslationKeys = {
   // Landing Page
   // ============================================================================
   landing: {
+    featureImageAltPlanning: "Smart trip planning",
+    featureImageAltExpenses: "Expense splitting",
+    featureImageAltOffline: "Offline maps",
     heroTitle: "Trevu",
     heroSubtitle: "Plan the perfect adventure. Organize trips, share expenses, and find local guides.",
     ctaRegister: "Sign up",
@@ -1423,6 +1430,17 @@ const en: TranslationKeys = {
     title: "Trevu — Trek beyond ordinary",
     description: "Plan the perfect adventure — organize trips, share expenses, find local guides",
     keywords: "adventure, trip, travel, expense sharing, guide, trekking, outdoor",
+    siteTagline: "Organize and discover adventure trips",
+    siteDescription: "Listings, applicants, tasks and shared costs – in one place. For organizers and participants of small-group adventure trips.",
+    tripFallbackDescription: "Discover this adventure on Trevu.",
+    pages: {
+      discover: { title: "Explore trips", description: "Small-group adventure trips in 8 categories: search by place, time and trip type in tile, list or 3D map view, and apply for the date you choose." },
+      community: { title: "Community", description: "Adventurers and organizers on Trevu: follow them and discover their trips." },
+      ideas: { title: "Idea board", description: "Trip ideas you can join or organize: destination, time window and the number of people interested, all in one place." },
+      idea: { title: "Idea board", description: "A trip idea on the Trevu idea board — join it or organize it." },
+      getStarted: { title: "What is Trevu?", description: "Listings, applicants, tasks and shared costs – in one place. See how you can organize small-group adventure trips with Trevu." },
+      pricing: { title: "Pricing", description: "Free for personal use. Subscriptions are for those who organize as a business; for cost-sharing trips Trevu is free." },
+    },
   },
 
   // ============================================================================
@@ -1465,6 +1483,7 @@ const en: TranslationKeys = {
   // Image Picker
   // ============================================================================
   imagePicker: {
+    oauthSource: "Sign-in account photo",
     dragDrop: "Drag image here, or click to browse",
     uploading: "Uploading...",
     uploadError: "Upload failed. Please try again.",
@@ -1727,6 +1746,11 @@ const en: TranslationKeys = {
     },
     // Dashboard
     dashboard: {
+      revenueModuleNote: "M04 Payment module",
+      demoNewUser: "New user registered",
+      demoTripPublished: "Trip published",
+      demoRegistrationConfirmed: "Registration confirmed",
+      minutesAgo: "{count} min ago",
       title: "Dashboard",
       subtitle: "Welcome back! Here's what's happening with Trevu.",
       totalUsers: "Total Users",
@@ -1811,6 +1835,7 @@ const en: TranslationKeys = {
     },
     // Trip Operations (M02)
     trips: {
+      statusUpdated: "Status updated: {status}",
       title: "Trip Operations",
       subtitle: "Manage and moderate all platform trips.",
       searchPlaceholder: "Search by title, location, organizer...",
@@ -2594,6 +2619,9 @@ const en: TranslationKeys = {
   // M021 — Trip Timeline
   // ============================================================================
   timeline: {
+    errorAlreadyExists: "This trip already has a schedule.",
+    errorTemplateNotFound: "The template was not found.",
+    errorTemplateEmpty: "The template has no phases.",
     title: "Trip Timeline",
     overallProgress: "Overall: {completed}/{total} tasks",
     progressPercent: "{percent}%",

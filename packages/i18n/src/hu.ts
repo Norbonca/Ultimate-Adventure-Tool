@@ -9,6 +9,7 @@ const hu = {
   // Közös (minden oldalon használt)
   // ============================================================================
   common: {
+    you: "te",
     retry: "Újrapróbálás",
     appName: "Trevu",
     appTagline: "Trek beyond ordinary",
@@ -56,6 +57,8 @@ const hu = {
   // Hibák & Értesítések
   // ============================================================================
   errors: {
+    unexpectedTitle: "Váratlan hiba történt",
+    reportedAutomatically: "A hiba automatikusan jelentve lett.",
     generic: "Hiba történt. Kérjük, próbáld újra.",
     networkError: "Hálózati hiba. Ellenőrizd az internetkapcsolatod.",
     notFound: "Az oldal nem található.",
@@ -104,6 +107,7 @@ const hu = {
   // Auth (Bejelentkezés / Regisztráció)
   // ============================================================================
   auth: {
+    cannotVerifyPassword: "A jelenlegi jelszó nem ellenőrizhető.",
     errors: {
       invalidCredentials: "Hibás email-cím vagy jelszó.",
       userAlreadyExists: "Ezzel az email-címmel már regisztráltak. Jelentkezz be.",
@@ -239,6 +243,9 @@ const hu = {
   // Landing Page
   // ============================================================================
   landing: {
+    featureImageAltPlanning: "Okos túratervezés",
+    featureImageAltExpenses: "Költségmegosztás",
+    featureImageAltOffline: "Offline térképek",
     heroTitle: "Trevu",
     heroSubtitle: "Tervezd meg a tökéletes kalandot. Szervezz túrákat, oszd meg a költségeket, és találj helyi túravezetőket.",
     ctaRegister: "Regisztráció",
@@ -1450,6 +1457,17 @@ const hu = {
     title: "Trevu — Trek beyond ordinary",
     description: "Tervezd meg a tökéletes kalandot — túrák szervezése, költségmegosztás, helyi túravezetők",
     keywords: "kaland, túra, utazás, költségmegosztás, túravezető, trekking, outdoor",
+    siteTagline: "Kalandtúrák szervezése és felfedezése",
+    siteDescription: "Meghirdetés, jelentkezők, teendők és közös költségek – egy felületen. Kis csoportos kalandtúrák szervezőinek és résztvevőinek.",
+    tripFallbackDescription: "Fedezd fel ezt a kalandot a Trevu-n.",
+    pages: {
+      discover: { title: "Túrák felfedezése", description: "Kis csoportos kalandtúrák 8 kategóriában: keress hely, idő és túratípus szerint, csempe-, lista- vagy 3D-térképnézetben, és jelentkezz a választott időpontra." },
+      community: { title: "Közösség", description: "Kalandorok és szervezők a Trevun: kövesd őket, és fedezd fel a túráikat." },
+      ideas: { title: "Ötletbörze", description: "Túraötletek, amelyekhez csatlakozhatsz, vagy amelyeket megszervezhetsz: célterület, időablak és az érdeklődők száma egy helyen." },
+      idea: { title: "Ötletbörze", description: "Túraötlet a Trevu Ötletbörzéjén — csatlakozz, vagy szervezd meg." },
+      getStarted: { title: "Mi a Trevu?", description: "Meghirdetés, jelentkezők, teendők és közös költségek – egy felületen. Ismerd meg, hogyan szervezhetsz kis csoportos kalandtúrákat a Trevuval." },
+      pricing: { title: "Árazás", description: "Személyes használatra ingyenes. Előfizetést az fizet, aki üzletszerűen szervez; költségmegosztó túrákhoz a Trevu ingyenes." },
+    },
   },
 
   // ============================================================================
@@ -1492,6 +1510,7 @@ const hu = {
   // Képválasztó (ImagePicker)
   // ============================================================================
   imagePicker: {
+    oauthSource: "A bejelentkezési fiók képe",
     dragDrop: "Húzd ide a képet, vagy kattints a tallózáshoz",
     uploading: "Feltöltés...",
     uploadError: "Feltöltési hiba. Próbáld újra.",
@@ -1754,6 +1773,11 @@ const hu = {
     },
     // Dashboard
     dashboard: {
+      revenueModuleNote: "M04 Payment modul",
+      demoNewUser: "Új felhasználó regisztrált",
+      demoTripPublished: "Túra publikálva",
+      demoRegistrationConfirmed: "Regisztráció megerősítve",
+      minutesAgo: "{count} perce",
       title: "Irányítópult",
       subtitle: "Üdvözlünk! Íme, mi történik a Trevu-ban.",
       totalUsers: "Összes felhasználó",
@@ -1838,6 +1862,7 @@ const hu = {
     },
     // Trip Operations (M02)
     trips: {
+      statusUpdated: "Státusz frissítve: {status}",
       title: "Túra műveletek",
       subtitle: "Összes platform-túra kezelése és moderálása.",
       searchPlaceholder: "Keresés cím, helyszín, szervező...",
@@ -2621,6 +2646,9 @@ const hu = {
   // M021 — Trip Timeline
   // ============================================================================
   timeline: {
+    errorAlreadyExists: "Ennek a túrának már van menetrendje.",
+    errorTemplateNotFound: "A sablon nem található.",
+    errorTemplateEmpty: "A sablonban nincs fázis.",
     title: "Menetrend",
     overallProgress: "Összesen: {completed}/{total} feladat",
     progressPercent: "{percent}%",

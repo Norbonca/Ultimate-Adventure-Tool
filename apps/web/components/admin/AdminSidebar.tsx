@@ -187,7 +187,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
           <Link
             href="/api/v1/auth/signout"
             className="text-slate-500 hover:text-white transition-colors text-sm"
-            title="Kijelentkezés"
+            title={t("auth.logout")}
           >
             →
           </Link>

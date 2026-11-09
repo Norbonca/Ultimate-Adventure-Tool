@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { updateTripStatus, type AdminTrip } from "../actions";
 import { Icon } from "@/components/Icon";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 interface TabLabel {
   key: string;
@@ -80,6 +81,8 @@ export function AdminTripsClient({
     applyFilter("search", search);
   };
 
+  const { t: tr } = useTranslation();
+
   const handleStatusChange = async (
     tripId: string,
     newStatus: "published" | "cancelled" | "draft"
@@ -88,7 +91,8 @@ export function AdminTripsClient({
     const res = await updateTripStatus(tripId, newStatus);
     setActionLoading(null);
     if (res.success) {
-      showToast(`Státusz frissítve: ${newStatus}`);
+      const statusKey = { published: "statusPublished", cancelled: "statusCancelled", draft: "statusDraft" } as const;
+      showToast(tr("admin.trips.statusUpdated", { status: tr(`admin.trips.${statusKey[newStatus]}`) }));
       router.refresh();
     }
   };

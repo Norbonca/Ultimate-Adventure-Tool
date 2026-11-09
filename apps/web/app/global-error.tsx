@@ -1,12 +1,18 @@
 "use client";
 
 import { useEffect } from "react";
+import { createT, DEFAULT_LOCALE, type Locale } from "@uat/i18n";
+import { isSupportedLocale, LOCALE_COOKIE } from "@/lib/i18n/negotiate";
 
-// i18n-skip: Next.js root error boundary fires BEFORE any i18n provider can mount
-// (the root <html>/<body> are rendered here, replacing the normal app shell).
-// Hardcoded Hungarian fallback is the canonical pattern — bilingual messaging
-// would require a parallel locale-detection script that runs without React context.
-// CLAUDE.md §3.7 i18n requirement is waived for this single file.
+// A gyökér hibahatár a provider előtt fut (itt renderelődik a <html>/<body>), ezért a nyelvet
+// maga oldja fel: választott nyelv (süti) → böngészőnyelv → alapértelmezett (az olvasó nyelve dönt).
+function readerLocale(): Locale {
+  if (typeof document === "undefined") return DEFAULT_LOCALE;
+  const fromCookie = document.cookie.match(new RegExp(`(?:^|; )${LOCALE_COOKIE}=([^;]*)`))?.[1];
+  if (isSupportedLocale(fromCookie)) return fromCookie;
+  const fromBrowser = navigator.language?.split("-")[0];
+  return isSupportedLocale(fromBrowser) ? fromBrowser : DEFAULT_LOCALE;
+}
 export default function GlobalError({
   error,
   reset,
@@ -25,8 +31,11 @@ export default function GlobalError({
       });
   }, [error]);
 
+  const locale = readerLocale();
+  const t = createT(locale);
+
   return (
-    <html>
+    <html lang={locale}>
       <body>
         <div style={{
           display: "flex",
@@ -39,10 +48,10 @@ export default function GlobalError({
           color: "#0F172A",
         }}>
           <h2 style={{ fontSize: "1.5rem", fontWeight: "bold", marginBottom: "1rem" }}>
-            Váratlan hiba történt
+            {t("errors.unexpectedTitle")}
           </h2>
           <p style={{ color: "#64748B", marginBottom: "1.5rem" }}>
-            A hiba automatikusan jelentve lett.
+            {t("errors.reportedAutomatically")}
           </p>
           <button
             onClick={reset}
@@ -56,7 +65,7 @@ export default function GlobalError({
               cursor: "pointer",
             }}
           >
-            Újrapróbálás
+            {t("common.retry")}
           </button>
         </div>
       </body>

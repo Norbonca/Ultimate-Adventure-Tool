@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import type { Locale } from "@uat/i18n";
 
@@ -26,7 +27,14 @@ const LABEL: Record<Locale, string> = {
  * Full: shows both options side by side.
  */
 export function LanguageSwitcher({ variant = "compact", className = "" }: LanguageSwitcherProps) {
-  const { locale, switchLocale, supportedLocales } = useTranslation();
+  const { locale, switchLocale: setClientLocale, supportedLocales } = useTranslation();
+  const router = useRouter();
+  // A kliens azonnal vált; a refresh a szerverkomponenseket (címek, metaadat, szerveroldali szövegek)
+  // is az új nyelven rendereli újra (a süti már az új nyelvet viszi).
+  const switchLocale = (next: Locale) => {
+    setClientLocale(next);
+    router.refresh();
+  };
 
   if (variant === "full") {
     return (

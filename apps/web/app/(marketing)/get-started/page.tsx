@@ -1136,7 +1136,7 @@ export default function HomePage() {
             </div>
             <Image
               src="https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=80&fit=crop&auto=format"
-              alt="Smart trip planning"
+              alt={t('landing.featureImageAltPlanning')}
               className="feature-image"
               width={800}
               height={533}
@@ -1160,7 +1160,7 @@ export default function HomePage() {
             </div>
             <Image
               src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80&fit=crop&auto=format"
-              alt="Expense splitting"
+              alt={t('landing.featureImageAltExpenses')}
               className="feature-image"
               width={800}
               height={533}
@@ -1184,7 +1184,7 @@ export default function HomePage() {
             </div>
             <Image
               src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80&fit=crop&auto=format"
-              alt="Offline maps"
+              alt={t('landing.featureImageAltOffline')}
               className="feature-image"
               width={800}
               height={533}

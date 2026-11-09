@@ -1,7 +1,20 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { LOCALE_COOKIE, isSupportedLocale, negotiateLocale } from "@/lib/i18n/negotiate";
 
 export async function proxy(request: NextRequest) {
+  // Az olvasó nyelve dönt (Norbert, 2026-11-09): választott nyelv (süti) híján az Accept-Language
+  // szerint. A kérés sütijébe is beírjuk, hogy a szerveroldali render már ezen a nyelven fusson,
+  // a válaszba pedig, hogy a kliens és a következő kérések is ezt használják.
+  const negotiated = isSupportedLocale(request.cookies.get(LOCALE_COOKIE)?.value)
+    ? null
+    : negotiateLocale(request.headers.get("accept-language"));
+  if (negotiated) request.cookies.set(LOCALE_COOKIE, negotiated);
+  const withLocale = (res: NextResponse) => {
+    if (negotiated) res.cookies.set(LOCALE_COOKIE, negotiated, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
+    return res;
+  };
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -50,7 +63,7 @@ export async function proxy(request: NextRequest) {
   if (!user && isProtected) {
     const url = request.nextUrl.clone();
     url.pathname = request.nextUrl.pathname.startsWith("/admin") ? "/admin/login" : "/login";
-    return NextResponse.redirect(url);
+    return withLocale(NextResponse.redirect(url));
   }
 
   // US-M01-017: a törlésre váró fiók a türelmi időben először a visszaállító oldalt kapja
@@ -61,11 +74,11 @@ export async function proxy(request: NextRequest) {
       const url = request.nextUrl.clone();
       url.pathname = "/account-restore";
       url.search = "";
-      return NextResponse.redirect(url);
+      return withLocale(NextResponse.redirect(url));
     }
   }
 
-  return supabaseResponse;
+  return withLocale(supabaseResponse);
 }
 
 export const config = {

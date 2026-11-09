@@ -7,6 +7,7 @@ import Link from "next/link";
 import { fetchTripBySlug, fetchCategoryParametersForDisplay, fetchMyParticipation, fetchCrewPositions } from "../actions";
 import { CATEGORY_DISPLAY, DIFFICULTY_LEVELS } from "@/lib/categories";
 import { getServerT, getServerLocale } from "@/lib/i18n/server";
+import { createT, type Locale } from "@uat/i18n";
 import { AppHeader } from "@/components/AppHeader";
 import { BackButtonNight } from "@/components/BackButton";
 import { ApplyButton, type ApplySeriesOption } from "@/components/ApplyButton";
@@ -34,15 +35,17 @@ export async function generateMetadata({ params }: TripDetailPageProps): Promise
   const { slug } = await params;
   const trip = (await fetchTripBySlug(slug)) ?? (await fetchTripBySlugForAdmin(slug));
   if (!trip) return {};
+  const { t, locale } = await getServerT();
 
   // FR-M02-010: formázásmentes, ≤ 200 karakteres leírás; a túra saját megosztóképe (1200×630).
   const description =
     plainExcerpt(trip.short_description as string | null) ||
     plainExcerpt(typeof trip.description === "string" ? trip.description : null) ||
-    "Fedezd fel ezt a kalandot a Trevu-n.";
+    t("metadata.tripFallbackDescription");
 
   const isPublic = isTripPublic(trip);
   return pageMeta({
+    locale,
     title: trip.title as string,
     description,
     path: `/trips/${slug}`,
@@ -838,7 +841,7 @@ function DetailValue({
   locale: string;
 }) {
   if (typeof value === "boolean") {
-    return value ? <Icon name="check-circle-2" size={16} className="text-emerald-600" label={locale === "en" ? "Yes" : "Igen"} /> : <Icon name="x-circle" size={16} className="text-red-500" label={locale === "en" ? "No" : "Nem"} />;
+    return value ? <Icon name="check-circle-2" size={16} className="text-emerald-600" label={createT(locale as Locale)("common.yes")} /> : <Icon name="x-circle" size={16} className="text-red-500" label={createT(locale as Locale)("common.no")} />;
   }
   return <>{formatParameterValue(value, fieldType, unit, options, locale)}</>;
 }

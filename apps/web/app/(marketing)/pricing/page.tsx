@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Button } from "@/components/ui/Button";
 import { pageMeta } from "@/lib/seo";
 import { getServerT } from "@/lib/i18n/server";
@@ -17,11 +18,15 @@ const TIERS: Tier[] = [
   { key: "enterprise", ctaHref: "mailto:hello@ttvk.hu" },
 ];
 
-export const metadata = pageMeta({
-  title: "Árazás",
-  description: "Személyes használatra ingyenes. Előfizetést az fizet, aki üzletszerűen szervez; költségmegosztó túrákhoz a Trevu ingyenes.",
-  path: "/pricing",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const { t, locale } = await getServerT();
+  return pageMeta({
+    locale,
+    title: t("metadata.pages.pricing.title"),
+    description: t("metadata.pages.pricing.description"),
+    path: "/pricing",
+  });
+}
 
 export default async function PricingPage() {
   const { t } = await getServerT();

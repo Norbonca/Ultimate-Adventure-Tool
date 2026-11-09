@@ -31,11 +31,13 @@ interface Props { params: Promise<{ slug: string }> }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const idea = await getIdeaBySlug(slug);
-  if (!idea) return { title: "Ötletbörze" };
+  const { t, locale } = await getServerT();
+  if (!idea) return { title: t("metadata.pages.idea.title") };
   const noindex = idea.visibility !== "public";
   return pageMeta({
+    locale,
     title: idea.title,
-    description: idea.description?.slice(0, 160) || "Túraötlet a Trevu Ötletbörzéjén — csatlakozz, vagy szervezd meg.",
+    description: idea.description?.slice(0, 160) || t("metadata.pages.idea.description"),
     path: `/ideas/${slug}`,
     type: "article",
     noindex,
