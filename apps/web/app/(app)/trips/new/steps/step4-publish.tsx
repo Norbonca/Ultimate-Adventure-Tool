@@ -222,7 +222,7 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
               }}
               placeholder={t("trips.wizard.crewPositionPlaceholder")}
               aria-label={t("trips.wizard.crewPositionPlaceholder")}
-              className="px-3 py-1.5 rounded-lg border border-navy-200 text-sm text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none w-48"
+              className="px-3 py-1.5 rounded-lg border border-navy-200 text-sm text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden w-48"
             />
             <button
               onClick={() => {
@@ -277,7 +277,7 @@ export function Step4Publish({ formData, onChange, categoryDisplay }: Step4Props
             id="trip-currency"
             value={formData.price_currency}
             onChange={(code) => onChange({ price_currency: code })}
-            className="w-full min-h-[48px] px-4 py-3 rounded-trevu border-[1.5px] border-navy-300 text-[15px] text-navy-900 bg-white focus:ring-[3px] focus:ring-trevu-600/10 focus:border-trevu-600 outline-none transition-all duration-200"
+            className="w-full min-h-[48px] px-4 py-3 rounded-trevu border-[1.5px] border-navy-300 text-[15px] text-navy-900 bg-white focus:ring-[3px] focus:ring-trevu-600/10 focus:border-trevu-600 outline-hidden transition-all duration-200"
           />
         </div>
       </div>

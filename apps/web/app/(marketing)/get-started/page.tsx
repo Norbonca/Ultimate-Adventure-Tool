@@ -135,21 +135,8 @@ export default function HomePage() {
   return (
     <>
       <style>{`
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-
-        html {
-          scroll-behavior: smooth;
-        }
-
-        body {
-          font-family: 'DM Sans', sans-serif;
-          color: #0F172A;
-          background-color: #FFFFFF;
-        }
+        /* Tailwind 4: ez a blokk réteg nélküli CSS, ezért minden utility-t felülírna —
+           a globális *, html és body szabály kikerült (a preflight és a globals.css adja). */
 
         /* Header */
         .header {
@@ -1058,15 +1045,15 @@ export default function HomePage() {
         <CoverImage src="/discover/hero.jpg" sizes="100vw" priority />
         <div aria-hidden className="absolute inset-0 bg-hero-scrim-mobile md:bg-hero-scrim" />
         <div className="relative mx-auto flex min-h-[520px] max-w-7xl flex-col justify-end gap-5 px-5 pb-10 pt-24 md:min-h-[640px] md:px-[120px] md:pb-14">
-          <span className="inline-flex w-fit items-center gap-2 rounded-full bg-glass px-4 py-1.5 text-[13px] font-semibold text-ink backdrop-blur">
+          <span className="inline-flex w-fit items-center gap-2 rounded-full bg-glass px-4 py-1.5 text-[13px] font-semibold text-ink backdrop-blur-sm">
             <span aria-hidden className="h-2 w-2 rounded-full bg-accent" />
             {t('landing.heroBadge')}
           </span>
-          <h1 className="max-w-[760px] text-hero-display-mobile text-ink [text-wrap:balance] md:text-hero-display">{t('landing.heroHeadline')}</h1>
+          <h1 className="max-w-[760px] text-hero-display-mobile text-ink text-balance md:text-hero-display">{t('landing.heroHeadline')}</h1>
           <p className="max-w-[640px] text-base leading-relaxed text-ink-body md:text-lg">{t('landing.heroSubheadline')}</p>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Link href="/register" className="inline-flex h-12 items-center justify-center rounded-trevu bg-accent px-7 text-base font-semibold text-accent-on hover:bg-accent-hover focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]">{t('landing.heroCta')}</Link>
-            <Link href="/" className="inline-flex h-12 items-center justify-center rounded-trevu border border-line-strong bg-glass px-7 text-base font-semibold text-ink hover:border-accent focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]">
+            <Link href="/register" className="inline-flex h-12 items-center justify-center rounded-trevu bg-accent px-7 text-base font-semibold text-accent-on hover:bg-accent-hover focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)">{t('landing.heroCta')}</Link>
+            <Link href="/" className="inline-flex h-12 items-center justify-center rounded-trevu border border-line-strong bg-glass px-7 text-base font-semibold text-ink hover:border-accent focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)">
               <Compass size={18} aria-hidden className="mr-2" />{t('landing.heroCtaSecondary')}
             </Link>
           </div>

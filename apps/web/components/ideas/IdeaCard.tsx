@@ -27,8 +27,8 @@ export interface IdeaCardProps {
 
 const STATUS_CLASS: Record<NonNullable<IdeaCardProps["statusTone"]>, string> = {
   neutral: "bg-ghost text-ink-secondary",
-  info: "bg-[color-mix(in_srgb,var(--color-info)_18%,transparent)] text-[var(--color-info)]",
-  success: "bg-[color-mix(in_srgb,var(--color-success)_18%,transparent)] text-[var(--color-success)]",
+  info: "bg-[color-mix(in_srgb,var(--color-info)_18%,transparent)] text-(--color-info)",
+  success: "bg-[color-mix(in_srgb,var(--color-success)_18%,transparent)] text-(--color-success)",
   muted: "bg-ghost text-ink-muted",
 };
 
@@ -39,20 +39,20 @@ export function IdeaCard(p: IdeaCardProps) {
     <Link
       href={p.href}
       data-testid="idea-card"
-      className="group flex h-full flex-col overflow-hidden rounded-trevu-2xl border border-line bg-surface transition duration-150 hover:-translate-y-px hover:border-line-strong focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+      className="group flex h-full flex-col overflow-hidden rounded-trevu-2xl border border-line bg-surface transition duration-150 hover:-translate-y-px hover:border-line-strong focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
     >
       <div className="relative h-[200px] shrink-0 bg-line">
         {p.imageUrl && <CoverImage src={p.imageUrl} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" />}
         <div className="absolute inset-x-3 top-3 flex items-center justify-between gap-2">
           {p.category ? (
-            <span className={`inline-flex items-center gap-1.5 rounded-chip bg-glass px-2.5 py-1 text-xs font-semibold backdrop-blur ${CATEGORY_TEXT[p.category.token]}`}>
+            <span className={`inline-flex items-center gap-1.5 rounded-chip bg-glass px-2.5 py-1 text-xs font-semibold backdrop-blur-sm ${CATEGORY_TEXT[p.category.token]}`}>
               <Icon name={p.category.icon} size={14} aria-hidden />
               {p.category.label}
             </span>
           ) : (
             <span />
           )}
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-glass px-2.5 py-1 text-xs font-semibold text-ink backdrop-blur">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-glass px-2.5 py-1 text-xs font-semibold text-ink backdrop-blur-sm">
             <Icon name="users" size={12} aria-hidden />
             {p.members}
           </span>

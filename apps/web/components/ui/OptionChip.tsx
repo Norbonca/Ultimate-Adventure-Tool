@@ -48,7 +48,7 @@ export function OptionChip({
       aria-pressed={mode === "pressed" ? selected : undefined}
       className={[
         "inline-flex h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-trevu px-3.5 text-sm font-semibold transition-colors",
-        "focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]",
+        "focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)",
         selected
           ? "bg-accent text-accent-on"
           : "border border-line bg-ghost text-ink hover:border-line-strong",

@@ -144,7 +144,7 @@ function ParameterField({
       : (param.label_localized as Record<string, string>)?.hu || param.label;
 
   const inputClasses =
-    "w-full min-h-[48px] px-4 py-3 rounded-trevu border-[1.5px] border-navy-300 text-[15px] text-navy-900 placeholder:text-navy-500 bg-white focus:ring-[3px] focus:ring-trevu-600/10 focus:border-trevu-600 outline-none transition-all duration-200";
+    "w-full min-h-[48px] px-4 py-3 rounded-trevu border-[1.5px] border-navy-300 text-[15px] text-navy-900 placeholder:text-navy-500 bg-white focus:ring-[3px] focus:ring-trevu-600/10 focus:border-trevu-600 outline-hidden transition-all duration-200";
 
   const fieldId = `param-${param.parameter_key}`;
   const labelNode = (
@@ -260,7 +260,7 @@ function ParameterField({
                   }}
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                     isSelected
-                      ? "bg-trevu-600 text-white shadow-sm"
+                      ? "bg-trevu-600 text-white shadow-xs"
                       : "bg-navy-50 text-navy-600 hover:bg-navy-100 border border-navy-200"
                   }`}
                 >

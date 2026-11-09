@@ -168,7 +168,7 @@ export function PeriodEditorClient(props: {
     }
   };
 
-  const inputCls = "w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-400 bg-white disabled:bg-slate-100";
+  const inputCls = "w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-hidden focus:border-emerald-400 bg-white disabled:bg-slate-100";
   const labelCls = "flex flex-col gap-1 text-xs font-medium text-slate-600";
   const section = "bg-white rounded-xl border border-slate-200 p-5 flex flex-col gap-4";
   const months = Array.from({ length: 12 }, (_, i) => i + 1);

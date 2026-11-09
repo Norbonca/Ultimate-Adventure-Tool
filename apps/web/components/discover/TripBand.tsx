@@ -92,7 +92,7 @@ export function TripBand({ href, title, imageUrl, place, details, category, pric
       <div className="flex min-w-0 flex-1 flex-col justify-between gap-1 px-3.5 py-3 md:justify-center md:gap-2 md:px-6 md:py-5">
         <h3 data-testid="trip-band-title" className="line-clamp-2 text-base font-semibold text-ink md:text-[22px] md:leading-tight">
           {isSeries ? (
-            <Link href={href} className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none">
+            <Link href={href} className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-hidden">
               {title}
             </Link>
           ) : (
@@ -116,7 +116,7 @@ export function TripBand({ href, title, imageUrl, place, details, category, pric
                   href={chip.href}
                   title={chip.title}
                   data-testid="series-chip"
-                  className={`inline-flex min-h-9 items-center rounded-chip px-3 text-xs font-semibold focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)] ${
+                  className={`inline-flex min-h-9 items-center rounded-chip px-3 text-xs font-semibold focus-visible:outline-hidden focus-visible:shadow-(--focus-ring) ${
                     chip.full ? "bg-ghost text-ink-muted line-through" : "bg-ghost text-ink hover:bg-line"
                   }`}
                 >
@@ -159,11 +159,11 @@ export function TripBand({ href, title, imageUrl, place, details, category, pric
   );
 
   return isSeries ? (
-    <article data-testid="trip-band" data-series="true" className={`relative ${shell} focus-within:shadow-[var(--focus-ring)]`}>
+    <article data-testid="trip-band" data-series="true" className={`relative ${shell} focus-within:shadow-(--focus-ring)`}>
       {body}
     </article>
   ) : (
-    <Link href={href} data-testid="trip-band" className={`${shell} focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]`}>
+    <Link href={href} data-testid="trip-band" className={`${shell} focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)`}>
       {body}
     </Link>
   );

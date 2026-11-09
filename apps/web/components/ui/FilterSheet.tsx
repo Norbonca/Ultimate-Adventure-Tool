@@ -72,9 +72,9 @@ export function FilterSheet({
         tabIndex={-1}
         data-testid={testId}
         className={[
-          "z-50 flex flex-col border-line bg-surface text-ink focus:outline-none",
+          "z-50 flex flex-col border-line bg-surface text-ink focus:outline-hidden",
           // mobil: alsó lap
-          "fixed inset-x-0 bottom-0 max-h-[88dvh] rounded-t-[20px] border-t",
+          "fixed inset-x-0 bottom-0 max-h-[88dvh] rounded-t-trevu-3xl border-t",
           // asztali: lebegő panel a gomb alatt
           "md:absolute md:inset-x-auto md:bottom-auto md:right-0 md:top-full md:mt-2 md:max-h-[70vh] md:w-[440px] md:rounded-trevu-2xl md:border md:border-line-strong",
         ].join(" ")}
@@ -90,7 +90,7 @@ export function FilterSheet({
             type="button"
             onClick={onClose}
             aria-label={closeLabel}
-            className="flex h-11 w-11 items-center justify-center rounded-trevu text-ink hover:bg-ghost focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+            className="flex h-11 w-11 items-center justify-center rounded-trevu text-ink hover:bg-ghost focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
           >
             <X size={22} aria-hidden />
           </button>
@@ -100,7 +100,7 @@ export function FilterSheet({
           <button
             type="button"
             onClick={onClear}
-            className="h-12 rounded-trevu bg-ghost px-5 text-base font-semibold text-ink hover:bg-line focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+            className="h-12 rounded-trevu bg-ghost px-5 text-base font-semibold text-ink hover:bg-line focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
           >
             {clearLabel}
           </button>
@@ -108,7 +108,7 @@ export function FilterSheet({
             type="button"
             onClick={onClose}
             data-testid={testId ? `${testId}-apply` : undefined}
-            className="h-12 flex-1 rounded-trevu bg-accent px-5 text-base font-semibold text-accent-on hover:bg-accent-hover focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+            className="h-12 flex-1 rounded-trevu bg-accent px-5 text-base font-semibold text-accent-on hover:bg-accent-hover focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
           >
             {applyLabel}
           </button>

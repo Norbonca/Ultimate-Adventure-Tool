@@ -100,7 +100,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
       )}
     <aside
       id="admin-sidebar"
-      className={`${menuOpen ? "fixed inset-y-0 left-0 z-50 flex" : "hidden"} w-60 min-h-screen bg-slate-900 flex-col flex-shrink-0 md:static md:flex`}
+      className={`${menuOpen ? "fixed inset-y-0 left-0 z-50 flex" : "hidden"} w-60 min-h-screen bg-slate-900 flex-col shrink-0 md:static md:flex`}
       onClick={(e) => {
         if ((e.target as HTMLElement).closest("a")) setMenuOpen(false);
       }}
@@ -144,7 +144,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
                       <span className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-slate-500 cursor-not-allowed text-sm">
                         <Icon name={item.icon} size={16} className="w-4 shrink-0" />
                         <span className="flex-1">{item.label}</span>
-                        <span className="text-[10px] bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded">
+                        <span className="text-[10px] bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded-sm">
                           {t("admin.comingSoon")}
                         </span>
                       </span>
@@ -177,7 +177,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
       {/* User footer */}
       <div className="px-3 py-4 border-t border-white/10">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
             {initials}
           </div>
           <div className="flex-1 min-w-0">

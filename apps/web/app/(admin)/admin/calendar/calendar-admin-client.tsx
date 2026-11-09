@@ -66,7 +66,7 @@ export function CalendarAdminClient({ overview, initialTab }: { overview: Calend
   };
 
   const years = Array.from({ length: 6 }, (_, i) => overview.generateRange.from - 1 + i);
-  const inputCls = "text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-400 bg-white";
+  const inputCls = "text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-hidden focus:border-emerald-400 bg-white";
   const tabCls = (active: boolean) =>
     `px-4 py-2 text-sm rounded-lg transition-colors ${active ? "bg-emerald-500 text-white" : "text-slate-600 hover:bg-slate-100"}`;
 

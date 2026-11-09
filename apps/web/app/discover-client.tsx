@@ -453,7 +453,7 @@ export default function DiscoverClient({
             data-testid={`view-toggle-${view}`}
             className={[
               'inline-flex h-9 min-w-10 items-center justify-center gap-2 rounded-lg px-2.5 text-sm font-semibold transition-colors md:px-3.5',
-              'focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]',
+              'focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)',
               active ? 'bg-ghost text-ink' : 'text-ink-muted hover:text-ink',
             ].join(' ')}
           >
@@ -509,7 +509,7 @@ export default function DiscoverClient({
                   .replace('{trips}', String(allCardCount))
                   .replace('{countries}', String(countryCount))}
               </p>
-              <h1 className="max-w-[720px] text-hero-display-mobile text-ink [text-wrap:balance] md:text-hero-display">
+              <h1 className="max-w-[720px] text-hero-display-mobile text-ink text-balance md:text-hero-display">
                 {t('discover.heroTitle')}
               </h1>
               <p className="hidden max-w-[720px] text-lg text-ink-body md:block">{t('discover.heroSubtitle')}</p>
@@ -547,7 +547,7 @@ export default function DiscoverClient({
                   aria-haspopup="dialog"
                   aria-expanded={filtersOpen}
                   data-testid="discover-filters-open"
-                  className="inline-flex h-11 items-center gap-2 rounded-trevu border border-line bg-ghost px-4 text-sm font-semibold text-ink hover:border-line-strong focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+                  className="inline-flex h-11 items-center gap-2 rounded-trevu border border-line bg-ghost px-4 text-sm font-semibold text-ink hover:border-line-strong focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
                 >
                   <SlidersHorizontal size={16} aria-hidden />
                   <span className="md:hidden">
@@ -646,7 +646,7 @@ export default function DiscoverClient({
                   value={sortBy}
                   onChange={(event) => changeSort(event.target.value)}
                   data-testid="discover-sort"
-                  className="h-10 rounded-trevu border border-line bg-surface px-3 text-sm text-ink focus:border-accent focus:outline-none focus:shadow-[var(--focus-ring)]"
+                  className="h-10 rounded-trevu border border-line bg-surface px-3 text-sm text-ink focus:border-accent focus:outline-hidden focus:shadow-(--focus-ring)"
                 >
                   {sortOptions.map(([value, label]) => (
                     <option key={value} value={value}>
@@ -685,7 +685,7 @@ export default function DiscoverClient({
                     <p className="text-sm font-semibold text-ink">{t('ideas.discover.emptyTitle')}</p>
                     <Link
                       href={`/ideas/new?via=discover_empty${activeCategory !== 'all' ? `&category=${activeCategory}` : ''}`}
-                      className="inline-flex h-11 items-center gap-2 rounded-trevu bg-accent px-5 text-sm font-semibold text-accent-on hover:opacity-95 focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+                      className="inline-flex h-11 items-center gap-2 rounded-trevu bg-accent px-5 text-sm font-semibold text-accent-on hover:opacity-95 focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
                     >
                       <Lightbulb size={16} aria-hidden />
                       {t('ideas.discover.pin')}
@@ -794,7 +794,7 @@ export default function DiscoverClient({
                       type="button"
                       onClick={() => setPage({ key: pageKey, count: visibleCount + PAGE_SIZE })}
                       data-testid="discover-load-more"
-                      className="h-12 rounded-trevu bg-ghost px-6 text-base font-semibold text-ink hover:bg-line focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+                      className="h-12 rounded-trevu bg-ghost px-6 text-base font-semibold text-ink hover:bg-line focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
                     >
                       {t('discover.loadMoreCount').replace('{count}', String(Math.min(PAGE_SIZE, remaining)))}
                     </button>
@@ -825,7 +825,7 @@ export default function DiscoverClient({
           </div>
           <Link
             href="/trips/new"
-            className="inline-flex h-12 items-center justify-center rounded-trevu px-6 text-base font-semibold text-accent-on [background:var(--gradient-dawn)] hover:opacity-95 focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+            className="inline-flex h-12 items-center justify-center rounded-trevu px-6 text-base font-semibold text-accent-on [background:var(--gradient-dawn)] hover:opacity-95 focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
           >
             {t('discover.createTrip')}
           </Link>

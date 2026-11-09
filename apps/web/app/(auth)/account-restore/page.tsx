@@ -26,7 +26,7 @@ export default async function AccountRestorePage() {
     <main className="min-h-screen bg-slate-50 flex items-end sm:items-center justify-center sm:p-6">
       <section
         aria-labelledby="restore-title"
-        className="w-full sm:max-w-[520px] bg-white rounded-t-[20px] sm:rounded-2xl shadow-2xl px-5 pt-6 pb-7 sm:p-8"
+        className="w-full sm:max-w-[520px] bg-white rounded-t-trevu-3xl sm:rounded-2xl shadow-2xl px-5 pt-6 pb-7 sm:p-8"
       >
         <div className="flex gap-3.5">
           <span className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 bg-trevu-50 text-trevu-700">

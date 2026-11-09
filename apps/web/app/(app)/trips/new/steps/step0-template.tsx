@@ -126,7 +126,7 @@ export function Step0Template({
           }}
           className={`text-left p-6 rounded-xl border-2 transition-all hover:shadow-md ${
             selectedMode === "template"
-              ? "border-trevu-500 bg-trevu-50/50 shadow-sm"
+              ? "border-trevu-500 bg-trevu-50/50 shadow-xs"
               : "border-navy-200 bg-white hover:border-navy-300"
           }`}
         >
@@ -150,7 +150,7 @@ export function Step0Template({
           aria-disabled="true"
           className={`text-left p-6 rounded-xl border-2 transition-all hover:shadow-md ${
             selectedMode === "ai"
-              ? "border-trevu-500 bg-trevu-50/50 shadow-sm"
+              ? "border-trevu-500 bg-trevu-50/50 shadow-xs"
               : "border-navy-200 bg-white hover:border-navy-300"
           }`}
         >
@@ -173,7 +173,7 @@ export function Step0Template({
           onClick={() => onSelectMode("scratch")}
           className={`text-left p-6 rounded-xl border-2 transition-all hover:shadow-md ${
             selectedMode === "scratch"
-              ? "border-trevu-500 bg-trevu-50/50 shadow-sm"
+              ? "border-trevu-500 bg-trevu-50/50 shadow-xs"
               : "border-navy-200 bg-white hover:border-navy-300"
           }`}
         >
@@ -219,9 +219,9 @@ export function Step0Template({
               >
                 {/* Image / gradient placeholder */}
                 <div
-                  className={`h-40 bg-gradient-to-br ${TEMPLATE_GRADIENTS[idx]} relative`}
+                  className={`h-40 bg-linear-to-br ${TEMPLATE_GRADIENTS[idx]} relative`}
                 >
-                  <div className="absolute top-3 left-3 px-2 py-0.5 bg-white/90 backdrop-blur-sm rounded-md text-xs font-medium text-navy-700">
+                  <div className="absolute top-3 left-3 px-2 py-0.5 bg-white/90 backdrop-blur-xs rounded-md text-xs font-medium text-navy-700">
                     <Icon name={tmpl.categoryIcon} size={13} /> {t(`categories.${tmpl.categoryKey}` as TranslationKey)}
                   </div>
                 </div>

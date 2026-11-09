@@ -41,12 +41,12 @@ export function Toggle({
       aria-labelledby={!ariaLabel && label ? labelId : undefined}
       disabled={disabled}
       onClick={() => onChange(!checked)}
-      className={`relative h-6 w-11 shrink-0 rounded-full transition-colors focus:outline-none focus-visible:ring-[3px] focus-visible:ring-trevu-600/30 disabled:opacity-50 disabled:pointer-events-none ${
+      className={`relative h-6 w-11 shrink-0 rounded-full transition-colors focus:outline-hidden focus-visible:ring-[3px] focus-visible:ring-trevu-600/30 disabled:opacity-50 disabled:pointer-events-none ${
         checked ? "bg-trevu-600" : "bg-navy-200"
       }`}
     >
       <span
-        className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
+        className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow-xs transition-transform ${
           checked ? "translate-x-5" : "translate-x-0"
         }`}
       />

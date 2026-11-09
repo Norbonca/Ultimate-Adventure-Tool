@@ -155,7 +155,7 @@ export function SettleBoard({ view, locale, disputeDays }: { view: ExpensesView;
 
       {sheet && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-navy-900/65 lg:items-center" role="dialog" aria-modal="true" onClick={() => setSheet(null)}>
-          <div onClick={(e) => e.stopPropagation()} className="w-full rounded-t-[20px] bg-white px-4 pb-7 pt-2.5 lg:max-w-[480px] lg:rounded-2xl lg:p-7" data-testid={`settle-sheet-${sheet.kind}`}>
+          <div onClick={(e) => e.stopPropagation()} className="w-full rounded-t-trevu-3xl bg-white px-4 pb-7 pt-2.5 lg:max-w-[480px] lg:rounded-2xl lg:p-7" data-testid={`settle-sheet-${sheet.kind}`}>
             <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-navy-300 lg:hidden" aria-hidden />
             <h2 className="text-xl font-semibold text-navy-900">
               {sheet.kind === "confirm" ? t("expenses.settlePage.confirmTitle") : sheet.kind === "dispute" ? t("expenses.settlePage.disputeTitle") : t("expenses.settlePage.payWith")}

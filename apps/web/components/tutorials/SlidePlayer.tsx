@@ -27,7 +27,7 @@ export function SlidePlayer({ tutorial, index, onIndex, compact = false, priorit
   const step = tutorial.steps[index];
   const go = (i: number) => onIndex(Math.max(0, Math.min(total - 1, i)));
   const navBtn =
-    "absolute inline-flex h-11 w-11 items-center justify-center rounded-full bg-glass text-ink backdrop-blur hover:bg-surface disabled:pointer-events-none disabled:opacity-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent";
+    "absolute inline-flex h-11 w-11 items-center justify-center rounded-full bg-glass text-ink backdrop-blur-sm hover:bg-surface disabled:pointer-events-none disabled:opacity-0 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-accent";
 
   return (
     <div
@@ -44,7 +44,7 @@ export function SlidePlayer({ tutorial, index, onIndex, compact = false, priorit
           go(index - 1);
         }
       }}
-      className={`relative aspect-video w-full overflow-hidden border border-line bg-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent ${compact ? "rounded-trevu-lg" : "rounded-trevu-2xl"}`}
+      className={`relative aspect-video w-full overflow-hidden border border-line bg-canvas focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-accent ${compact ? "rounded-trevu-lg" : "rounded-trevu-2xl"}`}
       data-testid="tutorial-slides"
       data-index={index}
     >
@@ -58,7 +58,7 @@ export function SlidePlayer({ tutorial, index, onIndex, compact = false, priorit
         priority={priority && index === 0}
       />
 
-      <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-chip bg-glass px-2 py-1 text-xs font-semibold text-ink backdrop-blur" data-testid="tutorial-slides-counter">
+      <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-chip bg-glass px-2 py-1 text-xs font-semibold text-ink backdrop-blur-sm" data-testid="tutorial-slides-counter">
         <Icon name="presentation" size={14} aria-hidden />
         {index + 1} / {total}
       </span>

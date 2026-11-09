@@ -42,7 +42,7 @@ export default function ForgotPasswordPage() {
 
       {/* Body */}
       <div className="flex flex-1 items-center justify-center px-4 py-12">
-        <div className="w-full max-w-[440px] rounded-2xl border border-navy-200 bg-white p-10 shadow-sm">
+        <div className="w-full max-w-[440px] rounded-2xl border border-navy-200 bg-white p-10 shadow-xs">
           {/* Icon */}
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-trevu-50 text-trevu-600">
             <Icon name="key-round" size={28} />

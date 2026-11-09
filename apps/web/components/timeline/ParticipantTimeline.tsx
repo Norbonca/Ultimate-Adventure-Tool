@@ -94,7 +94,7 @@ export function ParticipantTimeline({
               return (
                 <li
                   key={task.id}
-                  className={`flex items-center gap-2 rounded-[10px] bg-ghost py-1 pr-3 ${overdue ? "ring-1 ring-[var(--color-danger)]" : ""}`}
+                  className={`flex items-center gap-2 rounded-trevu bg-ghost py-1 pr-3 ${overdue ? "ring-1 ring-(--color-danger)" : ""}`}
                 >
                   <button
                     type="button"
@@ -107,9 +107,9 @@ export function ParticipantTimeline({
                     <span
                       className={`flex h-[22px] w-[22px] items-center justify-center rounded-md border-[1.5px] ${
                         done
-                          ? "border-[var(--color-success)] text-[var(--color-success)]"
+                          ? "border-(--color-success) text-(--color-success)"
                           : waiting
-                          ? "border-[var(--color-warning)] text-[var(--color-warning)]"
+                          ? "border-(--color-warning) text-(--color-warning)"
                           : "border-line-strong"
                       }`}
                     >
@@ -119,10 +119,10 @@ export function ParticipantTimeline({
                   </button>
                   <div className="min-w-0 flex-1 py-1.5">
                     <p className={`text-[15px] ${done ? "text-ink-muted line-through" : "text-ink"}`}>{name}</p>
-                    {meta && <p className={`text-[13px] ${overdue ? "text-[var(--color-danger)]" : "text-ink-muted"}`}>{meta}</p>}
+                    {meta && <p className={`text-[13px] ${overdue ? "text-(--color-danger)" : "text-ink-muted"}`}>{meta}</p>}
                   </div>
                   {overdue && (
-                    <span className="hidden shrink-0 rounded-md px-2 py-1 text-xs font-semibold text-[var(--color-danger)] ring-1 ring-[var(--color-danger)] sm:inline">
+                    <span className="hidden shrink-0 rounded-md px-2 py-1 text-xs font-semibold text-(--color-danger) ring-1 ring-(--color-danger) sm:inline">
                       {t("timeline.overdueWarning")}
                     </span>
                   )}
@@ -131,7 +131,7 @@ export function ParticipantTimeline({
             })}
           </ul>
         )}
-        {error && <p role="alert" className="text-sm font-medium text-[var(--color-danger)]">{error}</p>}
+        {error && <p role="alert" className="text-sm font-medium text-(--color-danger)">{error}</p>}
       </section>
 
       {/* ── Menetrend (csak olvasható) ── */}
@@ -143,7 +143,7 @@ export function ParticipantTimeline({
           </div>
           {stats.total_tasks > 0 && (
             <div className="flex items-center gap-2">
-              <span className="h-1.5 w-28 rounded-full bg-[var(--color-border)]">
+              <span className="h-1.5 w-28 rounded-full bg-(--color-border)">
                 <span className="block h-1.5 rounded-full bg-accent" style={{ width: `${stats.progress_percent}%` }} />
               </span>
               <span className="text-[13px] font-semibold text-accent">{stats.progress_percent}%</span>
@@ -192,8 +192,8 @@ function MilestoneRow({ milestone, isNext }: { milestone: MilestoneWithTasks; is
   return (
     <li
       aria-current={isNext ? "step" : undefined}
-      className={`flex gap-4 rounded-[10px] border p-3.5 sm:px-4 ${
-        isNext ? "border-accent bg-[var(--color-primary-subtle)]" : "border-line"
+      className={`flex gap-4 rounded-trevu border p-3.5 sm:px-4 ${
+        isNext ? "border-accent bg-(--color-primary-subtle)" : "border-line"
       } ${done ? "opacity-70" : ""}`}
     >
       {/* Asztali: dátumoszlop */}
@@ -207,14 +207,14 @@ function MilestoneRow({ milestone, isNext }: { milestone: MilestoneWithTasks; is
         <div className="flex items-center gap-2">
           <span
             className={`h-2 w-2 shrink-0 rounded-full ${
-              done ? "bg-[var(--color-success)]" : milestone.status === "in_progress" ? "bg-[var(--color-warning)]" : "bg-[var(--color-text-muted)]"
+              done ? "bg-(--color-success)" : milestone.status === "in_progress" ? "bg-(--color-warning)" : "bg-(--color-text-muted)"
             }`}
           />
           <span className="flex-1 text-[15px] font-semibold text-ink">{getLocalizedName(milestone, locale)}</span>
           {isNext && (
             <span className="shrink-0 rounded-md bg-accent px-2 py-0.5 text-xs font-semibold text-accent-on">{t("timeline.nextBadge")}</span>
           )}
-          {done && <span className="shrink-0 text-xs font-semibold text-[var(--color-success)]">{t("timeline.statusDone")}</span>}
+          {done && <span className="shrink-0 text-xs font-semibold text-(--color-success)">{t("timeline.statusDone")}</span>}
         </div>
         {place && (
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -240,7 +240,7 @@ function MilestoneRow({ milestone, isNext }: { milestone: MilestoneWithTasks; is
             href={mapUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-1 flex h-11 items-center justify-center gap-1.5 rounded-[10px] border border-accent text-sm font-semibold text-accent sm:hidden"
+            className="mt-1 flex h-11 items-center justify-center gap-1.5 rounded-trevu border border-accent text-sm font-semibold text-accent sm:hidden"
           >
             <Icon name="external-link" size={15} /> {t("timeline.locationOpenMap")}
           </a>

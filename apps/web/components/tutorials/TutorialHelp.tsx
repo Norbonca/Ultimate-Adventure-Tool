@@ -49,7 +49,7 @@ export function TutorialHelp({ anchor, className = "" }: TutorialHelpProps) {
         onClick={() => setOpen(true)}
         aria-label={label}
         aria-haspopup="dialog"
-        className={`relative inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-line bg-ghost px-3 text-sm font-semibold text-ink transition-colors after:absolute after:-inset-1 after:content-[''] hover:border-accent hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent ${className}`}
+        className={`relative inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-line bg-ghost px-3 text-sm font-semibold text-ink transition-colors after:absolute after:-inset-1 after:content-[''] hover:border-accent hover:text-accent focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-accent ${className}`}
         data-testid={`help-${anchor}`}
       >
         <Icon name="circle-play" size={16} aria-hidden className="text-accent" />
@@ -120,7 +120,7 @@ function HelpDialog({ tutorials, onClose }: { tutorials: Tutorial[]; onClose: ()
       type="button"
       onClick={onClose}
       aria-label={t("tutorials.close")}
-      className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ghost text-ink hover:bg-ghost-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+      className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ghost text-ink hover:bg-ghost-strong focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-accent"
       data-testid="help-close"
       data-autofocus
     >
@@ -131,7 +131,7 @@ function HelpDialog({ tutorials, onClose }: { tutorials: Tutorial[]; onClose: ()
   return createPortal(
     <div
       data-surface="night"
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-[rgba(15,23,42,0.7)] sm:items-center sm:p-6"
+      className="fixed inset-0 z-60 flex items-end justify-center bg-[rgba(15,23,42,0.7)] sm:items-center sm:p-6"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
@@ -141,11 +141,11 @@ function HelpDialog({ tutorials, onClose }: { tutorials: Tutorial[]; onClose: ()
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className={`flex max-h-[92dvh] w-full flex-col overflow-y-auto rounded-t-[20px] border border-line-strong bg-surface text-ink shadow-trevu-xl sm:rounded-trevu-3xl ${selected ? "sm:max-w-[864px]" : "sm:max-w-[640px]"}`}
+        className={`flex max-h-[92dvh] w-full flex-col overflow-y-auto rounded-t-trevu-3xl border border-line-strong bg-surface text-ink shadow-trevu-xl sm:rounded-trevu-3xl ${selected ? "sm:max-w-[864px]" : "sm:max-w-[640px]"}`}
         data-testid="help-dialog"
       >
         <div className="flex justify-center pt-2.5 sm:hidden" aria-hidden>
-          <span className="h-1 w-10 rounded-full bg-[var(--color-border-strong)]" />
+          <span className="h-1 w-10 rounded-full bg-(--color-border-strong)" />
         </div>
 
         {selected ? (
@@ -213,7 +213,7 @@ function HelpDialog({ tutorials, onClose }: { tutorials: Tutorial[]; onClose: ()
                   <button
                     type="button"
                     onClick={() => setSelected(tut)}
-                    className="flex w-full items-center gap-4 rounded-trevu-xl border border-line p-3 text-left hover:bg-ghost focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+                    className="flex w-full items-center gap-4 rounded-trevu-xl border border-line p-3 text-left hover:bg-ghost focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-accent"
                   >
                     <span className="relative flex h-[68px] w-[120px] shrink-0 items-center justify-center overflow-hidden rounded-[8px] sm:h-[90px] sm:w-[160px]">
                       <Image src={posterUrl(tut.slug)} alt="" fill sizes="160px" className="object-cover" />

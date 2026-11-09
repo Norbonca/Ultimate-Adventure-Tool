@@ -57,7 +57,7 @@ export interface CardImageProps {
 /** 3:2 image area with an optional gradient fallback and overlay slot. */
 export function CardImage({ src, alt, children, className }: CardImageProps) {
   return (
-    <div className={["relative aspect-[3/2] w-full overflow-hidden bg-navy-100", className ?? ""].join(" ")}>
+    <div className={["relative aspect-3/2 w-full overflow-hidden bg-navy-100", className ?? ""].join(" ")}>
       {src ? (
         <CoverImage src={src} alt={alt} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" />
       ) : (

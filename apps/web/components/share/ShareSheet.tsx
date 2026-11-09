@@ -40,7 +40,7 @@ export interface ShareSheetProps {
 type CopyState = "idle" | "copied" | "failed";
 
 const TARGET =
-  "flex w-24 shrink-0 flex-col items-center gap-2 rounded-trevu py-1 text-center text-xs md:w-[76px] font-medium text-ink-body hover:text-ink focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]";
+  "flex w-24 shrink-0 flex-col items-center gap-2 rounded-trevu py-1 text-center text-xs md:w-[76px] font-medium text-ink-body hover:text-ink focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)";
 const CIRCLE = "flex h-[52px] w-[52px] items-center justify-center rounded-full border border-line bg-ghost text-ink";
 
 export function ShareSheet({ open, onClose, slug, title, metaLine, imageUrl, isPublic, canNativeShare, onNativeShare }: ShareSheetProps) {
@@ -121,7 +121,7 @@ export function ShareSheet({ open, onClose, slug, title, metaLine, imageUrl, isP
         tabIndex={-1}
         onKeyDown={trapTab}
         data-testid="share-sheet"
-        className="flex max-h-[92dvh] w-full flex-col gap-4 overflow-y-auto rounded-t-[20px] border-t border-line bg-surface px-4 pb-7 pt-2.5 text-ink shadow-trevu-xl focus:outline-none md:max-w-[480px] md:gap-5 md:rounded-trevu-2xl md:border md:p-6"
+        className="flex max-h-[92dvh] w-full flex-col gap-4 overflow-y-auto rounded-t-trevu-3xl border-t border-line bg-surface px-4 pb-7 pt-2.5 text-ink shadow-trevu-xl focus:outline-hidden md:max-w-[480px] md:gap-5 md:rounded-trevu-2xl md:border md:p-6"
       >
         <div className="flex justify-center md:hidden" aria-hidden>
           <span className="h-1 w-10 rounded-full bg-line-strong" />
@@ -134,7 +134,7 @@ export function ShareSheet({ open, onClose, slug, title, metaLine, imageUrl, isP
             type="button"
             onClick={onClose}
             aria-label={t("trips.share.close")}
-            className="-mr-2 flex h-11 w-11 items-center justify-center rounded-trevu text-ink-secondary hover:bg-ghost focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+            className="-mr-2 flex h-11 w-11 items-center justify-center rounded-trevu text-ink-secondary hover:bg-ghost focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
           >
             <Icon name="x" size={20} />
           </button>
@@ -206,13 +206,13 @@ export function ShareSheet({ open, onClose, slug, title, metaLine, imageUrl, isP
             readOnly
             value={canonical}
             onFocus={(event) => event.currentTarget.select()}
-            className={`h-12 min-w-0 flex-1 rounded-trevu border bg-[var(--color-input-bg)] px-3.5 text-sm text-ink-body focus:outline-none focus-visible:shadow-[var(--focus-ring)] ${copy === "failed" ? "border-2 border-accent" : "border-line"}`}
+            className={`h-12 min-w-0 flex-1 rounded-trevu border bg-(--color-input-bg) px-3.5 text-sm text-ink-body focus:outline-hidden focus-visible:shadow-(--focus-ring) ${copy === "failed" ? "border-2 border-accent" : "border-line"}`}
           />
           <button
             type="button"
             onClick={doCopy}
             data-testid="share-copy"
-            className="inline-flex h-12 shrink-0 items-center gap-2 rounded-trevu bg-accent px-4 text-sm font-semibold text-accent-on hover:bg-accent-hover focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+            className="inline-flex h-12 shrink-0 items-center gap-2 rounded-trevu bg-accent px-4 text-sm font-semibold text-accent-on hover:bg-accent-hover focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
           >
             <Icon name={copy === "copied" ? "check" : "copy"} size={18} />
             {copy === "copied" ? t("trips.share.copied") : t("trips.share.copy")}
@@ -221,7 +221,7 @@ export function ShareSheet({ open, onClose, slug, title, metaLine, imageUrl, isP
 
         <p
           role="status"
-          className={`text-xs ${copy === "copied" ? "text-[var(--color-success)]" : copy === "failed" ? "text-[var(--color-warning)]" : "text-ink-muted"}`}
+          className={`text-xs ${copy === "copied" ? "text-(--color-success)" : copy === "failed" ? "text-(--color-warning)" : "text-ink-muted"}`}
         >
           {copy === "copied"
             ? t("trips.share.copiedStatus")

@@ -86,7 +86,7 @@ export function ApplyButton({
     return (
       <div className="space-y-3 text-center" role="status" data-testid="apply-success">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-success)_15%,transparent)]">
-          <Icon name="check" size={28} className="text-[var(--color-success)]" />
+          <Icon name="check" size={28} className="text-(--color-success)" />
         </div>
         <p className="text-lg font-bold text-navy-900">{t("series.successTitle")}</p>
         {success.dateLabel && (
@@ -325,7 +325,7 @@ export function ApplyButton({
                 />
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm font-bold text-navy-900">{o.dateLabel}</span>
-                  <span className={`block text-xs ${full && !o.applied && !o.closed ? "text-[var(--color-danger)]" : "text-navy-500"}`}>{hint}</span>
+                  <span className={`block text-xs ${full && !o.applied && !o.closed ? "text-(--color-danger)" : "text-navy-500"}`}>{hint}</span>
                 </span>
                 <span className="text-sm font-semibold text-navy-700">{o.priceLabel}</span>
               </label>
@@ -346,7 +346,7 @@ export function ApplyButton({
           maxLength={1000}
           rows={4}
           placeholder={t("trips.detail.applicationMessagePlaceholder")}
-          className="w-full px-3 py-2 text-sm border border-navy-200 rounded-lg focus:border-trevu-500 focus:ring-2 focus:ring-trevu-100 outline-none resize-none"
+          className="w-full px-3 py-2 text-sm border border-navy-200 rounded-lg focus:border-trevu-500 focus:ring-2 focus:ring-trevu-100 outline-hidden resize-none"
         />
         <div className="text-right text-[10px] text-navy-400 mt-0.5">
           {message.length}/1000

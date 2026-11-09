@@ -152,7 +152,7 @@ export function ExpensesDashboard({ view, locale }: { view: ExpensesView; locale
 
       {view.canAdd && active.length > 0 && <div className="mt-6 hidden lg:flex lg:justify-end">{addButton(false)}</div>}
       {view.canAdd && (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-navy-200 bg-white/95 px-4 pb-7 pt-3 backdrop-blur lg:hidden">{addButton(true)}</div>
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-navy-200 bg-white/95 px-4 pb-7 pt-3 backdrop-blur-sm lg:hidden">{addButton(true)}</div>
       )}
 
       {editing && (

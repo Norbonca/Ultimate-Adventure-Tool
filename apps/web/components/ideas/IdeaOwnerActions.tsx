@@ -43,7 +43,7 @@ export function IdeaOwnerActions({ ideaId, status, memberCount, hasLinkedTrips }
       {status === "closed" && <Button variant="outline" size="sm" icon="refresh-cw" loading={pending} onClick={() => run(() => reopenIdea(ideaId))}>{t("ideas.owner.reopen")}</Button>}
       {status === "expired" && <Button variant="outline" size="sm" icon="refresh-cw" onClick={() => setDialog("renew")}>{t("ideas.owner.renew")}</Button>}
       {deletable && <Button variant="ghost" size="sm" icon="trash-2" onClick={() => setDialog("delete")}>{t("ideas.owner.delete")}</Button>}
-      {error && <p role="alert" className="w-full text-sm text-[var(--color-danger)]">{error}</p>}
+      {error && <p role="alert" className="w-full text-sm text-(--color-danger)">{error}</p>}
 
       {dialog === "close" && (
         <Dialog open onClose={() => setDialog(null)} busy={pending} icon="x-circle" tone="danger" title={t("ideas.owner.closeTitle")} description={t("ideas.owner.closeBody")}

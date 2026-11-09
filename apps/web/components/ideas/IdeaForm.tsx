@@ -138,7 +138,7 @@ export function IdeaForm({ mode, initial, categories, countries, currencies }: P
     });
 
   const errText = error ? t(`ideas.errors.${error.key}`) : null;
-  const fieldErr = (f: string) => (error && error.field === f ? <p role="alert" className="mt-1 text-xs text-[var(--color-danger)]">{errText}</p> : null);
+  const fieldErr = (f: string) => (error && error.field === f ? <p role="alert" className="mt-1 text-xs text-(--color-danger)">{errText}</p> : null);
   const inputCls = "input-trevu w-full px-3.5 py-3 text-sm";
   const labelCls = "mb-1.5 block text-sm font-semibold text-navy-900";
 
@@ -217,7 +217,7 @@ export function IdeaForm({ mode, initial, categories, countries, currencies }: P
             <button key={s} type="button" aria-pressed={periodKey === s} onClick={() => { const [a, b] = SEASON_MONTHS[s]; setSm(a); setEm(b); setPeriodKey(s); setYearOverride(null); }} className={`rounded-chip px-3 py-1.5 text-xs font-semibold ${periodKey === s ? "bg-trevu-50 text-trevu-700" : "bg-navy-50 text-navy-600"}`}>{t(`ideas.period.${s}`)}</button>
           ))}
         </div>
-        {windowErr && <p role="alert" className="mt-1 text-xs text-[var(--color-danger)]">{t(`ideas.errors.${windowErr}`)}</p>}
+        {windowErr && <p role="alert" className="mt-1 text-xs text-(--color-danger)">{t(`ideas.errors.${windowErr}`)}</p>}
         {fieldErr("window_end_month")}
       </div>
 
@@ -283,7 +283,7 @@ export function IdeaForm({ mode, initial, categories, countries, currencies }: P
       </div>
 
       <p className="text-xs text-navy-500">{t("ideas.form.joinNote")}</p>
-      {error && !error.field && <p role="alert" className="text-sm text-[var(--color-danger)]">{errText}</p>}
+      {error && !error.field && <p role="alert" className="text-sm text-(--color-danger)">{errText}</p>}
 
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
         <Button variant="outline" href={mode === "edit" && initial?.slug ? `/ideas/${initial.slug}` : "/ideas"}>{t("common.cancel")}</Button>

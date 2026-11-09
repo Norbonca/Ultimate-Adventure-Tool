@@ -36,7 +36,7 @@ export function TimezoneSelect({ id, value, onChange, className }: TimezoneSelec
         onChange={(e) => onChange(e.target.value)}
         className={
           className ??
-          "w-full min-h-[48px] px-4 py-3 rounded-trevu border-[1.5px] border-navy-300 text-[15px] text-navy-900 bg-white focus:ring-[3px] focus:ring-trevu-600/10 focus:border-trevu-600 outline-none transition-all duration-200"
+          "w-full min-h-[48px] px-4 py-3 rounded-trevu border-[1.5px] border-navy-300 text-[15px] text-navy-900 bg-white focus:ring-[3px] focus:ring-trevu-600/10 focus:border-trevu-600 outline-hidden transition-all duration-200"
         }
       >
         {zones.map((zone) => (

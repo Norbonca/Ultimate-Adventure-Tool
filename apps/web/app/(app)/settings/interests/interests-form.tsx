@@ -247,7 +247,7 @@ export function InterestsForm({ categories, subDisciplines, initialInterests, in
                           <span className="text-sm font-medium text-navy-800">{sdName}</span>
                           {currentLevelDef && (
                             <span
-                              className="rounded px-2 py-0.5 text-[11px] font-semibold"
+                              className="rounded-sm px-2 py-0.5 text-[11px] font-semibold"
                               style={{ backgroundColor: currentLevelDef.bg, color: currentLevelDef.color }}
                             >
                               {t(`profile.skillLevels.${currentLevel}` as Parameters<typeof t>[0])}

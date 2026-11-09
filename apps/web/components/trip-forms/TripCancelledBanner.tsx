@@ -15,9 +15,9 @@ export function TripCancelledBanner({ title, meta, message, organizerName, note 
     <section
       role="status"
       aria-labelledby="trip-cancelled-title"
-      className="flex gap-3 sm:gap-3.5 rounded-xl border border-[var(--color-warning)] bg-[var(--color-warning-subtle)] p-3.5 sm:px-5 sm:py-4"
+      className="flex gap-3 sm:gap-3.5 rounded-xl border border-(--color-warning) bg-(--color-warning-subtle) p-3.5 sm:px-5 sm:py-4"
     >
-      <span className="w-10 h-10 rounded-full bg-white flex items-center justify-center shrink-0 text-[var(--color-warning)]">
+      <span className="w-10 h-10 rounded-full bg-white flex items-center justify-center shrink-0 text-(--color-warning)">
         <Icon name="calendar" size={20} />
       </span>
       <div className="min-w-0 flex-1 space-y-1">
@@ -26,7 +26,7 @@ export function TripCancelledBanner({ title, meta, message, organizerName, note 
         </h2>
         <p className="text-[13px] text-navy-600">{meta}</p>
         {message && (
-          <blockquote className="mt-1.5 rounded-trevu bg-white px-3.5 py-2.5 text-sm leading-relaxed text-navy-900 break-words">
+          <blockquote className="mt-1.5 rounded-trevu bg-white px-3.5 py-2.5 text-sm leading-relaxed text-navy-900 wrap-break-word">
             „{message}”{organizerName ? ` — ${organizerName}` : ""}
           </blockquote>
         )}

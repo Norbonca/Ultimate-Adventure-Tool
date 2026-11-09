@@ -325,7 +325,7 @@ export function WizardForm({ categories, countries, userId: _userId, fromIdea = 
                   {isCompleted ? <Icon name="check" size={16} strokeWidth={2.5} /> : step.num}
                 </div>
                 <span
-                  className={`text-xs mt-1.5 text-center break-words font-medium ${
+                  className={`text-xs mt-1.5 text-center wrap-break-word font-medium ${
                     isActive
                       ? "text-trevu-700"
                       : isCompleted
@@ -366,7 +366,7 @@ export function WizardForm({ categories, countries, userId: _userId, fromIdea = 
         <TutorialHelp anchor="trips.new" />
       </div>
       {/* ── Step Content ── */}
-      <div className="bg-white rounded-2xl border border-navy-200 shadow-sm p-6 sm:p-8">
+      <div className="bg-white rounded-2xl border border-navy-200 shadow-xs p-6 sm:p-8">
         {currentStep === 0 && (
           <Step0Template
             selectedMode={planningMode}
@@ -434,7 +434,7 @@ export function WizardForm({ categories, countries, userId: _userId, fromIdea = 
             <span className="text-xs text-green-600 flex items-center gap-1"><Icon name="check" size={12} strokeWidth={2.5} /> {t("trips.wizard.saved")}</span>
           )}
           {saveStatus === "error" && (
-            <span role="alert" className="max-w-full break-words text-xs text-red-500">{errorMsg}</span>
+            <span role="alert" className="max-w-full wrap-break-word text-xs text-red-500">{errorMsg}</span>
           )}
 
           {/* Draft save button (visible from step 2) */}

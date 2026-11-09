@@ -418,9 +418,9 @@ export function TripConfigClient({
   );
 
   const inputCls =
-    "w-full text-sm border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-400 bg-slate-50";
+    "w-full text-sm border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-emerald-400 bg-slate-50";
   const selectCls =
-    "w-full text-sm border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-400 bg-slate-50";
+    "w-full text-sm border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-emerald-400 bg-slate-50";
 
   // ─── Render ────────────────────────────────────────────────────────────────
 
@@ -544,7 +544,7 @@ export function TripConfigClient({
                             onChange={(e) =>
                               setCatForm((f) => ({ ...f, color_hex: e.target.value }))
                             }
-                            className="w-10 h-8 rounded cursor-pointer border border-slate-200"
+                            className="w-10 h-8 rounded-sm cursor-pointer border border-slate-200"
                           />
                         </td>
                         <td className="px-3 py-2">
@@ -584,7 +584,7 @@ export function TripConfigClient({
                           {cat.display_order}
                         </td>
                         <td className="px-3 py-2.5">
-                          <span className="text-slate-600 text-xs font-mono bg-slate-100 px-1.5 py-0.5 rounded">
+                          <span className="text-slate-600 text-xs font-mono bg-slate-100 px-1.5 py-0.5 rounded-sm">
                             {cat.icon_name}
                           </span>
                         </td>
@@ -597,7 +597,7 @@ export function TripConfigClient({
                         <td className="px-3 py-2.5">
                           <div className="flex items-center gap-1.5">
                             <span
-                              className="w-4 h-4 rounded-full border border-white/20 shadow-sm flex-shrink-0"
+                              className="w-4 h-4 rounded-full border border-white/20 shadow-xs shrink-0"
                               style={{ background: cat.color_hex }}
                             />
                             <span className="text-xs text-slate-500 font-mono">
@@ -635,7 +635,7 @@ export function TripConfigClient({
                 setSelectedCatForSd(e.target.value);
                 setShowSdForm(false);
               }}
-              className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-400 bg-white"
+              className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-hidden focus:border-emerald-400 bg-white"
             >
               <option value="">{t.t_sd_selectPrompt}</option>
               {initialCategories.map((c) => (
@@ -805,7 +805,7 @@ export function TripConfigClient({
                 setSelectedCatForP(e.target.value);
                 setShowPForm(false);
               }}
-              className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-400 bg-white"
+              className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-hidden focus:border-emerald-400 bg-white"
             >
               <option value="">{t.t_p_selectPrompt}</option>
               {initialCategories.map((c) => (
@@ -924,7 +924,7 @@ export function TripConfigClient({
                     type="checkbox"
                     checked={pForm.is_required}
                     onChange={(e) => setPForm((f) => ({ ...f, is_required: e.target.checked }))}
-                    className="w-4 h-4 rounded accent-emerald-500"
+                    className="w-4 h-4 rounded-sm accent-emerald-500"
                   />
                   {t.t_p_isRequired}
                 </label>
@@ -935,7 +935,7 @@ export function TripConfigClient({
                     onChange={(e) =>
                       setPForm((f) => ({ ...f, is_filterable: e.target.checked }))
                     }
-                    className="w-4 h-4 rounded accent-emerald-500"
+                    className="w-4 h-4 rounded-sm accent-emerald-500"
                   />
                   {t.t_p_isFilterable}
                 </label>
@@ -1039,7 +1039,7 @@ export function TripConfigClient({
                                 type="checkbox"
                                 checked={optForm.is_default}
                                 onChange={(e) => setOptForm((f) => ({ ...f, is_default: e.target.checked }))}
-                                className="w-3.5 h-3.5 rounded accent-emerald-500"
+                                className="w-3.5 h-3.5 rounded-sm accent-emerald-500"
                               />
                               {t.t_p_optionsIsDefault}
                             </label>
@@ -1091,7 +1091,7 @@ export function TripConfigClient({
                               {options.map((opt) => (
                                 <tr key={opt.id} className="hover:bg-slate-50/50">
                                   <td className="px-2.5 py-1.5">
-                                    <span className="font-mono bg-slate-100 px-1 py-0.5 rounded text-slate-700">
+                                    <span className="font-mono bg-slate-100 px-1 py-0.5 rounded-sm text-slate-700">
                                       {opt.value}
                                     </span>
                                   </td>
@@ -1111,14 +1111,14 @@ export function TripConfigClient({
                                     <div className="flex gap-1 justify-end">
                                       <button
                                         onClick={() => openEditOpt(opt)}
-                                        className="px-1.5 py-0.5 text-[10px] border border-slate-200 text-slate-600 rounded hover:border-emerald-400 hover:text-emerald-600 transition-colors"
+                                        className="px-1.5 py-0.5 text-[10px] border border-slate-200 text-slate-600 rounded-sm hover:border-emerald-400 hover:text-emerald-600 transition-colors"
                                       >
                                         {t.t_p_editParameter}
                                       </button>
                                       <button
                                         onClick={() => deleteOpt(opt.id)}
                                         disabled={loading === opt.id}
-                                        className="px-1.5 py-0.5 text-[10px] border border-red-200 text-red-600 rounded hover:bg-red-50 disabled:opacity-50 transition-colors"
+                                        className="px-1.5 py-0.5 text-[10px] border border-red-200 text-red-600 rounded-sm hover:bg-red-50 disabled:opacity-50 transition-colors"
                                       >
                                         {t.t_p_optionsDelete}
                                       </button>
@@ -1173,7 +1173,7 @@ export function TripConfigClient({
                     {filteredPs.map((p) => (
                       <tr key={p.id} className="hover:bg-slate-50/50 transition-colors">
                         <td className="px-4 py-2.5">
-                          <span className="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">
+                          <span className="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded-sm text-slate-700">
                             {p.parameter_key}
                           </span>
                         </td>

@@ -45,7 +45,7 @@ export function SystemStatusStrip() {
 
   const lead = (
     <div className="flex min-w-0 items-center gap-3">
-      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] ${s.soft} ${s.iconColor}`}>
+      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-trevu ${s.soft} ${s.iconColor}`}>
         <Icon name={leadIcon} size={18} className={!data && !failed ? "motion-safe:animate-spin" : undefined} />
       </span>
       <div className="min-w-0">

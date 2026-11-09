@@ -221,7 +221,7 @@ export function AddStaffMemberModal({
                 onChange={(e) => setCustomRoleLabel(e.target.value)}
                 placeholder={t("trips.crew.staffRolePlaceholder")}
                 maxLength={100}
-                className="w-full px-3 py-2 rounded-lg border border-navy-200 text-sm text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
+                className="w-full px-3 py-2 rounded-lg border border-navy-200 text-sm text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden transition-colors"
               />
             )}
           </div>
@@ -238,7 +238,7 @@ export function AddStaffMemberModal({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={t("trips.crew.searchPlaceholder")}
-                className="flex-1 outline-none text-sm text-navy-900 placeholder-navy-400"
+                className="flex-1 outline-hidden text-sm text-navy-900 placeholder-navy-400"
               />
             </div>
           </div>
@@ -342,7 +342,7 @@ export function AddStaffMemberModal({
                         setInviteError(null);
                       }}
                       placeholder={t("trips.crew.inviteEmailPlaceholder")}
-                      className="flex-1 outline-none text-sm text-navy-900 placeholder-navy-400"
+                      className="flex-1 outline-hidden text-sm text-navy-900 placeholder-navy-400"
                     />
                   </div>
                   <button

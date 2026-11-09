@@ -33,7 +33,7 @@ function getPasswordStrength(password: string): {
       level: 3,
       label: "strong",
       barClass: "bg-sage",
-      textClass: "text-[color:var(--color-success-text)]",
+      textClass: "text-(--color-success-text)",
     };
   if (types >= 2)
     return { level: 2, label: "medium", barClass: "bg-golden", textClass: "text-amber-600" };
@@ -95,7 +95,7 @@ export default function ResetPasswordPage() {
 
       {/* Body */}
       <div className="flex flex-1 items-center justify-center px-4 py-12">
-        <div className="w-full max-w-[440px] rounded-2xl border border-navy-200 bg-white p-10 shadow-sm">
+        <div className="w-full max-w-[440px] rounded-2xl border border-navy-200 bg-white p-10 shadow-xs">
           {/* Icon */}
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-trevu-50 text-trevu-600">
             <Icon name="shield-check" size={28} />
@@ -112,8 +112,8 @@ export default function ResetPasswordPage() {
           {!sessionReady ? (
             <div className="text-center text-sm text-navy-500">
               <p>{t('auth.verifyingResetLink')}</p>
-              <div className="mt-4 h-1 w-24 mx-auto rounded bg-navy-200 overflow-hidden">
-                <div className="h-full w-1/2 bg-trevu-600 animate-pulse rounded" />
+              <div className="mt-4 h-1 w-24 mx-auto rounded-sm bg-navy-200 overflow-hidden">
+                <div className="h-full w-1/2 bg-trevu-600 animate-pulse rounded-sm" />
               </div>
             </div>
           ) : (

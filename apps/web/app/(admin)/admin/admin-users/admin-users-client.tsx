@@ -174,7 +174,7 @@ export function AdminUsersClient({
   };
 
   const inputCls =
-    "w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-400 bg-white";
+    "w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-hidden focus:border-emerald-400 bg-white";
 
   return (
     <>
@@ -350,7 +350,7 @@ export function AdminUsersClient({
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <div
-                          className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                          className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
                             isSelf
                               ? "bg-emerald-500 text-white"
                               : "bg-slate-200 text-slate-600"
@@ -384,7 +384,7 @@ export function AdminUsersClient({
                           <select
                             value={editForm.role}
                             onChange={(e) => setEditForm((f) => ({ ...f, role: e.target.value }))}
-                            className="w-full text-xs border border-emerald-300 rounded-lg px-2 py-1.5 focus:outline-none focus:border-emerald-500 bg-white"
+                            className="w-full text-xs border border-emerald-300 rounded-lg px-2 py-1.5 focus:outline-hidden focus:border-emerald-500 bg-white"
                           >
                             {roleOptions.map(([val, label]) => (
                               <option key={val} value={val}>{label}</option>
@@ -395,7 +395,7 @@ export function AdminUsersClient({
                             value={editForm.notes}
                             onChange={(e) => setEditForm((f) => ({ ...f, notes: e.target.value }))}
                             placeholder={t.t_notesPlaceholder}
-                            className="w-full text-xs border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-emerald-400 bg-white"
+                            className="w-full text-xs border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-hidden focus:border-emerald-400 bg-white"
                           />
                         </div>
                       ) : (

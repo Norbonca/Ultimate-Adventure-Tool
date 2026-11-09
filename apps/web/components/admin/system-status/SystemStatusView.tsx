@@ -60,7 +60,7 @@ export function SystemStatusView() {
             type="button"
             onClick={() => void recheck()}
             disabled={checking}
-            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[10px] border border-line-strong bg-surface px-4 text-sm font-semibold text-ink transition-colors hover:bg-canvas disabled:cursor-wait disabled:opacity-70 md:w-auto"
+            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-trevu border border-line-strong bg-surface px-4 text-sm font-semibold text-ink transition-colors hover:bg-canvas disabled:cursor-wait disabled:opacity-70 md:w-auto"
           >
             <Icon name="refresh-cw" size={16} className={checking ? "motion-safe:animate-spin" : undefined} />
             {checking ? t("admin.system.rechecking") : t("admin.system.recheck")}
@@ -70,7 +70,7 @@ export function SystemStatusView() {
 
       {/* Lekérési hiba: az utolsó ismert állapot marad (K-6) */}
       {failed && (
-        <div role="alert" className="flex items-center gap-3 rounded-xl bg-[var(--color-warning-subtle)] px-4 py-3 text-sm text-amber-800">
+        <div role="alert" className="flex items-center gap-3 rounded-xl bg-(--color-warning-subtle) px-4 py-3 text-sm text-amber-800">
           <Icon name="wifi-off" size={18} />
           <span>
             <span className="font-semibold">{t("admin.system.stale")}</span> —{" "}
@@ -131,7 +131,7 @@ export function SystemStatusView() {
                 return (
                   <li key={key} className="py-3 md:py-3.5">
                     <div className="flex items-center gap-3 md:gap-3.5">
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-canvas text-ink-secondary md:h-9 md:w-9 md:rounded-[10px]">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-canvas text-ink-secondary md:h-9 md:w-9 md:rounded-trevu">
                         <Icon name={CHECK_ICON[key]} size={18} />
                       </span>
                       <div className="min-w-0 flex-1">

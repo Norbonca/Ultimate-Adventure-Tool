@@ -112,7 +112,7 @@ export function TripDangerZone({ tripId, slug, title, status }: TripDangerZonePr
         {/* M211 — súgó (D21) */}
         <TutorialHelp anchor="trip.cancel" />
       </div>
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4 rounded-xl border border-coral bg-[var(--color-danger-subtle)] px-5 py-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 rounded-xl border border-coral bg-(--color-danger-subtle) px-5 py-4">
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-navy-900">{t("trips.deletion.rowTitle")}</p>
           <p className="text-[13px] leading-relaxed text-navy-600 mt-1">
@@ -124,7 +124,7 @@ export function TripDangerZone({ tripId, slug, title, status }: TripDangerZonePr
           type="button"
           onClick={open}
           disabled={!deletable || busy}
-          className="inline-flex items-center justify-center gap-2 rounded-trevu border border-coral bg-white px-5 py-3 text-[15px] font-semibold text-red-600 hover:bg-[var(--color-danger-subtle)] transition-colors disabled:opacity-50 disabled:pointer-events-none"
+          className="inline-flex items-center justify-center gap-2 rounded-trevu border border-coral bg-white px-5 py-3 text-[15px] font-semibold text-red-600 hover:bg-(--color-danger-subtle) transition-colors disabled:opacity-50 disabled:pointer-events-none"
         >
           <Icon name="trash-2" size={18} />
           <span>{t("trips.deletion.button")}</span>

@@ -211,7 +211,7 @@ export function AddSeriesDateDialog({
         </div>
       </div>
       {error && !error.field && (
-        <p role="alert" className="text-sm text-[var(--color-danger)]">
+        <p role="alert" className="text-sm text-(--color-danger)">
           {error.message}
         </p>
       )}
