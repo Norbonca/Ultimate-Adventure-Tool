@@ -135,21 +135,8 @@ export default function HomePage() {
   return (
     <>
       <style>{`
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-
-        html {
-          scroll-behavior: smooth;
-        }
-
-        body {
-          font-family: 'DM Sans', sans-serif;
-          color: #0F172A;
-          background-color: #FFFFFF;
-        }
+        /* Tailwind 4: ez a blokk réteg nélküli CSS, ezért minden utility-t felülírna —
+           a globális *, html és body szabály kikerült (a preflight és a globals.css adja). */
 
         /* Header */
         .header {
