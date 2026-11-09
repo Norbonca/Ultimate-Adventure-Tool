@@ -8,6 +8,11 @@
 import type { Metadata } from "next";
 import { createT, type Locale } from "@uat/i18n";
 
+/** A webhely abszolút címe (metadataBase, kanonikus és strukturált adat). */
+export const SITE_URL = process.env.NEXT_PUBLIC_APP_URL?.startsWith("http")
+  ? process.env.NEXT_PUBLIC_APP_URL
+  : "https://www.ttvk.hu";
+
 export const SITE_NAME = "Trevu";
 /** OpenGraph-locale a felület nyelvéből; a többi támogatott nyelv `alternateLocale`. */
 export function ogLocale(locale: Locale): { locale: string; alternateLocale: string[] } {

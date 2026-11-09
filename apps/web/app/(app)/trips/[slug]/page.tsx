@@ -26,6 +26,9 @@ import { fetchTripBySlugForAdmin } from "@/lib/admin-auth";
 import { getIdeaForTrip } from "@/lib/ideas/queries";
 import { ShareButton } from "@/components/share/ShareButton";
 import { isTripPublic, plainExcerpt, tripOgImagePath } from "@/lib/share/trip-share";
+import { tripStructuredData } from "@/lib/share/trip-structured-data";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { SITE_URL } from "@/lib/seo";
 
 interface TripDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -285,8 +288,34 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
         .join(" · ")
     : "";
 
+  // FR-M02-010 / ND-SH-04: keresőknek szóló strukturált adat, csak nyilvános túrán.
+  const structuredData = isTripPublic(trip)
+    ? tripStructuredData(SITE_URL, {
+          slug: trip.slug as string,
+          title: trip.title as string,
+          description:
+            plainExcerpt(trip.short_description as string | null) ||
+            plainExcerpt(typeof trip.description === "string" ? trip.description : null) ||
+            (trip.title as string),
+          imageUrl: (trip.cover_image_url as string | null) ?? tripOgImagePath(trip.slug as string, trip.updated_at as string | null),
+          startDate: trip.start_date as string | null,
+          endDate: trip.end_date as string | null,
+          city: trip.location_city as string | null,
+          region: trip.location_region as string | null,
+          country: trip.location_country as string | null,
+          priceAmount: trip.price_amount as number | null,
+          priceCurrency: trip.price_currency as string | null,
+          spotsLeft: Math.max(0, spotsLeft),
+          registrationDeadline: trip.registration_deadline as string | null,
+          organizerName: organizer?.display_name ?? null,
+          organizerSlug: organizer?.slug ?? null,
+          keywords: [categoryName, subDiscName],
+        })
+    : null;
+
   return (
     <main className="min-h-screen bg-slate-50 pb-20 lg:pb-0">
+      {structuredData && <JsonLd data={structuredData} />}
       <div data-surface="night" className="contents">
         <AppHeader
           user={user ? { email: user.email ?? "", displayName: user.user_metadata?.full_name } : null}
