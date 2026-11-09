@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { SITE_NAME, ogLocale } from "@/lib/seo";
 import "@/styles/globals.css";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { getServerT } from "@/lib/i18n/server";
 import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
 
@@ -52,6 +54,10 @@ export default async function RootLayout({
         className="min-h-screen bg-canvas text-ink antialiased"
       >
         <LocaleProvider locale={locale}>{children}</LocaleProvider>
+        {/* Forgalom- és teljesítménymérés (Norbert, 2026-11-09): Vercel Web Analytics + Speed Insights,
+            süti nélkül, összesített adat; a Vercel-projektben a két funkciót be kell kapcsolni. */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
