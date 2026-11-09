@@ -6,13 +6,18 @@
  */
 
 import type { Metadata } from "next";
+import { createT, type Locale } from "@uat/i18n";
 
 export const SITE_NAME = "Trevu";
-export const SITE_TAGLINE = "Kalandtúrák szervezése és felfedezése";
-export const SITE_DESCRIPTION =
-  "Meghirdetés, jelentkezők, teendők és közös költségek – egy felületen. Kis csoportos kalandtúrák szervezőinek és résztvevőinek.";
+/** OpenGraph-locale a felület nyelvéből; a többi támogatott nyelv `alternateLocale`. */
+export function ogLocale(locale: Locale): { locale: string; alternateLocale: string[] } {
+  const map: Record<Locale, string> = { hu: "hu_HU", en: "en_US" };
+  return { locale: map[locale], alternateLocale: (Object.keys(map) as Locale[]).filter((l) => l !== locale).map((l) => map[l]) };
+}
 
 interface PageMetaInput {
+  /** Az olvasó nyelve (`getServerLocale()`), ebből jön az og:locale és az alapkép alt-szövege. */
+  locale: Locale;
   /** A lap címe a „· Trevu” utótag nélkül (azt a gyökér sablonja fűzi hozzá). */
   title: string;
   description: string;
@@ -25,11 +30,12 @@ interface PageMetaInput {
   absoluteTitle?: boolean;
 }
 
-export function pageMeta({ title, description, path, image, type = "website", noindex, absoluteTitle }: PageMetaInput): Metadata {
+export function pageMeta({ locale, title, description, path, image, type = "website", noindex, absoluteTitle }: PageMetaInput): Metadata {
   const fullTitle = absoluteTitle ? title : `${title} · ${SITE_NAME}`;
   // Saját kép nélkül a gyökér megosztási képe (app/opengraph-image.tsx) — a Next ezt az alszegmensekre
   // nem örökíti, ha az oldal saját openGraph-ot ad, ezért kifejezetten megadjuk.
-  const img = image ?? { url: "/opengraph-image", width: 1200, height: 630, alt: `${SITE_NAME} — ${SITE_TAGLINE}` };
+  const t = createT(locale);
+  const img = image ?? { url: "/opengraph-image", width: 1200, height: 630, alt: `${SITE_NAME} — ${t("metadata.siteTagline")}` };
   const images = [{ url: img.url, width: img.width, height: img.height, alt: img.alt ?? title }];
   return {
     title: absoluteTitle ? { absolute: title } : title,
@@ -38,8 +44,7 @@ export function pageMeta({ title, description, path, image, type = "website", no
     openGraph: {
       type,
       siteName: SITE_NAME,
-      locale: "hu_HU",
-      alternateLocale: ["en_US"],
+      ...ogLocale(locale),
       url: path,
       title: fullTitle,
       description,

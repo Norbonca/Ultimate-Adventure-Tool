@@ -9,8 +9,9 @@ import { getServerT } from "@/lib/i18n/server";
 import { PresentationPlayerClient } from "@/components/presentation/PresentationPlayerClient";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getServerT();
+  const { t, locale } = await getServerT();
   return pageMeta({
+    locale,
     title: t("presentation.metaTitle"),
     description: t("presentation.metaDescription"),
     path: "/presentation",

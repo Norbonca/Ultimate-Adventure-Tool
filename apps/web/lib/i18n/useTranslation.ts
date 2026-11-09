@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useMemo, useSyncExternalStore } from "react";
 import {
-  t as translate,
+  createT,
   setLocale,
   getLocale,
   getSection,
@@ -12,6 +12,7 @@ import {
   SUPPORTED_LOCALES,
   DEFAULT_LOCALE,
 } from "@uat/i18n";
+import { useServerLocale } from "./LocaleProvider";
 
 const LOCALE_CHANGE_EVENT = "trevu-locale-change";
 const STORAGE_KEY = "trevu-locale";
@@ -83,7 +84,6 @@ function subscribe(onChange: () => void) {
 }
 
 const getSnapshot = () => getLocale();
-const getServerSnapshot = () => getLocale();
 
 /**
  * React hook for i18n translations.
@@ -97,7 +97,10 @@ const getServerSnapshot = () => getLocale();
  *   <button onClick={() => switchLocale('en')}>EN</button>
  */
 export function useTranslation() {
-  const locale = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  // A szerveroldali render és a hidratálás a szerver által feloldott olvasói nyelvet használja
+  // (LocaleProvider), nem a megosztott modul-állapotot — így kérések között sem szivárog át.
+  const serverLocale = useServerLocale();
+  const locale = useSyncExternalStore(subscribe, getSnapshot, () => serverLocale);
 
   const switchLocale = useCallback((newLocale: Locale) => {
     persistLocale(newLocale);
@@ -105,13 +108,10 @@ export function useTranslation() {
     window.dispatchEvent(new CustomEvent(LOCALE_CHANGE_EVENT, { detail: newLocale }));
   }, []);
 
-  const t = useCallback(
-    (key: TranslationKey, params?: Record<string, string | number>) => {
-      return translate(key, params);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [locale]
-  );
+  const t = useMemo(() => {
+    const bound = createT(locale);
+    return (key: TranslationKey, params?: Record<string, string | number>) => bound(key, params);
+  }, [locale]);
 
   const section = useCallback(
     <K extends keyof TranslationKeys>(sectionName: K) => {

@@ -1423,6 +1423,17 @@ const en: TranslationKeys = {
     title: "Trevu — Trek beyond ordinary",
     description: "Plan the perfect adventure — organize trips, share expenses, find local guides",
     keywords: "adventure, trip, travel, expense sharing, guide, trekking, outdoor",
+    siteTagline: "Organize and discover adventure trips",
+    siteDescription: "Listings, applicants, tasks and shared costs – in one place. For organizers and participants of small-group adventure trips.",
+    tripFallbackDescription: "Discover this adventure on Trevu.",
+    pages: {
+      discover: { title: "Explore trips", description: "Small-group adventure trips in 8 categories: search by place, time and trip type in tile, list or 3D map view, and apply for the date you choose." },
+      community: { title: "Community", description: "Adventurers and organizers on Trevu: follow them and discover their trips." },
+      ideas: { title: "Idea board", description: "Trip ideas you can join or organize: destination, time window and the number of people interested, all in one place." },
+      idea: { title: "Idea board", description: "A trip idea on the Trevu idea board — join it or organize it." },
+      getStarted: { title: "What is Trevu?", description: "Listings, applicants, tasks and shared costs – in one place. See how you can organize small-group adventure trips with Trevu." },
+      pricing: { title: "Pricing", description: "Free for personal use. Subscriptions are for those who organize as a business; for cost-sharing trips Trevu is free." },
+    },
   },
 
   // ============================================================================

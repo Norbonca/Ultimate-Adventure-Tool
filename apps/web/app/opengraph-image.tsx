@@ -27,7 +27,6 @@ export default async function OpengraphImage() {
   return new ImageResponse(
     (
       <div style={{ width: "100%", height: "100%", display: "flex", position: "relative", background: "#0F172A", fontFamily: "DM Sans" }}>
-        {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse (satori) csak <img>-et ismer */}
         <img src={heroSrc} alt="" width={1200} height={630} style={{ position: "absolute", top: 0, left: 0, width: 1200, height: 630, objectFit: "cover" }} />
         <div style={{ position: "absolute", top: 56, left: 64, display: "flex", alignItems: "center", gap: 12, padding: "10px 18px 10px 10px", borderRadius: 16, background: "rgba(15,23,42,0.85)" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 44, height: 44, borderRadius: 12, background: "#2DD4BF", color: "#0F172A", fontSize: 26, fontWeight: 700 }}>T</div>

@@ -19,11 +19,15 @@ import { fetchCategories } from "../trips/actions";
 import { CATEGORY_DISPLAY } from "@/lib/categories";
 import { CATEGORY_TEXT } from "@/components/discover/TripBand";
 
-export const metadata: Metadata = pageMeta({
-  title: "Ötletbörze",
-  description: "Túraötletek, amelyekhez csatlakozhatsz, vagy amelyeket megszervezhetsz: célterület, időablak és az érdeklődők száma egy helyen.",
-  path: "/ideas",
-}); // a root layout sablonja fűzi hozzá a „· Trevu”-t
+export async function generateMetadata(): Promise<Metadata> {
+  const { t, locale } = await getServerT();
+  return pageMeta({
+    locale,
+    title: t("metadata.pages.ideas.title"),
+    description: t("metadata.pages.ideas.description"),
+    path: "/ideas",
+  });
+}
 
 interface PageProps { searchParams: Promise<Record<string, string | string[] | undefined>> }
 

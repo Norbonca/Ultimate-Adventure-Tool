@@ -1450,6 +1450,17 @@ const hu = {
     title: "Trevu — Trek beyond ordinary",
     description: "Tervezd meg a tökéletes kalandot — túrák szervezése, költségmegosztás, helyi túravezetők",
     keywords: "kaland, túra, utazás, költségmegosztás, túravezető, trekking, outdoor",
+    siteTagline: "Kalandtúrák szervezése és felfedezése",
+    siteDescription: "Meghirdetés, jelentkezők, teendők és közös költségek – egy felületen. Kis csoportos kalandtúrák szervezőinek és résztvevőinek.",
+    tripFallbackDescription: "Fedezd fel ezt a kalandot a Trevu-n.",
+    pages: {
+      discover: { title: "Túrák felfedezése", description: "Kis csoportos kalandtúrák 8 kategóriában: keress hely, idő és túratípus szerint, csempe-, lista- vagy 3D-térképnézetben, és jelentkezz a választott időpontra." },
+      community: { title: "Közösség", description: "Kalandorok és szervezők a Trevun: kövesd őket, és fedezd fel a túráikat." },
+      ideas: { title: "Ötletbörze", description: "Túraötletek, amelyekhez csatlakozhatsz, vagy amelyeket megszervezhetsz: célterület, időablak és az érdeklődők száma egy helyen." },
+      idea: { title: "Ötletbörze", description: "Túraötlet a Trevu Ötletbörzéjén — csatlakozz, vagy szervezd meg." },
+      getStarted: { title: "Mi a Trevu?", description: "Meghirdetés, jelentkezők, teendők és közös költségek – egy felületen. Ismerd meg, hogyan szervezhetsz kis csoportos kalandtúrákat a Trevuval." },
+      pricing: { title: "Árazás", description: "Személyes használatra ingyenes. Előfizetést az fizet, aki üzletszerűen szervez; költségmegosztó túrákhoz a Trevu ingyenes." },
+    },
   },
 
   // ============================================================================

@@ -34,15 +34,17 @@ export async function generateMetadata({ params }: TripDetailPageProps): Promise
   const { slug } = await params;
   const trip = (await fetchTripBySlug(slug)) ?? (await fetchTripBySlugForAdmin(slug));
   if (!trip) return {};
+  const { t, locale } = await getServerT();
 
   // FR-M02-010: formázásmentes, ≤ 200 karakteres leírás; a túra saját megosztóképe (1200×630).
   const description =
     plainExcerpt(trip.short_description as string | null) ||
     plainExcerpt(typeof trip.description === "string" ? trip.description : null) ||
-    "Fedezd fel ezt a kalandot a Trevu-n.";
+    t("metadata.tripFallbackDescription");
 
   const isPublic = isTripPublic(trip);
   return pageMeta({
+    locale,
     title: trip.title as string,
     description,
     path: `/trips/${slug}`,

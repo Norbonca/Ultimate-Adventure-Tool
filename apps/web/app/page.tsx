@@ -1,4 +1,6 @@
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import { getServerT } from "@/lib/i18n/server";
 import { pageMeta, SITE_NAME } from "@/lib/seo";
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORY_DISPLAY, DIFFICULTY_LEVELS } from "@/lib/categories";
@@ -9,13 +11,16 @@ import {
 } from "@/lib/discover-view";
 import DiscoverClient from "./discover-client";
 
-export const metadata = pageMeta({
-  title: `${SITE_NAME} — Túrák felfedezése`,
-  absoluteTitle: true,
-  description:
-    "Kis csoportos kalandtúrák 8 kategóriában: keress hely, idő és túratípus szerint, csempe-, lista- vagy 3D-térképnézetben, és jelentkezz a választott időpontra.",
-  path: "/",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const { t, locale } = await getServerT();
+  return pageMeta({
+    locale,
+    title: `${SITE_NAME} — ${t("metadata.pages.discover.title")}`,
+    description: t("metadata.pages.discover.description"),
+    path: "/",
+    absoluteTitle: true,
+  });
+}
 
 async function fetchPublishedTrips() {
   const supabase = await createClient();

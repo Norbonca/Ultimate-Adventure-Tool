@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { pageMeta } from "@/lib/seo";
 import { redirect } from "next/navigation";
@@ -67,11 +68,15 @@ function PersonRow({
   );
 }
 
-export const metadata = pageMeta({
-  title: "Közösség",
-  description: "Kalandorok és szervezők a Trevun: kövesd őket, és fedezd fel a túráikat.",
-  path: "/community",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const { t, locale } = await getServerT();
+  return pageMeta({
+    locale,
+    title: t("metadata.pages.community.title"),
+    description: t("metadata.pages.community.description"),
+    path: "/community",
+  });
+}
 
 export default async function CommunityPage() {
   const supabase = await createClient();
