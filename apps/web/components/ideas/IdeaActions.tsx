@@ -87,7 +87,7 @@ export function IdeaActions(p: IdeaActionsProps) {
     <div className={wrap} data-testid="idea-actions">
       {primary && <div className={p.layout === "sticky" ? "flex-1" : ""}>{primary}</div>}
       {p.layout !== "sticky" && secondary.length > 0 && <div className="flex flex-wrap gap-2">{secondary}</div>}
-      {error && <p role="alert" className="text-sm text-[var(--color-danger)]">{error}</p>}
+      {error && <p role="alert" className="text-sm text-(--color-danger)">{error}</p>}
       {toast && <p role="status" className="rounded-trevu bg-[color-mix(in_srgb,var(--color-success)_15%,transparent)] px-3 py-2 text-sm text-ink">{toast}</p>}
 
       {dialog === "join" && (

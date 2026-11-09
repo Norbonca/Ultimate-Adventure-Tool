@@ -34,7 +34,7 @@ export function BasicInfoSection({
           <select
             value={data.sub_discipline_id}
             onChange={(e) => onSubDisciplineChange(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 bg-white focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
+            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 bg-white focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden transition-colors"
           >
             <option value="">{t("trips.wizard.selectSubcategory")}</option>
             {subDisciplines.map((sub) => (
@@ -59,7 +59,7 @@ export function BasicInfoSection({
           onChange={(e) => onChange({ title: e.target.value })}
           placeholder={t("trips.wizard.titlePlaceholder")}
           maxLength={200}
-          className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 placeholder:text-navy-300 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
+          className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 placeholder:text-navy-300 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden transition-colors"
         />
         <p className="text-xs text-navy-400 mt-1">
           {t("trips.wizard.charCount").replace("{count}", String(data.title.length))}
@@ -77,7 +77,7 @@ export function BasicInfoSection({
           onChange={(e) => onChange({ short_description: e.target.value })}
           placeholder={t("trips.wizard.shortDescPlaceholder")}
           maxLength={280}
-          className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 placeholder:text-navy-300 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
+          className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 placeholder:text-navy-300 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden transition-colors"
         />
       </div>
 
@@ -91,7 +91,7 @@ export function BasicInfoSection({
           onChange={(e) => onChange({ description: e.target.value })}
           placeholder={t("trips.wizard.descPlaceholder")}
           rows={5}
-          className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 placeholder:text-navy-300 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors resize-none"
+          className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 placeholder:text-navy-300 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden transition-colors resize-none"
         />
       </div>
 
@@ -106,7 +106,7 @@ export function BasicInfoSection({
             value={data.start_date}
             onChange={(e) => onChange({ start_date: e.target.value })}
             min={todayIso}
-            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
+            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden transition-colors"
           />
         </div>
         <div>
@@ -118,7 +118,7 @@ export function BasicInfoSection({
             value={data.end_date}
             onChange={(e) => onChange({ end_date: e.target.value })}
             min={data.start_date || todayIso}
-            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
+            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden transition-colors"
           />
         </div>
       </div>
@@ -132,7 +132,7 @@ export function BasicInfoSection({
           <select
             value={data.location_country}
             onChange={(e) => onChange({ location_country: e.target.value })}
-            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 bg-white focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
+            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 bg-white focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden transition-colors"
           >
             {countries.map((c) => (
               <option key={c.code} value={c.code}>
@@ -150,7 +150,7 @@ export function BasicInfoSection({
             value={data.location_region}
             onChange={(e) => onChange({ location_region: e.target.value })}
             placeholder={t("trips.wizard.regionPlaceholder")}
-            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 placeholder:text-navy-300 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
+            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 placeholder:text-navy-300 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden transition-colors"
           />
         </div>
         <div>
@@ -162,7 +162,7 @@ export function BasicInfoSection({
             value={data.location_city}
             onChange={(e) => onChange({ location_city: e.target.value })}
             placeholder={t("trips.wizard.cityPlaceholder")}
-            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 placeholder:text-navy-300 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
+            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 placeholder:text-navy-300 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden transition-colors"
           />
         </div>
       </div>
@@ -179,7 +179,7 @@ export function BasicInfoSection({
             onChange={(e) => onChange({ max_participants: parseInt(e.target.value) || 2 })}
             min={2}
             max={200}
-            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
+            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden transition-colors"
           />
         </div>
         <div>
@@ -192,7 +192,7 @@ export function BasicInfoSection({
             onChange={(e) => onChange({ min_participants: parseInt(e.target.value) || 1 })}
             min={1}
             max={data.max_participants}
-            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
+            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden transition-colors"
           />
         </div>
         <div>

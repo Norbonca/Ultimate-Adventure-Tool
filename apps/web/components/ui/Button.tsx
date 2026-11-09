@@ -55,7 +55,7 @@ function classes(
   return [
     "inline-flex items-center justify-center rounded-trevu font-semibold",
     "transition-all duration-200 select-none",
-    "focus:outline-none focus-visible:ring-[3px]",
+    "focus:outline-hidden focus-visible:ring-[3px]",
     "disabled:opacity-50 disabled:pointer-events-none",
     VARIANT[variant],
     SIZE[size],

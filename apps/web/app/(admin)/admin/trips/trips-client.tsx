@@ -161,7 +161,7 @@ export function AdminTripsClient({
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t.t_search_placeholder}
             aria-label={t.t_search_placeholder}
-            className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-emerald-400 bg-slate-50"
+            className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-hidden focus:border-emerald-400 bg-slate-50"
           />
           <button
             type="submit"

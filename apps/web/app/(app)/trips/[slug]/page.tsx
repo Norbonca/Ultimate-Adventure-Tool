@@ -303,7 +303,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
         )}
         <div aria-hidden className="absolute inset-0 bg-hero-scrim-mobile md:bg-hero-scrim" />
         {trip.cover_image_source === "user_upload" && (
-          <span className="absolute right-4 top-16 z-10 rounded-full bg-glass px-2.5 py-1 text-[11px] font-semibold text-ink backdrop-blur">
+          <span className="absolute right-4 top-16 z-10 rounded-full bg-glass px-2.5 py-1 text-[11px] font-semibold text-ink backdrop-blur-sm">
             <Icon name="camera" size={12} className="-mt-0.5 mr-1 inline" />{t("imagePicker.ownPhoto")}
           </span>
         )}
@@ -323,19 +323,19 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
           <div className="flex max-w-[760px] flex-col gap-3.5">
             <div className="flex flex-wrap items-center gap-2">
               {category && (
-                <span className="inline-flex w-fit items-center gap-1.5 rounded-chip bg-glass px-2.5 py-1 text-xs font-semibold text-ink backdrop-blur">
+                <span className="inline-flex w-fit items-center gap-1.5 rounded-chip bg-glass px-2.5 py-1 text-xs font-semibold text-ink backdrop-blur-sm">
                   {catDisplay && <span style={{ color: catDisplay.colorHex }} className="inline-flex"><Icon name={catDisplay.icon} size={14} /></span>}
                   {categoryName}{subDisc ? ` · ${subDiscName}` : ""}
                 </span>
               )}
               {isCancelled && (
-                <span className="inline-flex items-center gap-1.5 rounded-chip bg-[var(--color-warning-subtle)] px-2.5 py-1 text-xs font-semibold text-[var(--color-warning-text)]">
+                <span className="inline-flex items-center gap-1.5 rounded-chip bg-(--color-warning-subtle) px-2.5 py-1 text-xs font-semibold text-(--color-warning-text)">
                   <Icon name="calendar" size={12} />
                   {t("trips.status.cancelled")}
                 </span>
               )}
             </div>
-            <h1 className="text-[30px] font-extrabold leading-[1.1] tracking-[-0.02em] text-ink [text-wrap:balance] md:text-hero-display">{trip.title}</h1>
+            <h1 className="text-[30px] font-extrabold leading-[1.1] tracking-[-0.02em] text-ink text-balance md:text-hero-display">{trip.title}</h1>
             <p className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm font-medium text-ink-body">
               <span className="inline-flex items-center gap-1.5">
                 <Icon name="map-pin" size={16} className="text-ink-secondary" />

@@ -334,7 +334,7 @@ export default function ProfilePage() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex gap-8">
           {/* ─── LEFT SIDEBAR ─── */}
-          <aside className="w-[320px] flex-shrink-0">
+          <aside className="w-[320px] shrink-0">
             <div className="bg-white rounded-2xl border border-slate-200 p-8 sticky top-24">
               {/* Avatar */}
               <div className="flex flex-col items-center gap-4">
@@ -433,7 +433,7 @@ export default function ProfilePage() {
                 {(profile.location_city || profile.country_code) && (
                   <div className="flex items-center gap-2.5">
                     <svg
-                      className="w-4 h-4 text-slate-400 flex-shrink-0"
+                      className="w-4 h-4 text-slate-400 shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -463,7 +463,7 @@ export default function ProfilePage() {
                 {memberSinceDate && (
                   <div className="flex items-center gap-2.5">
                     <svg
-                      className="w-4 h-4 text-slate-400 flex-shrink-0"
+                      className="w-4 h-4 text-slate-400 shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -488,7 +488,7 @@ export default function ProfilePage() {
                 {profile.verified_organizer && (
                   <div className="flex items-center gap-2.5">
                     <svg
-                      className="w-4 h-4 text-teal-600 flex-shrink-0"
+                      className="w-4 h-4 text-teal-600 shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"

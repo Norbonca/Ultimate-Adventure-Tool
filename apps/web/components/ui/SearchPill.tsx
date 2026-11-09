@@ -52,7 +52,7 @@ export function SearchPill({
       data-testid={testId}
       className={[
         "flex h-14 w-full items-center gap-3 rounded-full border border-line-strong bg-glass py-2 pl-5 pr-2 backdrop-blur-md",
-        "focus-within:border-accent focus-within:shadow-[var(--focus-ring)]",
+        "focus-within:border-accent focus-within:shadow-(--focus-ring)",
         className ?? "",
       ].join(" ")}
     >
@@ -64,13 +64,13 @@ export function SearchPill({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         data-testid={inputTestId}
-        className="min-w-0 flex-1 bg-transparent text-base text-ink placeholder:text-ink-muted focus:outline-none [&::-webkit-search-cancel-button]:hidden"
+        className="min-w-0 flex-1 bg-transparent text-base text-ink placeholder:text-ink-muted focus:outline-hidden [&::-webkit-search-cancel-button]:hidden"
         placeholder={placeholder}
       />
       <button
         type="submit"
         data-testid={submitTestId}
-        className="h-10 shrink-0 rounded-full bg-accent px-5 text-sm font-semibold text-accent-on transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+        className="h-10 shrink-0 rounded-full bg-accent px-5 text-sm font-semibold text-accent-on transition-colors hover:bg-accent-hover focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
       >
         {submitLabel}
       </button>

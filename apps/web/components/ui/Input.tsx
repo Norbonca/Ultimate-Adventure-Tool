@@ -47,7 +47,7 @@ export function Input({
           aria-describedby={describedBy}
           className={[
             "w-full min-h-[48px] rounded-trevu border-[1.5px] bg-white px-4 py-3 text-[15px] text-navy-900",
-            "placeholder:text-navy-500 outline-none transition-all duration-200",
+            "placeholder:text-navy-500 outline-hidden transition-all duration-200",
             error
               ? "border-coral focus:border-coral focus:ring-[3px] focus:ring-coral/15"
               : "border-navy-300 focus:border-trevu-600 focus:ring-[3px] focus:ring-trevu-600/10",

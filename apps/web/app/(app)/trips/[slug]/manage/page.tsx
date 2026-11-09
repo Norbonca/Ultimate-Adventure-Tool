@@ -93,7 +93,7 @@ export default async function TripManagePage({ params }: ManagePageProps) {
 
           {/* Trip Name + Meta */}
           <div className="space-y-2">
-            <h2 className="text-lg font-bold text-navy-900 leading-tight break-words">
+            <h2 className="text-lg font-bold text-navy-900 leading-tight wrap-break-word">
               {trip.title}
             </h2>
             <div className="text-sm text-navy-500 space-y-1">

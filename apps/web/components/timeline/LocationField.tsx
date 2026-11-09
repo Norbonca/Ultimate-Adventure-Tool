@@ -33,7 +33,7 @@ type SearchState =
   | { kind: "too_short" };
 
 export const TIMELINE_INPUT =
-  "h-11 w-full rounded-[10px] border border-line bg-[var(--color-input-bg)] px-3 text-base text-ink placeholder:text-ink-muted outline-none focus:border-accent focus:shadow-[var(--focus-ring)] disabled:opacity-50";
+  "h-11 w-full rounded-trevu border border-line bg-(--color-input-bg) px-3 text-base text-ink placeholder:text-ink-muted outline-hidden focus:border-accent focus:shadow-(--focus-ring) disabled:opacity-50";
 
 export function LocationField({
   tripId,
@@ -106,7 +106,7 @@ export function LocationField({
   }
 
   const linkBtn =
-    "inline-flex min-h-11 sm:min-h-0 items-center justify-center gap-1.5 rounded-[10px] border border-line sm:border-0 text-[13px] font-medium";
+    "inline-flex min-h-11 sm:min-h-0 items-center justify-center gap-1.5 rounded-trevu border border-line sm:border-0 text-[13px] font-medium";
 
   return (
     <div className="space-y-2">
@@ -115,7 +115,7 @@ export function LocationField({
       </label>
 
       {value && !editing ? (
-        <div className="space-y-2.5 rounded-[10px] border border-line bg-ghost p-3.5">
+        <div className="space-y-2.5 rounded-trevu border border-line bg-ghost p-3.5">
           <div className="flex gap-2.5">
             <Icon name="map-pin" size={18} className="mt-0.5 shrink-0 text-accent" />
             <div className="min-w-0">
@@ -125,9 +125,9 @@ export function LocationField({
                 maxLength={300}
                 onChange={(e) => onChange({ ...value, name: e.target.value })}
                 aria-label={t("timeline.locationName")}
-                className="-mx-1.5 w-[calc(100%+0.75rem)] rounded-md border border-transparent bg-transparent px-1.5 py-0.5 font-semibold text-ink outline-none hover:border-line focus:border-accent"
+                className="-mx-1.5 w-[calc(100%+0.75rem)] rounded-md border border-transparent bg-transparent px-1.5 py-0.5 font-semibold text-ink outline-hidden hover:border-line focus:border-accent"
               />
-              <p className="break-words text-[13px] text-ink-muted">
+              <p className="wrap-break-word text-[13px] text-ink-muted">
                 {[value.address, value.lat != null ? t("timeline.locationHasCoords") : t("timeline.locationNoCoords")]
                   .filter(Boolean)
                   .join(" · ")}
@@ -151,7 +151,7 @@ export function LocationField({
             >
               <Icon name="search" size={14} /> {t("timeline.locationChange")}
             </button>
-            <button type="button" onClick={() => onChange(null)} className={`${linkBtn} text-[var(--color-danger)] hover:underline`}>
+            <button type="button" onClick={() => onChange(null)} className={`${linkBtn} text-(--color-danger) hover:underline`}>
               <Icon name="trash-2" size={14} /> {t("timeline.locationRemove")}
             </button>
           </div>
@@ -181,7 +181,7 @@ export function LocationField({
               type="button"
               onClick={() => void runSearch()}
               disabled={search.kind === "busy"}
-              className="h-11 shrink-0 rounded-[10px] border border-line-strong px-3.5 text-sm font-medium text-ink hover:bg-ghost disabled:opacity-60"
+              className="h-11 shrink-0 rounded-trevu border border-line-strong px-3.5 text-sm font-medium text-ink hover:bg-ghost disabled:opacity-60"
             >
               {search.kind === "busy" ? t("timeline.locationSearching") : t("timeline.locationSearch")}
             </button>
@@ -191,24 +191,24 @@ export function LocationField({
             {search.kind === "idle" && <p className="text-[13px] text-ink-muted">{t("timeline.locationHelp")}</p>}
             {search.kind === "too_short" && <p className="text-[13px] text-ink-muted">{t("timeline.locationTooShort")}</p>}
             {(search.kind === "none" || search.kind === "unavailable") && (
-              <p className="flex gap-2 rounded-[10px] border border-line bg-ghost p-3 text-[13px] text-ink-secondary">
-                <Icon name="info" size={16} className="mt-0.5 shrink-0 text-[var(--color-warning)]" />
+              <p className="flex gap-2 rounded-trevu border border-line bg-ghost p-3 text-[13px] text-ink-secondary">
+                <Icon name="info" size={16} className="mt-0.5 shrink-0 text-(--color-warning)" />
                 {search.kind === "none" ? t("timeline.locationNoResults") : t("timeline.locationUnavailable")}
               </p>
             )}
             {search.kind === "results" && (
-              <ul aria-label={t("timeline.locationResults")} className="overflow-hidden rounded-[10px] border border-line">
+              <ul aria-label={t("timeline.locationResults")} className="overflow-hidden rounded-trevu border border-line">
                 {search.results.map((r) => (
                   <li key={r.placeId} className="border-t border-line first:border-t-0">
                     <button
                       type="button"
                       onClick={() => choose({ name: r.name, notes: value?.notes ?? "", address: r.address, lat: r.lat, lng: r.lng, place: r })}
-                      className="flex min-h-11 w-full items-start gap-2.5 p-3 text-left outline-none hover:bg-[var(--color-primary-subtle)] focus-visible:bg-[var(--color-primary-subtle)]"
+                      className="flex min-h-11 w-full items-start gap-2.5 p-3 text-left outline-hidden hover:bg-(--color-primary-subtle) focus-visible:bg-(--color-primary-subtle)"
                     >
                       <Icon name="map-pin" size={16} className="mt-0.5 shrink-0 text-ink-muted" />
                       <span className="min-w-0">
                         <span className="block text-sm font-semibold text-ink">{r.name}</span>
-                        {r.address && <span className="block break-words text-xs text-ink-muted">{r.address}</span>}
+                        {r.address && <span className="block wrap-break-word text-xs text-ink-muted">{r.address}</span>}
                       </span>
                     </button>
                   </li>

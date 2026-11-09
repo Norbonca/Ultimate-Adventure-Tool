@@ -33,7 +33,7 @@ export function PresentationPromo({ className = "" }: { className?: string }) {
 
   return (
     <section data-surface="night" className={`bg-canvas px-4 py-8 md:px-[120px] md:py-12 ${className}`} data-testid="presentation-promo">
-      <div className="mx-auto grid max-w-7xl items-center gap-6 overflow-hidden rounded-[20px] border border-line p-5 [background:linear-gradient(135deg,var(--color-bg)_0%,var(--color-primary-subtle)_100%)] md:grid-cols-[5fr_7fr] md:gap-12 md:rounded-3xl md:p-12">
+      <div className="mx-auto grid max-w-7xl items-center gap-6 overflow-hidden rounded-trevu-3xl border border-line p-5 [background:linear-gradient(135deg,var(--color-bg)_0%,var(--color-primary-subtle)_100%)] md:grid-cols-[5fr_7fr] md:gap-12 md:rounded-3xl md:p-12">
         <div className="order-2 flex flex-col gap-4 md:order-1 md:gap-5">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent md:text-sm">{t("presentation.promoEyebrow")}</p>
           <h2 className="text-[28px] font-extrabold leading-tight text-ink md:text-[40px]">{cover.title[lang]}</h2>
@@ -41,7 +41,7 @@ export function PresentationPromo({ className = "" }: { className?: string }) {
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
             <Link
               href="/presentation"
-              className="inline-flex h-12 items-center justify-center gap-2.5 rounded-trevu bg-accent px-6 text-base font-bold text-accent-on transition-colors hover:bg-accent-hover focus-visible:shadow-[var(--focus-ring)] focus-visible:outline-none"
+              className="inline-flex h-12 items-center justify-center gap-2.5 rounded-trevu bg-accent px-6 text-base font-bold text-accent-on transition-colors hover:bg-accent-hover focus-visible:shadow-(--focus-ring) focus-visible:outline-hidden"
               data-testid="presentation-promo-cta"
             >
               <Icon name="circle-play" size={20} aria-hidden />

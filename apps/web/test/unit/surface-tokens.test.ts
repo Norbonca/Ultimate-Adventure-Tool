@@ -9,13 +9,15 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import tailwindConfig from "../../tailwind.config";
 
 const css = readFileSync(resolve(__dirname, "../../styles/globals.css"), "utf8");
 
 function block(selector: string): string {
-  const start = css.indexOf(selector);
-  if (start < 0) return "";
+  // a szabály maga (`selector {`), nem a variánsokban előforduló részszelektor
+  const esc = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const m = new RegExp(`(?:^|\\n)[ \\t]*${esc}\\s*\\{`).exec(css);
+  if (!m) return "";
+  const start = m.index;
   const open = css.indexOf("{", start);
   const close = css.indexOf("}", open);
   return css.slice(open + 1, close);
@@ -79,13 +81,27 @@ describe("felület-mód tokenek (Brand Guide v2 §8)", () => {
   });
 
   it("a Tailwind szemantikus színei CSS-változóra képeznek le", () => {
-    const colors = tailwindConfig.theme?.extend?.colors as Record<string, unknown>;
-    const flat = (v: unknown): string[] =>
-      typeof v === "string" ? [v] : Object.values(v as Record<string, unknown>).flatMap(flat);
+    // Tailwind v4: a téma a globals.css @theme blokkjában van. Egy szemantikus szín
+    // vagy var(--…)-ra mutat, vagy a téma-változó neve maga az, amit a Night scope
+    // felülír (pl. --color-surface) — mindkét esetben a [data-surface] scope hat rá.
+    const inline = block("@theme inline");
+    const theme = block("@theme") + inline;
+    expect(inline).not.toBe("");
+    // a futásidejű tokenre mutató értéknek `@theme inline`-ban a helye (különben :root-on oldódik fel)
+    expect(block("@theme")).not.toMatch(/--color-[a-z0-9-]+:\s*var\(/);
+    const nightTokens = new Set([...night.matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1]));
+    const root = block(":root");
     for (const key of ["canvas", "surface", "ink", "line", "accent", "ghost", "glass", "scrim", "cat-token"]) {
-      const values = flat(colors[key]);
-      expect(values.length, key).toBeGreaterThan(0);
-      for (const v of values) expect(v, key).toMatch(/^var\(--/);
+      const entries = [...theme.matchAll(new RegExp(`(--color-${key}(?:-[a-z0-9-]+)?)\\s*:\\s*([^;]+);`, "g"))];
+      expect(entries.length, key).toBeGreaterThan(0);
+      for (const [, name, v] of entries) {
+        const runtime = nightTokens.has(name) || value(root, name) !== undefined;
+        expect(v.trim().startsWith("var(--") || runtime, `${name}: ${v}`).toBe(true);
+      }
     }
+  });
+
+  it("a night: variáns definiálva van (v4 @custom-variant)", () => {
+    expect(css).toMatch(/@custom-variant night\s*\{/);
   });
 });

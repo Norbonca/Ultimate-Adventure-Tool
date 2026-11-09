@@ -62,10 +62,10 @@ export function SeriesRows({ series, testId }: { series: TripTileSeries; testId:
             <Link
               href={row.href}
               data-testid="series-row"
-              className="flex min-h-11 items-center justify-between gap-3 rounded-trevu bg-ghost px-3 text-sm hover:bg-line focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+              className="flex min-h-11 items-center justify-between gap-3 rounded-trevu bg-ghost px-3 text-sm hover:bg-line focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
             >
               <span className={row.full ? "text-ink-muted line-through" : "font-semibold text-ink"}>{row.label}</span>
-              <span className={row.full ? "text-xs font-semibold text-[var(--color-danger)]" : "text-xs font-medium text-ink-secondary"}>
+              <span className={row.full ? "text-xs font-semibold text-(--color-danger)" : "text-xs font-medium text-ink-secondary"}>
                 {row.status}
               </span>
             </Link>
@@ -76,7 +76,7 @@ export function SeriesRows({ series, testId }: { series: TripTileSeries; testId:
         <Link
           href={series.more.href}
           data-testid="series-more"
-          className="inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-accent hover:underline focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+          className="inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-accent hover:underline focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
         >
           {series.more.label}
           <ChevronRight size={14} aria-hidden />
@@ -100,14 +100,14 @@ export function TripTile({ href, title, imageUrl, place, dates, spots, host, dif
         )}
         <div className="absolute inset-x-3 top-3 flex items-center justify-between gap-2">
           {category && CatIcon ? (
-            <span className={`inline-flex items-center gap-1.5 rounded-chip bg-glass px-2.5 py-1 text-xs font-semibold backdrop-blur ${CATEGORY_TEXT[category.token]}`}>
+            <span className={`inline-flex items-center gap-1.5 rounded-chip bg-glass px-2.5 py-1 text-xs font-semibold backdrop-blur-sm ${CATEGORY_TEXT[category.token]}`}>
               <CatIcon size={14} aria-hidden />
               {category.label}
             </span>
           ) : (
             <span />
           )}
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-glass px-2.5 py-1 text-xs font-semibold text-ink backdrop-blur">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-glass px-2.5 py-1 text-xs font-semibold text-ink backdrop-blur-sm">
             <SpotsIcon size={12} aria-hidden />
             {spots}
           </span>
@@ -117,7 +117,7 @@ export function TripTile({ href, title, imageUrl, place, dates, spots, host, dif
       <div className="flex flex-1 flex-col gap-2.5 px-[18px] pb-[18px] pt-4">
         <h3 data-testid="trip-tile-title" className="line-clamp-2 text-lg font-semibold leading-tight text-ink">
           {isSeries ? (
-            <Link href={href} className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none">
+            <Link href={href} className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-hidden">
               {title}
             </Link>
           ) : (
@@ -158,11 +158,11 @@ export function TripTile({ href, title, imageUrl, place, dates, spots, host, dif
   );
 
   return isSeries ? (
-    <article data-testid="trip-tile" data-series="true" className={`relative ${shell} focus-within:shadow-[var(--focus-ring)]`}>
+    <article data-testid="trip-tile" data-series="true" className={`relative ${shell} focus-within:shadow-(--focus-ring)`}>
       {body}
     </article>
   ) : (
-    <Link href={href} data-testid="trip-tile" className={`${shell} focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]`}>
+    <Link href={href} data-testid="trip-tile" className={`${shell} focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)`}>
       {body}
     </Link>
   );

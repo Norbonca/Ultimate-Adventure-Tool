@@ -124,10 +124,10 @@ export function SeriesDatesSection({ rows, currentTripId, isOrganizer, organizer
                 <Link
                   href={`/trips/${row.slug}`}
                   aria-current={current ? "page" : undefined}
-                  className="flex min-h-11 min-w-0 flex-1 flex-col justify-center gap-0.5 rounded-lg sm:flex-row sm:items-center sm:justify-start sm:gap-4 focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+                  className="flex min-h-11 min-w-0 flex-1 flex-col justify-center gap-0.5 rounded-lg sm:flex-row sm:items-center sm:justify-start sm:gap-4 focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
                 >
                   <span className={`text-[15px] font-bold ${muted ? "text-navy-400 line-through" : "text-navy-900"}`}>{row.dateLabel}</span>
-                  <span className={`text-sm ${full && !row.closed ? "font-semibold text-[var(--color-danger)]" : "text-navy-500"}`}>{status(row)}</span>
+                  <span className={`text-sm ${full && !row.closed ? "font-semibold text-(--color-danger)" : "text-navy-500"}`}>{status(row)}</span>
                 </Link>
                 {current && (
                   <span className="shrink-0 rounded-chip bg-trevu-600 px-2.5 py-1 text-xs font-semibold text-white">{t("series.viewing")}</span>
@@ -162,7 +162,7 @@ export function SeriesDatesSection({ rows, currentTripId, isOrganizer, organizer
         </button>
       )}
 
-      {error && <p role="alert" className="mt-3 text-sm text-[var(--color-danger)]">{error}</p>}
+      {error && <p role="alert" className="mt-3 text-sm text-(--color-danger)">{error}</p>}
 
       {isOrganizer && organizer && (
         <AddSeriesDateDialog

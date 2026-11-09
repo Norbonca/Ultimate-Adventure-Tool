@@ -128,7 +128,7 @@ export default async function PricingPage() {
                 <ul className="flex-1 space-y-2.5 text-sm text-slate-700">
                   {features.map((feat, i) => (
                     <li key={i} className="flex gap-2">
-                      <span className="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full bg-trevu-50 text-trevu-700 flex items-center justify-center">
+                      <span className="mt-0.5 shrink-0 w-4 h-4 rounded-full bg-trevu-50 text-trevu-700 flex items-center justify-center">
                         <Icon name="check" size={10} strokeWidth={3} />
                       </span>
                       <span>{feat}</span>

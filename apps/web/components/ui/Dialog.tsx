@@ -15,8 +15,8 @@ import { Icon } from "@/components/Icon";
 export type DialogTone = "danger" | "warning" | "primary";
 
 const TONE: Record<DialogTone, string> = {
-  danger: "bg-[var(--color-danger-subtle)] text-coral",
-  warning: "bg-[var(--color-warning-subtle)] text-[var(--color-warning)]",
+  danger: "bg-(--color-danger-subtle) text-coral",
+  warning: "bg-(--color-warning-subtle) text-(--color-warning)",
   primary: "bg-trevu-50 text-trevu-700",
 };
 
@@ -67,7 +67,7 @@ export function Dialog({ open, onClose, icon, tone = "danger", title, descriptio
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className="w-full sm:max-w-[520px] bg-white rounded-t-[20px] sm:rounded-2xl shadow-2xl px-5 pt-3 pb-7 sm:p-8 max-h-[92vh] overflow-y-auto outline-none"
+        className="w-full sm:max-w-[520px] bg-white rounded-t-trevu-3xl sm:rounded-2xl shadow-2xl px-5 pt-3 pb-7 sm:p-8 max-h-[92vh] overflow-y-auto outline-hidden"
       >
         <div className="flex justify-center mb-3 sm:hidden" aria-hidden="true">
           <span className="w-10 h-1 rounded-full bg-navy-200" />

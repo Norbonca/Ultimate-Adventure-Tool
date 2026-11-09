@@ -80,15 +80,15 @@ export default async function IdeasBoardPage({ searchParams }: PageProps) {
         <div className="relative mx-auto flex min-h-[320px] max-w-7xl flex-col justify-end gap-4 px-5 pb-8 pt-24 md:min-h-[420px] md:px-8 md:pb-10">
           <p className="text-sm font-medium text-ink-secondary">{t("ideas.board.stats", { count: total })}</p>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <h1 className="max-w-[720px] text-hero-display-mobile text-ink [text-wrap:balance] md:text-hero-display">{t("ideas.board.title")}</h1>
+            <h1 className="max-w-[720px] text-hero-display-mobile text-ink text-balance md:text-hero-display">{t("ideas.board.title")}</h1>
             {/* M211 — súgó a cím mellett (D21 elhelyezési szabály) */}
             <TutorialHelp anchor="ideas" />
           </div>
           <p className="hidden max-w-[720px] text-lg text-ink-body md:block">{t("ideas.board.subtitle")}</p>
-          <form action="/ideas" className="flex max-w-[720px] items-center gap-2 rounded-full border border-line bg-surface/80 px-4 py-2 backdrop-blur" role="search">
+          <form action="/ideas" className="flex max-w-[720px] items-center gap-2 rounded-full border border-line bg-surface/80 px-4 py-2 backdrop-blur-sm" role="search">
             {filters.category && <input type="hidden" name="category" value={filters.category} />}
             <Icon name="search" size={18} className="shrink-0 text-ink-muted" aria-hidden />
-            <input name="q" defaultValue={filters.q ?? ""} placeholder={t("ideas.board.searchPlaceholder")} aria-label={t("ideas.board.searchPlaceholder")} className="min-w-0 flex-1 bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted" />
+            <input name="q" defaultValue={filters.q ?? ""} placeholder={t("ideas.board.searchPlaceholder")} aria-label={t("ideas.board.searchPlaceholder")} className="min-w-0 flex-1 bg-transparent text-sm text-ink outline-hidden placeholder:text-ink-muted" />
             <button type="submit" className="inline-flex h-9 items-center rounded-full bg-accent px-4 text-sm font-semibold text-accent-on">{t("common.search")}</button>
           </form>
         </div>

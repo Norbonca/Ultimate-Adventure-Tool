@@ -77,7 +77,7 @@ export function SettingsSection({ data, onChange }: SettingsSectionProps) {
               onChange={(e) =>
                 onChange({ max_participants: parseInt(e.target.value) || 2 })
               }
-              className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
+              className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden transition-colors"
             />
           </div>
           <div>
@@ -92,7 +92,7 @@ export function SettingsSection({ data, onChange }: SettingsSectionProps) {
               onChange={(e) =>
                 onChange({ staff_seats: Math.max(0, Math.min(50, parseInt(e.target.value) || 0)) })
               }
-              className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
+              className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden transition-colors"
             />
           </div>
         </div>
@@ -147,7 +147,7 @@ export function SettingsSection({ data, onChange }: SettingsSectionProps) {
               onChange({ price_amount: e.target.value ? Number(e.target.value) : null })
             }
             placeholder="0.00"
-            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
+            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden transition-colors"
           />
         </div>
         <div>
@@ -157,7 +157,7 @@ export function SettingsSection({ data, onChange }: SettingsSectionProps) {
           <CurrencySelect
             value={data.price_currency}
             onChange={(code) => onChange({ price_currency: code })}
-            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 bg-white focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
+            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 bg-white focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden transition-colors"
           />
         </div>
         <div>
@@ -168,14 +168,14 @@ export function SettingsSection({ data, onChange }: SettingsSectionProps) {
             type="date"
             value={data.registration_deadline ? data.registration_deadline.slice(0, 10) : ""}
             onChange={(e) => onChange({ registration_deadline: e.target.value })}
-            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
+            className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden transition-colors"
           />
         </div>
         <TimezoneSelect
           id="edit-trip-timezone"
           value={data.timezone}
           onChange={(timezone) => onChange({ timezone })}
-          className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 bg-white focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
+          className="w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 bg-white focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden transition-colors"
         />
       </div>
 
@@ -237,7 +237,7 @@ function Toggle({
       aria-pressed={checked}
     >
       <span
-        className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${
+        className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-xs transition-transform ${
           checked ? "translate-x-5" : "translate-x-0"
         }`}
       />

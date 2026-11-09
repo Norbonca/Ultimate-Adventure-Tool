@@ -158,7 +158,7 @@ export function AdminUsersClient({
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t.t_search_placeholder}
             aria-label={t.t_search_placeholder}
-            className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-emerald-400 bg-slate-50"
+            className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-hidden focus:border-emerald-400 bg-slate-50"
           />
           <button
             type="submit"
@@ -173,7 +173,7 @@ export function AdminUsersClient({
           defaultValue={initialStatus}
           onChange={(e) => applyFilter("status", e.target.value)}
           aria-label={t.t_filter_status}
-          className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 bg-slate-50 focus:outline-none focus:border-emerald-400"
+          className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 bg-slate-50 focus:outline-hidden focus:border-emerald-400"
         >
           <option value="">{t.t_filter_status}</option>
           <option value="active">{t.t_status_active}</option>
@@ -184,7 +184,7 @@ export function AdminUsersClient({
           defaultValue={initialPlan}
           onChange={(e) => applyFilter("plan", e.target.value)}
           aria-label={t.t_filter_plan}
-          className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 bg-slate-50 focus:outline-none focus:border-emerald-400"
+          className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 bg-slate-50 focus:outline-hidden focus:border-emerald-400"
         >
           <option value="">{t.t_filter_plan}</option>
           <option value="free">{t.t_plan_free}</option>
@@ -229,7 +229,7 @@ export function AdminUsersClient({
                   {/* User cell */}
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 text-xs font-bold flex-shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 text-xs font-bold shrink-0">
                         {userInitials(user)}
                       </div>
                       <div className="min-w-0">

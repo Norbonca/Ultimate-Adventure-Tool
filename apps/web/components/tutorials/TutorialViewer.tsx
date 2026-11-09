@@ -47,7 +47,7 @@ export function TutorialViewer({ tutorial, variant, panelFooter }: TutorialViewe
             </span>
             <span className={`min-w-0 flex-1 text-left leading-snug ${compact ? "text-sm" : "text-[15px]"} ${isActive ? "font-semibold text-ink" : "text-ink-body"}`}>{text}</span>
             {tutorial.hasVideo && (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-[6px] bg-ghost px-2 py-0.5 text-xs font-semibold tabular-nums text-accent">
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-chip bg-ghost px-2 py-0.5 text-xs font-semibold tabular-nums text-accent">
                 <Icon name="play" size={10} aria-hidden />
                 {formatTime(step.at)}
               </span>
@@ -60,7 +60,7 @@ export function TutorialViewer({ tutorial, variant, panelFooter }: TutorialViewe
             {interactive ? (
               <button
                 type="button"
-                className={`${cls} min-h-11 hover:bg-ghost focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent`}
+                className={`${cls} min-h-11 hover:bg-ghost focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-accent`}
                 onClick={() => (slides ? setSlide(i) : playerRef.current?.seek(step.at))}
                 aria-label={slides ? `${i + 1}. ${text}` : `${i + 1}. ${text} — ${t("tutorials.jumpTo", { time: formatTime(step.at) })}`}
                 data-testid={`tutorial-step-${i + 1}`}

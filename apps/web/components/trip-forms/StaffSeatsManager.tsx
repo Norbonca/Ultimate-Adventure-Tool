@@ -298,7 +298,7 @@ export function StaffSeatsManager({ tripId, totalSeats }: StaffSeatsManagerProps
                     }}
                     placeholder={t("trips.crew.staffRolePlaceholder")}
                     maxLength={100}
-                    className="w-full px-3 py-2 rounded-lg border border-navy-200 text-sm text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors"
+                    className="w-full px-3 py-2 rounded-lg border border-navy-200 text-sm text-navy-900 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden transition-colors"
                     autoFocus
                   />
                 )}

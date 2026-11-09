@@ -24,7 +24,7 @@ export function Checkbox({ id, label, className, ...rest }: CheckboxProps) {
       <input
         id={id}
         type="checkbox"
-        className="h-5 w-5 rounded border-[1.5px] border-navy-300 text-trevu-600 focus:ring-trevu-600/20"
+        className="h-5 w-5 rounded-sm border-[1.5px] border-navy-300 text-trevu-600 focus:ring-trevu-600/20"
         {...rest}
       />
       <span>{label}</span>

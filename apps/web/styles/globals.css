@@ -1,6 +1,310 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@source '../../../packages/ui/src/**/*.{ts,tsx}';
+
+/* `night:` variáns — a Night-régión belül, de nem egy beágyazott Day-régióban
+   (Brand Guide v2 §2, §8); a v3-as tailwind.config.ts plugin megfelelője. */
+@custom-variant night {
+  [data-surface="night"] &:not([data-surface="day"] *) {
+    @slot;
+  }
+  &[data-surface="night"] {
+    @slot;
+  }
+}
+
+@theme {
+  --color-trevu-50: #f0fdfa;
+  --color-trevu-100: #ccfbf1;
+  --color-trevu-200: #99f6e4;
+  --color-trevu-300: #5eead4;
+  --color-trevu-400: #2dd4bf;
+  --color-trevu-500: #14b8a6;
+  --color-trevu-600: #0d9488;
+  --color-trevu-700: #0f766e;
+  --color-trevu-800: #115e59;
+  --color-trevu-900: #134e4a;
+
+  --color-navy-50: #f8fafc;
+  --color-navy-100: #f1f5f9;
+  --color-navy-200: #e2e8f0;
+  --color-navy-300: #cbd5e1;
+  --color-navy-400: #94a3b8;
+  --color-navy-500: #64748b;
+  --color-navy-600: #475569;
+  --color-navy-700: #334155;
+  --color-navy-800: #1e293b;
+  --color-navy-900: #0f172a;
+
+  --color-coral: #f97066;
+  --color-coral-light: #fca5a1;
+
+  --color-sage: #6ee7b7;
+
+  --color-golden: #fbbf24;
+
+  --color-violet: #8b5cf6;
+
+  --color-orange: #f97316;
+
+  --color-cat-hiking: #059669;
+  --color-cat-climbing: #92400e;
+  --color-cat-water: #0d9488;
+  --color-cat-cycling: #d97706;
+  --color-cat-running: #dc2626;
+  --color-cat-winter: #3b82f6;
+  --color-cat-expedition: #8b5cf6;
+  --color-cat-motorsport: #b91c1c;
+
+  --color-surface: #ffffff; /* futásidőben a :root / [data-surface] scope adja */
+
+
+
+
+  --color-ghost: #f1f5f9; /* futásidőben a :root / [data-surface] scope adja */
+  --color-glass: rgba(255, 255, 255, 0.85); /* futásidőben a :root / [data-surface] scope adja */
+  --color-scrim: rgba(15, 23, 42, 0.65); /* futásidőben a :root / [data-surface] scope adja */
+
+
+  --color-brand-50: #f0fdfa;
+  --color-brand-100: #ccfbf1;
+  --color-brand-200: #99f6e4;
+  --color-brand-300: #5eead4;
+  --color-brand-400: #2dd4bf;
+  --color-brand-500: #14b8a6;
+  --color-brand-600: #0d9488;
+  --color-brand-700: #0f766e;
+  --color-brand-800: #115e59;
+  --color-brand-900: #134e4a;
+
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-display: 'DM Sans', system-ui, sans-serif;
+
+  --text-hero-display--line-height: 1.1;
+  --text-hero-display--letter-spacing: -0.02em;
+  --text-hero-display--font-weight: 800;
+  --text-hero-display-mobile--line-height: 1.1;
+  --text-hero-display-mobile--letter-spacing: -0.02em;
+  --text-hero-display-mobile--font-weight: 800;
+
+
+  --radius-trevu: 10px;
+  --radius-trevu-lg: 12px;
+  --radius-trevu-xl: 14px;
+  --radius-trevu-2xl: 16px;
+  --radius-trevu-3xl: 20px;
+  --radius-chip: 6px;
+
+  --shadow-trevu: 0 2px 8px rgba(13, 148, 136, 0.25);
+  --shadow-trevu-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-trevu-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-trevu-xl: 0 24px 80px rgba(15, 23, 42, 0.18);
+  --shadow-trevu-glow: 0 2px 12px rgba(13, 148, 136, 0.12);
+
+  --animate-shimmer: shimmer 1.5s infinite;
+  --animate-slide-up: slideUp 0.3s ease;
+
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+  @keyframes slideUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
+
+/* Futásidejű tokenre mutató témaértékek: `inline`, hogy az utility közvetlenül a
+   var(--…)-t kapja, és a [data-surface] scope az elemen oldja fel (v4-ben a nem
+   inline téma-változó már a :root-on feloldódna, és a Night felülírás nem hatna). */
+@theme inline {
+  --color-canvas: var(--color-bg);
+  --color-ink: var(--color-text);
+  --color-ink-muted: var(--color-text-muted);
+  --color-ink-secondary: var(--color-text-secondary);
+  --color-ink-body: var(--color-text-body);
+  --color-line: var(--color-border);
+  --color-line-strong: var(--color-border-strong);
+  --color-accent: var(--color-primary);
+  --color-accent-hover: var(--color-primary-hover);
+  --color-accent-on: var(--color-on-primary);
+  --color-cat-token-hiking: var(--cat-hiking);
+  --color-cat-token-climbing: var(--cat-climbing);
+  --color-cat-token-water: var(--cat-water);
+  --color-cat-token-cycling: var(--cat-cycling);
+  --color-cat-token-running: var(--cat-running);
+  --color-cat-token-winter: var(--cat-winter);
+  --color-cat-token-expedition: var(--cat-expedition);
+  --color-cat-token-motorsport: var(--cat-motorsport);
+  --text-hero-display: var(--font-hero-display);
+  --text-hero-display-mobile: var(--font-hero-display-mobile);
+  --background-image-hero-scrim: var(--hero-scrim);
+  --background-image-hero-scrim-mobile: var(--hero-scrim-mobile);
+}
+
+/* v3-kompatibilitás: v4-ben a gombok kurzora alapból `default`. */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@utility btn-trevu {
+  /* ── Buttons ── */
+  @apply inline-flex items-center justify-center gap-2 text-[15px] min-h-[48px]
+           font-semibold rounded-trevu transition-all duration-200
+           focus:outline-hidden focus:ring-2 focus:ring-offset-2;
+}
+
+@utility btn-trevu-primary {
+  @apply btn-trevu px-7 py-3.5
+           bg-trevu-600 text-white shadow-trevu
+           hover:bg-trevu-700 active:scale-[0.97];
+
+  [data-surface='night'] &:not([data-surface='day'] *) {
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+
+  [data-surface='night'] &:not([data-surface='day'] *) {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+}
+
+@utility btn-trevu-secondary {
+  @apply btn-trevu px-7 py-3.5
+           bg-transparent text-navy-900 border-2 border-navy-200
+           hover:border-navy-400;
+
+  [data-surface='night'] &:not([data-surface='day'] *) {
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+
+  [data-surface='night'] &:not([data-surface='day'] *) {
+    background-color: transparent;
+    color: var(--color-text-body);
+  }
+}
+
+@utility btn-trevu-outline {
+  @apply btn-trevu px-7 py-3.5
+           bg-transparent text-trevu-600 border-[1.5px] border-trevu-600
+           hover:bg-trevu-50;
+
+  [data-surface='night'] &:not([data-surface='day'] *) {
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+
+  [data-surface='night'] &:not([data-surface='day'] *) {
+    background-color: transparent;
+    color: var(--color-text-body);
+  }
+}
+
+@utility btn-trevu-ghost {
+  @apply btn-trevu px-3.5 py-2
+           bg-transparent text-navy-600 font-medium
+           hover:bg-navy-100 hover:text-navy-900;
+
+  [data-surface='night'] &:not([data-surface='day'] *) {
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+
+  [data-surface='night'] &:not([data-surface='day'] *) {
+    background-color: transparent;
+    color: var(--color-text-body);
+  }
+}
+
+@utility card-trevu {
+  /* ── Cards ── */
+  @apply bg-white border border-navy-200 rounded-2xl p-6
+           transition-all duration-300
+           hover:shadow-trevu-lg hover:-translate-y-0.5;
+
+  [data-surface='night'] &:not([data-surface='day'] *) {
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+
+  [data-surface='night'] &:not([data-surface='day'] *) {
+    background-color: var(--color-surface);
+  }
+}
+
+@utility card-trevu-flat {
+  @apply bg-navy-100 rounded-2xl p-6;
+
+  [data-surface='night'] &:not([data-surface='day'] *) {
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+
+  [data-surface='night'] &:not([data-surface='day'] *) {
+    background-color: var(--color-ghost);
+  }
+}
+
+@utility card-trevu-dark {
+  @apply bg-navy-800 rounded-2xl p-7;
+}
+
+@utility input-trevu {
+  /* ── Inputs ── */
+  @apply w-full min-h-[48px] rounded-trevu border-[1.5px] border-navy-300
+           px-4 py-3 text-[15px] text-navy-900
+           bg-white outline-hidden transition-all duration-200
+           placeholder:text-navy-500
+           focus:border-trevu-600 focus:ring-[3px] focus:ring-trevu-600/10;
+
+  [data-surface='night'] &:not([data-surface='day'] *) {
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+
+  [data-surface='night'] &:not([data-surface='day'] *) {
+    background-color: var(--color-input-bg);
+  }
+}
+
+@utility badge-trevu {
+  /* ── Badges ── */
+  @apply inline-flex items-center gap-1.5 px-2.5 py-1
+           rounded-md text-xs font-medium;
+}
 
 /* ============================================================
    TREVU DESIGN SYSTEM — Global Styles
@@ -250,6 +554,29 @@
     color-scheme: light;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: "DM Sans", system-ui, sans-serif;
+    color: var(--text-primary);
+    background: var(--arctic-white);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: rgba(13, 148, 136, 0.15);
+    color: var(--deep-navy);
+  }
+}
+
+/* Night kompatibilitási réteg — v4-ben a @layer base minden utility mögé kerül
+   (natív cascade layer), ezért a régi paletta-osztályok felülírása az utilities
+   rétegben van: ott a specificitás dönt, mint v3-ban (body[…] :where(…) > .bg-white,
+   de < night: variáns). */
+@layer utilities {
   /* A teljes publikus és alkalmazásfelület Night. A régebbi képernyők még a
      neutrális Tailwind-palettát használják; ez az átmeneti kompatibilitási
      réteg ugyanarra a szemantikus Night-tokenkészletre köti őket. A külön
@@ -389,121 +716,6 @@
     .placeholder\:text-navy-500
   ):not([data-surface="day"] *)::placeholder {
     color: var(--color-text-muted);
-  }
-
-  html {
-    scroll-behavior: smooth;
-  }
-
-  body {
-    font-family: "DM Sans", system-ui, sans-serif;
-    color: var(--text-primary);
-    background: var(--arctic-white);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  ::selection {
-    background: rgba(13, 148, 136, 0.15);
-    color: var(--deep-navy);
-  }
-}
-
-@layer components {
-  /* ── Buttons ── */
-  .btn-trevu {
-    @apply inline-flex items-center justify-center gap-2 text-[15px] min-h-[48px]
-           font-semibold rounded-trevu transition-all duration-200
-           focus:outline-none focus:ring-2 focus:ring-offset-2;
-  }
-
-  .btn-trevu-primary {
-    @apply btn-trevu px-7 py-3.5
-           bg-trevu-600 text-white shadow-trevu
-           hover:bg-trevu-700 active:scale-[0.97];
-  }
-
-  .btn-trevu-secondary {
-    @apply btn-trevu px-7 py-3.5
-           bg-transparent text-navy-900 border-2 border-navy-200
-           hover:border-navy-400;
-  }
-
-  .btn-trevu-outline {
-    @apply btn-trevu px-7 py-3.5
-           bg-transparent text-trevu-600 border-[1.5px] border-trevu-600
-           hover:bg-trevu-50;
-  }
-
-  .btn-trevu-ghost {
-    @apply btn-trevu px-3.5 py-2
-           bg-transparent text-navy-600 font-medium
-           hover:bg-navy-100 hover:text-navy-900;
-  }
-
-  /* ── Cards ── */
-  .card-trevu {
-    @apply bg-white border border-navy-200 rounded-2xl p-6
-           transition-all duration-300
-           hover:shadow-trevu-lg hover:-translate-y-0.5;
-  }
-
-  .card-trevu-flat {
-    @apply bg-navy-100 rounded-2xl p-6;
-  }
-
-  .card-trevu-dark {
-    @apply bg-navy-800 rounded-2xl p-7;
-  }
-
-  /* ── Inputs ── */
-  .input-trevu {
-    @apply w-full min-h-[48px] rounded-trevu border-[1.5px] border-navy-300
-           px-4 py-3 text-[15px] text-navy-900
-           bg-white outline-none transition-all duration-200
-           placeholder:text-navy-500
-           focus:border-trevu-600 focus:ring-[3px] focus:ring-trevu-600/10;
-  }
-
-  [data-surface="night"] .btn-trevu-primary:not([data-surface="day"] *),
-  [data-surface="night"] .btn-trevu-secondary:not([data-surface="day"] *),
-  [data-surface="night"] .btn-trevu-outline:not([data-surface="day"] *),
-  [data-surface="night"] .btn-trevu-ghost:not([data-surface="day"] *),
-  [data-surface="night"] .card-trevu:not([data-surface="day"] *),
-  [data-surface="night"] .card-trevu-flat:not([data-surface="day"] *),
-  [data-surface="night"] .input-trevu:not([data-surface="day"] *) {
-    border-color: var(--color-border);
-    color: var(--color-text);
-  }
-
-  [data-surface="night"] .btn-trevu-primary:not([data-surface="day"] *) {
-    background-color: var(--color-primary);
-    color: var(--color-on-primary);
-  }
-
-  [data-surface="night"] .btn-trevu-secondary:not([data-surface="day"] *),
-  [data-surface="night"] .btn-trevu-outline:not([data-surface="day"] *),
-  [data-surface="night"] .btn-trevu-ghost:not([data-surface="day"] *) {
-    background-color: transparent;
-    color: var(--color-text-body);
-  }
-
-  [data-surface="night"] .card-trevu:not([data-surface="day"] *) {
-    background-color: var(--color-surface);
-  }
-
-  [data-surface="night"] .card-trevu-flat:not([data-surface="day"] *) {
-    background-color: var(--color-ghost);
-  }
-
-  [data-surface="night"] .input-trevu:not([data-surface="day"] *) {
-    background-color: var(--color-input-bg);
-  }
-
-  /* ── Badges ── */
-  .badge-trevu {
-    @apply inline-flex items-center gap-1.5 px-2.5 py-1
-           rounded-md text-xs font-medium;
   }
 }
 

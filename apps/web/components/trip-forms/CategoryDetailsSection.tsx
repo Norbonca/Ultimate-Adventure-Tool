@@ -134,7 +134,7 @@ function ParameterField({
       : (param.label_localized as Record<string, string>)?.hu || param.label;
 
   const inputClasses =
-    "w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 placeholder:text-navy-300 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-none transition-colors bg-white";
+    "w-full px-4 py-2.5 rounded-xl border border-navy-200 text-navy-900 placeholder:text-navy-300 focus:ring-2 focus:ring-trevu-500 focus:border-trevu-500 outline-hidden transition-colors bg-white";
   // UX-015: minden mező programozottan a címkéjéhez kötve
   const fieldId = `catparam-${param.id}`;
 
@@ -207,7 +207,7 @@ function ParameterField({
             }`}
           >
             <span
-              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${
+              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-xs transition-transform ${
                 value ? "translate-x-5" : "translate-x-0"
               }`}
             />
@@ -264,7 +264,7 @@ function ParameterField({
                   }}
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                     isSelected
-                      ? "bg-trevu-600 text-white shadow-sm"
+                      ? "bg-trevu-600 text-white shadow-xs"
                       : "bg-navy-50 text-navy-600 hover:bg-navy-100 border border-navy-200"
                   }`}
                 >

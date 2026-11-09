@@ -105,7 +105,7 @@ export function PresentationPlayer() {
           <Link
             href="/"
             aria-label={t("presentation.close")}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-ghost text-ink hover:bg-surface focus-visible:shadow-[var(--focus-ring)] focus-visible:outline-none"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-ghost text-ink hover:bg-surface focus-visible:shadow-(--focus-ring) focus-visible:outline-hidden"
           >
             <Icon name="x" size={20} aria-hidden />
           </Link>
@@ -160,7 +160,7 @@ export function PresentationPlayer() {
           disabled={index === 0}
           aria-label={t("presentation.prev")}
           data-testid="presentation-prev"
-          className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-ghost text-ink hover:bg-surface disabled:opacity-40 focus-visible:shadow-[var(--focus-ring)] focus-visible:outline-none"
+          className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-ghost text-ink hover:bg-surface disabled:opacity-40 focus-visible:shadow-(--focus-ring) focus-visible:outline-hidden"
         >
           <Icon name="chevron-left" size={22} aria-hidden />
         </button>
@@ -170,7 +170,7 @@ export function PresentationPlayer() {
           aria-label={playing ? t("presentation.pause") : t("presentation.play")}
           aria-pressed={playing}
           data-testid="presentation-toggle"
-          className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-accent text-accent-on hover:bg-accent-hover focus-visible:shadow-[var(--focus-ring)] focus-visible:outline-none"
+          className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-accent text-accent-on hover:bg-accent-hover focus-visible:shadow-(--focus-ring) focus-visible:outline-hidden"
         >
           <Icon name={playing ? "pause" : "play"} size={22} aria-hidden />
         </button>
@@ -180,7 +180,7 @@ export function PresentationPlayer() {
           disabled={index === last}
           aria-label={t("presentation.next")}
           data-testid="presentation-next"
-          className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-ghost text-ink hover:bg-surface disabled:opacity-40 focus-visible:shadow-[var(--focus-ring)] focus-visible:outline-none"
+          className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-ghost text-ink hover:bg-surface disabled:opacity-40 focus-visible:shadow-(--focus-ring) focus-visible:outline-hidden"
         >
           <Icon name="chevron-right" size={22} aria-hidden />
         </button>
@@ -314,7 +314,7 @@ function TextBlock({ slide, tx }: { slide: Extract<Slide, { kind: "split" | "pho
   return (
     <div className="flex flex-col gap-4 md:gap-6">
       {slide.badge && (
-        <p className={`${s.pop} self-start rounded-full bg-[var(--color-primary-subtle)] px-4 py-1.5 text-sm font-bold text-accent md:text-base`} style={delay(0)}>
+        <p className={`${s.pop} self-start rounded-full bg-(--color-primary-subtle) px-4 py-1.5 text-sm font-bold text-accent md:text-base`} style={delay(0)}>
           {tx(slide.badge)}
         </p>
       )}
@@ -328,7 +328,7 @@ function TextBlock({ slide, tx }: { slide: Extract<Slide, { kind: "split" | "pho
       <ul className="flex flex-col gap-2.5">
         {slide.bullets.map((b, i) => (
           <li key={i} className={`${s.rise} flex items-start gap-3 text-base text-ink-body md:text-lg`} style={delay(360 + i * 110)}>
-            <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-subtle)] text-accent">
+            <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-(--color-primary-subtle) text-accent">
               <Icon name="check" size={14} aria-hidden />
             </span>
             {tx(b)}
@@ -360,7 +360,7 @@ function CardView({ card, tx, d }: { card: Card; tx: (v: L) => string; d: number
       )}
       {card.n && <p className="text-4xl font-extrabold text-accent md:text-5xl">{card.n}</p>}
       {card.icon && (
-        <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-subtle)] text-accent">
+        <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-(--color-primary-subtle) text-accent">
           <Icon name={card.icon} size={26} aria-hidden />
         </span>
       )}

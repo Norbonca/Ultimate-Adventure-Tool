@@ -7,24 +7,24 @@ import type { DisplayState } from "./format";
 
 export const STATE_STYLE: Record<DisplayState, { chip: string; icon: string; dot: string; soft: string; iconColor: string }> = {
   ok: {
-    chip: "bg-[var(--color-success-subtle)] text-[var(--color-success-text)]",
+    chip: "bg-(--color-success-subtle) text-(--color-success-text)",
     icon: "check-circle-2",
-    dot: "bg-[var(--color-success)]",
-    soft: "bg-[var(--color-success-subtle)]",
-    iconColor: "text-[var(--color-success-text)]",
+    dot: "bg-(--color-success)",
+    soft: "bg-(--color-success-subtle)",
+    iconColor: "text-(--color-success-text)",
   },
   warn: {
-    chip: "bg-[var(--color-warning-subtle)] text-amber-800",
+    chip: "bg-(--color-warning-subtle) text-amber-800",
     icon: "alert-triangle",
-    dot: "bg-[var(--color-warning)]",
-    soft: "bg-[var(--color-warning-subtle)]",
+    dot: "bg-(--color-warning)",
+    soft: "bg-(--color-warning-subtle)",
     iconColor: "text-amber-700",
   },
   down: {
-    chip: "bg-[var(--color-danger-subtle)] text-red-700",
+    chip: "bg-(--color-danger-subtle) text-red-700",
     icon: "x-circle",
-    dot: "bg-[var(--color-danger)]",
-    soft: "bg-[var(--color-danger-subtle)]",
+    dot: "bg-(--color-danger)",
+    soft: "bg-(--color-danger-subtle)",
     iconColor: "text-red-700",
   },
   wait: {

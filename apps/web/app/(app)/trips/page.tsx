@@ -292,7 +292,7 @@ export default async function MyTripsPage({
                         {trip?.slug ? (
                           <Link
                             href={`/trips/${trip.slug}/manage${app.status === "pending" ? "#applications" : ""}`}
-                            className="group -mx-2 flex min-h-[44px] items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-navy-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-trevu-500"
+                            className="group -mx-2 flex min-h-[44px] items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-navy-50 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-trevu-500"
                           >
                             <span className="min-w-0 flex-1">{body}</span>
                             <Icon name="chevron-right" size={16} className="shrink-0 text-navy-400 group-hover:text-navy-700" aria-hidden />

@@ -219,7 +219,7 @@ export function ImagePicker({
 
           {/* Own photo badge on cover preview */}
           {isImageType && currentSource === "user_upload" && (
-            <span className="absolute bottom-3 right-3 text-[11px] font-semibold text-white bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-tl-lg">
+            <span className="absolute bottom-3 right-3 text-[11px] font-semibold text-white bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-tl-lg">
               <Icon name="camera" size={12} className="inline -mt-0.5 mr-1" />{t("imagePicker.ownPhoto")}
             </span>
           )}

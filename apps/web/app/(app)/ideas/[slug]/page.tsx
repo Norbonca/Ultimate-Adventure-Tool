@@ -86,12 +86,12 @@ export default async function IdeaDetailPage({ params }: Props) {
         <div className="relative mx-auto flex min-h-[300px] max-w-7xl flex-col justify-end gap-6 px-5 pb-8 pt-6 md:min-h-[420px] md:flex-row md:items-end md:justify-between md:px-[120px] md:pb-12">
           <div className="flex max-w-[760px] flex-col gap-3.5">
             <div className="flex flex-wrap items-center gap-2">
-              {chip && <span className={`inline-flex w-fit items-center gap-1.5 rounded-chip bg-glass px-2.5 py-1 text-xs font-semibold backdrop-blur ${CATEGORY_TEXT[chip.token]}`}><Icon name={chip.icon} size={14} />{chip.label}</span>}
-              {underReview && <span className="inline-flex items-center gap-1.5 rounded-chip bg-[var(--color-warning-subtle)] px-2.5 py-1 text-xs font-semibold text-[var(--color-warning-text)]"><Icon name="flag" size={12} />{t("ideas.detail.underReview")}</span>}
+              {chip && <span className={`inline-flex w-fit items-center gap-1.5 rounded-chip bg-glass px-2.5 py-1 text-xs font-semibold backdrop-blur-sm ${CATEGORY_TEXT[chip.token]}`}><Icon name={chip.icon} size={14} />{chip.label}</span>}
+              {underReview && <span className="inline-flex items-center gap-1.5 rounded-chip bg-(--color-warning-subtle) px-2.5 py-1 text-xs font-semibold text-(--color-warning-text)"><Icon name="flag" size={12} />{t("ideas.detail.underReview")}</span>}
               {!joinable && !underReview && <span className="inline-flex items-center gap-1.5 rounded-chip bg-glass px-2.5 py-1 text-xs font-semibold text-ink"><Icon name="x-circle" size={12} />{st.label}</span>}
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <h1 className="text-[30px] font-extrabold leading-[1.1] tracking-[-0.02em] text-ink [text-wrap:balance] md:text-hero-display">{idea.title}</h1>
+              <h1 className="text-[30px] font-extrabold leading-[1.1] tracking-[-0.02em] text-ink text-balance md:text-hero-display">{idea.title}</h1>
               {/* M211 — súgó a cím mellett (D21 elhelyezési szabály) */}
               <TutorialHelp anchor="idea.detail" />
             </div>

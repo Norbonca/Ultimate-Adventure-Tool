@@ -256,7 +256,7 @@ export function ApplicationsManager({ tripId, initial, showHelp = true }: Applic
                   rows={3}
                   onChange={(e) => setRejecting({ id: p.id, reason: e.target.value })}
                   placeholder={t("trips.crew.rejectReasonPlaceholder")}
-                  className="w-full rounded-xl border border-navy-200 bg-white px-3 py-2.5 text-sm text-navy-900 outline-none transition-colors focus:border-trevu-500 focus:ring-2 focus:ring-trevu-500"
+                  className="w-full rounded-xl border border-navy-200 bg-white px-3 py-2.5 text-sm text-navy-900 outline-hidden transition-colors focus:border-trevu-500 focus:ring-2 focus:ring-trevu-500"
                 />
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <span className="text-xs text-navy-500">

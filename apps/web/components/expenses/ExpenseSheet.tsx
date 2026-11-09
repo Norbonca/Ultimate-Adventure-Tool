@@ -92,7 +92,7 @@ export function ExpenseSheet({ view, locale, expense, canDelete, onClose, onSave
     });
   }
 
-  const input = "h-11 w-full rounded-trevu border border-navy-200 bg-navy-50 px-3.5 text-[15px] text-navy-900 focus:border-trevu-500 focus:outline-none";
+  const input = "h-11 w-full rounded-trevu border border-navy-200 bg-navy-50 px-3.5 text-[15px] text-navy-900 focus:border-trevu-500 focus:outline-hidden";
   const label = "mb-1.5 block text-xs font-medium text-navy-500";
 
   return (
@@ -100,7 +100,7 @@ export function ExpenseSheet({ view, locale, expense, canDelete, onClose, onSave
       <form
         onSubmit={submit}
         onClick={(e) => e.stopPropagation()}
-        className="max-h-[92vh] w-full min-w-0 overflow-y-auto rounded-t-[20px] bg-white px-4 pb-7 pt-2.5 lg:max-w-[560px] lg:rounded-2xl lg:p-7"
+        className="max-h-[92vh] w-full min-w-0 overflow-y-auto rounded-t-trevu-3xl bg-white px-4 pb-7 pt-2.5 lg:max-w-[560px] lg:rounded-2xl lg:p-7"
         data-testid="expense-sheet"
       >
         <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-navy-300 lg:hidden" aria-hidden />

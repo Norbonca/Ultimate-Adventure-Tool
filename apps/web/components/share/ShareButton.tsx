@@ -32,9 +32,9 @@ export interface ShareButtonProps {
 
 const STYLE = {
   night:
-    "inline-flex min-h-11 items-center gap-1.5 rounded-full bg-glass px-3.5 text-sm font-medium text-ink backdrop-blur hover:text-accent focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]",
+    "inline-flex min-h-11 items-center gap-1.5 rounded-full bg-glass px-3.5 text-sm font-medium text-ink backdrop-blur-sm hover:text-accent focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)",
   block:
-    "flex w-full items-center justify-center gap-2 rounded-xl border border-line bg-surface px-4 py-2.5 text-sm font-medium text-ink-secondary transition-colors hover:bg-canvas focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]",
+    "flex w-full items-center justify-center gap-2 rounded-xl border border-line bg-surface px-4 py-2.5 text-sm font-medium text-ink-secondary transition-colors hover:bg-canvas focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)",
 } as const;
 
 export function ShareButton({ slug, title, metaLine, imageUrl, isPublic = true, variant = "night", label }: ShareButtonProps) {

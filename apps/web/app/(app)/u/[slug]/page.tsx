@@ -32,9 +32,9 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           // eslint-disable-next-line @next/next/no-img-element -- same user-controlled Storage avatar as the social list
           <img src={profile.avatar_url} alt={name} className="mx-auto h-24 w-24 rounded-full object-cover" />
         ) : <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-primary text-2xl text-on-primary">{name.slice(0, 2).toUpperCase()}</div>}
-        <h1 className="mt-4 break-words text-center text-2xl font-bold">{name}</h1>
+        <h1 className="mt-4 wrap-break-word text-center text-2xl font-bold">{name}</h1>
         {profile.slug && <p className="mt-1 break-all text-center text-muted">@{profile.slug}</p>}
-        {profile.bio && <p className="mt-5 whitespace-pre-wrap break-words text-sm">{profile.bio}</p>}
+        {profile.bio && <p className="mt-5 whitespace-pre-wrap wrap-break-word text-sm">{profile.bio}</p>}
         <div className="mt-5 flex justify-center">
           {user?.id === profile.id ? <Button href="/settings/profile">{t('common.edit')}</Button>
             : user ? <FollowToggle targetId={profile.id} initialFollowing={!!following} />

@@ -330,7 +330,7 @@ export function EditTripForm({
 
       {/* ── Form area ── */}
       <section className="px-6 sm:px-12 lg:px-[120px] py-8 pb-32">
-        <div className="bg-white rounded-2xl border border-navy-200 shadow-sm p-6 sm:p-8">
+        <div className="bg-white rounded-2xl border border-navy-200 shadow-xs p-6 sm:p-8">
           {tabContent}
         </div>
       </section>

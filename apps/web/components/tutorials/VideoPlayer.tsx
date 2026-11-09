@@ -127,7 +127,7 @@ export function VideoPlayer({ ref, tutorial, onTime, compact = false, priority =
   const caption = stepIndex >= 0 ? loc(tutorial.steps[stepIndex].text, captionLang) : "";
   const langName = (l: TutorialLocale) => tr(`tutorials.language.${l}`);
   const captionLabel = tr("tutorials.captionLanguages", { languages: langName(asTutorialLocale(locale)) });
-  const btn = "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-ink hover:bg-ghost focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent";
+  const btn = "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-ink hover:bg-ghost focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-accent";
 
   return (
     <div
@@ -159,7 +159,7 @@ export function VideoPlayer({ ref, tutorial, onTime, compact = false, priority =
             type="button"
             onClick={() => start()}
             aria-label={tr("tutorials.player.play", { title })}
-            className={`absolute left-1/2 top-1/2 inline-flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-accent text-accent-on shadow-trevu-xl hover:bg-accent-hover focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent ${compact ? "h-16 w-16" : "h-[72px] w-[72px]"}`}
+            className={`absolute left-1/2 top-1/2 inline-flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-accent text-accent-on shadow-trevu-xl hover:bg-accent-hover focus-visible:outline-solid focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent ${compact ? "h-16 w-16" : "h-[72px] w-[72px]"}`}
             data-testid="tutorial-play"
           >
             <Icon name="play" size={compact ? 26 : 30} aria-hidden className="translate-x-0.5" />
@@ -250,7 +250,7 @@ export function VideoPlayer({ ref, tutorial, onTime, compact = false, priority =
               }}
               aria-label={tr("tutorials.player.progress")}
               aria-valuetext={formatTime(time)}
-              className="mx-1 h-11 min-w-0 flex-1 cursor-pointer accent-[var(--color-primary)]"
+              className="mx-1 h-11 min-w-0 flex-1 cursor-pointer accent-(--color-primary)"
             />
             <button
               type="button"

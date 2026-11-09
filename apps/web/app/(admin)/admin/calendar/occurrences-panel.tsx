@@ -81,7 +81,7 @@ export function OccurrencesPanel({
 
   const dateTime = (iso: string | null) =>
     iso ? new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "hu-HU", { dateStyle: "medium", timeZone: "UTC" }).format(new Date(iso)) : "";
-  const inputCls = "w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-400 bg-white";
+  const inputCls = "w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-hidden focus:border-emerald-400 bg-white";
   const btn = "px-2.5 py-1 text-xs border rounded-lg disabled:opacity-50 transition-colors";
 
   return (

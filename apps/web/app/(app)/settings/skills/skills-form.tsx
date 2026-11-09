@@ -189,7 +189,7 @@ export function SkillsForm({ categories, subDisciplines, userInterests, initialS
                     {subs.length} {t('settings.interests.subDisciplines')}
                     {currentLevel && (
                       <span
-                        className="ml-2 inline-block rounded px-2 py-0.5 text-[11px] font-semibold"
+                        className="ml-2 inline-block rounded-sm px-2 py-0.5 text-[11px] font-semibold"
                         style={{ backgroundColor: currentLevelDef?.bg, color: currentLevelDef?.color }}
                       >
                         {t(`settings.skills.${currentLevel}` as Parameters<typeof t>[0])}

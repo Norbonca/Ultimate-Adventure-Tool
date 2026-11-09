@@ -53,9 +53,9 @@ import { TIMELINE_INPUT } from "@/components/timeline/LocationField";
 import { TutorialHelp } from "@/components/tutorials/TutorialHelp";
 
 const STATUS_DOT: Record<string, string> = {
-  not_started: "bg-[var(--color-text-muted)]",
-  in_progress: "bg-[var(--color-warning)]",
-  done: "bg-[var(--color-success)]",
+  not_started: "bg-(--color-text-muted)",
+  in_progress: "bg-(--color-warning)",
+  done: "bg-(--color-success)",
 };
 
 // Phase icons are Icon Bank keys (03_Icon_Bank.md §6.2) stored in trip_phases.icon.
@@ -314,7 +314,7 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
     return (
       <div role="alert" className="rounded-2xl border border-line bg-surface p-8 text-center">
         <p className="mb-4 text-ink-secondary">{t("timeline.loadFailed")}</p>
-        <button type="button" onClick={reloadTimeline} className="h-11 rounded-[10px] border border-line px-4 text-sm font-medium text-ink hover:bg-ghost">
+        <button type="button" onClick={reloadTimeline} className="h-11 rounded-trevu border border-line px-4 text-sm font-medium text-ink hover:bg-ghost">
           {t("timeline.retry")}
         </button>
       </div>
@@ -376,7 +376,7 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
             .replace("{completed}", String(stats.completed_tasks))
             .replace("{total}", String(stats.total_tasks))}
         </span>
-        <div className="h-1.5 flex-1 rounded-full bg-[var(--color-border)]">
+        <div className="h-1.5 flex-1 rounded-full bg-(--color-border)">
           <div className="h-1.5 rounded-full bg-accent transition-all" style={{ width: `${stats.progress_percent}%` }} />
         </div>
         <span className="text-[13px] font-semibold text-accent">
@@ -407,12 +407,12 @@ export function TripTimelineClient({ tripId, isOrganizer }: TripTimelineClientPr
       {toast && (
         <div
           role={toast.tone === "error" ? "alert" : "status"}
-          className="fixed bottom-28 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2.5 rounded-[10px] border border-[var(--color-border-strong)] bg-surface px-4 py-3 text-sm font-medium text-ink shadow-lg sm:left-auto sm:right-8 sm:translate-x-0"
+          className="fixed bottom-28 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2.5 rounded-trevu border border-(--color-border-strong) bg-surface px-4 py-3 text-sm font-medium text-ink shadow-lg sm:left-auto sm:right-8 sm:translate-x-0"
         >
           <Icon
             name={toast.tone === "ok" ? "check" : "alert-triangle"}
             size={18}
-            className={toast.tone === "ok" ? "text-[var(--color-success)]" : "text-[var(--color-danger)]"}
+            className={toast.tone === "ok" ? "text-(--color-success)" : "text-(--color-danger)"}
           />
           {toast.text}
           {toast.tone === "error" && (
@@ -528,7 +528,7 @@ function TemplateSelector({ tripId, onInit, onEmpty }: { tripId: string; onInit:
       </div>
 
       {error && (
-        <div role="alert" className="break-all rounded-xl border border-line bg-ghost p-4 text-sm text-[var(--color-danger)]">
+        <div role="alert" className="break-all rounded-xl border border-line bg-ghost p-4 text-sm text-(--color-danger)">
           <strong>{t("timeline.initError")}:</strong> {error}
         </div>
       )}
@@ -641,10 +641,10 @@ function PhaseColumn({
               autoFocus
             />
             <div className="flex gap-2">
-              <button type="button" onClick={() => void handleAddMilestone()} className="h-10 flex-1 rounded-[10px] bg-accent text-sm font-semibold text-accent-on hover:bg-accent-hover">
+              <button type="button" onClick={() => void handleAddMilestone()} className="h-10 flex-1 rounded-trevu bg-accent text-sm font-semibold text-accent-on hover:bg-accent-hover">
                 {t("common.save")}
               </button>
-              <button type="button" onClick={() => setAddingMilestone(false)} className="h-10 flex-1 rounded-[10px] border border-line text-sm text-ink-secondary hover:text-ink">
+              <button type="button" onClick={() => setAddingMilestone(false)} className="h-10 flex-1 rounded-trevu border border-line text-sm text-ink-secondary hover:text-ink">
                 {t("common.cancel")}
               </button>
             </div>
@@ -653,7 +653,7 @@ function PhaseColumn({
           <button
             type="button"
             onClick={() => setAddingMilestone(true)}
-            className="flex h-11 w-full items-center justify-center gap-1.5 rounded-[10px] border border-line text-[13px] text-ink-muted transition-colors hover:border-accent hover:text-accent"
+            className="flex h-11 w-full items-center justify-center gap-1.5 rounded-trevu border border-line text-[13px] text-ink-muted transition-colors hover:border-accent hover:text-accent"
           >
             <Icon name="plus" size={14} /> {t("timeline.addMilestone")}
           </button>
@@ -680,8 +680,8 @@ function MilestoneCard({ milestone, isOrganizer, onClick }: { milestone: Milesto
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Translate.toString(transform), transition }}
-      className={`flex rounded-[10px] border bg-surface transition-colors ${
-        isDragging ? "relative z-10 border-accent shadow-lg" : "border-line hover:border-[var(--color-border-strong)]"
+      className={`flex rounded-trevu border bg-surface transition-colors ${
+        isDragging ? "relative z-10 border-accent shadow-lg" : "border-line hover:border-(--color-border-strong)"
       }`}
     >
       {isOrganizer && (
@@ -717,7 +717,7 @@ function MilestoneCard({ milestone, isOrganizer, onClick }: { milestone: Milesto
           </span>
         )}
         <span className="flex items-center gap-2 pl-4">
-          <span className="h-1 flex-1 rounded-full bg-[var(--color-border)]">
+          <span className="h-1 flex-1 rounded-full bg-(--color-border)">
             <span className="block h-1 rounded-full bg-accent" style={{ width: `${progressPct}%` }} />
           </span>
           <span className="text-xs text-ink-muted">
@@ -751,7 +751,7 @@ function AddPhaseButton({ tripId, onCreated }: { tripId: string; onCreated: () =
       <button
         type="button"
         onClick={() => setAdding(true)}
-        className="flex h-11 shrink-0 items-center gap-1.5 rounded-[10px] border border-line px-3.5 text-sm font-medium text-ink hover:bg-ghost"
+        className="flex h-11 shrink-0 items-center gap-1.5 rounded-trevu border border-line px-3.5 text-sm font-medium text-ink hover:bg-ghost"
       >
         <Icon name="plus" size={16} /> {t("timeline.addPhase")}
       </button>
@@ -773,7 +773,7 @@ function AddPhaseButton({ tripId, onCreated }: { tripId: string; onCreated: () =
         className={`${TIMELINE_INPUT} w-48`}
         autoFocus
       />
-      <button type="button" onClick={() => void handleAdd()} className="h-11 rounded-[10px] bg-accent px-3.5 text-sm font-semibold text-accent-on hover:bg-accent-hover">
+      <button type="button" onClick={() => void handleAdd()} className="h-11 rounded-trevu bg-accent px-3.5 text-sm font-semibold text-accent-on hover:bg-accent-hover">
         {t("common.save")}
       </button>
       <button type="button" onClick={() => setAdding(false)} className="flex h-11 w-11 items-center justify-center text-ink-muted hover:text-ink" aria-label={t("common.cancel")}>

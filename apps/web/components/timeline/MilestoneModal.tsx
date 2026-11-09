@@ -184,7 +184,7 @@ function TaskRow({
     <li
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={`rounded-[10px] bg-ghost ${isDragging ? "relative z-10 ring-1 ring-accent shadow-lg" : ""}`}
+      className={`rounded-trevu bg-ghost ${isDragging ? "relative z-10 ring-1 ring-accent shadow-lg" : ""}`}
     >
       <div className="flex items-center gap-2 px-2 py-2">
         {isOrganizer && (
@@ -206,9 +206,9 @@ function TaskRow({
           aria-pressed={isPendingVerification ? "mixed" : isCompleted}
           className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1.5px] text-xs transition-colors ${
             isCompleted
-              ? "border-[var(--color-success)] text-[var(--color-success)]"
+              ? "border-(--color-success) text-(--color-success)"
               : isPendingVerification
-              ? "border-[var(--color-warning)] text-[var(--color-warning)]"
+              ? "border-(--color-warning) text-(--color-warning)"
               : "border-line-strong hover:border-accent"
           }`}
         >
@@ -228,16 +228,16 @@ function TaskRow({
         </button>
         {isPendingVerification && isOrganizer && (
           <div className="flex gap-1">
-            <button type="button" onClick={onVerify} className="flex h-8 w-8 items-center justify-center rounded-md text-[var(--color-success)] hover:bg-ghost" aria-label={t("timeline.verifyTask")}>
+            <button type="button" onClick={onVerify} className="flex h-8 w-8 items-center justify-center rounded-md text-(--color-success) hover:bg-ghost" aria-label={t("timeline.verifyTask")}>
               <Icon name="check" size={14} strokeWidth={3} />
             </button>
-            <button type="button" onClick={onReject} className="flex h-8 w-8 items-center justify-center rounded-md text-[var(--color-danger)] hover:bg-ghost" aria-label={t("timeline.rejectTask")}>
+            <button type="button" onClick={onReject} className="flex h-8 w-8 items-center justify-center rounded-md text-(--color-danger) hover:bg-ghost" aria-label={t("timeline.rejectTask")}>
               <Icon name="x" size={14} strokeWidth={3} />
             </button>
           </div>
         )}
         {task.status === "rejected" && (
-          <span className="rounded-md px-2 py-0.5 text-xs text-[var(--color-danger)] ring-1 ring-line">{t("timeline.taskRejected")}</span>
+          <span className="rounded-md px-2 py-0.5 text-xs text-(--color-danger) ring-1 ring-line">{t("timeline.taskRejected")}</span>
         )}
         {isOrganizer && (
           <div className="flex shrink-0 items-center">
@@ -259,12 +259,12 @@ function TaskRow({
           <p className={LABEL}>{t("timeline.dueLabel")}</p>
           <DueFields idPrefix={fid} date={date} time={time} onDate={setDate} onTime={setTime} />
           <LocationField tripId={tripId} value={place} onChange={setPlace} showNotes={false} label={t("timeline.locationLabel")} />
-          {error && <p role="alert" className="text-xs font-medium text-[var(--color-danger)]">{t("errors.saveFailed")}</p>}
+          {error && <p role="alert" className="text-xs font-medium text-(--color-danger)">{t("errors.saveFailed")}</p>}
           <div className="flex justify-end gap-2">
-            <button type="button" onClick={() => setOpen(false)} className="h-10 rounded-[10px] px-3.5 text-sm text-ink-secondary hover:text-ink">
+            <button type="button" onClick={() => setOpen(false)} className="h-10 rounded-trevu px-3.5 text-sm text-ink-secondary hover:text-ink">
               {t("common.cancel")}
             </button>
-            <button type="button" onClick={save} disabled={busy} className="h-10 rounded-[10px] border border-accent px-4 text-sm font-semibold text-accent hover:bg-[var(--color-primary-subtle)] disabled:opacity-50">
+            <button type="button" onClick={save} disabled={busy} className="h-10 rounded-trevu border border-accent px-4 text-sm font-semibold text-accent hover:bg-(--color-primary-subtle) disabled:opacity-50">
               {busy ? "…" : t("timeline.taskSave")}
             </button>
           </div>
@@ -459,10 +459,10 @@ export function MilestoneModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={`${fid}-title`}
-        className="flex max-h-[92vh] w-full flex-col rounded-t-[20px] border border-line bg-surface shadow-2xl sm:mx-4 sm:max-w-[600px] sm:rounded-2xl"
+        className="flex max-h-[92vh] w-full flex-col rounded-t-trevu-3xl border border-line bg-surface shadow-2xl sm:mx-4 sm:max-w-[600px] sm:rounded-2xl"
       >
         <div className="flex justify-center pt-2 sm:hidden" aria-hidden="true">
-          <span className="h-1 w-10 rounded-full bg-[var(--color-border-strong)]" />
+          <span className="h-1 w-10 rounded-full bg-(--color-border-strong)" />
         </div>
 
         <div className="flex-1 space-y-5 overflow-y-auto p-4 sm:p-7">
@@ -480,7 +480,7 @@ export function MilestoneModal({
             ) : (
               <h3 id={`${fid}-title`} className="flex-1 text-lg font-bold text-ink">{name}</h3>
             )}
-            <button type="button" onClick={close} aria-label={t("common.close")} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] text-ink-muted hover:bg-ghost hover:text-ink">
+            <button type="button" onClick={close} aria-label={t("common.close")} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-trevu text-ink-muted hover:bg-ghost hover:text-ink">
               <Icon name="x" size={20} />
             </button>
           </div>
@@ -497,7 +497,7 @@ export function MilestoneModal({
                   onClick={() => setStatus(opt.value)}
                   className={`min-h-9 rounded-md px-3 text-[13px] font-semibold transition-colors ${
                     status === opt.value
-                      ? "bg-[var(--color-primary-subtle)] text-accent ring-1 ring-accent"
+                      ? "bg-(--color-primary-subtle) text-accent ring-1 ring-accent"
                       : "bg-ghost text-ink-secondary hover:text-ink"
                   }`}
                 >
@@ -533,7 +533,7 @@ export function MilestoneModal({
                   onClick={async () => {
                     if (await onMove(phaseId, index - 1)) setChanged(true);
                   }}
-                  className="flex h-11 items-center gap-1.5 rounded-[10px] border border-line px-3 text-sm text-ink hover:bg-ghost disabled:opacity-40"
+                  className="flex h-11 items-center gap-1.5 rounded-trevu border border-line px-3 text-sm text-ink hover:bg-ghost disabled:opacity-40"
                 >
                   <Icon name="arrow-up" size={16} /> <span className="hidden sm:inline">{t("timeline.moveUp")}</span>
                   <span className="sr-only sm:hidden">{t("timeline.moveUp")}</span>
@@ -544,7 +544,7 @@ export function MilestoneModal({
                   onClick={async () => {
                     if (await onMove(phaseId, index + 1)) setChanged(true);
                   }}
-                  className="flex h-11 items-center gap-1.5 rounded-[10px] border border-line px-3 text-sm text-ink hover:bg-ghost disabled:opacity-40"
+                  className="flex h-11 items-center gap-1.5 rounded-trevu border border-line px-3 text-sm text-ink hover:bg-ghost disabled:opacity-40"
                 >
                   <Icon name="arrow-down" size={16} /> <span className="hidden sm:inline">{t("timeline.moveDown")}</span>
                   <span className="sr-only sm:hidden">{t("timeline.moveDown")}</span>
@@ -643,7 +643,7 @@ export function MilestoneModal({
                   onClick={() => void handleAddTask()}
                   disabled={!newTaskName.trim()}
                   aria-label={t("timeline.addTask")}
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] bg-ghost text-ink hover:bg-[var(--color-primary-subtle)] disabled:opacity-40"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-trevu bg-ghost text-ink hover:bg-(--color-primary-subtle) disabled:opacity-40"
                 >
                   <Icon name="plus" size={18} />
                 </button>
@@ -651,20 +651,20 @@ export function MilestoneModal({
             )}
           </div>
 
-          {error && <p role="alert" className="text-sm font-medium text-[var(--color-danger)]">{error}</p>}
+          {error && <p role="alert" className="text-sm font-medium text-(--color-danger)">{error}</p>}
         </div>
 
         {/* Lábléc — mobilon ragadós alsó sáv */}
         <div className="flex flex-col gap-3 border-t border-line p-4 sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-4">
           {isOrganizer ? (
-            <button type="button" onClick={() => setConfirmDelete(true)} className="min-h-11 text-left text-sm font-medium text-[var(--color-danger)] hover:underline sm:min-h-0">
+            <button type="button" onClick={() => setConfirmDelete(true)} className="min-h-11 text-left text-sm font-medium text-(--color-danger) hover:underline sm:min-h-0">
               {t("timeline.milestoneDelete")}
             </button>
           ) : (
             <span />
           )}
           <div className="flex gap-2.5">
-            <button type="button" onClick={close} className="h-11 flex-1 rounded-[10px] border border-line px-4 text-[15px] text-ink-secondary hover:text-ink sm:flex-none sm:border-0">
+            <button type="button" onClick={close} className="h-11 flex-1 rounded-trevu border border-line px-4 text-[15px] text-ink-secondary hover:text-ink sm:flex-none sm:border-0">
               {t(changed ? "common.close" : "common.cancel")}
             </button>
             {isOrganizer && (
@@ -672,7 +672,7 @@ export function MilestoneModal({
                 type="button"
                 onClick={() => void handleSave()}
                 disabled={saving}
-                className="h-11 flex-1 rounded-[10px] bg-accent px-5 text-[15px] font-semibold text-accent-on hover:bg-accent-hover disabled:opacity-50 sm:flex-none"
+                className="h-11 flex-1 rounded-trevu bg-accent px-5 text-[15px] font-semibold text-accent-on hover:bg-accent-hover disabled:opacity-50 sm:flex-none"
               >
                 {saving ? "…" : t("timeline.milestoneSave")}
               </button>
@@ -691,10 +691,10 @@ export function MilestoneModal({
         busy={deleting}
         actions={
           <>
-            <button type="button" onClick={() => void handleDelete()} disabled={deleting} className="h-11 rounded-[10px] bg-[var(--color-danger)] px-5 text-sm font-semibold text-white disabled:opacity-50">
+            <button type="button" onClick={() => void handleDelete()} disabled={deleting} className="h-11 rounded-trevu bg-(--color-danger) px-5 text-sm font-semibold text-white disabled:opacity-50">
               {t("timeline.milestoneDelete")}
             </button>
-            <button type="button" onClick={() => setConfirmDelete(false)} disabled={deleting} className="h-11 rounded-[10px] px-4 text-sm text-ink-secondary">
+            <button type="button" onClick={() => setConfirmDelete(false)} disabled={deleting} className="h-11 rounded-trevu px-4 text-sm text-ink-secondary">
               {t("common.cancel")}
             </button>
           </>

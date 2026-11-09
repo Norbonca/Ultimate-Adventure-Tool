@@ -77,7 +77,7 @@ export default async function TutorialsPage({ searchParams }: PageProps) {
         {/* HERO — D21 S1 */}
         <section className="flex flex-col gap-4 md:gap-5" data-testid="tutorials-hero">
           <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-accent md:text-xs">{t("tutorials.eyebrow")}</p>
-          <h1 className="text-[32px] font-bold leading-[1.1] text-ink [text-wrap:balance] md:text-[56px]">{t("tutorials.title")}</h1>
+          <h1 className="text-[32px] font-bold leading-[1.1] text-ink text-balance md:text-[56px]">{t("tutorials.title")}</h1>
           <p className="max-w-[720px] text-base leading-relaxed text-ink-body md:text-lg">{t("tutorials.lead")}</p>
           <div className="mt-2 flex flex-col gap-3 md:flex-row md:items-center">
             <form action="/tutorials" role="search" className="flex min-w-0 items-center gap-2 rounded-full border border-line bg-surface px-4 py-1.5 md:w-[520px]">
@@ -89,7 +89,7 @@ export default async function TutorialsPage({ searchParams }: PageProps) {
                 defaultValue={q}
                 placeholder={t("tutorials.searchPlaceholder")}
                 aria-label={t("tutorials.searchPlaceholder")}
-                className="h-10 min-w-0 flex-1 bg-transparent text-[15px] text-ink outline-none placeholder:text-ink-muted"
+                className="h-10 min-w-0 flex-1 bg-transparent text-[15px] text-ink outline-hidden placeholder:text-ink-muted"
                 data-testid="tutorials-search"
               />
               <button type="submit" className="inline-flex h-9 shrink-0 items-center rounded-full bg-accent px-4 text-sm font-semibold text-accent-on">

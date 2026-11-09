@@ -24,7 +24,7 @@ export function TutorialCard({ tutorial, locale, roleLabel, badge, lengthLabel, 
   return (
     <Link
       href={tutorialHref(tutorial.slug)}
-      className="group flex gap-3 rounded-trevu-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:flex-col sm:gap-3"
+      className="group flex gap-3 rounded-trevu-xl focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:flex-col sm:gap-3"
       data-testid={`tutorial-card-${tutorial.slug}`}
     >
       <span className="relative block h-[68px] w-[120px] shrink-0 overflow-hidden rounded-[8px] border border-line sm:aspect-video sm:h-auto sm:w-full sm:rounded-trevu-xl">
