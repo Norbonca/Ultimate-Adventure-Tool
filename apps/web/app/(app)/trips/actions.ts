@@ -1041,7 +1041,8 @@ export async function assignStaffSeat(
       return { ok: false, error: t("errors.saveFailed") };
     }
     if (!data || data.length === 0) {
-      return { ok: false, error: "A frissítés nem érintett rekordot." };
+      console.error("assignStaffSeat update: 0 sor");
+      return { ok: false, error: t("errors.saveFailed") };
     }
   } else {
     const { data, error } = await admin
@@ -1053,7 +1054,8 @@ export async function assignStaffSeat(
       return { ok: false, error: t("errors.saveFailed") };
     }
     if (!data || data.length === 0) {
-      return { ok: false, error: "A beszúrás nem hozott létre rekordot." };
+      console.error("assignStaffSeat insert: 0 sor");
+      return { ok: false, error: t("errors.saveFailed") };
     }
   }
 
@@ -1312,7 +1314,7 @@ export async function inviteStaffByEmail(
   | { ok: true; mode: "invited"; email: string }
   | { ok: false; error: string }
 > {
-  const { t } = await getServerT();
+  const { t, locale } = await getServerT();
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -1418,12 +1420,14 @@ export async function inviteStaffByEmail(
         invited_to_trip_id: tripId,
         invited_to_trip_slug: trip.slug,
         staff_role_label: roleLabel?.trim().slice(0, 100) || null,
+        // a meghívó nyelve — a meghívott nyelvét még nem ismerjük
+        locale,
       },
     });
 
   if (inviteErr || !invited?.user) {
     console.error("inviteStaffByEmail invite error:", inviteErr);
-    return { ok: false, error: inviteErr?.message ?? t("trips.errors.inviteFailed") };
+    return { ok: false, error: t("trips.errors.inviteFailed") };
   }
 
   const res = await upsertParticipant(invited.user.id);

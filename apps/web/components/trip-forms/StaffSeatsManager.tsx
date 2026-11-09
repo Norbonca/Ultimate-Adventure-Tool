@@ -91,8 +91,8 @@ export function StaffSeatsManager({ tripId, totalSeats }: StaffSeatsManagerProps
       notifyParticipantsChanged(tripId);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      console.error("[StaffSeatsManager] assignStaffSeat threw:", e);
-      setError(`Kivétel: ${msg}`);
+      console.error("[StaffSeatsManager] assignStaffSeat threw:", msg);
+      setError(t("errors.generic"));
     } finally {
       setPending(false);
     }
@@ -104,14 +104,14 @@ export function StaffSeatsManager({ tripId, totalSeats }: StaffSeatsManagerProps
     try {
       const result = await removeStaffSeat(tripId, participantId);
       if (!result || result.error) {
-        setError(result?.error ?? "Ismeretlen hiba a törlésnél");
+        setError(result?.error ?? t("errors.generic"));
         return;
       }
       await reload();
       notifyParticipantsChanged(tripId);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      setError(`Kivétel: ${msg}`);
+      console.error("[StaffSeatsManager] removeStaffSeat threw:", e instanceof Error ? e.message : String(e));
+      setError(t("errors.generic"));
     } finally {
       setPending(false);
     }

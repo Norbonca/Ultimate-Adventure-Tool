@@ -25,7 +25,7 @@ export default function RegisterPage() {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const router = useRouter();
   const supabase = createClient();
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   useEffect(() => {
     fetch("/api/v1/auth/check")
@@ -59,6 +59,8 @@ export default function RegisterPage() {
           full_name: `${firstName} ${lastName}`.trim(),
           first_name: firstName,
           last_name: lastName,
+          // a regisztráló nyelve — a megerősítő levél és a profil nyelve ehhez igazodhat
+          locale,
         },
         emailRedirectTo: `${window.location.origin}/callback`,
       },

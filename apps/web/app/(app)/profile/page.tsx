@@ -602,7 +602,7 @@ export default function ProfilePage() {
                     )}
                   </span>
                   <span className="text-xs text-slate-400">
-                    {(profile.reputation_points || 0).toLocaleString()} XP
+                    {(profile.reputation_points || 0).toLocaleString(locale === "en" ? "en-US" : "hu-HU")} XP
                   </span>
                 </div>
                 <div className="w-full bg-slate-200 rounded-full h-2">

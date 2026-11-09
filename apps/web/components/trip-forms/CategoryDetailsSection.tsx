@@ -35,11 +35,11 @@ export function CategoryDetailsSection({
       const key = param.group_key || "_default";
       if (!groups[key]) {
         groups[key] = {
-          label: param.group_label || "Egyéb",
+          label: param.group_label || "",
           labelHu:
             (param.group_label_localized as Record<string, string>)?.hu ||
             param.group_label ||
-            "Egyéb",
+            "",
           params: [],
         };
       }

@@ -37,9 +37,10 @@ export async function fetchCategoriesWithSubDisciplines() {
 // ============================================
 
 export async function fetchUserInterests() {
+  const { t } = await getServerT();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { interests: [], error: "Not authenticated" };
+  if (!user) return { interests: [], error: t("errors.notAuthenticated") };
 
   const { data, error } = await supabase
     .from("user_adventure_interests")
@@ -54,7 +55,7 @@ export async function saveUserInterests(categoryIds: string[]) {
   const { t } = await getServerT();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "Not authenticated" };
+  if (!user) return { error: t("errors.notAuthenticated") };
 
   const input = z.array(z.string().uuid()).max(100).safeParse(categoryIds);
   if (!input.success) return { error: t("errors.validationFailed") };
@@ -72,9 +73,10 @@ export async function saveUserInterests(categoryIds: string[]) {
 // ============================================
 
 export async function fetchUserSkills() {
+  const { t } = await getServerT();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { skills: [], error: "Not authenticated" };
+  if (!user) return { skills: [], error: t("errors.notAuthenticated") };
 
   const { data, error } = await supabase
     .from("user_skills")
@@ -106,7 +108,7 @@ export async function saveUserSkills(
   const { t } = await getServerT();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "Not authenticated" };
+  if (!user) return { error: t("errors.notAuthenticated") };
 
   const parsed = z.array(skillEntrySchema).max(500).safeParse(skills);
   const parsedRemove = z.array(z.string().uuid()).max(500).safeParse(removeCategoryIds);
@@ -148,9 +150,10 @@ export async function saveUserSkills(
 // ============================================
 
 export async function fetchPrivacySettings() {
+  const { t } = await getServerT();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { settings: null, error: "Not authenticated" };
+  if (!user) return { settings: null, error: t("errors.notAuthenticated") };
 
   const { data, error } = await supabase
     .from("user_privacy_settings")
@@ -175,7 +178,7 @@ export async function savePrivacySettings(settings: Record<string, unknown>) {
   if (!parsed.success) return { error: t("errors.validationFailed") };
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "Not authenticated" };
+  if (!user) return { error: t("errors.notAuthenticated") };
 
   const { error } = await supabase
     .from("user_privacy_settings")

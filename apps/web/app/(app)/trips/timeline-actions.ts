@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { effectiveTripTimezone } from "@/lib/calendar/trip-calendar";
 import { normalizeTime } from "@/lib/timeline/format";
+import { getServerT } from "@/lib/i18n/server";
 
 // ============================================
 // M021 — Trip Timeline Server Actions
@@ -225,11 +226,12 @@ export async function initTimelineFromTemplate(
   tripId: string,
   templateId: string
 ): Promise<{ success: boolean; error?: string }> {
+  const { t } = await getServerT();
   const { supabase, user } = await getAuthUser();
-  if (!user) return { success: false, error: "Not authenticated" };
+  if (!user) return { success: false, error: t("errors.notAuthenticated") };
 
   const trip = await verifyTripOrganizer(supabase, tripId, user.id);
-  if (!trip) return { success: false, error: "Not authorized" };
+  if (!trip) return { success: false, error: t("errors.unauthorized") };
 
   // Ellenőrzés: van-e már timeline
   const { count } = await supabase
@@ -238,16 +240,20 @@ export async function initTimelineFromTemplate(
     .eq("trip_id", tripId);
 
   if (count && count > 0) {
-    return { success: false, error: "Timeline already exists for this trip" };
+    return { success: false, error: t("timeline.errorAlreadyExists") };
   }
 
   // Sablon betöltése
   const { template, error: tplError } = await fetchTimelineTemplateDetail(templateId);
-  if (!template || tplError) return { success: false, error: tplError ?? "Template not found" };
+  if (!template || tplError) {
+    console.error("initTimelineFromTemplate: sablon", templateId, tplError);
+    return { success: false, error: t("timeline.errorTemplateNotFound") };
+  }
 
   const phaseCount = template.phases?.length ?? 0;
   if (phaseCount === 0) {
-    return { success: false, error: `Template has no phases (templateId: ${templateId})` };
+    console.error("initTimelineFromTemplate: üres sablon", templateId);
+    return { success: false, error: t("timeline.errorTemplateEmpty") };
   }
 
   const tripStartDate = trip.start_date ? new Date(trip.start_date) : new Date();
@@ -325,7 +331,8 @@ export async function initTimelineFromTemplate(
   }
 
   if (errors.length > 0) {
-    return { success: false, error: errors.join(" | ") };
+    console.error("initTimelineFromTemplate:", errors.join(" | "));
+    return { success: false, error: t("errors.saveFailed") };
   }
 
   return { success: true };

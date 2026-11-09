@@ -48,7 +48,7 @@ export default function ChangePasswordPage() {
     // Verify current password by signing in
     const { data: { user } } = await supabase.auth.getUser();
     if (!user?.email) {
-      setError("Cannot verify current password");
+      setError(t("auth.cannotVerifyPassword"));
       setLoading(false);
       return;
     }

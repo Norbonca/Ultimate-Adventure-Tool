@@ -7,6 +7,7 @@ import Link from "next/link";
 import { fetchTripBySlug, fetchCategoryParametersForDisplay, fetchMyParticipation, fetchCrewPositions } from "../actions";
 import { CATEGORY_DISPLAY, DIFFICULTY_LEVELS } from "@/lib/categories";
 import { getServerT, getServerLocale } from "@/lib/i18n/server";
+import { createT, type Locale } from "@uat/i18n";
 import { AppHeader } from "@/components/AppHeader";
 import { BackButtonNight } from "@/components/BackButton";
 import { ApplyButton, type ApplySeriesOption } from "@/components/ApplyButton";
@@ -840,7 +841,7 @@ function DetailValue({
   locale: string;
 }) {
   if (typeof value === "boolean") {
-    return value ? <Icon name="check-circle-2" size={16} className="text-emerald-600" label={locale === "en" ? "Yes" : "Igen"} /> : <Icon name="x-circle" size={16} className="text-red-500" label={locale === "en" ? "No" : "Nem"} />;
+    return value ? <Icon name="check-circle-2" size={16} className="text-emerald-600" label={createT(locale as Locale)("common.yes")} /> : <Icon name="x-circle" size={16} className="text-red-500" label={createT(locale as Locale)("common.no")} />;
   }
   return <>{formatParameterValue(value, fieldType, unit, options, locale)}</>;
 }
