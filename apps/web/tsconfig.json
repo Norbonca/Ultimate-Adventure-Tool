@@ -21,7 +21,8 @@
         "../../packages/i18n/src"
       ]
     },
-    "allowJs": true
+    "allowJs": true,
+    "types": ["node"]
   },
   "include": [
     "next-env.d.ts",
