@@ -1,15 +1,10 @@
 import type { Metadata } from "next";
-import { SITE_NAME, ogLocale } from "@/lib/seo";
+import { SITE_NAME, SITE_URL, ogLocale } from "@/lib/seo";
 import "@/styles/globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { getServerT } from "@/lib/i18n/server";
 import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_APP_URL?.startsWith("http")
-    ? process.env.NEXT_PUBLIC_APP_URL
-    : "https://www.ttvk.hu";
 
 /** A gyökér metaadata az olvasó nyelvén (Norbert, 2026-11-09). */
 export async function generateMetadata(): Promise<Metadata> {
