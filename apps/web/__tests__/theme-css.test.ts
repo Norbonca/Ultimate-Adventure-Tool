@@ -1,4 +1,5 @@
 // @vitest-environment node
+// hex-skip: próbakészlet és várt tokenértékek — nem megjelenítés
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
