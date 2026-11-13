@@ -20,7 +20,7 @@ const ROLES = {
   anon: { email: null, routes: ["/?view=list", "/get-started", "/pricing", "/login", "/register", "/forgot-password", `/trips/${TRIP}`, "/presentation"] },
   dora: {
     email: "dora@demo.trevu.local",
-    routes: ["/?view=list", "/trips", `/trips/${TRIP}`, `/trips/${TRIP}/manage`, `/trips/${TRIP}/edit`, `/trips/${TRIP}/expenses`, "/trips/new", "/profile", "/settings", "/settings/skills", "/settings/interests", "/dashboard", "/community", "/ideas", "/tutorials"],
+    routes: ["/?view=list", "/trips", `/trips/${TRIP}`, `/trips/${TRIP}/manage`, `/trips/${TRIP}/edit`, `/trips/${TRIP}/expenses`, "/trips/new", "/profile", "/settings/skills", "/settings/interests", "/dashboard", "/community", "/ideas", "/tutorials"],
   },
   admin: { email: "admin@demo.trevu.local", routes: ["/admin", "/admin/calendar", "/admin/users", "/admin/trips"] },
 };
