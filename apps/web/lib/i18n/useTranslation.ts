@@ -37,12 +37,33 @@ function isSupported(value: string | null | undefined): value is Locale {
   return !!value && (SUPPORTED_LOCALES as readonly string[]).includes(value);
 }
 
+/**
+ * A localStorage nem mindig érhető el: letiltott vagy privát módú tárnál a böngésző dob,
+ * Node 25+ alatt (tesztfutó) a globális `localStorage` fájl nélkül `undefined`.
+ * A nyelv elsődleges forrása a cookie; a tár csak másodpéldány, a hiánya nem hiba.
+ */
+function readStoredLocale(): string | null {
+  try {
+    return globalThis.localStorage?.getItem(STORAGE_KEY) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredLocale(locale: Locale) {
+  try {
+    globalThis.localStorage?.setItem(STORAGE_KEY, locale);
+  } catch {
+    // a cookie elég
+  }
+}
+
 /** A nyelv rögzítése mindenhol (modul-állapot, <html lang>, cookie, localStorage). */
 function persistLocale(locale: Locale) {
   setLocale(locale);
   document.documentElement.lang = locale;
   setCookie(STORAGE_KEY, locale);
-  localStorage.setItem(STORAGE_KEY, locale);
+  writeStoredLocale(locale);
 }
 
 // ── Külső tár (useSyncExternalStore) ───────────────────────────────────────────
@@ -56,7 +77,7 @@ function bootstrapClientLocale() {
   if (bootstrapped || typeof window === "undefined") return;
   bootstrapped = true;
   const fromCookie = getCookie(STORAGE_KEY);
-  const fromStorage = localStorage.getItem(STORAGE_KEY);
+  const fromStorage = readStoredLocale();
   const stored = isSupported(fromCookie) ? fromCookie : isSupported(fromStorage) ? fromStorage : null;
   const browserLang = navigator.language.split("-")[0];
   const next = stored ?? (isSupported(browserLang) ? browserLang : null);

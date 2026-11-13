@@ -59,4 +59,38 @@ describe("useTranslation — useSyncExternalStore (D12)", () => {
     });
     expect(screen.getByTestId("locale-a").textContent).toBe("hu");
   });
+
+  it.each([
+    ["nincs localStorage (Node 25+ tesztfutó)", undefined],
+    [
+      "a tár dob (letiltott vagy privát mód)",
+      {
+        getItem: () => {
+          throw new Error("SecurityError");
+        },
+        setItem: () => {
+          throw new Error("QuotaExceededError");
+        },
+      },
+    ],
+  ])("elérhetetlen tár mellett is vált, a cookie viszi a nyelvet — %s", async (_name, storage) => {
+    const original = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+    Object.defineProperty(globalThis, "localStorage", { configurable: true, value: storage });
+    try {
+      render(<Probe id="c" />);
+      await act(async () => {
+        await Promise.resolve();
+      });
+      await act(async () => {
+        fireEvent.click(screen.getByText("switch-c"));
+      });
+      expect(screen.getByTestId("locale-c").textContent).toBe("en");
+      expect(document.cookie).toContain("trevu-locale=en");
+    } finally {
+      if (original) Object.defineProperty(globalThis, "localStorage", original);
+      await act(async () => {
+        fireEvent.click(screen.getByText("switch-c"));
+      });
+    }
+  });
 });
