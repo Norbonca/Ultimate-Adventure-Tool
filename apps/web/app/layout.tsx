@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SITE_NAME, SITE_URL, ogLocale } from "@/lib/seo";
+import { DEFAULT_THEME } from "@uat/config";
 import "@/styles/globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -31,7 +32,7 @@ export default async function RootLayout({
   const { locale } = await getServerT();
 
   return (
-    <html lang={locale}>
+    <html lang={locale} data-theme={DEFAULT_THEME.id}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -45,7 +46,7 @@ export default async function RootLayout({
         />
       </head>
       <body
-        data-surface="night"
+        data-surface={DEFAULT_THEME.defaultSurface}
         className="min-h-screen bg-canvas text-ink antialiased"
       >
         <LocaleProvider locale={locale}>{children}</LocaleProvider>

@@ -10,7 +10,12 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-const css = readFileSync(resolve(__dirname, "../../styles/globals.css"), "utf8");
+// A tokenkészletek a témarétegből generált stíluslapban vannak (packages/config/src/theme → themes.generated.css);
+// a Tailwind-kötések a globals.css-ben maradtak — a teszt a kettőt együtt nézi.
+const css =
+  readFileSync(resolve(__dirname, "../../styles/themes.generated.css"), "utf8") +
+  "\n" +
+  readFileSync(resolve(__dirname, "../../styles/globals.css"), "utf8");
 
 function block(selector: string): string {
   // a szabály maga (`selector {`), nem a variánsokban előforduló részszelektor
@@ -27,6 +32,9 @@ function value(scope: string, token: string): string | undefined {
   const m = scope.match(new RegExp(`${token}\\s*:\\s*([^;]+);`));
   return m?.[1].trim().toUpperCase();
 }
+
+/** Az alaptéma gyökérblokkja a generált stíluslapban. */
+const ROOT = ':root,\n[data-theme="alap"]';
 
 const NIGHT: Record<string, string> = {
   "--color-bg": "#0F172A",
@@ -74,7 +82,7 @@ describe("felület-mód tokenek (Brand Guide v2 §8)", () => {
   });
 
   it("a Night-ban felülírt új tokeneknek van Day értéke a :root-ban", () => {
-    const root = block(":root");
+    const root = block(ROOT);
     for (const token of ["--color-on-primary", "--color-ghost", "--color-glass", "--color-input-bg", "--hero-scrim"]) {
       expect(value(root, token), token).toBeDefined();
     }
@@ -90,7 +98,7 @@ describe("felület-mód tokenek (Brand Guide v2 §8)", () => {
     // a futásidejű tokenre mutató értéknek `@theme inline`-ban a helye (különben :root-on oldódik fel)
     expect(block("@theme")).not.toMatch(/--color-[a-z0-9-]+:\s*var\(/);
     const nightTokens = new Set([...night.matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1]));
-    const root = block(":root");
+    const root = block(ROOT);
     for (const key of ["canvas", "surface", "ink", "line", "accent", "ghost", "glass", "scrim", "cat-token"]) {
       const entries = [...theme.matchAll(new RegExp(`(--color-${key}(?:-[a-z0-9-]+)?)\\s*:\\s*([^;]+);`, "g"))];
       expect(entries.length, key).toBeGreaterThan(0);
