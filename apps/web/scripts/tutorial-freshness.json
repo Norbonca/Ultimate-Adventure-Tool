@@ -1,0 +1,265 @@
+{
+  "__leiras": "M211 — az útmutatóképek frissességének követése. A `kozos.utvonalak` minden útmutatót elavulttá tesz, az `utmutatok.<slug>.utvonalak` csak azt az egyet. A `felveve` a felvétel pillanatában a HEAD commitja; a felvevő szkriptek írják. Ellenőrzés: node apps/web/scripts/check-tutorial-freshness.mjs",
+  "kozos": {
+    "leiras": "Az egész felületet érintő változás — ezektől minden útmutató elavul.",
+    "utvonalak": [
+      "apps/web/components/AppHeader.tsx",
+      "apps/web/components/LanguageSwitcher.tsx",
+      "apps/web/components/SiteFooter.tsx",
+      "apps/web/components/brand/",
+      "apps/web/components/ui/",
+      "apps/web/styles/globals.css",
+      "apps/web/styles/themes.generated.css",
+      "packages/config/src/brand.ts",
+      "packages/config/src/theme/"
+    ]
+  },
+  "puha": {
+    "leiras": "Nem tesz elavulttá, csak átnézendő: a feliratok változása a képeken is látszik.",
+    "utvonalak": [
+      "packages/i18n/src/"
+    ]
+  },
+  "utmutatok": {
+    "kozos-koltseg": {
+      "utvonalak": [
+        "apps/web/app/(app)/trips/[slug]/expenses/",
+        "apps/web/components/expenses/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "kiegyenlites": {
+      "utvonalak": [
+        "apps/web/app/(app)/trips/[slug]/expenses/",
+        "apps/web/components/expenses/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "uj-idopont": {
+      "utvonalak": [
+        "apps/web/app/(app)/trips/[slug]/page.tsx",
+        "apps/web/components/ApplyButton.tsx",
+        "apps/web/components/calendar/",
+        "apps/web/components/trip-series/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "jelentkezok-elbiralasa": {
+      "utvonalak": [
+        "apps/web/app/(app)/trips/[slug]/edit/",
+        "apps/web/components/ImagePicker.tsx",
+        "apps/web/components/trip-forms/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "menetrend-teendok": {
+      "utvonalak": [
+        "apps/web/app/(app)/trips/[slug]/manage/",
+        "apps/web/components/TripTimelineClient.tsx",
+        "apps/web/components/timeline/",
+        "apps/web/components/trip-forms/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "elso-tura-meghirdetese": {
+      "utvonalak": [
+        "apps/web/app/(app)/trips/new/",
+        "apps/web/app/(app)/trips/page.tsx",
+        "apps/web/components/ideas/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "kereses-es-szures": {
+      "utvonalak": [
+        "apps/web/app/discover-client.tsx",
+        "apps/web/app/page.tsx",
+        "apps/web/components/discover/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "3d-terkep": {
+      "utvonalak": [
+        "apps/web/app/discover-client.tsx",
+        "apps/web/app/page.tsx",
+        "apps/web/components/discover/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "jelentkezes-idopontra": {
+      "utvonalak": [
+        "apps/web/app/(app)/trips/[slug]/page.tsx",
+        "apps/web/components/ApplyButton.tsx",
+        "apps/web/components/calendar/",
+        "apps/web/components/trip-series/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "otlet-kituzese": {
+      "utvonalak": [
+        "apps/web/app/(app)/ideas/",
+        "apps/web/app/(app)/ideas/new/",
+        "apps/web/components/ideas/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "szerepek-es-stabhelyek": {
+      "utvonalak": [
+        "apps/web/app/(app)/trips/[slug]/edit/",
+        "apps/web/components/ImagePicker.tsx",
+        "apps/web/components/trip-forms/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "check-in": {
+      "utvonalak": [
+        "apps/web/app/(app)/trips/[slug]/edit/",
+        "apps/web/components/ImagePicker.tsx",
+        "apps/web/components/trip-forms/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "boritokep": {
+      "utvonalak": [
+        "apps/web/app/(app)/trips/[slug]/edit/",
+        "apps/web/components/ImagePicker.tsx",
+        "apps/web/components/trip-forms/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "tura-beallitasok": {
+      "utvonalak": [
+        "apps/web/app/(app)/trips/[slug]/edit/",
+        "apps/web/components/ImagePicker.tsx",
+        "apps/web/components/trip-forms/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "koltseg-beallitasok": {
+      "utvonalak": [
+        "apps/web/app/(app)/trips/[slug]/edit/",
+        "apps/web/components/ImagePicker.tsx",
+        "apps/web/components/trip-forms/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "tura-lemondasa": {
+      "utvonalak": [
+        "apps/web/app/(app)/trips/[slug]/edit/",
+        "apps/web/components/ImagePicker.tsx",
+        "apps/web/components/trip-forms/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "mire-varnak": {
+      "utvonalak": [
+        "apps/web/app/(app)/trips/page.tsx",
+        "apps/web/components/ideas/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "keszsegek-es-erdeklodes": {
+      "utvonalak": [
+        "apps/web/app/(app)/settings/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "jelentkezes-allapota": {
+      "utvonalak": [
+        "apps/web/app/(app)/trips/[slug]/page.tsx",
+        "apps/web/components/ApplyButton.tsx",
+        "apps/web/components/calendar/",
+        "apps/web/components/trip-series/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "resztvevoi-menetrend": {
+      "utvonalak": [
+        "apps/web/app/(app)/trips/[slug]/participant/",
+        "apps/web/components/timeline/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "naptar-es-idozona": {
+      "utvonalak": [
+        "apps/web/app/(app)/trips/[slug]/page.tsx",
+        "apps/web/components/ApplyButton.tsx",
+        "apps/web/components/calendar/",
+        "apps/web/components/trip-series/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    },
+    "otlet-csatlakozas": {
+      "utvonalak": [
+        "apps/web/app/(app)/ideas/[slug]/",
+        "apps/web/components/ideas/"
+      ],
+      "felveve": {
+        "hu": "5e71da7",
+        "en": "5e71da7"
+      }
+    }
+  }
+}

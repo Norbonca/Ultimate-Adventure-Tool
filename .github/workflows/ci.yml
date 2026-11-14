@@ -65,6 +65,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Az útmutató-frissesség kapu a PR alap-commitjához képest diffel.
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -88,6 +91,12 @@ jobs:
 
       - name: Architectural invariants
         run: node .skills/trevu-test/scripts/check-architecture.mjs
+
+      # M211 (CLAUDE.md 3.12): érinti-e EZ a változás az útmutatók képernyőképeit?
+      # Csak a PR saját diffjét nézi, a régi adósság nem blokkol.
+      - name: Útmutató-frissesség (M211)
+        if: github.event_name == 'pull_request'
+        run: node apps/web/scripts/check-tutorial-freshness.mjs --diff "${{ github.event.pull_request.base.sha }}"
 
   db-push:
     name: Supabase DB Push

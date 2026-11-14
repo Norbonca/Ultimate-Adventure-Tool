@@ -1,20 +1,21 @@
 // M211 — Útmutató-diák: lépésenként egy képernyőkép a helyi demókörnyezetből, a magyarázott elem
 // jelzőnarancs (B „Terep”, #F15B2A) kerettel, szén fátyollal kiemelve, lekerekítés nélkül.
 // Kimenet: public/tutorials/slides/<slug>/<lépés>.jpg (1440×810).
-// Használat: BASE=http://localhost:3011 node scripts/tutorial-slides-capture.mjs [slug-szűrő]
+// Használat: BASE=http://localhost:3011 [LOCALE=en] node scripts/tutorial-slides-capture.mjs [slug-szűrő]
+// Angolul (LOCALE=en) a kimenet a …/slides-en mappába megy.
 // A lépéstábla és a segédfüggvények: tutorial-capture-lib.mjs
 import { chromium } from "@playwright/test";
 import { mkdirSync } from "node:fs";
-import { BASE, VIEW, TUTORIALS, settle, into, highlight } from "./tutorial-capture-lib.mjs";
+import { BASE, LOCALE, VIEW, TUTORIALS, settle, into, highlight, rogzitFelvetel } from "./tutorial-capture-lib.mjs";
 
 const FILTER = process.argv[2] ? new RegExp(process.argv[2]) : null;
-const OUT = "public/tutorials/slides";
+const OUT = LOCALE === "hu" ? "public/tutorials/slides" : "public/tutorials/slides-" + LOCALE;
 const browser = await chromium.launch();
 const ctxs = {};
 async function ctxFor(who) {
   if (ctxs[who ?? "-"]) return ctxs[who ?? "-"];
-  const ctx = await browser.newContext({ ...VIEW, locale: "hu-HU", timezoneId: "Europe/Budapest" });
-  await ctx.addCookies([{ name: "trevu-locale", value: "hu", url: BASE }]);
+  const ctx = await browser.newContext({ ...VIEW, locale: LOCALE === "en" ? "en-GB" : "hu-HU", timezoneId: "Europe/Budapest" });
+  await ctx.addCookies([{ name: "trevu-locale", value: LOCALE, url: BASE }]);
   if (who) {
     const p = await ctx.newPage();
     await p.goto(BASE + "/login", { waitUntil: "networkidle", timeout: 120000 });
@@ -57,4 +58,10 @@ for (const [slug, who, steps] of TUTORIALS) {
 }
 await browser.close();
 console.log(log.join("\n"));
+
+// Csak a hibátlan útmutatók felvételét rögzítjük.
+const hibas = new Set(log.filter((l) => !l.startsWith("OK")).map((l) => l.split(/\s+/)[1].split("/")[0]));
+const sikeres = [...new Set(log.map((l) => l.split(/\s+/)[1].split("/")[0]))].filter((s) => !hibas.has(s));
+const r = rogzitFelvetel(sikeres);
+if (r) console.log(`\nManifest: ${r.n} útmutató felvétele ${LOCALE} nyelven a(z) ${r.head} commitra állítva.`);
 
