@@ -81,7 +81,7 @@ export function OccurrencesPanel({
 
   const dateTime = (iso: string | null) =>
     iso ? new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "hu-HU", { dateStyle: "medium", timeZone: "UTC" }).format(new Date(iso)) : "";
-  const inputCls = "w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-hidden focus:border-emerald-400 bg-white";
+  const inputCls = "w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-hidden focus:border-trevu-600 bg-white";
   const btn = "px-2.5 py-1 text-xs border rounded-lg disabled:opacity-50 transition-colors";
 
   return (
@@ -97,7 +97,7 @@ export function OccurrencesPanel({
               type="button"
               onClick={generate}
               disabled={busy !== null || period.status !== "active"}
-              className="px-3 py-2 text-sm border border-slate-200 text-slate-700 rounded-lg hover:border-emerald-400 hover:text-emerald-600 disabled:opacity-50 transition-colors"
+              className="px-3 py-2 text-sm border border-slate-200 text-slate-700 rounded-lg hover:border-trevu-600 hover:text-trevu-700 disabled:opacity-50 transition-colors"
             >
               {busy === "generate" ? t("admin.calendar.actions.working") : t("admin.calendar.actions.generateThis")}
             </button>
@@ -105,7 +105,7 @@ export function OccurrencesPanel({
           <button
             type="button"
             onClick={() => setForm({ earliest: "", latest: "", sourceNote: "" })}
-            className="px-4 py-2 text-sm bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+            className="px-4 py-2 text-sm bg-trevu-600 text-white rounded-lg hover:bg-trevu-700 transition-colors"
           >
             + {t("admin.calendar.actions.addOccurrence")}
           </button>
@@ -136,7 +136,7 @@ export function OccurrencesPanel({
             <button type="button" onClick={() => setForm(null)} className="px-3 py-2 text-sm border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-100 transition-colors">
               {t("admin.calendar.actions.cancel")}
             </button>
-            <button type="submit" disabled={busy === "form"} className="px-4 py-2 text-sm bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 disabled:opacity-50 transition-colors">
+            <button type="submit" disabled={busy === "form"} className="px-4 py-2 text-sm bg-trevu-600 text-white rounded-lg hover:bg-trevu-700 disabled:opacity-50 transition-colors">
               {t("admin.calendar.actions.save")}
             </button>
           </div>
@@ -182,7 +182,7 @@ export function OccurrencesPanel({
                         <button
                           type="button"
                           onClick={() => setForm({ id: o.id, earliest: o.earliest, latest: o.latest, sourceNote: o.source_note ?? "" })}
-                          className={`${btn} border-slate-200 text-slate-600 hover:border-emerald-400 hover:text-emerald-600`}
+                          className={`${btn} border-slate-200 text-slate-600 hover:border-trevu-600 hover:text-trevu-700`}
                         >
                           {t("admin.calendar.actions.edit")}
                         </button>

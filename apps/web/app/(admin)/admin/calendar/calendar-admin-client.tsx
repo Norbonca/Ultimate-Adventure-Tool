@@ -66,9 +66,9 @@ export function CalendarAdminClient({ overview, initialTab }: { overview: Calend
   };
 
   const years = Array.from({ length: 6 }, (_, i) => overview.generateRange.from - 1 + i);
-  const inputCls = "text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-hidden focus:border-emerald-400 bg-white";
+  const inputCls = "text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-hidden focus:border-trevu-600 bg-white";
   const tabCls = (active: boolean) =>
-    `px-4 py-2 text-sm rounded-lg transition-colors ${active ? "bg-emerald-500 text-white" : "text-slate-600 hover:bg-slate-100"}`;
+    `px-4 py-2 text-sm rounded-lg transition-colors ${active ? "bg-trevu-600 text-white" : "text-slate-600 hover:bg-slate-100"}`;
 
   return (
     <>
@@ -151,13 +151,13 @@ export function CalendarAdminClient({ overview, initialTab }: { overview: Calend
                 type="button"
                 onClick={handleGenerate}
                 disabled={busy}
-                className="px-3 py-2 text-sm border border-slate-200 text-slate-700 rounded-lg hover:border-emerald-400 hover:text-emerald-600 disabled:opacity-50 transition-colors"
+                className="px-3 py-2 text-sm border border-slate-200 text-slate-700 rounded-lg hover:border-trevu-600 hover:text-trevu-700 disabled:opacity-50 transition-colors"
               >
                 {busy ? t("admin.calendar.actions.working") : t("admin.calendar.actions.generate", overview.generateRange)}
               </button>
               <Link
                 href={overview.scope && overview.scope !== GLOBAL_SCOPE ? `/admin/calendar/periods/new?country=${overview.scope}` : "/admin/calendar/periods/new"}
-                className="px-4 py-2 text-sm bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
+                className="px-4 py-2 text-sm bg-trevu-600 text-white rounded-lg hover:bg-trevu-700 transition-colors">
                 + {t("admin.calendar.actions.newPeriod")}
               </Link>
             </div>
@@ -242,7 +242,7 @@ export function CalendarAdminClient({ overview, initialTab }: { overview: Calend
                       <td className="px-4 py-3 text-right">
                         <Link
                           href={`/admin/calendar/periods/${p.id}`}
-                          className="px-2.5 py-1 text-xs border border-slate-200 text-slate-600 rounded-lg hover:border-emerald-400 hover:text-emerald-600 transition-colors"
+                          className="px-2.5 py-1 text-xs border border-slate-200 text-slate-600 rounded-lg hover:border-trevu-600 hover:text-trevu-700 transition-colors"
                         >
                           {t("admin.calendar.actions.edit")}
                         </Link>

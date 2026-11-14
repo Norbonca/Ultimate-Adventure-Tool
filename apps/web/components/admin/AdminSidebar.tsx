@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandHead } from "@/components/brand/BrandMark";
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -108,8 +109,8 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
       {/* Logo */}
       <div className="px-4 py-5 border-b border-white/10">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center text-white font-bold text-sm">
-            T
+          <div className="w-8 h-8 rounded-lg bg-trevu-500 flex items-center justify-center text-slate-900">
+            <BrandHead height={20} />
           </div>
           <span className="text-white font-semibold text-sm tracking-wide">
             {t("admin.header.title")}
@@ -153,7 +154,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
                         href={item.href}
                         className={`flex items-center gap-2.5 px-2 py-1.5 rounded-md text-sm transition-colors ${
                           isActive
-                            ? "bg-emerald-500/20 text-emerald-400"
+                            ? "bg-trevu-500/20 text-trevu-400"
                             : "text-slate-400 hover:text-white hover:bg-white/5"
                         }`}
                       >
@@ -177,7 +178,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
       {/* User footer */}
       <div className="px-3 py-4 border-t border-white/10">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+          <div className="w-8 h-8 rounded-full bg-trevu-500 flex items-center justify-center text-slate-900 text-xs font-bold shrink-0">
             {initials}
           </div>
           <div className="flex-1 min-w-0">

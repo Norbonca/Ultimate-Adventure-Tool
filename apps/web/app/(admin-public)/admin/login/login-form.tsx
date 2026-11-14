@@ -14,7 +14,7 @@ export function AdminLoginForm() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white">
+          <div className="w-10 h-10 rounded-xl bg-trevu-500 flex items-center justify-center text-slate-900">
             <BrandHead height={26} />
           </div>
           <span className="text-white text-xl font-semibold">{t("admin.header.title")}</span>
@@ -34,7 +34,7 @@ export function AdminLoginForm() {
                 name="email"
                 required
                 autoComplete="email"
-                className="w-full bg-slate-900 border border-white/10 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-slate-500 focus:outline-hidden focus:border-emerald-500 transition-colors"
+                className="w-full bg-slate-900 border border-white/10 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-slate-500 focus:outline-hidden focus:border-trevu-500 transition-colors"
               />
             </div>
 
@@ -47,7 +47,7 @@ export function AdminLoginForm() {
                 required
                 autoComplete="current-password"
                 placeholder="••••••••"
-                className="w-full bg-slate-900 border border-white/10 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-slate-500 focus:outline-hidden focus:border-emerald-500 transition-colors"
+                className="w-full bg-slate-900 border border-white/10 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-slate-500 focus:outline-hidden focus:border-trevu-500 transition-colors"
               />
             </div>
 

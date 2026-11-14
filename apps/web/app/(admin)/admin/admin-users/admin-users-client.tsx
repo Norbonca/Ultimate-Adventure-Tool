@@ -174,7 +174,7 @@ export function AdminUsersClient({
   };
 
   const inputCls =
-    "w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-hidden focus:border-emerald-400 bg-white";
+    "w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-hidden focus:border-trevu-600 bg-white";
 
   return (
     <>
@@ -193,7 +193,7 @@ export function AdminUsersClient({
       <div className="flex items-center justify-end">
         <button
           onClick={() => { setShowAddForm(true); setAddError(null); }}
-          className="px-4 py-2 text-sm bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+          className="px-4 py-2 text-sm bg-trevu-600 text-white rounded-lg hover:bg-trevu-700 transition-colors"
         >
           + {t.t_addAdmin}
         </button>
@@ -305,7 +305,7 @@ export function AdminUsersClient({
               <button
                 type="submit"
                 disabled={loading === "add"}
-                className="px-4 py-2 text-sm bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 disabled:opacity-50 transition-colors"
+                className="px-4 py-2 text-sm bg-trevu-600 text-white rounded-lg hover:bg-trevu-700 disabled:opacity-50 transition-colors"
               >
                 {t.t_addConfirm}
               </button>
@@ -352,7 +352,7 @@ export function AdminUsersClient({
                         <div
                           className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
                             isSelf
-                              ? "bg-emerald-500 text-white"
+                              ? "bg-trevu-600 text-white"
                               : "bg-slate-200 text-slate-600"
                           }`}
                         >
@@ -395,7 +395,7 @@ export function AdminUsersClient({
                             value={editForm.notes}
                             onChange={(e) => setEditForm((f) => ({ ...f, notes: e.target.value }))}
                             placeholder={t.t_notesPlaceholder}
-                            className="w-full text-xs border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-hidden focus:border-emerald-400 bg-white"
+                            className="w-full text-xs border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-hidden focus:border-trevu-600 bg-white"
                           />
                         </div>
                       ) : (
@@ -430,7 +430,7 @@ export function AdminUsersClient({
                             <button
                               onClick={() => handleSaveRole(admin.id)}
                               disabled={loading === admin.id}
-                              className="px-2.5 py-1 text-xs bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 disabled:opacity-50 transition-colors"
+                              className="px-2.5 py-1 text-xs bg-trevu-600 text-white rounded-lg hover:bg-trevu-700 disabled:opacity-50 transition-colors"
                             >
                               {t.t_saveRole}
                             </button>
@@ -446,7 +446,7 @@ export function AdminUsersClient({
                             {admin.is_active && (
                               <button
                                 onClick={() => startEdit(admin)}
-                                className="px-2.5 py-1 text-xs border border-slate-200 text-slate-600 rounded-lg hover:border-emerald-400 hover:text-emerald-600 transition-colors"
+                                className="px-2.5 py-1 text-xs border border-slate-200 text-slate-600 rounded-lg hover:border-trevu-600 hover:text-trevu-700 transition-colors"
                               >
                                 {t.t_editRole}
                               </button>

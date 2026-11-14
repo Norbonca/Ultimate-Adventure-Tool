@@ -38,7 +38,7 @@ export function UserDetailActions({ userId, userName, isBanned, labels }: UserDe
           type="button"
           disabled={loading}
           onClick={() => run(() => unbanUser(userId), labels.unbanSuccess)}
-          className="px-3.5 py-2 text-sm bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors disabled:opacity-50"
+          className="px-3.5 py-2 text-sm bg-trevu-600 text-white rounded-lg hover:bg-trevu-700 transition-colors disabled:opacity-50"
         >
           {labels.unban}
         </button>
