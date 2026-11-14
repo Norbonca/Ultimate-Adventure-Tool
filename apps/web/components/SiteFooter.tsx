@@ -50,14 +50,14 @@ export function SiteFooter() {
       aria-label={t("footer.label")}
       className="relative mt-auto bg-canvas text-ink"
     >
-      <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 pb-8 md:min-h-[232px] md:flex-row md:items-end md:justify-between md:gap-10 md:pb-10 md:pl-8 md:pr-[300px] md:pt-10">
+      <div className="relative mx-auto flex max-w-7xl flex-col gap-6 px-5 pb-8 md:min-h-[232px] md:flex-row md:items-end md:justify-between md:gap-10 md:pb-10 md:pl-8 md:pr-[300px] md:pt-10">
         {/* Mobilon a figura a sáv tetején, jobbra */}
         <Image
           src="/brand/zho-kabala-sotet-alapra.webp"
           alt={t("footer.mascotAlt")}
           width={560}
           height={491}
-          className="pointer-events-none -mb-2 mt-3 w-[168px] self-end md:absolute md:bottom-0 md:right-8 md:m-0 md:w-[248px]"
+          className="pointer-events-none -mb-2 mt-3 w-[168px] self-end md:absolute md:bottom-0 md:right-5 md:m-0 md:w-[248px]"
         />
         <div className="flex flex-col gap-3">
           <Link href="/" className="inline-flex items-center gap-3 text-ink" aria-label={BRAND.name}>
