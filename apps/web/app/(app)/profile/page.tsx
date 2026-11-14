@@ -87,11 +87,11 @@ const SKILL_LEVEL_KEYS: Record<string, string> = {
 };
 
 const SKILL_LEVEL_COLORS: Record<string, string> = {
-  none: "#DC2626",
-  beginner: "#16A34A",
-  intermediate: "#D97706",
-  advanced: "#3B82F6",
-  expert: "#8B5CF6",
+  none: "var(--color-danger)",
+  beginner: "var(--difficulty-1)",
+  intermediate: "var(--difficulty-2)",
+  advanced: "var(--difficulty-3)",
+  expert: "var(--difficulty-4)",
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────
@@ -724,7 +724,7 @@ export default function ProfilePage() {
                               ? `url(${
                                   trip.card_image_url || trip.cover_image_url
                                 }) center/cover`
-                              : "linear-gradient(135deg, #0D9488, #0F766E)",
+                              : "var(--color-primary)",
                         }}
                       />
                       <div className="p-3">

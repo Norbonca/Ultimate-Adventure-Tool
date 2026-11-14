@@ -6,7 +6,8 @@
 // part of the design-iteration process; teljes i18n az amikor a get-started
 // oldal Pencil-design v2 + komponensekre bontás is befejeződik.
 //
-// hex-skip: ugyanezen okból az inline `<style jsx>` blokkban szereplő hex
+// hex-skip: a márka- és felületszínek 2026-11-14 óta témaváltozók (fallbackkel); a megmaradt hex
+// a kategória-ikonok saját színe. Korábbi megjegyzés: az inline `<style jsx>` blokkban szereplő hex
 // színek (~140 db) is külön refaktor task része. A teljes landing redesign
 // fogja megoldani a CSS-token migrációt egyszerre, addig a stable hex-érték
 // jobban szolgálja a marketing iterációt.
@@ -45,7 +46,7 @@ export default function HomePage() {
     {
       name: t('categories.hiking'),
       icon: Mountain,
-      color: '#22C55E',
+      color: 'var(--color-success, #22C55E)',
       label: t('landing.categoryHikingLabel'),
     },
     {
@@ -63,7 +64,7 @@ export default function HomePage() {
     {
       name: t('categories.cycling'),
       icon: Bike,
-      color: '#EAB308',
+      color: 'var(--color-rating, #EAB308)',
       label: t('landing.categoryCyclingLabel'),
     },
     {
@@ -75,13 +76,13 @@ export default function HomePage() {
     {
       name: t('categories.running'),
       icon: Timer,
-      color: '#EF4444',
+      color: 'var(--color-danger, #EF4444)',
       label: t('landing.categoryRunningLabel'),
     },
     {
       name: t('categories.winterSports'),
       icon: Snowflake,
-      color: '#06B6D4',
+      color: 'var(--color-primary, #06B6D4)',
       label: t('landing.categoryWinterLabel'),
     },
     {
@@ -96,7 +97,7 @@ export default function HomePage() {
     {
       name: t('landing.secondaryCrew'),
       icon: Users,
-      color: '#0D9488',
+      color: 'var(--color-primary, #0D9488)',
       desc: t('landing.secondaryCrewDesc'),
     },
     {
@@ -108,7 +109,7 @@ export default function HomePage() {
     {
       name: t('landing.secondaryCalendar'),
       icon: CalendarDays,
-      color: '#06B6D4',
+      color: 'var(--color-primary, #06B6D4)',
       desc: t('landing.secondaryCalendarDesc'),
     },
     {
@@ -126,7 +127,7 @@ export default function HomePage() {
     {
       name: t('landing.secondaryLanguages'),
       icon: Languages,
-      color: '#22C55E',
+      color: 'var(--color-success, #22C55E)',
       desc: t('landing.secondaryLanguagesDesc'),
     },
   ];
@@ -145,7 +146,7 @@ export default function HomePage() {
           z-index: 50;
           background: rgba(255, 255, 255, 0.85);
           backdrop-filter: blur(12px);
-          border-bottom: 1px solid rgba(13, 148, 136, 0.1);
+          border-bottom: 1px solid color-mix(in srgb, var(--color-primary) 10%, transparent);
         }
 
         .header-content {
@@ -164,11 +165,11 @@ export default function HomePage() {
         }
 
         .logo-tre {
-          color: #0D9488;
+          color: var(--color-primary, #0D9488);
         }
 
         .logo-vu {
-          color: #0F172A;
+          color: var(--deep-navy, #0F172A);
         }
 
         .nav-desktop {
@@ -178,7 +179,7 @@ export default function HomePage() {
         }
 
         .nav-desktop a {
-          color: #0F172A;
+          color: var(--deep-navy, #0F172A);
           text-decoration: none;
           font-size: 14px;
           font-weight: 500;
@@ -186,7 +187,7 @@ export default function HomePage() {
         }
 
         .nav-desktop a:hover {
-          color: #0D9488;
+          color: var(--color-primary, #0D9488);
         }
 
         .nav-right {
@@ -196,7 +197,7 @@ export default function HomePage() {
         }
 
         .btn-login {
-          color: #0F172A;
+          color: var(--deep-navy, #0F172A);
           background: transparent;
           border: none;
           font-size: 14px;
@@ -206,11 +207,11 @@ export default function HomePage() {
         }
 
         .btn-login:hover {
-          color: #0D9488;
+          color: var(--color-primary, #0D9488);
         }
 
         .btn-primary {
-          background: #0D9488;
+          background: var(--color-primary, #0D9488);
           color: white;
           border: none;
           padding: 0.75rem 1.5rem;
@@ -222,7 +223,7 @@ export default function HomePage() {
         }
 
         .btn-primary:hover {
-          background: #0B8176;
+          background: var(--color-primary-hover, #0B8176);
         }
 
         .hamburger {
@@ -235,7 +236,7 @@ export default function HomePage() {
 
         /* Hero */
         .hero {
-          background: linear-gradient(135deg, #F8FAFC 0%, #E6F7F5 50%, #CCEFEB 100%);
+          background: linear-gradient(135deg, var(--arctic-white, #F8FAFC) 0%, var(--color-primary-subtle, #E6F7F5) 50%, var(--color-primary-subtle, #CCEFEB) 100%);
           padding: 6rem 2rem;
           text-align: center;
         }
@@ -263,7 +264,7 @@ export default function HomePage() {
           display: inline-block;
           width: 6px;
           height: 6px;
-          background: #22C55E;
+          background: var(--color-success, #22C55E);
           border-radius: 50%;
           animation: pulse 2s infinite;
         }
@@ -283,12 +284,12 @@ export default function HomePage() {
           line-height: 1.1;
           margin-bottom: 1.5rem;
           letter-spacing: -1px;
-          color: #0F172A;
+          color: var(--deep-navy, #0F172A);
         }
 
         .hero-subheadline {
           font-size: 18px;
-          color: #475569;
+          color: var(--text-secondary, #475569);
           max-width: 700px;
           margin: 0 auto 2rem;
           line-height: 1.6;
@@ -303,7 +304,7 @@ export default function HomePage() {
         }
 
         .btn-cta-primary {
-          background: #0D9488;
+          background: var(--color-primary, #0D9488);
           color: white;
           border: none;
           padding: 1rem 2rem;
@@ -315,13 +316,13 @@ export default function HomePage() {
         }
 
         .btn-cta-primary:hover {
-          background: #0B8176;
+          background: var(--color-primary-hover, #0B8176);
         }
 
         .btn-cta-secondary {
           background: transparent;
-          color: #0F172A;
-          border: 2px solid #0F172A;
+          color: var(--deep-navy, #0F172A);
+          border: 2px solid var(--deep-navy, #0F172A);
           padding: calc(1rem - 2px) calc(2rem - 2px);
           border-radius: 0.75rem;
           font-size: 16px;
@@ -331,7 +332,7 @@ export default function HomePage() {
         }
 
         .btn-cta-secondary:hover {
-          background: #F8FAFC;
+          background: var(--arctic-white, #F8FAFC);
         }
 
         .hero-image {
@@ -354,7 +355,7 @@ export default function HomePage() {
         }
 
         .trust-text {
-          color: #64748B;
+          color: var(--text-slate, #64748B);
           font-size: 14px;
           font-weight: 500;
         }
@@ -371,7 +372,7 @@ export default function HomePage() {
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          color: #0F172A;
+          color: var(--deep-navy, #0F172A);
           font-size: 14px;
           font-weight: 500;
         }
@@ -416,25 +417,25 @@ export default function HomePage() {
         }
 
         .tag-teal {
-          background: rgba(13, 148, 136, 0.1);
-          color: #0D9488;
+          background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+          color: var(--color-primary, #0D9488);
         }
 
         .tag-light {
-          background: rgba(13, 148, 136, 0.15);
-          color: #0D9488;
+          background: color-mix(in srgb, var(--color-primary) 15%, transparent);
+          color: var(--color-primary, #0D9488);
         }
 
         .section-headline {
           font-size: 48px;
           font-weight: 800;
           margin-bottom: 1rem;
-          color: #0F172A;
+          color: var(--deep-navy, #0F172A);
         }
 
         .section-description {
           font-size: 18px;
-          color: #475569;
+          color: var(--text-secondary, #475569);
           margin-bottom: 3rem;
           max-width: 700px;
           line-height: 1.6;
@@ -447,28 +448,28 @@ export default function HomePage() {
         }
 
         .card {
-          background: #F8FAFC;
+          background: var(--arctic-white, #F8FAFC);
           padding: 2rem;
           border-radius: 1rem;
-          border: 1px solid #E2E8F0;
+          border: 1px solid var(--border-subtle, #E2E8F0);
         }
 
         .card-headline {
           font-size: 20px;
           font-weight: 700;
           margin-bottom: 1rem;
-          color: #0F172A;
+          color: var(--deep-navy, #0F172A);
         }
 
         .card-text {
           font-size: 15px;
-          color: #475569;
+          color: var(--text-secondary, #475569);
           line-height: 1.6;
         }
 
         /* Features Section */
         .features {
-          background: #F8FAFC;
+          background: var(--arctic-white, #F8FAFC);
           padding: 6rem 2rem;
         }
 
@@ -507,12 +508,12 @@ export default function HomePage() {
         .feature-headline {
           font-size: 28px;
           font-weight: 700;
-          color: #0F172A;
+          color: var(--deep-navy, #0F172A);
         }
 
         .feature-description {
           font-size: 16px;
-          color: #475569;
+          color: var(--text-secondary, #475569);
           line-height: 1.6;
         }
 
@@ -524,7 +525,7 @@ export default function HomePage() {
 
         /* Categories Section */
         .categories {
-          background: #0F172A;
+          background: var(--deep-navy, #0F172A);
           padding: 6rem 2rem;
         }
 
@@ -533,7 +534,7 @@ export default function HomePage() {
         }
 
         .categories .section-description {
-          color: #CBD5E1;
+          color: var(--border-medium, #CBD5E1);
         }
 
         .categories-grid {
@@ -543,8 +544,8 @@ export default function HomePage() {
         }
 
         .category-card {
-          background: #1E293B;
-          border: 1px solid #334155;
+          background: var(--navy-800, #1E293B);
+          border: 1px solid var(--pal-navy-700, #334155);
           padding: 2rem;
           border-radius: 1rem;
           display: flex;
@@ -554,8 +555,8 @@ export default function HomePage() {
         }
 
         .category-card:hover {
-          background: #334155;
-          border-color: #475569;
+          background: var(--pal-navy-700, #334155);
+          border-color: var(--text-secondary, #475569);
         }
 
         .category-icon-box {
@@ -575,7 +576,7 @@ export default function HomePage() {
 
         .category-label {
           font-size: 14px;
-          color: #94A3B8;
+          color: var(--text-muted, #94A3B8);
         }
 
         /* Secondary Features */
@@ -608,18 +609,18 @@ export default function HomePage() {
         .secondary-name {
           font-size: 18px;
           font-weight: 700;
-          color: #0F172A;
+          color: var(--deep-navy, #0F172A);
         }
 
         .secondary-desc {
           font-size: 15px;
-          color: #475569;
+          color: var(--text-secondary, #475569);
           line-height: 1.6;
         }
 
         /* Social Proof */
         .social-proof {
-          background: #F8FAFC;
+          background: var(--arctic-white, #F8FAFC);
           padding: 4rem 2rem;
         }
 
@@ -633,7 +634,7 @@ export default function HomePage() {
 
         .stat-item {
           padding: 2rem;
-          border-right: 1px solid #E2E8F0;
+          border-right: 1px solid var(--border-subtle, #E2E8F0);
         }
 
         .stat-item:last-child {
@@ -643,12 +644,12 @@ export default function HomePage() {
         .stat-number {
           font-size: 32px;
           font-weight: 800;
-          color: #0D9488;
+          color: var(--color-primary, #0D9488);
         }
 
         .stat-label {
           font-size: 14px;
-          color: #475569;
+          color: var(--text-secondary, #475569);
           margin-top: 0.5rem;
         }
 
@@ -662,12 +663,12 @@ export default function HomePage() {
           background: white;
           padding: 2rem;
           border-radius: 1rem;
-          border: 1px solid #E2E8F0;
+          border: 1px solid var(--border-subtle, #E2E8F0);
         }
 
         .testimonial-text {
           font-size: 15px;
-          color: #475569;
+          color: var(--text-secondary, #475569);
           margin-bottom: 1.5rem;
           line-height: 1.6;
           font-style: italic;
@@ -694,17 +695,17 @@ export default function HomePage() {
         .testimonial-name {
           font-size: 14px;
           font-weight: 700;
-          color: #0F172A;
+          color: var(--deep-navy, #0F172A);
         }
 
         .testimonial-role {
           font-size: 12px;
-          color: #64748B;
+          color: var(--text-slate, #64748B);
         }
 
         /* Final CTA */
         .final-cta {
-          background: linear-gradient(135deg, #0F172A 0%, #134E4A 100%);
+          background: linear-gradient(135deg, var(--deep-navy, #0F172A) 0%, var(--pal-trevu-900, #134E4A) 100%);
           padding: 6rem 2rem;
           text-align: center;
           color: white;
@@ -718,15 +719,15 @@ export default function HomePage() {
 
         .final-subline {
           font-size: 18px;
-          color: #CBD5E1;
+          color: var(--border-medium, #CBD5E1);
           max-width: 600px;
           margin: 0 auto 2rem;
           line-height: 1.6;
         }
 
         .btn-final-cta {
-          background: #14B8A6;
-          color: #0F172A;
+          background: var(--color-primary-hover, #14B8A6);
+          color: var(--deep-navy, #0F172A);
           border: none;
           padding: 1rem 2rem;
           border-radius: 0.75rem;
@@ -739,18 +740,18 @@ export default function HomePage() {
         }
 
         .btn-final-cta:hover {
-          background: #0D9488;
+          background: var(--color-primary, #0D9488);
         }
 
         .final-trust {
           font-size: 14px;
-          color: #94A3B8;
+          color: var(--text-muted, #94A3B8);
         }
 
         /* Footer */
         .footer {
-          background: #0F172A;
-          color: #CBD5E1;
+          background: var(--deep-navy, #0F172A);
+          color: var(--border-medium, #CBD5E1);
           padding: 4rem 2rem 2rem;
         }
 
@@ -775,13 +776,13 @@ export default function HomePage() {
         .footer-logo {
           font-size: 20px;
           font-weight: 800;
-          color: #14B8A6;
+          color: var(--color-primary-hover, #14B8A6);
         }
 
         .footer-tagline {
           font-size: 14px;
           line-height: 1.6;
-          color: #94A3B8;
+          color: var(--text-muted, #94A3B8);
         }
 
         .footer-column h3 {
@@ -800,18 +801,18 @@ export default function HomePage() {
         }
 
         .footer-column a {
-          color: #CBD5E1;
+          color: var(--border-medium, #CBD5E1);
           text-decoration: none;
           font-size: 14px;
           transition: color 0.2s;
         }
 
         .footer-column a:hover {
-          color: #14B8A6;
+          color: var(--color-primary-hover, #14B8A6);
         }
 
         .footer-divider {
-          border-top: 1px solid #334155;
+          border-top: 1px solid var(--pal-navy-700, #334155);
           margin: 2rem 0;
         }
 
@@ -828,7 +829,7 @@ export default function HomePage() {
         }
 
         .social-icon {
-          color: #CBD5E1;
+          color: var(--border-medium, #CBD5E1);
           width: 20px;
           height: 20px;
           cursor: pointer;
@@ -836,7 +837,7 @@ export default function HomePage() {
         }
 
         .social-icon:hover {
-          color: #14B8A6;
+          color: var(--color-primary-hover, #14B8A6);
         }
 
         /* Teljes Night felület — a Discover oldal szemantikus tokenjeivel. */
@@ -1006,7 +1007,7 @@ export default function HomePage() {
 
           .stat-item {
             border-right: none;
-            border-bottom: 1px solid #E2E8F0;
+            border-bottom: 1px solid var(--border-subtle, #E2E8F0);
             padding: 1.5rem;
           }
 
@@ -1112,9 +1113,9 @@ export default function HomePage() {
             <div className="feature-content">
               <div
                 className="feature-icon-box"
-                style={{ backgroundColor: '#CCF0EB' }}
+                style={{ backgroundColor: 'var(--color-primary-subtle, #CCF0EB)' }}
               >
-                <Zap size={32} color="#0D9488" />
+                <Zap size={32} color="var(--color-primary, #0D9488)" />
               </div>
               <h3 className="feature-headline">{t('landing.feature1Title')}</h3>
               <p className="feature-description">

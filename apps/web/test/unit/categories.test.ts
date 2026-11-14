@@ -86,7 +86,7 @@ describe('DIFFICULTY_LEVELS invariants', () => {
     DIFFICULTY_LEVELS.forEach((lvl, i) => {
       expect(lvl.label, `level ${i + 1} HU`).toBeTruthy();
       expect(lvl.labelEn, `level ${i + 1} EN`).toBeTruthy();
-      expect(lvl.color).toMatch(/^#[0-9A-Fa-f]{6}$/);
+      expect(lvl.color, `level ${i + 1} szín a témából`).toBe(`var(--difficulty-${i + 1})`);
     });
   });
 });

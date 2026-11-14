@@ -11,10 +11,10 @@ function getPasswordStrength(password: string): { level: number; label: string; 
   if (/[A-Z]/.test(password)) types++;
   if (/[0-9]/.test(password)) types++;
   if (/[^a-zA-Z0-9]/.test(password)) types++;
-  if (password.length < 8) return { level: 1, label: "weak", color: "#DC2626" };
-  if (types >= 3) return { level: 3, label: "strong", color: "#059669" };
-  if (types >= 2) return { level: 2, label: "medium", color: "#D97706" };
-  return { level: 1, label: "weak", color: "#DC2626" };
+  if (password.length < 8) return { level: 1, label: "weak", color: "var(--color-danger)" };
+  if (types >= 3) return { level: 3, label: "strong", color: "var(--color-success)" };
+  if (types >= 2) return { level: 2, label: "medium", color: "var(--color-rating)" };
+  return { level: 1, label: "weak", color: "var(--color-danger)" };
 }
 
 export default function ChangePasswordPage() {
@@ -139,7 +139,7 @@ export default function ChangePasswordPage() {
                 <div
                   key={i}
                   className="h-1 flex-1 rounded-full transition-colors"
-                  style={{ backgroundColor: i <= strength.level ? strength.color : "#E2E8F0" }}
+                  style={{ backgroundColor: i <= strength.level ? strength.color : "var(--color-border)" }}
                 />
               ))}
             </div>

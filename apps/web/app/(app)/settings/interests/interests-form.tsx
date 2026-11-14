@@ -41,11 +41,11 @@ function getLocalized(obj: LocalizedName, locale: string, fallback: string): str
 }
 
 const SKILL_LEVELS = [
-  { key: "none", color: "#DC2626", bg: "#FEF2F2" },
-  { key: "beginner", color: "#64748B", bg: "#F1F5F9" },
-  { key: "intermediate", color: "#D97706", bg: "#FEF3C7" },
-  { key: "advanced", color: "#3B82F6", bg: "#DBEAFE" },
-  { key: "expert", color: "#8B5CF6", bg: "#EDE9FE" },
+  { key: "none", color: "var(--color-danger)", bg: "color-mix(in srgb, var(--color-danger) 12%, transparent)" },
+  { key: "beginner", color: "var(--difficulty-1)", bg: "color-mix(in srgb, var(--difficulty-1) 12%, transparent)" },
+  { key: "intermediate", color: "var(--difficulty-2)", bg: "color-mix(in srgb, var(--difficulty-2) 12%, transparent)" },
+  { key: "advanced", color: "var(--difficulty-3)", bg: "color-mix(in srgb, var(--difficulty-3) 12%, transparent)" },
+  { key: "expert", color: "var(--difficulty-4)", bg: "color-mix(in srgb, var(--difficulty-4) 12%, transparent)" },
 ] as const;
 
 interface Props {
@@ -268,7 +268,7 @@ export function InterestsForm({ categories, subDisciplines, initialInterests, in
                                 className="flex-1 rounded-md py-1.5 text-[11px] font-semibold transition-colors"
                                 style={{
                                   backgroundColor: isActive ? level.color : level.bg,
-                                  color: isActive ? "#FFFFFF" : level.color,
+                                  color: isActive ? "var(--color-bg)" : level.color,
                                 }}
                               >
                                 {t(`profile.skillLevels.${level.key}` as Parameters<typeof t>[0])}

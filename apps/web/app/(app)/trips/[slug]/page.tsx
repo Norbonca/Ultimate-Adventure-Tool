@@ -445,7 +445,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                   style={{
                     borderColor: diffLevel.color,
                     color: diffLevel.color,
-                    backgroundColor: `${diffLevel.color}10`,
+                    backgroundColor: `color-mix(in srgb, ${diffLevel.color} 8%, transparent)`,
                   }}
                 >
                   <span className="font-bold">{diffLabelText}</span>
@@ -724,7 +724,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
                     const ratio = total > 0 ? filled / total : 0;
                     const pct = Math.min(100, Math.round(ratio * 100));
                     const barColor =
-                      ratio >= 1 ? "#10B981" : ratio > 0 ? "#EAB308" : "#CBD5E1";
+                      ratio >= 1 ? "var(--color-success)" : ratio > 0 ? "var(--color-rating)" : "var(--color-border-strong)";
                     return (
                       <li key={pos.id} className="space-y-1.5">
                         <div className="flex justify-between text-sm">
