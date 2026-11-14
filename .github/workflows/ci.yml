@@ -93,10 +93,12 @@ jobs:
         run: node .skills/trevu-test/scripts/check-architecture.mjs
 
       # M211 (CLAUDE.md 3.12): érinti-e EZ a változás az útmutatók képernyőképeit?
-      # Csak a PR saját diffjét nézi, a régi adósság nem blokkol.
-      - name: Útmutató-frissesség (M211)
+      # Csak jelez, nem blokkol: a fejlesztést nem tartja fel az útmutatóképek újrafelvétele.
+      # A tényleges ellenőrzés és frissítés ütemezetten, a véglegesítés után fut
+      # (.github/workflows/utmutato-frissesseg.yml). Norbert döntése, 2026-11-14.
+      - name: Útmutató-frissesség (M211, csak jelzés)
         if: github.event_name == 'pull_request'
-        run: node apps/web/scripts/check-tutorial-freshness.mjs --diff "${{ github.event.pull_request.base.sha }}"
+        run: node apps/web/scripts/check-tutorial-freshness.mjs --figyelmeztet --diff "${{ github.event.pull_request.base.sha }}"
 
   db-push:
     name: Supabase DB Push

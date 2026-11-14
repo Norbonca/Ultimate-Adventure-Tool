@@ -1,0 +1,32 @@
+name: Útmutató-frissesség (ütemezett)
+
+# M211: az útmutatók képanyagának frissessége a main ágon.
+# A PR-eken ez csak jelzés (ci.yml), hogy a fejlesztést ne blokkolja;
+# itt ütemezetten, a véglegesített állapoton fut. Ha valamelyik útmutató
+# elavult, a futás piros lesz — ekkor kell a képeket újrafelvenni
+# (helyi demókörnyezet: tutorial-slides-capture.mjs, tutorial-posters-capture.mjs, hu és en).
+# Norbert döntése, 2026-11-14.
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"  # hétfőnként 06:17 UTC
+  workflow_dispatch:
+
+jobs:
+  frissesseg:
+    name: Útmutató-frissesség (main)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Elavult útmutatók
+        run: node apps/web/scripts/check-tutorial-freshness.mjs | tee -a "$GITHUB_STEP_SUMMARY"; exit "${PIPESTATUS[0]}"
