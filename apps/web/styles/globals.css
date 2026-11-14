@@ -793,3 +793,10 @@ body[data-fullscreen-view] [data-site-footer] {
     line-height: 1.12;
   }
 }
+
+/* Mobil védőkorlát: egy véletlenül túl széles elem se tegye vízszintesen görgethetővé az oldalt
+   (a `clip` a sticky fejlécet nem töri, szemben a `hidden`-nel). */
+html,
+body {
+  overflow-x: clip;
+}
