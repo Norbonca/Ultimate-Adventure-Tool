@@ -1035,6 +1035,41 @@ export default function HomePage() {
             gap: 1rem;
           }
         }
+
+        /* ── B „Terep” (2026-11-14): szögletes forma, árnyék nélkül; címkék mono verzálként; ikonok vonalas
+           keretben pasztell háttér helyett. Csak a terep témában — az „alap” változatlan. ── */
+        [data-theme="terep"] body:has(.section-tag) :is(section, footer) *:not(.badge-dot) {
+          border-radius: 0 !important;
+          box-shadow: none !important;
+        }
+        [data-theme="terep"] .hero-badge,
+        [data-theme="terep"] .section-tag {
+          background: transparent !important;
+          border: 0 !important;
+          padding: 0 !important;
+          font-family: var(--font-mono);
+          font-size: 13px;
+          font-weight: 500;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          color: var(--color-primary) !important;
+        }
+        [data-theme="terep"] .feature-icon-box,
+        [data-theme="terep"] .category-icon-box,
+        [data-theme="terep"] .secondary-icon-box {
+          background: transparent !important;
+          border: 1px solid var(--color-border-strong) !important;
+          color: var(--color-text) !important;
+        }
+        [data-theme="terep"] .category-card,
+        [data-theme="terep"] .feature-card {
+          background: transparent !important;
+          border-color: var(--color-border-strong) !important;
+        }
+        [data-theme="terep"] .category-card:hover {
+          background: var(--color-ghost) !important;
+          transform: none !important;
+        }
       `}</style>
 
       <div data-surface="night" className="contents">

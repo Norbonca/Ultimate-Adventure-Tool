@@ -38,6 +38,7 @@ import {
   List,
   SlidersHorizontal,
   Lightbulb,
+  ArrowRight,
 } from '@/lib/icons';
 import type { LucideIcon } from '@/lib/icons';
 import { SearchPill, OptionChip, FilterSheet } from '@/components/ui';
@@ -435,6 +436,31 @@ export default function DiscoverClient({
     </>
   );
 
+  // B „Terep”: asztalon a kategóriák verzál fülsorként két vonal között (a mobil szűrőlapon OptionChip marad).
+  const categoryTabs = (testIdPrefix: string) => (
+    <>
+      {[{ id: 'all', label: t('discover.allTrips') }, ...categories.map((c) => ({ id: c.id, label: categoryLabel(c.name) }))].map((item) => {
+        const selected = activeCategory === item.id;
+        return (
+          <button
+            key={item.id}
+            type="button"
+            aria-pressed={selected}
+            onClick={() => setActiveCategory(selected && item.id !== 'all' ? 'all' : item.id)}
+            data-testid={`${testIdPrefix}-${item.id}`}
+            className={[
+              '-mb-px inline-flex min-h-12 items-center border-b-2 text-[13px] font-bold uppercase tracking-[0.06em] transition-colors',
+              'focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)',
+              selected ? 'border-accent text-accent' : 'border-transparent text-ink-secondary hover:text-ink',
+            ].join(' ')}
+          >
+            {item.label}
+          </button>
+        );
+      })}
+    </>
+  );
+
   const viewToggle = (
     <div className="flex shrink-0 items-center gap-2">
     <div
@@ -499,28 +525,32 @@ export default function DiscoverClient({
           {/* HERO — v2 §5: Deep Navy alapon a terv panorámafotója (D02 #H1rRQE / #l87Il, ugyanaz a kép
               asztalin és mobilon), alulról kötelező olvashatósági gradienssel (--hero-scrim).
               Fotó: Unsplash photo-1504681869696 (D03 Landing hero, @hdbernd) — public/discover/hero.jpg; Norbert választása 2026-09-16 */}
-          <section data-surface="night" className="relative overflow-hidden bg-canvas">
-            <Image
-              src="/discover/hero.jpg"
-              alt=""
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
-            />
-            <div aria-hidden className="absolute inset-0 bg-hero-scrim-mobile md:bg-hero-scrim" />
-            <div className="relative mx-auto flex min-h-[380px] max-w-7xl flex-col justify-end gap-3 px-5 pb-8 pt-16 md:min-h-[480px] md:gap-4 md:px-[120px] md:pb-12">
-              <p className="text-sm font-semibold text-ink">
-                {t('discover.heroStats')
-                  .replace('{trips}', String(allCardCount))
-                  .replace('{countries}', String(countryCount))}
-              </p>
-              <h1 className="max-w-[720px] text-hero-display-mobile text-ink text-balance md:text-hero-display">
-                {t('discover.heroTitle')}
-              </h1>
-              <p className="hidden max-w-[720px] text-lg text-ink-body md:block">{t('discover.heroSubtitle')}</p>
+          <section data-surface="night" className="bg-canvas text-ink">
+            {/* B „Terep” (ZHO_B_Nyitooldal): osztott hero — balra a cím, jobbra a panorámafotó; mobilon a kép felül. */}
+            <div className="mx-auto grid max-w-7xl md:min-h-[520px] md:grid-cols-[minmax(0,6fr)_minmax(0,5fr)]">
+              <div className="relative order-1 h-[220px] md:order-2 md:h-auto">
+                <Image src="/discover/hero.jpg" alt="" fill priority sizes="(min-width: 768px) 45vw, 100vw" className="object-cover" />
+              </div>
+              <div className="order-2 flex flex-col justify-center gap-4 px-5 py-10 md:order-1 md:gap-6 md:py-16 md:pl-[120px] md:pr-12">
+                <p className="font-mono text-[13px] uppercase tracking-[0.06em] text-ink-muted">
+                  {t('discover.heroStats')
+                    .replace('{trips}', String(allCardCount))
+                    .replace('{countries}', String(countryCount))}
+                </p>
+                <h1 className="text-hero-display-mobile text-ink text-balance md:text-hero-display">
+                  {t('discover.heroTitle')}
+                </h1>
+                <p className="max-w-[560px] text-lg text-ink-body">{t('discover.heroSubtitle')}</p>
+              </div>
+            </div>
+          </section>
+
+          {/* 01 / TALÁLD MEG — kereső sáv a hero alatt (csont munkafelület) */}
+          <div className="mx-auto max-w-7xl px-4 pt-6 md:px-[120px] md:pt-8">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-8">
+              <p className="shrink-0 font-mono text-[13px] font-medium uppercase tracking-[0.06em] text-accent">{t('discover.sectionFind')}</p>
               <SearchPill
-                className="mt-2 max-w-[720px] md:mt-4"
+                className="w-full"
                 value={queryInput}
                 onChange={(value) => {
                   setQueryInput(value);
@@ -535,16 +565,13 @@ export default function DiscoverClient({
                 submitTestId="discover-search-submit"
               />
             </div>
-          </section>
-
-          {/* M211b — promó blokk a bemutatóvideóval, a hero alatt: csak kijelentkezett látogatónak (D09 `JvYxg`). */}
-          {auth === 'out' && <PresentationPromo />}
+          </div>
 
           {/* TOOLBAR — asztali: kategória-pirulák | Szűrők + nézetváltó; mobil: Szűrők (n) + nézetváltó */}
           <div className="mx-auto max-w-7xl px-4 pb-2 pt-5 md:px-[120px] md:pb-5 md:pt-7">
             <div className="relative flex items-start justify-between gap-4">
-              <div id="categories" className="hidden flex-wrap items-center gap-2.5 md:flex" data-testid="discover-category-pills">
-                {categoryPills('category-pill')}
+              <div id="categories" className="hidden flex-1 flex-wrap items-center gap-x-6 gap-y-1 border-y border-line md:flex" data-testid="discover-category-pills">
+                {categoryTabs('category-pill')}
               </div>
               <div className="flex flex-1 items-center gap-3 md:flex-none">
                 <button
@@ -636,15 +663,18 @@ export default function DiscoverClient({
           </div>
 
           <main id="discover-results" className="mx-auto max-w-7xl px-4 pb-10 md:px-[120px] md:pb-16">
-            <div className="flex items-center justify-between pb-3 md:pb-4">
-              <div className="flex flex-wrap items-center gap-3">
-                <p className="text-base font-medium text-ink md:text-lg" data-testid="discover-count">
+            <div className="flex items-end justify-between gap-4 border-b border-line pb-4 pt-6 md:pb-6 md:pt-10">
+              <div className="flex flex-col gap-2">
+                <p className="font-mono text-[13px] font-medium uppercase tracking-[0.06em] text-accent">{t('discover.sectionDepartures')}</p>
+                <div className="flex flex-wrap items-center gap-3">
+                <h2 className="text-[34px] text-ink md:text-[56px]" data-testid="discover-count">
                   {filteredTrips.length === 0
                     ? t('discover.noTripsYet')
                     : t('discover.tripsAvailable').replace('{count}', String(cards.length))}
-                </p>
+                </h2>
                 {/* M211 — súgó a címsor mellett (D21 elhelyezési szabály) */}
                 <TutorialHelp anchor="discover" />
+                </div>
               </div>
               <label className="hidden items-center gap-2 text-sm text-ink-secondary md:flex">
                 <span>{t('discover.sortLabel')}:</span>
@@ -703,7 +733,7 @@ export default function DiscoverClient({
             ) : (
               <>
                 {viewMode === 'grid' ? (
-                  <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6" data-testid="discover-trip-grid">
+                  <ul className="grid grid-cols-1 gap-4 pt-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6" data-testid="discover-trip-grid">
                     {visibleCards.map((card) => {
                       const trip = card.kind === 'single' ? card.trip : card.representative;
                       const category = resolveJoin(trip.categories);
@@ -750,7 +780,7 @@ export default function DiscoverClient({
                     })}
                   </ul>
                 ) : (
-                <ul className="flex flex-col gap-3 md:gap-4" data-testid="discover-trip-list">
+                <ul className="flex flex-col gap-3 pt-6 md:gap-4" data-testid="discover-trip-list">
                   {visibleCards.map((card) => {
                     const trip = card.kind === 'single' ? card.trip : card.representative;
                     const category = resolveJoin(trip.categories);
@@ -819,24 +849,46 @@ export default function DiscoverClient({
         </>
       )}
 
-      {/* CTA — Night sáv, Dawn Gradient gomb. Norbert 2026-09-16: az alsó fehér (Day) sáv megszűnik.
-          3D térkép nézetben nincs: ott a térkép a teljes képernyőt kitölti, és az oldal nem görgethető
-          (Norbert, 2026-09-26 — „scrollozásnál kilép a térkép frameből"). */}
       {viewMode !== 'globe' && (
-      <section className="border-t border-line bg-canvas text-ink" data-testid="discover-cta">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 md:flex-row md:items-center md:justify-between md:px-[120px] md:py-14">
-          <div className="flex flex-col gap-2">
-            <h2 className="text-[22px] font-semibold text-ink md:text-[28px]">{t('discover.ctaTitle')}</h2>
-            <p className="text-sm text-ink-secondary md:text-base">{t('discover.ctaSubtitle')}</p>
-          </div>
-          <Link
-            href="/trips/new"
-            className="inline-flex h-12 items-center justify-center rounded-trevu px-6 text-base font-semibold text-accent-on [background:var(--gradient-dawn)] hover:opacity-95 focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
-          >
-            {t('discover.createTrip')}
-          </Link>
-        </div>
-      </section>
+        <>
+          {/* 03 / ÍGY MEGY — szén sáv három lépéssel (ZHO_B_Nyitooldal) */}
+          <section data-surface="night" className="bg-canvas text-ink" data-testid="discover-how">
+            <div className="mx-auto max-w-7xl px-5 py-12 md:px-[120px] md:py-20">
+              <p className="font-mono text-[13px] font-medium uppercase tracking-[0.06em] text-accent">{t('discover.sectionHow')}</p>
+              <h2 className="mt-2 text-[44px] text-ink md:text-[66px]">{t('discover.howTitle')}</h2>
+              <ol className="mt-8 grid gap-6 md:mt-10 md:grid-cols-3 md:gap-0">
+                {([1, 2, 3] as const).map((n) => (
+                  <li key={n} className="flex flex-col gap-2 border-l border-line pl-5 md:pr-8">
+                    <span className="font-mono text-[13px] tracking-[0.06em] text-accent">03.{n}</span>
+                    <h3 className="font-[family-name:var(--font-family-heading)] text-[30px] uppercase leading-[1.1] text-ink md:text-[36px]">
+                      {t(`discover.howStep${n}Title`)}
+                    </h3>
+                    <p className="text-base text-ink-body">{t(`discover.howStep${n}Text`)}</p>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </section>
+
+          {/* 04 / SZERVEZŐKNEK — kijelentkezve a bemutatóvideós blokk (M211b, D09 `JvYxg`), utána a túraindítás */}
+          {auth === 'out' && <PresentationPromo />}
+          <section className="border-t border-line bg-canvas text-ink" data-testid="discover-cta">
+            <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-12 md:flex-row md:items-end md:justify-between md:px-[120px] md:py-16">
+              <div className="flex max-w-[640px] flex-col gap-3">
+                <p className="font-mono text-[13px] font-medium uppercase tracking-[0.06em] text-accent">{t('discover.sectionOrganizers')}</p>
+                <h2 className="text-[36px] text-ink md:text-[56px]">{t('discover.ctaTitle')}</h2>
+                <p className="text-base text-ink-secondary md:text-lg">{t('discover.ctaSubtitle')}</p>
+              </div>
+              <Link
+                href="/trips/new"
+                className="inline-flex h-14 shrink-0 items-center justify-center gap-2 bg-accent px-6 text-base font-bold text-accent-on hover:bg-accent-hover focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
+              >
+                {t('discover.createTrip')}
+                <ArrowRight size={18} aria-hidden />
+              </Link>
+            </div>
+          </section>
+        </>
       )}
     </div>
   );
