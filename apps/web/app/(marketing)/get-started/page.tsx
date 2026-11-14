@@ -13,6 +13,7 @@
 // jobban szolgálja a marketing iterációt.
 import Link from 'next/link';
 import Image from 'next/image';
+import { BrandWordmark } from "@/components/brand/BrandMark";
 import { CoverImage } from '@/components/ui/CoverImage';
 import {
   MapPin,
@@ -1279,7 +1280,7 @@ export default function HomePage() {
         <div className="footer-content">
           <div className="footer-top">
             <div className="footer-brand">
-              <div className="footer-logo">trevu</div>
+              <div className="footer-logo"><BrandWordmark height={28} /></div>
               <p className="footer-tagline">
                 {t('landing.footerTagline')}
               </p>

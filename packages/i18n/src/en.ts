@@ -1,5 +1,5 @@
 /**
- * English (en) translations — Trevu
+ * English (en) translations
  *
  * Structure mirrors hu.ts exactly — every key must exist in both files.
  */
@@ -12,8 +12,8 @@ const en: TranslationKeys = {
   common: {
     you: "you",
     retry: "Try again",
-    appName: "Trevu",
-    appTagline: "Trek beyond ordinary",
+    appName: "{brand}",
+    appTagline: "{tagline}",
     loading: "Loading...",
     back: "Back",
     save: "Save",
@@ -121,14 +121,14 @@ const en: TranslationKeys = {
     },
     login: "Log in",
     loginTitle: "Log in",
-    loginSubtitle: "Welcome to Trevu",
+    loginSubtitle: "Welcome to {brand}",
     loginLoading: "Logging in...",
     loginWithGoogle: "Log in with Google",
     loginWithGoogleLoading: "Logging in...",
 
     register: "Sign up",
     registerTitle: "Sign up",
-    registerSubtitle: "Join the Trevu community",
+    registerSubtitle: "Join the {brand} community",
     registerLoading: "Signing up...",
     registerWithGoogle: "Sign up with Google",
     registerWithGoogleLoading: "Signing up...",
@@ -206,7 +206,7 @@ const en: TranslationKeys = {
     discover: "Explore trips",
     discoverTrips: "Discover Trips",
     pricing: "Pricing",
-    getStarted: "What is Trevu?",
+    getStarted: "What is {brand}?",
     tutorials: "Tutorials",
     logIn: "Log in",
     signUp: "Sign up",
@@ -247,7 +247,7 @@ const en: TranslationKeys = {
     featureImageAltPlanning: "Smart trip planning",
     featureImageAltExpenses: "Expense splitting",
     featureImageAltOffline: "Offline maps",
-    heroTitle: "Trevu",
+    heroTitle: "{brand}",
     heroSubtitle: "Plan the perfect adventure. Organize trips, share expenses, and find local guides.",
     ctaRegister: "Sign up",
     ctaLogin: "Log in",
@@ -256,7 +256,7 @@ const en: TranslationKeys = {
 
     // Hero
     heroBadge: "Organize and discover adventure trips",
-    heroHeadline: "Trek beyond ordinary",
+    heroHeadline: "{tagline}",
     heroSubheadline: "Listing, applicants, tasks and shared costs – on one platform. For organizers and participants of small-group adventure trips.",
     heroCta: "Start Planning Free →",
     heroCtaSecondary: "Explore Trips",
@@ -269,7 +269,7 @@ const en: TranslationKeys = {
     // Problem section
     problemTag: "THE CHALLENGE",
     problemHeadline: "Let the trip be the challenge, and the organizing simple.",
-    problemDescription: "Applicants in one spreadsheet, costs in another, tasks scattered across messages. Trevu brings it all into one place so you can focus on the trip.",
+    problemDescription: "Applicants in one spreadsheet, costs in another, tasks scattered across messages. {brand} brings it all into one place so you can focus on the trip.",
     problemCard1Title: "Plan your adventure",
     problemCard1Text: "Pick from 8 adventure categories, and the wizard guides you in four steps: category, basics, details, publish.",
     problemCard2Title: "Travel together, split fairly",
@@ -291,7 +291,7 @@ const en: TranslationKeys = {
     // Categories section
     categoriesTag: "8 ADVENTURE CATEGORIES",
     categoriesHeadline: "One platform. Every adventure.",
-    categoriesDescription: "Whether you're summiting peaks, catching waves, or pedaling through valleys — trevu speaks your sport's language.",
+    categoriesDescription: "Whether you're summiting peaks, catching waves, or pedaling through valleys — {brand} speaks your sport's language.",
     categoryHikingLabel: "Distance, elevation, terrain difficulty",
     categoryMountainLabel: "Technical grades, via ferrata, gear lists",
     categoryWaterLabel: "Sailing, kayaking, surfing, kite",
@@ -345,7 +345,7 @@ const en: TranslationKeys = {
     footerPrivacy: "Privacy Policy",
     footerTerms: "Terms of Service",
     footerCookies: "Cookie Policy",
-    footerCopyright: "© 2026 Trevu. All rights reserved.",
+    footerCopyright: "© 2026 {brand}. All rights reserved.",
   },
 
   // ============================================================================
@@ -875,7 +875,7 @@ const en: TranslationKeys = {
       notPublicHint: "This trip isn't public yet: the link only opens for people with access.",
       more: "More",
       openIn: "Share on {platform} (opens in a new tab)",
-      message: "{title} — check it out on Trevu!",
+      message: "{title} — check it out on {brand}!",
       emailSubject: "Trip tip: {title}",
       platform: {
         facebook: "Facebook",
@@ -888,7 +888,7 @@ const en: TranslationKeys = {
         free: "Free",
         perPerson: "/ person",
         days: "{count} days",
-        alt: "{title} — a trip on Trevu",
+        alt: "{title} — a trip on {brand}",
       },
     },
 
@@ -1010,7 +1010,7 @@ const en: TranslationKeys = {
       inviteSentNewTitle: "Invite email sent",
       inviteSentNewDesc: "{email} — once they sign up, they'll automatically join the trip as crew.",
       inviteAddedExistingTitle: "User added to the crew",
-      inviteAddedExistingDesc: "{name} is already on Trevu. They've been added to the crew with the chosen position.",
+      inviteAddedExistingDesc: "{name} is already on {brand}. They've been added to the crew with the chosen position.",
       inviteAnother: "Invite another",
       assignWillAppear: "The person will appear as a participant immediately.",
       applicationsLoading: "Loading applications…",
@@ -1427,19 +1427,19 @@ const en: TranslationKeys = {
   // Metadata & SEO
   // ============================================================================
   metadata: {
-    title: "Trevu — Trek beyond ordinary",
+    title: "{brand} — {tagline}",
     description: "Plan the perfect adventure — organize trips, share expenses, find local guides",
     keywords: "adventure, trip, travel, expense sharing, guide, trekking, outdoor",
     siteTagline: "Organize and discover adventure trips",
     siteDescription: "Listings, applicants, tasks and shared costs – in one place. For organizers and participants of small-group adventure trips.",
-    tripFallbackDescription: "Discover this adventure on Trevu.",
+    tripFallbackDescription: "Discover this adventure on {brand}.",
     pages: {
       discover: { title: "Explore trips", description: "Small-group adventure trips in 8 categories: search by place, time and trip type in tile, list or 3D map view, and apply for the date you choose." },
-      community: { title: "Community", description: "Adventurers and organizers on Trevu: follow them and discover their trips." },
+      community: { title: "Community", description: "Adventurers and organizers on {brand}: follow them and discover their trips." },
       ideas: { title: "Idea board", description: "Trip ideas you can join or organize: destination, time window and the number of people interested, all in one place." },
-      idea: { title: "Idea board", description: "A trip idea on the Trevu idea board — join it or organize it." },
-      getStarted: { title: "What is Trevu?", description: "Listings, applicants, tasks and shared costs – in one place. See how you can organize small-group adventure trips with Trevu." },
-      pricing: { title: "Pricing", description: "Free for personal use. Subscriptions are for those who organize as a business; for cost-sharing trips Trevu is free." },
+      idea: { title: "Idea board", description: "A trip idea on the {brand} idea board — join it or organize it." },
+      getStarted: { title: "What is {brand}?", description: "Listings, applicants, tasks and shared costs – in one place. See how you can organize small-group adventure trips with {brand}." },
+      pricing: { title: "Pricing", description: "Free for personal use. Subscriptions are for those who organize as a business; for cost-sharing trips {brand} is free." },
     },
   },
 
@@ -1738,7 +1738,7 @@ const en: TranslationKeys = {
     },
     // Header
     header: {
-      title: "Trevu Admin",
+      title: "{brand} Admin",
       lastUpdated: "Last updated",
       superAdmin: "Super Admin",
       openMenu: "Open menu",
@@ -1752,7 +1752,7 @@ const en: TranslationKeys = {
       demoRegistrationConfirmed: "Registration confirmed",
       minutesAgo: "{count} min ago",
       title: "Dashboard",
-      subtitle: "Welcome back! Here's what's happening with Trevu.",
+      subtitle: "Welcome back! Here's what's happening with {brand}.",
       totalUsers: "Total Users",
       newSignups: "New Signups",
       activeTrips: "Active Trips",
@@ -2858,8 +2858,8 @@ const en: TranslationKeys = {
   // M211 — Tutorials (D21)
   // ============================================================================
   presentation: {
-    metaTitle: "Trevu for organizers — presentation",
-    metaDescription: "Listing, applicants, tasks and shared costs on one platform: the Trevu presentation for adventure trip organizers.",
+    metaTitle: "{brand} for organizers — presentation",
+    metaDescription: "Listing, applicants, tasks and shared costs on one platform: the {brand} presentation for adventure trip organizers.",
     label: "for organizers",
     counter: "{n} / {total}",
     controls: "Presentation controls",
@@ -2874,7 +2874,7 @@ const en: TranslationKeys = {
     promoEyebrow: "For organizers",
     promoCta: "Watch the presentation",
     promoMeta: "{count} slides · about {minutes} min",
-    videoLabel: "Trevu presentation for organizers — video",
+    videoLabel: "{brand} presentation for organizers — video",
   },
   tutorials: {
     groups: {
@@ -2899,9 +2899,9 @@ const en: TranslationKeys = {
       tasks: "Tasks",
     },
     metaTitle: "Tutorials",
-    metaDescription: "Step-by-step illustrated guides on using Trevu.",
+    metaDescription: "Step-by-step illustrated guides on using {brand}.",
     eyebrow: "Tutorials",
-    title: "How to use Trevu",
+    title: "How to use {brand}",
     lead: "Step-by-step illustrated guides — one feature at a time, in a few minutes.",
     searchPlaceholder: "What would you like to do?",
     search: "Search",

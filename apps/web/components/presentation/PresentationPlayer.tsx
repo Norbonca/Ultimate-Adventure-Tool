@@ -8,6 +8,7 @@
  * a dia száma az URL-ben (#3). Mozgáscsökkentésnél nincs animáció és nincs automatikus léptetés.
  */
 
+import { BrandWordmark } from "@/components/brand/BrandMark";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
@@ -95,8 +96,8 @@ export function PresentationPlayer() {
     >
       {/* Felső sáv */}
       <header className="flex h-14 shrink-0 items-center justify-between px-4 md:h-16 md:px-8">
-        <Link href="/" className="text-sm font-bold tracking-wide text-accent md:text-base">
-          trevu <span className="font-semibold text-ink-muted">· {t("presentation.label")}</span>
+        <Link href="/" className="inline-flex items-center gap-2 text-sm font-bold tracking-wide text-accent md:text-base">
+          <BrandWordmark height={16} /> <span className="font-semibold text-ink-muted">· {t("presentation.label")}</span>
         </Link>
         <div className="flex items-center gap-3 md:gap-4">
           <span className="text-sm tabular-nums text-ink-muted" data-testid="presentation-counter" aria-live="polite">

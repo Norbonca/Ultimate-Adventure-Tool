@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { BrandHead } from "@/components/brand/BrandMark";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { adminLogin } from "./actions";
 
@@ -13,10 +14,10 @@ export function AdminLoginForm() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold text-lg">
-            T
+          <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white">
+            <BrandHead height={26} />
           </div>
-          <span className="text-white text-xl font-semibold">Trevu Admin</span>
+          <span className="text-white text-xl font-semibold">{t("admin.header.title")}</span>
         </div>
 
         {/* Card */}

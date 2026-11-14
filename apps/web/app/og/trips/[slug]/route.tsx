@@ -3,7 +3,7 @@
  * Terv: design/D02_Trip_Management.pen#eUTEO (borítóval), #sK41E (borító nélkül).
  *
  * - Csak nyilvános túrához készül saját kép (a `trips_select_public` RLS szabálya szerint); minden más esetben
- *   az általános Trevu-kép (`app/opengraph-image.tsx`) jön vissza — nem nyilvános túra adata nem kerül ki.
+ *   az általános megosztókép (`app/opengraph-image.tsx`) jön vissza — nem nyilvános túra adata nem kerül ki.
  * - A borítókép csak a saját tárhelyről és az Unsplash-ról töltődik le (SSRF ellen), 4 mp-es időkorláttal,
  *   és csak JPEG/PNG lehet; egyébként a Night alap teal fénnyel áll.
  * - A színek a Night-tokenek értékei (`globals.css [data-surface="night"]`): az ImageResponse nem ismeri a
@@ -22,12 +22,13 @@ import OpengraphImage from "@/app/opengraph-image";
 import { CATEGORY_DISPLAY } from "@/lib/categories";
 import { iconSvgNode } from "@/lib/icons";
 import { isTripPublic } from "@/lib/share/trip-share";
+import { OG_NIGHT, OgBrand, ogAlpha } from "@/components/brand/og";
 
 export const runtime = "nodejs";
 
 const SIZE = { width: 1200, height: 630 };
 const CACHE = "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800";
-const NIGHT = { bg: "#0F172A", text: "#F1F5F9", body: "#E2E8F0", muted: "#94A3B8", primary: "#2DD4BF", onPrimary: "#0F172A" };
+const NIGHT = OG_NIGHT;
 const MAX_COVER_BYTES = 6 * 1024 * 1024;
 
 function allowedCoverHosts(): Set<string> {
@@ -85,12 +86,7 @@ function SvgIcon({ name, size, color }: { name: string; size: number; color: str
 
 /** A logó (márkajel + szóvédjegy) sötét alátéten — a design `OG Brand` rétege; nem nyelvfüggő felirat. */
 function Brand() {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 18px 10px 10px", borderRadius: 16, background: "rgba(15,23,42,0.85)" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 44, height: 44, borderRadius: 12, background: NIGHT.primary, color: NIGHT.onPrimary, fontSize: 26, fontWeight: 700 }}>T</div>
-      <div style={{ fontSize: 28, fontWeight: 700, color: NIGHT.primary }}>trevu</div>
-    </div>
-  );
+  return <OgBrand />;
 }
 
 export async function GET(_request: Request, { params }: { params: Promise<{ slug: string }> }) {
@@ -115,7 +111,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
           // eslint-disable-next-line @next/next/no-img-element -- ImageResponse (satori) csak <img>-et ismer
           <img src={cover} alt="" width={SIZE.width} height={SIZE.height} style={{ position: "absolute", top: 0, left: 0, width: SIZE.width, height: SIZE.height, objectFit: "cover" }} />
         ) : (
-          <div style={{ position: "absolute", top: 0, left: 0, width: SIZE.width, height: SIZE.height, display: "flex", alignItems: "center", justifyContent: "center", background: "radial-gradient(circle at 10% 5%, rgba(45,212,191,0.20), rgba(15,23,42,0) 60%)" }}>
+          <div style={{ position: "absolute", top: 0, left: 0, width: SIZE.width, height: SIZE.height, display: "flex", alignItems: "center", justifyContent: "center", background: `radial-gradient(circle at 10% 5%, ${ogAlpha(NIGHT.primary, 0.2)}, ${ogAlpha(NIGHT.bg, 0)} 60%)` }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 220, height: 220, borderRadius: 9999, background: "#1E293B" }}>
               <SvgIcon name={display?.icon ?? "compass"} size={120} color={display?.colorHex ?? NIGHT.primary} />
             </div>
