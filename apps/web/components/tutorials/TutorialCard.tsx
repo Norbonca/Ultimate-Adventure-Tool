@@ -27,13 +27,12 @@ export function TutorialCard({ tutorial, locale, roleLabel, badge, lengthLabel, 
       className="group flex gap-3 rounded-trevu-xl focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:flex-col sm:gap-3"
       data-testid={`tutorial-card-${tutorial.slug}`}
     >
-      <span className="relative block h-[68px] w-[120px] shrink-0 overflow-hidden rounded-[8px] border border-line sm:aspect-video sm:h-auto sm:w-full sm:rounded-trevu-xl">
+      <span className="relative block h-[68px] w-[120px] shrink-0 overflow-hidden rounded-trevu border border-line sm:aspect-video sm:h-auto sm:w-full sm:rounded-trevu-xl">
         <Image src={posterUrl(tutorial.slug)} alt="" fill sizes="(min-width: 1024px) 336px, (min-width: 640px) 50vw, 120px" className="object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
-        <span aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0)_40%,rgba(15,23,42,0.7)_100%)]" />
-        <span className="absolute bottom-1 right-1 inline-flex items-center gap-1 rounded-[4px] bg-[rgba(15,23,42,0.8)] px-1.5 py-0.5 text-[11px] font-semibold text-white sm:bottom-2 sm:right-2 sm:text-xs">
+        <span className="absolute bottom-1 right-1 inline-flex items-center gap-1 rounded-chip bg-scrim px-1.5 py-0.5 text-[11px] font-semibold text-white sm:bottom-2 sm:right-2 sm:text-xs">
           {lengthLabel}
         </span>
-        <span className="absolute left-2 top-2 hidden items-center gap-1 rounded-chip bg-[rgba(15,23,42,0.8)] px-1.5 py-0.5 text-xs font-semibold text-white sm:inline-flex">
+        <span className="absolute left-2 top-2 hidden items-center gap-1 rounded-chip bg-scrim px-1.5 py-0.5 text-xs font-semibold text-white sm:inline-flex">
           <Icon name={badge.icon} size={13} aria-hidden />
           {badge.label}
         </span>

@@ -104,7 +104,7 @@ export default async function TutorialsPage({ searchParams }: PageProps) {
                     key={r.key ?? "all"}
                     href={link({ role: r.key })}
                     aria-current={active ? "page" : undefined}
-                    className={`inline-flex h-9 items-center rounded-[8px] px-3 text-sm font-semibold ${active ? "bg-surface text-ink" : "text-ink-secondary hover:text-ink"}`}
+                    className={`inline-flex h-9 items-center rounded-trevu px-3 text-sm font-semibold ${active ? "bg-surface text-ink" : "text-ink-secondary hover:text-ink"}`}
                   >
                     <span className="md:hidden">{r.short}</span>
                     <span className="hidden md:inline">{r.label}</span>
@@ -137,7 +137,6 @@ export default async function TutorialsPage({ searchParams }: PageProps) {
           <section className="grid gap-5 rounded-trevu-2xl border border-line bg-surface p-4 md:p-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-8" data-testid="tutorials-featured">
             <Link href={tutorialHref(featured.slug)} className="group relative block aspect-video overflow-hidden rounded-trevu-xl border border-line">
               <Image src={posterUrl(featured.slug)} alt="" fill priority sizes="(min-width: 1024px) 720px, 100vw" className="object-cover transition-transform duration-300 group-hover:scale-[1.02]" />
-              <span aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.1)_0%,rgba(15,23,42,0.6)_100%)]" />
               <span aria-hidden className="absolute left-1/2 top-1/2 inline-flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-accent text-accent-on md:h-[72px] md:w-[72px]">
                 <Icon name="play" size={28} className="translate-x-0.5" />
               </span>

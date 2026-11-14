@@ -131,7 +131,7 @@ function HelpDialog({ tutorials, onClose }: { tutorials: Tutorial[]; onClose: ()
   return createPortal(
     <div
       data-surface="night"
-      className="fixed inset-0 z-60 flex items-end justify-center bg-[rgba(15,23,42,0.7)] sm:items-center sm:p-6"
+      className="fixed inset-0 z-60 flex items-end justify-center bg-scrim sm:items-center sm:p-6"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
@@ -215,9 +215,9 @@ function HelpDialog({ tutorials, onClose }: { tutorials: Tutorial[]; onClose: ()
                     onClick={() => setSelected(tut)}
                     className="flex w-full items-center gap-4 rounded-trevu-xl border border-line p-3 text-left hover:bg-ghost focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-accent"
                   >
-                    <span className="relative flex h-[68px] w-[120px] shrink-0 items-center justify-center overflow-hidden rounded-[8px] sm:h-[90px] sm:w-[160px]">
+                    <span className="relative flex h-[68px] w-[120px] shrink-0 items-center justify-center overflow-hidden rounded-trevu sm:h-[90px] sm:w-[160px]">
                       <Image src={posterUrl(tut.slug)} alt="" fill sizes="160px" className="object-cover" />
-                      <span aria-hidden className="absolute inset-0 bg-[rgba(15,23,42,0.4)]" />
+                      <span aria-hidden className="absolute inset-0 bg-scrim" />
                       <span aria-hidden className="relative inline-flex h-8 w-8 items-center justify-center rounded-full bg-accent text-accent-on">
                         <Icon name="play" size={14} />
                       </span>
