@@ -31,9 +31,10 @@ const SEMLEGES: Record<string, string> = {
   "100": "#DEDCD1",
   "200": "#CFCDC2",
   "300": KOD,
-  "400": "#8E8F86",
-  "500": "#797B72",
-  "600": KO,
+  // A 400–600 fokozat szövegszín is (text-navy-500 a másodlagos szöveg): csonton ≥ 4,2:1, ill. ≥ 5:1
+  "400": "#6B6D65",
+  "500": "#5F6159",
+  "600": "#4E514A",
   "700": "#3A3D37",
   "800": SZEN_EMELT,
   "900": SZEN,

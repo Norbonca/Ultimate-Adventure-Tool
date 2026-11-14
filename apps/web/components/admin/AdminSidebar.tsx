@@ -84,7 +84,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
   return (
     <>
       {/* M151 — mobil felső sáv (design/D15_Admin.pen#oDiPb): 768 px alatt az oldalsáv fiókként nyílik */}
-      <div className="sticky top-0 z-30 flex h-14 items-center gap-3 bg-slate-900 px-4 md:hidden">
+      <div data-surface="night" className="sticky top-0 z-30 flex h-14 items-center gap-3 bg-slate-900 px-4 md:hidden">
         <button
           type="button"
           onClick={() => setMenuOpen(true)}
@@ -100,6 +100,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
         <div className="fixed inset-0 z-40 bg-slate-950/60 md:hidden" aria-hidden="true" onClick={() => setMenuOpen(false)} />
       )}
     <aside
+      data-surface="night"
       id="admin-sidebar"
       className={`${menuOpen ? "fixed inset-y-0 left-0 z-50 flex" : "hidden"} w-60 min-h-screen bg-slate-900 flex-col shrink-0 md:static md:flex`}
       onClick={(e) => {
