@@ -8,6 +8,7 @@ import {
   DEFAULT_THEME_ID,
   SURFACE_TOKEN_KEYS,
   THEMES,
+  getTheme,
   renderThemeCss,
   renderThemesCss,
   resolveToken,
@@ -68,7 +69,9 @@ describe("témaréteg", () => {
   });
 
   it("a tokenek CSS nélkül is feloldhatók (megosztókép, levél)", () => {
-    expect(resolveToken(DEFAULT_THEME, "night", "color-bg")).toBe("#0F172A");
-    expect(resolveToken(DEFAULT_THEME, "day", "color-primary")).toBe("#0D9488");
+    expect(resolveToken(DEFAULT_THEME, "night", "color-bg")).toBe("#222520");
+    expect(resolveToken(DEFAULT_THEME, "day", "color-primary")).toBe("#B3360E");
+    expect(resolveToken(getTheme("alap"), "night", "color-bg")).toBe("#0F172A");
+    expect(resolveToken(getTheme("alap"), "day", "color-primary")).toBe("#0D9488");
   });
 });
