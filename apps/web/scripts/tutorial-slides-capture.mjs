@@ -1,5 +1,6 @@
 // M211 — Útmutató-diák: lépésenként egy képernyőkép a helyi demókörnyezetből, a magyarázott elem
-// teal kerettel kiemelve. Kimenet: public/tutorials/slides/<slug>/<lépés>.jpg (1440×810).
+// jelzőnarancs (B „Terep”, #F15B2A) kerettel, szén fátyollal kiemelve, lekerekítés nélkül.
+// Kimenet: public/tutorials/slides/<slug>/<lépés>.jpg (1440×810).
 // Használat: BASE=http://localhost:3011 node scripts/tutorial-slides-capture.mjs [slug-szűrő]
 import { chromium } from "@playwright/test";
 import { mkdirSync } from "node:fs";
@@ -41,7 +42,7 @@ async function highlight(p, locs) {
     d.className = "m211-hl";
     Object.assign(d.style, {
       position: "fixed", left: `${x - 8}px`, top: `${y - 8}px`, width: `${w + 16}px`, height: `${h + 16}px`,
-      border: "3px solid #2DD4BF", borderRadius: "12px", boxShadow: "0 0 0 9999px rgba(15,23,42,0.35), 0 0 24px rgba(45,212,191,0.6)",
+      border: "3px solid #F15B2A", borderRadius: "0px", boxShadow: "0 0 0 9999px rgba(34,37,32,0.35)",
       zIndex: "2147483647", pointerEvents: "none",
     });
     document.body.appendChild(d);

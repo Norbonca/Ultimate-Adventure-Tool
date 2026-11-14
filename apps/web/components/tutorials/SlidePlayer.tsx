@@ -63,8 +63,8 @@ export function SlidePlayer({ tutorial, index, onIndex, compact = false, priorit
         {index + 1} / {total}
       </span>
 
-      <div className={`absolute inset-x-0 bottom-0 flex flex-col items-center gap-2 bg-[rgba(15,23,42,0.9)] text-center ${compact ? "px-14 pb-2.5 pt-2" : "px-16 pb-3 pt-3"}`}>
-        <p aria-live="polite" className={`font-semibold leading-snug text-white ${compact ? "text-sm" : "text-base md:text-lg"}`} data-testid="tutorial-slides-caption">
+      <div data-surface="night" className={`absolute inset-x-0 bottom-0 flex flex-col items-center gap-2 bg-canvas/90 text-center ${compact ? "px-14 pb-2.5 pt-2" : "px-16 pb-3 pt-3"}`}>
+        <p aria-live="polite" className={`font-semibold leading-snug text-ink ${compact ? "text-sm" : "text-base md:text-lg"}`} data-testid="tutorial-slides-caption">
           {loc(step.text, locale)}
         </p>
         <div className="flex items-center gap-1.5" aria-hidden>

@@ -139,7 +139,7 @@ export function VideoPlayer({ ref, tutorial, onTime, compact = false, priority =
       {phase !== "video" && (
         <>
           <Image src={posterUrl(tutorial.slug)} alt="" fill sizes="(min-width: 1024px) 820px, 100vw" className="object-cover" priority={priority} />
-          <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.15)_0%,rgba(15,23,42,0.75)_100%)]" />
+          <div aria-hidden className="absolute inset-0 bg-hero-scrim" />
         </>
       )}
 
@@ -225,12 +225,12 @@ export function VideoPlayer({ ref, tutorial, onTime, compact = false, priority =
         <>
           {captionsOn && caption && (
             <div className={`pointer-events-none absolute inset-x-0 flex justify-center px-4 ${compact ? "bottom-16" : "bottom-20"}`} aria-hidden>
-              <span className={`max-w-[90%] rounded-trevu bg-[rgba(15,23,42,0.85)] px-3 py-1.5 text-center font-semibold text-white ${compact ? "text-sm" : "text-base md:text-lg"}`} data-testid="tutorial-caption">
+              <span data-surface="night" className={`max-w-[90%] rounded-trevu bg-canvas/85 px-3 py-1.5 text-center font-semibold text-ink ${compact ? "text-sm" : "text-base md:text-lg"}`} data-testid="tutorial-caption">
                 {caption}
               </span>
             </div>
           )}
-          <div className="absolute inset-x-0 bottom-0 flex items-center gap-1 bg-[linear-gradient(180deg,transparent,rgba(15,23,42,0.9))] px-2 pb-1.5 pt-6">
+          <div data-surface="night" className="absolute inset-x-0 bottom-0 flex items-center gap-1 bg-canvas/90 px-2 pb-1.5 pt-2">
             <button type="button" onClick={toggle} className={btn} aria-label={playing ? tr("tutorials.player.pause") : tr("tutorials.player.resume")}>
               <Icon name={playing ? "pause" : "play"} size={20} aria-hidden />
             </button>

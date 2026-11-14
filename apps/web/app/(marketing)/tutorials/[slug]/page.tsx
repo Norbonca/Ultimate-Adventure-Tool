@@ -124,7 +124,7 @@ export default async function TutorialDetailPage({ params }: PageProps) {
             </section>
 
             {tutorial.tip && (
-              <aside className="flex max-w-[720px] gap-3 rounded-trevu-lg border border-[rgba(45,212,191,0.3)] bg-[rgba(45,212,191,0.08)] p-4" data-testid="tutorial-tip">
+              <aside className="flex max-w-[720px] gap-3 rounded-trevu-lg border border-accent bg-(--color-primary-subtle) p-4" data-testid="tutorial-tip">
                 <Icon name="lightbulb" size={20} aria-hidden className="mt-0.5 shrink-0 text-accent" />
                 <div className="flex flex-col gap-1">
                   <p className="text-sm font-bold text-ink">{t("tutorials.tip")}</p>

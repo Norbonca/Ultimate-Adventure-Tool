@@ -54,7 +54,7 @@ export function TutorialViewer({ tutorial, variant, panelFooter }: TutorialViewe
             )}
           </>
         );
-        const cls = `flex w-full items-center gap-3 rounded-trevu-lg border px-3 py-2.5 ${isActive ? "border-accent bg-[rgba(45,212,191,0.12)]" : "border-line"}`;
+        const cls = `flex w-full items-center gap-3 rounded-trevu-lg border px-3 py-2.5 ${isActive ? "border-accent bg-(--color-primary-subtle)" : "border-line"}`;
         return (
           <li key={step.at} aria-current={isActive ? "step" : undefined}>
             {interactive ? (
