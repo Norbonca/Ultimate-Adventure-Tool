@@ -3,10 +3,11 @@
 
 @source '../../../packages/ui/src/**/*.{ts,tsx}';
 
-/* `night:` variáns — a Night-régión belül, de nem egy beágyazott Day-régióban
-   (Brand Guide v2 §2, §8); a v3-as tailwind.config.ts plugin megfelelője. */
+/* `night:` variáns — a Night-régión belül, de nem egy abba ágyazott Day-régióban
+   (Brand Guide v2 §2, §8). 2026-11-14 (B „Terep”): a gyökér Day, ezért a kizárás csak a Night-on
+   BELÜLI Day-régióra vonatkozik — különben a Day gyökér minden Night-szakaszt kioltana. */
 @custom-variant night {
-  [data-surface="night"] &:not([data-surface="day"] *) {
+  [data-surface="night"] &:not([data-surface="night"] [data-surface="day"] *) {
     @slot;
   }
   &[data-surface="night"] {
@@ -328,12 +329,12 @@
            bg-trevu-600 text-white shadow-trevu
            hover:bg-trevu-700 active:scale-[0.97];
 
-  [data-surface='night'] &:not([data-surface='day'] *) {
+  [data-surface='night'] &:not([data-surface='night'] [data-surface='day'] *) {
     border-color: var(--color-border);
     color: var(--color-text);
   }
 
-  [data-surface='night'] &:not([data-surface='day'] *) {
+  [data-surface='night'] &:not([data-surface='night'] [data-surface='day'] *) {
     background-color: var(--color-primary);
     color: var(--color-on-primary);
   }
@@ -344,12 +345,12 @@
            bg-transparent text-navy-900 border-2 border-navy-200
            hover:border-navy-400;
 
-  [data-surface='night'] &:not([data-surface='day'] *) {
+  [data-surface='night'] &:not([data-surface='night'] [data-surface='day'] *) {
     border-color: var(--color-border);
     color: var(--color-text);
   }
 
-  [data-surface='night'] &:not([data-surface='day'] *) {
+  [data-surface='night'] &:not([data-surface='night'] [data-surface='day'] *) {
     background-color: transparent;
     color: var(--color-text-body);
   }
@@ -360,12 +361,12 @@
            bg-transparent text-trevu-600 border-[1.5px] border-trevu-600
            hover:bg-trevu-50;
 
-  [data-surface='night'] &:not([data-surface='day'] *) {
+  [data-surface='night'] &:not([data-surface='night'] [data-surface='day'] *) {
     border-color: var(--color-border);
     color: var(--color-text);
   }
 
-  [data-surface='night'] &:not([data-surface='day'] *) {
+  [data-surface='night'] &:not([data-surface='night'] [data-surface='day'] *) {
     background-color: transparent;
     color: var(--color-text-body);
   }
@@ -376,12 +377,12 @@
            bg-transparent text-navy-600 font-medium
            hover:bg-navy-100 hover:text-navy-900;
 
-  [data-surface='night'] &:not([data-surface='day'] *) {
+  [data-surface='night'] &:not([data-surface='night'] [data-surface='day'] *) {
     border-color: var(--color-border);
     color: var(--color-text);
   }
 
-  [data-surface='night'] &:not([data-surface='day'] *) {
+  [data-surface='night'] &:not([data-surface='night'] [data-surface='day'] *) {
     background-color: transparent;
     color: var(--color-text-body);
   }
@@ -393,12 +394,12 @@
            transition-all duration-300
            hover:shadow-trevu-lg hover:-translate-y-0.5;
 
-  [data-surface='night'] &:not([data-surface='day'] *) {
+  [data-surface='night'] &:not([data-surface='night'] [data-surface='day'] *) {
     border-color: var(--color-border);
     color: var(--color-text);
   }
 
-  [data-surface='night'] &:not([data-surface='day'] *) {
+  [data-surface='night'] &:not([data-surface='night'] [data-surface='day'] *) {
     background-color: var(--color-surface);
   }
 }
@@ -406,12 +407,12 @@
 @utility card-trevu-flat {
   @apply bg-navy-100 rounded-2xl p-6;
 
-  [data-surface='night'] &:not([data-surface='day'] *) {
+  [data-surface='night'] &:not([data-surface='night'] [data-surface='day'] *) {
     border-color: var(--color-border);
     color: var(--color-text);
   }
 
-  [data-surface='night'] &:not([data-surface='day'] *) {
+  [data-surface='night'] &:not([data-surface='night'] [data-surface='day'] *) {
     background-color: var(--color-ghost);
   }
 }
@@ -428,12 +429,12 @@
            placeholder:text-navy-500
            focus:border-trevu-600 focus:ring-[3px] focus:ring-trevu-600/10;
 
-  [data-surface='night'] &:not([data-surface='day'] *) {
+  [data-surface='night'] &:not([data-surface='night'] [data-surface='day'] *) {
     border-color: var(--color-border);
     color: var(--color-text);
   }
 
-  [data-surface='night'] &:not([data-surface='day'] *) {
+  [data-surface='night'] &:not([data-surface='night'] [data-surface='day'] *) {
     background-color: var(--color-input-bg);
   }
 }
@@ -482,179 +483,179 @@
      neutrális Tailwind-palettát használják; ez az átmeneti kompatibilitási
      réteg ugyanarra a szemantikus Night-tokenkészletre köti őket. A külön
      data-surface="day" adminrégiókat szándékosan kizárjuk. */
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .bg-white
-  ):not([data-surface="day"] *) {
+  ):not([data-surface="night"] [data-surface="day"] *) {
     background-color: var(--color-surface);
   }
 
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .bg-slate-50,
     .bg-navy-50
-  ):not([data-surface="day"] *) {
+  ):not([data-surface="night"] [data-surface="day"] *) {
     background-color: var(--color-ghost);
   }
 
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .bg-slate-100,
     .bg-navy-100
-  ):not([data-surface="day"] *) {
+  ):not([data-surface="night"] [data-surface="day"] *) {
     background-color: var(--color-ghost);
   }
 
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .bg-slate-200,
     .bg-navy-200
-  ):not([data-surface="day"] *) {
+  ):not([data-surface="night"] [data-surface="day"] *) {
     background-color: var(--color-border);
   }
 
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .text-slate-900,
     .text-slate-800,
     .text-navy-900,
     .text-navy-800
-  ):not([data-surface="day"] *) {
+  ):not([data-surface="night"] [data-surface="day"] *) {
     color: var(--color-text);
   }
 
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .text-slate-700,
     .text-slate-600,
     .text-navy-700,
     .text-navy-600
-  ):not([data-surface="day"] *) {
+  ):not([data-surface="night"] [data-surface="day"] *) {
     color: var(--color-text-body);
   }
 
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .text-slate-500,
     .text-slate-400,
     .text-slate-300,
     .text-navy-500,
     .text-navy-400,
     .text-navy-300
-  ):not([data-surface="day"] *) {
+  ):not([data-surface="night"] [data-surface="day"] *) {
     color: var(--color-text-muted);
   }
 
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .border-slate-100,
     .border-slate-200,
     .border-slate-300,
     .border-navy-100,
     .border-navy-200,
     .border-navy-300
-  ):not([data-surface="day"] *) {
+  ):not([data-surface="night"] [data-surface="day"] *) {
     border-color: var(--color-border);
   }
 
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .bg-trevu-50,
     .bg-trevu-100
-  ):not([data-surface="day"] *) {
+  ):not([data-surface="night"] [data-surface="day"] *) {
     background-color: color-mix(in srgb, var(--color-primary) 18%, transparent);
   }
 
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .bg-trevu-400,
     .bg-trevu-500,
     .bg-trevu-600
-  ):not([data-surface="day"] *) {
+  ):not([data-surface="night"] [data-surface="day"] *) {
     background-color: var(--color-primary);
   }
 
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .text-trevu-500,
     .text-trevu-600,
     .text-trevu-700
-  ):not([data-surface="day"] *) {
+  ):not([data-surface="night"] [data-surface="day"] *) {
     color: var(--color-primary);
   }
 
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .text-teal-600,
     .text-teal-700,
     .text-trevu-800
-  ):not([data-surface="day"] *) {
+  ):not([data-surface="night"] [data-surface="day"] *) {
     color: var(--color-primary);
   }
 
   /* Állapotszínek: a sötét fokozatok világos alapra valók — Night-on a szemantikus állapottoken
      (2026-11-14, B „Terep”: a meleg szén alapon a sötét zöld, piros és sárga olvashatatlan). */
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .text-emerald-500,
     .text-emerald-600,
     .text-emerald-700,
     .text-emerald-800,
     .text-green-600,
     .text-green-700
-  ):not([data-surface="day"] *) {
+  ):not([data-surface="night"] [data-surface="day"] *) {
     color: var(--color-success);
   }
 
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .text-red-500,
     .text-red-600,
     .text-red-700
-  ):not([data-surface="day"] *) {
+  ):not([data-surface="night"] [data-surface="day"] *) {
     color: var(--color-danger);
   }
 
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .text-amber-500,
     .text-amber-600,
     .text-amber-700,
     .text-amber-800,
     .text-yellow-700
-  ):not([data-surface="day"] *) {
+  ):not([data-surface="night"] [data-surface="day"] *) {
     color: var(--color-rating);
   }
 
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .border-trevu-200,
     .border-trevu-300,
     .border-trevu-400,
     .border-trevu-500,
     .border-trevu-600
-  ):not([data-surface="day"] *) {
+  ):not([data-surface="night"] [data-surface="day"] *) {
     border-color: var(--color-primary);
   }
 
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .hover\:bg-slate-50:hover,
     .hover\:bg-slate-100:hover,
     .hover\:bg-navy-50:hover,
     .hover\:bg-navy-100:hover
-  ):not([data-surface="day"] *) {
+  ):not([data-surface="night"] [data-surface="day"] *) {
     background-color: var(--color-ghost);
   }
 
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .hover\:text-slate-700:hover,
     .hover\:text-slate-900:hover,
     .hover\:text-navy-700:hover,
     .hover\:text-navy-800:hover,
     .hover\:text-navy-900:hover
-  ):not([data-surface="day"] *) {
+  ):not([data-surface="night"] [data-surface="day"] *) {
     color: var(--color-text);
   }
 
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .hover\:bg-trevu-50:hover
-  ):not([data-surface="day"] *) {
+  ):not([data-surface="night"] [data-surface="day"] *) {
     background-color: color-mix(in srgb, var(--color-primary) 18%, transparent);
   }
 
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .hover\:bg-trevu-700:hover
-  ):not([data-surface="day"] *) {
+  ):not([data-surface="night"] [data-surface="day"] *) {
     background-color: var(--color-primary-hover);
   }
 
-  body[data-surface="night"] :where(
+  [data-surface="night"] :where(
     .placeholder\:text-navy-500
-  ):not([data-surface="day"] *)::placeholder {
+  ):not([data-surface="night"] [data-surface="day"] *)::placeholder {
     color: var(--color-text-muted);
   }
 }
