@@ -63,7 +63,7 @@ export default async function TutorialDetailPage({ params }: PageProps) {
   );
 
   return (
-    <div data-surface="night" className="min-h-screen bg-canvas pb-24 text-ink lg:pb-0">
+    <div className="min-h-screen bg-canvas pb-24 text-ink lg:pb-0">
       <AppHeader
         user={user ? { email: user.email ?? "", displayName: user.user_metadata?.full_name } : null}
       />

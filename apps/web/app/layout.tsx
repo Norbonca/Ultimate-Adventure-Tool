@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SITE_NAME, SITE_URL, ogLocale } from "@/lib/seo";
 import { DEFAULT_THEME } from "@uat/config";
+import { SiteFooter } from "@/components/SiteFooter";
 import "@/styles/globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -41,7 +42,7 @@ export default async function RootLayout({
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
           rel="stylesheet"
         />
       </head>
@@ -49,7 +50,10 @@ export default async function RootLayout({
         data-surface={DEFAULT_THEME.defaultSurface}
         className="min-h-screen bg-canvas text-ink antialiased"
       >
-        <LocaleProvider locale={locale}>{children}</LocaleProvider>
+        <LocaleProvider locale={locale}>
+          {children}
+          <SiteFooter />
+        </LocaleProvider>
         {/* Forgalom- és teljesítménymérés (Norbert, 2026-11-09): Vercel Web Analytics + Speed Insights,
             süti nélkül, összesített adat; a Vercel-projektben a két funkciót be kell kapcsolni. */}
         <Analytics />

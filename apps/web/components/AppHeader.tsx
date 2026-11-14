@@ -121,7 +121,7 @@ export function AppHeader({ user }: AppHeaderProps) {
       : resolvedUser?.email?.charAt(0)?.toUpperCase() ?? "?";
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200 night:bg-glass night:border-line">
+    <header data-surface="night" className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200 night:bg-glass night:border-line">
       <div className="max-w-7xl mx-auto h-14 px-4 flex items-center">
         {/* ── BAL ZÓNA: márkajel (menügomb) + szójel (home link) ── */}
         <div className="flex items-center gap-1 shrink-0 relative" ref={menuRef}>

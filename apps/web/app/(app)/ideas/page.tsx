@@ -70,11 +70,11 @@ export default async function IdeasBoardPage({ searchParams }: PageProps) {
   const pages = Math.max(1, Math.ceil(total / BOARD_PAGE_SIZE));
 
   return (
-    <div data-surface="night" className="min-h-screen bg-canvas text-ink">
+    <div className="min-h-screen bg-canvas text-ink">
       <AppHeader user={user ? { email: user.email ?? "", displayName: user.user_metadata?.full_name } : null} />
 
       {/* HERO — D22 EQOlq R7kD1o */}
-      <section className="relative overflow-hidden bg-canvas" data-testid="ideas-hero">
+      <section data-surface="night" className="relative overflow-hidden bg-canvas" data-testid="ideas-hero">
         <CoverImage src="/discover/hero.jpg" sizes="100vw" priority />
         <div aria-hidden className="absolute inset-0 bg-hero-scrim-mobile md:bg-hero-scrim" />
         <div className="relative mx-auto flex min-h-[320px] max-w-7xl flex-col justify-end gap-4 px-5 pb-8 pt-24 md:min-h-[420px] md:px-8 md:pb-10">
