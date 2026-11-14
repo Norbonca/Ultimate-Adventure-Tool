@@ -789,6 +789,7 @@ body[data-fullscreen-view] [data-site-footer] {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.01em;
-    line-height: 0.98;
+    /* A verzál ékezet (Ö, Ő, Ű, É) a sor fölé nyúlik: 1,0 alatt összeér a fölötte lévő sorral. */
+    line-height: 1.12;
   }
 }
