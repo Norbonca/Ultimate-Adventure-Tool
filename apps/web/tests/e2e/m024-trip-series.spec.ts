@@ -56,7 +56,7 @@ test("M024: one Discover card per series, date choice on apply, organizer adds a
 
     // K-1/K-5/K-9: egy kártya, max 3 időpontsor, „+2 további”, a sor a saját túrájára visz
     const base = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
-    await page.context().addCookies([{ name: "trevu-discover-view-v2", value: "grid", url: base }]);
+    await page.context().addCookies([{ name: "trevu-discover-view-v3", value: "grid", url: base }]);
     await page.goto("/");
     await page.getByTestId("discover-search-query").fill(title);
     await page.getByTestId("discover-search-submit").click();

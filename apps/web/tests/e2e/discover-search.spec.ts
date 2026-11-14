@@ -13,14 +13,14 @@ import { test, expect } from '@playwright/test';
 test.describe('Discover — hero search', () => {
   test.beforeEach(async ({ page, context, baseURL }) => {
     await context.addCookies([
-      { name: 'trevu-discover-view-v2', value: 'list', url: baseURL ?? 'http://localhost:3000' },
+      { name: 'trevu-discover-view-v3', value: 'list', url: baseURL ?? 'http://localhost:3000' },
     ]);
     await page.goto('/');
     await expect(page.getByTestId('discover-hero-search')).toBeVisible();
   });
 
   test('DISCOVER-SEARCH-1: the pill search filters on Enter and on the button, and clearing restores the list', async ({ page }) => {
-    const titles = page.getByTestId('trip-band-title');
+    const titles = page.getByTestId('trip-row-title');
     const count = page.getByTestId('discover-count');
     test.skip((await titles.count()) === 0, 'no published trips in the local data');
     const totalText = await count.innerText();
@@ -40,7 +40,7 @@ test.describe('Discover — hero search', () => {
   });
 
   test('DISCOVER-SEARCH-2: a time phrase filters by date — an impossible year shows no trips', async ({ page }) => {
-    test.skip((await page.getByTestId('trip-band-title').count()) === 0, 'no published trips in the local data');
+    test.skip((await page.getByTestId('trip-row-title').count()) === 0, 'no published trips in the local data');
     const query = page.getByTestId('discover-search-query');
 
     await query.fill('valamikor');
