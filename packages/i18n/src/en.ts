@@ -196,6 +196,11 @@ const en: TranslationKeys = {
     privacyPolicy: "Privacy Policy",
   },
 
+  footer: {
+    label: "Footer",
+    mascotAlt: "The {brand} trail companion: a zho carrying a pack, stepping towards the footer",
+  },
+
   // ============================================================================
   // Navigation
   // ============================================================================

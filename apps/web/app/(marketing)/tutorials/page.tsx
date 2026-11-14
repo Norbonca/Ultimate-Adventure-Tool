@@ -68,7 +68,7 @@ export default async function TutorialsPage({ searchParams }: PageProps) {
   ];
 
   return (
-    <div data-surface="night" className="min-h-screen bg-canvas text-ink">
+    <div className="min-h-screen bg-canvas text-ink">
       <AppHeader
         user={user ? { email: user.email ?? "", displayName: user.user_metadata?.full_name } : null}
       />

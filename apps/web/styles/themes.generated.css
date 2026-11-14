@@ -89,11 +89,12 @@
   --globe-land-2: #3A3D37;
   --hero-scrim: linear-gradient(to top, rgba(34, 37, 32, 0.92) 0%, rgba(34, 37, 32, 0.65) 35%, rgba(34, 37, 32, 0) 70%);
   --hero-scrim-mobile: linear-gradient(to top, rgba(34, 37, 32, 0.94) 0%, rgba(34, 37, 32, 0.8) 45%, rgba(34, 37, 32, 0.35) 80%, rgba(34, 37, 32, 0.15) 100%);
-  --font-hero-display: 48px;
-  --font-hero-display-mobile: 38px;
+  --font-hero-display: clamp(56px, 5.6vw, 84px);
+  --font-hero-display-mobile: 46px;
   --color-scrim: rgba(34, 37, 32, 0.7);
   --font-family-sans: "Barlow", system-ui, sans-serif;
   --font-family-display: "Barlow", system-ui, sans-serif;
+  --font-family-heading: "Anton", "Barlow", system-ui, sans-serif;
   --font-family-mono: "JetBrains Mono", ui-monospace, monospace;
   --pal-navy-50: #E9E7DE;
   --pal-navy-100: #DEDCD1;

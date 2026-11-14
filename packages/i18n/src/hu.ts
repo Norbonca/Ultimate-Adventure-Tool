@@ -195,6 +195,11 @@ const hu = {
     privacyPolicy: "Adatvédelmi Irányelveket",
   },
 
+  footer: {
+    label: "Lábléc",
+    mascotAlt: "A {brand} túratárs: málhát cipelő zho, a lábléc felé lép",
+  },
+
   // ============================================================================
   // Navigation
   // ============================================================================

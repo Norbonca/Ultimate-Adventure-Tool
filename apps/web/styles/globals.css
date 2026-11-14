@@ -675,3 +675,20 @@
     border-radius: 0;
   }
 }
+
+/* A teljes képernyős nézet (3D térkép) alatt nincs közös lábléc. */
+body[data-fullscreen-view] [data-site-footer] {
+  display: none;
+}
+
+/* B „Terep”: a h1–h2 címsor Anton, csak verzál (a betűnek egy vastagsága van, ezért a súly rögzített —
+   a font-bold/extrabold osztály ne vastagítsa műfélkövérre). A h3-tól lefelé Barlow. */
+@layer utilities {
+  [data-theme="terep"] :is(h1, h2) {
+    font-family: var(--font-family-heading);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    line-height: 0.98;
+  }
+}

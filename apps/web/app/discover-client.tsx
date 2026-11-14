@@ -13,11 +13,11 @@
  * egy kártyára vonódnak (lib/trip-series.ts groupTripsForDiscover, spec K-1…K-11); a találatszám kártyát számol.
  * Nézetszerződés: components/discover/discover-view-toggle.md.
  *
- * A teljes oldal Night (data-surface="night"); az alsó CTA-sáv az egyetlen Day-régió
- * (Night→Day váltás felülről lefelé, v2 §2/2). Minden szín szemantikus tokenből jön.
+ * B „Terep” (2026-11-14): a munkafelület csont (Day); a fejléc és a hero Night. A teljes képernyős
+ * 3D térkép alatt nincs lábléc (body[data-fullscreen-view]). Minden szín szemantikus tokenből jön.
  */
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -195,6 +195,12 @@ export default function DiscoverClient({
     setViewMode(next);
     rememberDiscoverView(next);
   };
+  // A 3D térkép teljes képernyős: alatta a közös lábléc nem jelenik meg.
+  useEffect(() => {
+    if (viewMode === 'globe') document.body.dataset.fullscreenView = '';
+    else delete document.body.dataset.fullscreenView;
+    return () => { delete document.body.dataset.fullscreenView; };
+  }, [viewMode]);
 
   // Pirula-kereső (lib/trip-search.ts createTripSearch): a beírt szöveg Enterre vagy a
   // Keresés gombra érvényesül; a mező kiürítése azonnal visszaállítja a listát.
@@ -467,7 +473,7 @@ export default function DiscoverClient({
   );
 
   return (
-    <div data-surface="night" className="min-h-screen bg-canvas text-ink">
+    <div className="min-h-screen bg-canvas text-ink">
       <AppHeader
       />
 
@@ -493,7 +499,7 @@ export default function DiscoverClient({
           {/* HERO — v2 §5: Deep Navy alapon a terv panorámafotója (D02 #H1rRQE / #l87Il, ugyanaz a kép
               asztalin és mobilon), alulról kötelező olvashatósági gradienssel (--hero-scrim).
               Fotó: Unsplash photo-1504681869696 (D03 Landing hero, @hdbernd) — public/discover/hero.jpg; Norbert választása 2026-09-16 */}
-          <section className="relative overflow-hidden bg-canvas">
+          <section data-surface="night" className="relative overflow-hidden bg-canvas">
             <Image
               src="/discover/hero.jpg"
               alt=""

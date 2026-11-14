@@ -6,8 +6,8 @@ import type { SurfaceMode, ThemeDefinition } from "./types";
  * design/claude/B_DesignSystem; tokenértékek: design/claude/Arculat_iranyok/WORK_B_tokenkeszlet.md).
  *
  * 1. lépés (tokencsere): szén, csont és jelzőnarancs paletta, Barlow, szögletes forma, árnyék és
- * színátmenet nélkül. A felület-módok szerepe nem változik: a nem-admin felület Night (szén),
- * az admin Day (csont). A szakaszszintű Day/Night elrendezés a 2. lépés.
+ * színátmenet nélkül. 2. lépés: szakaszszintű Day/Night — a munkafelület csont (Day); a fejléc,
+ * a hero, a kiemelt sávok és a lábléc Night (szén). Az admin is ezt a szabályt követi.
  *
  * A `pal-*` tokenek a Tailwind-palettaosztályokat (navy, slate, trevu, teal, emerald, red, amber …)
  * kötik a témához: a `globals.css` `@theme inline` blokkja `var(--pal-…, <alapérték>)` alakban olvassa,
@@ -93,7 +93,9 @@ const NINCS_ARNYEK = "0 0 #0000";
 export const terep: ThemeDefinition = {
   id: "terep",
   label: "B — Terep",
-  defaultSurface: "night",
+  // 2. lépés (2026-11-14): szakaszszintű Day/Night — a munkafelület csont (Day); a fejléc, a hero,
+  // a kiemelt sávok és a lábléc maguk kérik a Night-ot (`data-surface="night"`).
+  defaultSurface: "day",
   base: {
     ...alap.base,
     // Régi nevek — a meglévő hivatkozások a B értékeit kapják
@@ -124,10 +126,13 @@ export const terep: ThemeDefinition = {
     "shadow-primary": "none",
     "gradient-trevu": `linear-gradient(${NARANCS}, ${NARANCS})`,
     "gradient-dawn": `linear-gradient(${NARANCS}, ${NARANCS})`,
-    // Betű: Barlow a felület és a szöveg, JetBrains Mono az adat. Az Anton (csak verzál) a 2. lépés elrendezéseivel jön.
+    // Betű: Barlow a felület és a szöveg, JetBrains Mono az adat, Anton (csak verzál) a h1–h2 címsor.
     "font-mono": "\"JetBrains Mono\", ui-monospace, monospace",
     "font-family-sans": "\"Barlow\", system-ui, sans-serif",
     "font-family-display": "\"Barlow\", system-ui, sans-serif",
+    "font-family-heading": "\"Anton\", \"Barlow\", system-ui, sans-serif",
+    "font-hero-display": "clamp(56px, 5.6vw, 84px)",
+    "font-hero-display-mobile": "46px",
     "font-family-mono": "\"JetBrains Mono\", ui-monospace, monospace",
     // Szemantikus kiegészítők
     "color-primary-light": NARANCS,
