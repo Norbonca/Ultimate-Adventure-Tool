@@ -573,6 +573,45 @@
   }
 
   body[data-surface="night"] :where(
+    .text-teal-600,
+    .text-teal-700,
+    .text-trevu-800
+  ):not([data-surface="day"] *) {
+    color: var(--color-primary);
+  }
+
+  /* Állapotszínek: a sötét fokozatok világos alapra valók — Night-on a szemantikus állapottoken
+     (2026-11-14, B „Terep”: a meleg szén alapon a sötét zöld, piros és sárga olvashatatlan). */
+  body[data-surface="night"] :where(
+    .text-emerald-500,
+    .text-emerald-600,
+    .text-emerald-700,
+    .text-emerald-800,
+    .text-green-600,
+    .text-green-700
+  ):not([data-surface="day"] *) {
+    color: var(--color-success);
+  }
+
+  body[data-surface="night"] :where(
+    .text-red-500,
+    .text-red-600,
+    .text-red-700
+  ):not([data-surface="day"] *) {
+    color: var(--color-danger);
+  }
+
+  body[data-surface="night"] :where(
+    .text-amber-500,
+    .text-amber-600,
+    .text-amber-700,
+    .text-amber-800,
+    .text-yellow-700
+  ):not([data-surface="day"] *) {
+    color: var(--color-rating);
+  }
+
+  body[data-surface="night"] :where(
     .border-trevu-200,
     .border-trevu-300,
     .border-trevu-400,
