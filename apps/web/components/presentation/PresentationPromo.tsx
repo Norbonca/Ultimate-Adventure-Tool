@@ -16,7 +16,7 @@ import { SLIDES, SLIDE_SECONDS } from "@/lib/presentation/content";
 const VIDEO = "/videos/trevu-bemutato.mp4";
 const POSTER = "/videos/trevu-bemutato-poster.jpg";
 
-export function PresentationPromo({ className = "" }: { className?: string }) {
+export function PresentationPromo({ className = "", eyebrow }: { className?: string; eyebrow?: string }) {
   const { t, locale } = useTranslation();
   const lang = locale === "en" ? "en" : "hu";
   const cover = SLIDES[0];
@@ -33,10 +33,10 @@ export function PresentationPromo({ className = "" }: { className?: string }) {
 
   return (
     <section data-surface="night" className={`bg-canvas px-4 py-8 md:px-[120px] md:py-12 ${className}`} data-testid="presentation-promo">
-      <div className="mx-auto grid max-w-7xl items-center gap-6 overflow-hidden rounded-trevu-3xl border border-line p-5 [background:linear-gradient(135deg,var(--color-bg)_0%,var(--color-primary-subtle)_100%)] md:grid-cols-[5fr_7fr] md:gap-12 md:rounded-3xl md:p-12">
+      <div className="mx-auto grid max-w-7xl items-center gap-6 md:grid-cols-[5fr_7fr] md:gap-12">
         <div className="order-2 flex flex-col gap-4 md:order-1 md:gap-5">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent md:text-sm">{t("presentation.promoEyebrow")}</p>
-          <h2 className="text-[28px] font-extrabold leading-tight text-ink md:text-[40px]">{cover.title[lang]}</h2>
+          <p className="font-mono text-[13px] font-medium uppercase tracking-[0.06em] text-accent">{eyebrow ?? t("presentation.promoEyebrow")}</p>
+          <h2 className="text-[36px] text-ink md:text-[56px]">{cover.title[lang]}</h2>
           {"lead" in cover && <p className="text-base leading-relaxed text-ink-secondary md:text-lg">{cover.lead[lang]}</p>}
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
             <Link
@@ -50,7 +50,7 @@ export function PresentationPromo({ className = "" }: { className?: string }) {
             <span className="text-sm text-ink-muted">{t("presentation.promoMeta", { count: SLIDES.length, minutes })}</span>
           </div>
         </div>
-        <div className="order-1 overflow-hidden rounded-2xl border border-line bg-canvas shadow-2xl md:order-2">
+        <div className="order-1 overflow-hidden border border-line bg-canvas md:order-2">
           <video
             ref={videoRef}
             src={VIDEO}
