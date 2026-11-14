@@ -874,11 +874,13 @@ export default function DiscoverClient({
           </section>
 
           {/* 04 / SZERVEZŐKNEK — kijelentkezve a bemutatóvideós blokk (M211b, D09 `JvYxg`), utána a túraindítás */}
-          {auth === 'out' && <PresentationPromo />}
+          {auth === 'out' && <PresentationPromo eyebrow={t('discover.sectionOrganizers')} className="border-t border-line md:py-16" />}
           <section className="border-t border-line bg-canvas text-ink" data-testid="discover-cta">
             <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-12 md:flex-row md:items-end md:justify-between md:px-[120px] md:py-16">
               <div className="flex max-w-[640px] flex-col gap-3">
-                <p className="font-mono text-[13px] font-medium uppercase tracking-[0.06em] text-accent">{t('discover.sectionOrganizers')}</p>
+                {auth !== 'out' && (
+                  <p className="font-mono text-[13px] font-medium uppercase tracking-[0.06em] text-accent">{t('discover.sectionOrganizers')}</p>
+                )}
                 <h2 className="text-[36px] text-ink md:text-[56px]">{t('discover.ctaTitle')}</h2>
                 <p className="text-base text-ink-secondary md:text-lg">{t('discover.ctaSubtitle')}</p>
               </div>
