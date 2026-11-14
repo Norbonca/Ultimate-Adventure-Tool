@@ -737,7 +737,7 @@ export default function DiscoverClient({
             ) : (
               <>
                 {viewMode === 'grid' ? (
-                  <ul className="grid grid-cols-1 gap-4 pt-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6" data-testid="discover-trip-grid">
+                  <ul className="grid grid-cols-1 gap-3 pt-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4" data-testid="discover-trip-grid">
                     {visibleCards.map((card) => {
                       const trip = card.kind === 'single' ? card.trip : card.representative;
                       const category = resolveJoin(trip.categories);
