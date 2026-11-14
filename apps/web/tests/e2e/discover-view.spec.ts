@@ -1,11 +1,11 @@
 import { test, expect, type Page } from '@playwright/test';
 
 /**
- * Discover view toggle — grid (tiles, default) / globe / list (Norbert, 2026-09-16).
+ * Discover view toggle — list (compact rows, default since 2026-11-14) / grid (tiles) / globe (Norbert, 2026-09-16, 2026-11-14).
  *
  * Contract: components/discover/discover-view-toggle.md
- *  - the tile grid is the default view for a visitor with no cookie;
- *  - switching writes `trevu-discover-view-v2` and survives a reload;
+ *  - the compact list is the default view for a visitor with no cookie;
+ *  - switching writes `trevu-discover-view-v3` and survives a reload;
  *  - the server renders the remembered view, so there is no flash of the
  *    wrong layout on first paint;
  *  - the globe never becomes a dead end: without WebGL it falls back to a
@@ -15,7 +15,7 @@ import { test, expect, type Page } from '@playwright/test';
  * accept either a live canvas or the documented fallback message.
  */
 
-const COOKIE = 'trevu-discover-view-v2';
+const COOKIE = 'trevu-discover-view-v3';
 
 async function readViewCookie(page: Page): Promise<string | undefined> {
   const cookies = await page.context().cookies();
@@ -30,20 +30,20 @@ async function expectGlobePresent(page: Page) {
 }
 
 test.describe('Discover — view toggle', () => {
-  test('DISCOVER-VIEW-1: the tile grid is the default view without a cookie', async ({ page }) => {
+  test('DISCOVER-VIEW-1: the compact list is the default view without a cookie', async ({ page }) => {
     await page.goto('/');
 
-    const gridButton = page.getByTestId('view-toggle-grid');
-    await expect(gridButton).toBeVisible();
-    await expect(gridButton).toHaveAttribute('aria-pressed', 'true');
+    const listButton = page.getByTestId('view-toggle-list');
+    await expect(listButton).toBeVisible();
+    await expect(listButton).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByTestId('view-toggle-globe')).toHaveAttribute('aria-pressed', 'false');
-    await expect(page.getByTestId('view-toggle-list')).toHaveAttribute('aria-pressed', 'false');
-    await expect(page.getByTestId('discover-trip-grid').or(page.getByTestId('discover-empty')).first()).toBeVisible();
-    await expect(page.getByTestId('discover-trip-list')).toHaveCount(0);
+    await expect(page.getByTestId('view-toggle-grid')).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.getByTestId('discover-trip-list').or(page.getByTestId('discover-empty')).first()).toBeVisible();
+    await expect(page.getByTestId('discover-trip-grid')).toHaveCount(0);
     await expect(page.getByTestId('globe-discover')).toHaveCount(0);
   });
 
-  test('DISCOVER-VIEW-2: switching to the list writes the cookie and shows trip bands', async ({ page }) => {
+  test('DISCOVER-VIEW-2: switching to the list writes the cookie and shows trip rows', async ({ page }) => {
     await page.goto('/');
 
     await page.getByTestId('view-toggle-list').click();
@@ -86,30 +86,27 @@ test.describe('Discover — view toggle', () => {
     await expect(page.getByTestId('discover-hero-search')).toBeVisible();
   });
 
-  test('DISCOVER-VIEW-3b: a choice saved under the old cookie name does not hide the tiles', async ({ page, context, baseURL }) => {
-    await context.addCookies([{ name: 'trevu-discover-view', value: 'list', url: baseURL ?? 'http://localhost:3000' }]);
+  test('DISCOVER-VIEW-3b: a choice saved under an old cookie name does not override the default', async ({ page, context, baseURL }) => {
+    await context.addCookies([{ name: 'trevu-discover-view-v2', value: 'grid', url: baseURL ?? 'http://localhost:3000' }]);
     await page.goto('/');
-    await expect(page.getByTestId('view-toggle-grid')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('view-toggle-list')).toHaveAttribute('aria-pressed', 'true');
   });
 
-  test('DISCOVER-VIEW-3c: the Discover page is a Night surface end to end — no light band at the bottom', async ({ page, context, baseURL }) => {
-    await context.addCookies([{ name: COOKIE, value: 'list', url: baseURL ?? 'http://localhost:3000' }]);
+  test('DISCOVER-VIEW-3c: B „Terep” — the hero is a Night section, the work surface is Day (bone)', async ({ page }) => {
     await page.goto('/');
-    const root = page.locator('[data-surface="night"]').first();
-    await expect(root).toBeVisible();
-    await expect(root).toHaveCSS('background-color', 'rgb(15, 23, 42)');
-    await expect(page.locator('[data-surface="day"]')).toHaveCount(0);
-    await expect(page.getByTestId('discover-cta')).toHaveCSS('background-color', 'rgb(15, 23, 42)');
+    await expect(page.locator('section[data-surface="night"]').first()).toHaveCSS('background-color', 'rgb(34, 37, 32)');
+    await expect(page.locator('body')).toHaveAttribute('data-surface', 'day');
+    await expect(page.getByTestId('discover-cta')).toHaveCSS('background-color', 'rgb(233, 231, 222)');
   });
 
-  test('DISCOVER-VIEW-4: an unknown cookie value falls back to the tile grid', async ({ page, context }) => {
+  test('DISCOVER-VIEW-4: an unknown cookie value falls back to the compact list', async ({ page, context }) => {
     await context.addCookies([
       { name: COOKIE, value: 'definitely-not-a-view', url: 'http://localhost:3000' },
     ]);
 
     await page.goto('/');
 
-    await expect(page.getByTestId('view-toggle-grid')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('view-toggle-list')).toHaveAttribute('aria-pressed', 'true');
   });
 
   test('DISCOVER-VIEW-5: globe markers come from /api/v1/trips/globe', async ({ page }) => {

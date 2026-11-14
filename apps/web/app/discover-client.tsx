@@ -8,7 +8,7 @@
  *   design/D02_Trip_Management.pen#l87Il   Discover lista nézet, mobil 390
  *   design/D02_Trip_Management.pen#W9Kgy   szűrőpanel nyitva (asztali) + üres állapot
  *   design/D02_Trip_Management.pen#RTE9l   FilterSheet, mobil 390
- * Komponensek: components/ui/SearchPill, OptionChip, FilterSheet; components/discover/TripBand.
+ * Komponensek: components/ui/SearchPill, OptionChip, FilterSheet; components/discover/TripRow (listanézet), TripTile (csempe).
  * M024 (design/D09_Search_Discover.pen#ZD6Bo, #c57jCF, #SFkdK, #Kx86J): az azonos sorozat időpontjai
  * egy kártyára vonódnak (lib/trip-series.ts groupTripsForDiscover, spec K-1…K-11); a találatszám kártyát számol.
  * Nézetszerződés: components/discover/discover-view-toggle.md.
@@ -42,7 +42,8 @@ import {
 } from '@/lib/icons';
 import type { LucideIcon } from '@/lib/icons';
 import { SearchPill, OptionChip, FilterSheet } from '@/components/ui';
-import { TripBand, CATEGORY_TEXT, type CategoryToken } from '@/components/discover/TripBand';
+import { CATEGORY_TEXT, type CategoryToken } from '@/components/discover/TripBand';
+import { TripRow } from '@/components/discover/TripRow';
 import { TripTile } from '@/components/discover/TripTile';
 import {
   DEFAULT_DISCOVER_VIEW,
@@ -783,43 +784,31 @@ export default function DiscoverClient({
                     })}
                   </ul>
                 ) : (
-                <ul className="flex flex-col gap-3 pt-6 md:gap-4" data-testid="discover-trip-list">
+                <ul className="flex flex-col border-t border-line" data-testid="discover-trip-list">
+                  {/* B „Terep”: tömör sorok (TripRow) — egy túra egy sor; az időpontok a túraoldalon választhatók */}
                   {visibleCards.map((card) => {
                     const trip = card.kind === 'single' ? card.trip : card.representative;
                     const category = resolveJoin(trip.categories);
                     const meta = category ? categoryMeta(category.name) : null;
+                    const level = difficultyLevels.find((d) => d.value === trip.difficulty);
                     const next = card.kind === 'series' ? card.rows[0] : null;
                     return (
                       <li key={card.key}>
-                        <TripBand
+                        <TripRow
                           href={`/trips/${trip.slug}`}
                           title={trip.title}
                           imageUrl={trip.card_image_url || trip.cover_image_url}
-                          place={formatPlace(trip)}
-                          details={[formatDates(trip), t('discover.spotsLeft').replace('{count}', String(spotsLeftOf(trip)))]}
                           category={category && meta ? { label: categoryLabel(category.name), token: meta.token, icon: meta.icon } : null}
+                          meta={[
+                            formatPlace(trip),
+                            card.kind === 'series' && next
+                              ? `${t('series.dateCount', { count: card.dateCount })} · ${t('series.nextDate', { date: formatShortDates(next) })}`
+                              : formatDates(trip),
+                            level ? (locale === 'en' ? level.labelEn : level.label) : null,
+                            card.kind === 'series' ? null : t('discover.spotsLeft').replace('{count}', String(spotsLeftOf(trip))),
+                          ]}
                           price={cardPrice(card)}
-                          priceCaption={t('discover.priceCaption')}
-                          ctaLabel={t('discover.viewDetails')}
-                          series={
-                            card.kind === 'series'
-                              ? {
-                                  chips: card.rows.map((row) => ({
-                                    key: row.id,
-                                    href: `/trips/${row.slug}`,
-                                    label: formatShortDates(row),
-                                    full: spotsLeftOf(row) === 0,
-                                    title: seriesStatus(row),
-                                  })),
-                                  more: card.moreCount > 0
-                                    ? { href: `/trips/${trip.slug}#idopontok`, label: t('series.moreDates', { count: card.moreCount }) }
-                                    : null,
-                                  nextLabel: next
-                                    ? `${t('series.nextDate', { date: formatShortDates(next) })} · ${seriesStatus(next)}`
-                                    : t('series.dateCount', { count: card.dateCount }),
-                                }
-                              : null
-                          }
+                          priceCaption={t('discover.perPerson')}
                         />
                       </li>
                     );

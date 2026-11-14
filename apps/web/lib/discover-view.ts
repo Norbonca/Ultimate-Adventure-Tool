@@ -9,7 +9,7 @@
  * v2 (2026-09-16): a csempés nézet visszakerült és ez az alapértelmezés. A cookie neve új,
  * hogy a 1b-s átállás alatt mentett `list`/`globe` választás ne takarja el a csempéket.
  */
-export const DISCOVER_VIEW_COOKIE = 'trevu-discover-view-v2';
+export const DISCOVER_VIEW_COOKIE = 'trevu-discover-view-v3';
 
 /**
  * Nézetek: csempe (rács) — alapértelmezés, 3D gömb, lista (borítós sávok).
@@ -20,7 +20,8 @@ export const DISCOVER_VIEWS = ['grid', 'globe', 'list'] as const;
 export type DiscoverView = (typeof DISCOVER_VIEWS)[number];
 
 /** A csempés nézet a Discover belépő nézete. */
-export const DEFAULT_DISCOVER_VIEW: DiscoverView = 'grid';
+/** 2026-11-14 (Norbert: „helytakarékosabban kellene megjeleníteni a túrákat”): az alapnézet a tömör sorlista. */
+export const DEFAULT_DISCOVER_VIEW: DiscoverView = 'list';
 
 /** One year — the choice is a lasting preference, not a session detail. */
 export const DISCOVER_VIEW_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
