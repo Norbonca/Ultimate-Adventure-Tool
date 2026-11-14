@@ -1066,6 +1066,13 @@ export default function HomePage() {
           background: transparent !important;
           border-color: var(--color-border-strong) !important;
         }
+        [data-theme="terep"] .final-cta {
+          background: var(--color-bg) !important;
+        }
+        [data-theme="terep"] .feature-icon-box svg,
+        [data-theme="terep"] .secondary-icon-box svg {
+          color: var(--color-primary) !important;
+        }
         [data-theme="terep"] .category-card:hover {
           background: var(--color-ghost) !important;
           transform: none !important;
@@ -1297,7 +1304,7 @@ export default function HomePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="final-cta">
+      <section data-surface="night" className="final-cta">
         <div className="section-container">
           <h2 className="final-headline">{t('landing.finalHeadline')}</h2>
           <p className="final-subline">
