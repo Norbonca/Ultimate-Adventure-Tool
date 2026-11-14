@@ -138,7 +138,7 @@ export function VideoPlayer({ ref, tutorial, onTime, compact = false, priority =
     >
       {phase !== "video" && (
         <>
-          <Image src={posterUrl(tutorial.slug)} alt="" fill sizes="(min-width: 1024px) 820px, 100vw" className="object-cover" priority={priority} />
+          <Image src={posterUrl(tutorial.slug, locale)} alt="" fill sizes="(min-width: 1024px) 820px, 100vw" className="object-cover" priority={priority} />
         </>
       )}
 
@@ -197,7 +197,7 @@ export function VideoPlayer({ ref, tutorial, onTime, compact = false, priority =
           ref={videoRef}
           className={`absolute inset-0 h-full w-full bg-canvas object-contain ${phase === "error" ? "invisible" : ""}`}
           src={videoUrl(tutorial.slug)}
-          poster={posterUrl(tutorial.slug)}
+          poster={posterUrl(tutorial.slug, locale)}
           preload="metadata"
           playsInline
           onClick={toggle}

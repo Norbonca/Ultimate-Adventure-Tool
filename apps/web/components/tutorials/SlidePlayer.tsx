@@ -50,7 +50,7 @@ export function SlidePlayer({ tutorial, index, onIndex, compact = false, priorit
     >
       <Image
         key={index}
-        src={slideUrl(tutorial.slug, index)}
+        src={slideUrl(tutorial.slug, index, locale)}
         alt={loc(step.text, locale)}
         fill
         sizes="(min-width: 1024px) 820px, 100vw"

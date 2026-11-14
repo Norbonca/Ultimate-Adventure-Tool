@@ -136,7 +136,7 @@ export default async function TutorialsPage({ searchParams }: PageProps) {
         {featured && (
           <section className="grid gap-5 rounded-trevu-2xl border border-line bg-surface p-4 md:p-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-8" data-testid="tutorials-featured">
             <Link href={tutorialHref(featured.slug)} className="group relative block aspect-video overflow-hidden rounded-trevu-xl border border-line">
-              <Image src={posterUrl(featured.slug)} alt="" fill priority sizes="(min-width: 1024px) 720px, 100vw" className="object-cover transition-transform duration-300 group-hover:scale-[1.02]" />
+              <Image src={posterUrl(featured.slug, locale)} alt="" fill priority sizes="(min-width: 1024px) 720px, 100vw" className="object-cover transition-transform duration-300 group-hover:scale-[1.02]" />
               <span aria-hidden className="absolute left-1/2 top-1/2 inline-flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-accent text-accent-on md:h-[72px] md:w-[72px]">
                 <Icon name="play" size={28} className="translate-x-0.5" />
               </span>
