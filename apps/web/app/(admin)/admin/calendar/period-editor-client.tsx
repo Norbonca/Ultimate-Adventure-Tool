@@ -168,7 +168,7 @@ export function PeriodEditorClient(props: {
     }
   };
 
-  const inputCls = "w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-hidden focus:border-emerald-400 bg-white disabled:bg-slate-100";
+  const inputCls = "w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-hidden focus:border-trevu-600 bg-white disabled:bg-slate-100";
   const labelCls = "flex flex-col gap-1 text-xs font-medium text-slate-600";
   const section = "bg-white rounded-xl border border-slate-200 p-5 flex flex-col gap-4";
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -431,7 +431,7 @@ export function PeriodEditorClient(props: {
               {form.status === "active" ? t("admin.calendar.actions.deactivate") : t("admin.calendar.actions.activate")}
             </button>
           )}
-          <button type="submit" disabled={busy} className="px-4 py-2 text-sm bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 disabled:opacity-50 transition-colors">
+          <button type="submit" disabled={busy} className="px-4 py-2 text-sm bg-trevu-600 text-white rounded-lg hover:bg-trevu-700 disabled:opacity-50 transition-colors">
             {busy ? t("admin.calendar.actions.working") : t("admin.calendar.actions.save")}
           </button>
         </div>

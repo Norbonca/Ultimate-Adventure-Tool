@@ -172,7 +172,7 @@ export default async function AdminDashboardPage() {
           <div className="mt-6 pt-4 border-t border-slate-100 space-y-2">
             <Link
               href="/admin/users"
-              className="flex items-center gap-2 text-sm text-slate-600 hover:text-emerald-600 transition-colors"
+              className="flex items-center gap-2 text-sm text-slate-600 hover:text-trevu-700 transition-colors"
             >
               <Icon name="users" size={15} />
               <span>
@@ -181,7 +181,7 @@ export default async function AdminDashboardPage() {
             </Link>
             <Link
               href="/admin/trips"
-              className="flex items-center gap-2 text-sm text-slate-600 hover:text-emerald-600 transition-colors"
+              className="flex items-center gap-2 text-sm text-slate-600 hover:text-trevu-700 transition-colors"
             >
               <Icon name="backpack" size={15} />
               <span>

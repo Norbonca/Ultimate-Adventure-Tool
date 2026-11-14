@@ -21,7 +21,7 @@ export default async function CalendarPeriodPage({
     <div className="p-8">
       <div className="flex flex-col gap-6 max-w-5xl">
         <div>
-          <Link href="/admin/calendar" className="text-sm text-slate-500 hover:text-emerald-600">
+          <Link href="/admin/calendar" className="text-sm text-slate-500 hover:text-trevu-700">
             ← {t("admin.calendar.actions.back")}
           </Link>
           <h1 className="text-xl font-semibold text-slate-900 mt-2">

@@ -49,7 +49,7 @@ export function BanUserModal({ userName, loading, labels, onCancel, onConfirm }:
               onChange={(e) => setReason(e.target.value)}
               placeholder={labels.reasonPlaceholder}
               rows={3}
-              className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-hidden focus:border-emerald-400 resize-none"
+              className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-hidden focus:border-trevu-600 resize-none"
             />
           </div>
 

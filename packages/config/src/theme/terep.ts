@@ -177,6 +177,17 @@ export const terep: ThemeDefinition = {
     ...skala("green", SIKER),
     ...skala("amber", FIGYELMEZTETES),
     ...skala("yellow", FIGYELMEZTETES),
+    // A B palettájában nincs kék és lila: ezek a jelölőszínek a meleg semleges skálára esnek
+    // (az állapotot ikon és szöveg is jelzi); a narancs a márkaskála.
+    ...skala("blue", SEMLEGES),
+    ...skala("sky", SEMLEGES),
+    ...skala("cyan", SEMLEGES),
+    ...skala("indigo", SEMLEGES),
+    ...skala("violet", SEMLEGES),
+    ...skala("purple", SEMLEGES),
+    ...skala("pink", SEMLEGES),
+    ...skala("fuchsia", SEMLEGES),
+    ...skala("orange", NARANCS_SKALA),
     "pal-coral": HIBA["400"]!,
     "pal-coral-light": HIBA["300"]!,
     "pal-sage": SIKER["300"]!,

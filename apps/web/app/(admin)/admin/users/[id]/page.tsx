@@ -89,7 +89,7 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
     <div className="p-8 space-y-6">
       {/* Breadcrumb */}
       <nav aria-label="breadcrumb" className="flex items-center gap-1.5 text-sm">
-        <Link href="/admin/users" className="text-slate-500 hover:text-emerald-600">
+        <Link href="/admin/users" className="text-slate-500 hover:text-trevu-700">
           {t("admin.users.title")}
         </Link>
         <Icon name="chevron-right" size={14} className="text-slate-400" />
@@ -167,7 +167,7 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
             {user.trips.map((trip) => (
               <li key={trip.id} className="flex items-center justify-between gap-4 py-3 border-b border-slate-100 last:border-b-0">
                 <div className="min-w-0">
-                  <Link href={`/trips/${trip.slug}`} target="_blank" className="text-sm font-medium text-slate-900 hover:text-emerald-600 truncate block">
+                  <Link href={`/trips/${trip.slug}`} target="_blank" className="text-sm font-medium text-slate-900 hover:text-trevu-700 truncate block">
                     {trip.title}
                   </Link>
                   <p className="text-xs text-slate-500 mt-0.5">

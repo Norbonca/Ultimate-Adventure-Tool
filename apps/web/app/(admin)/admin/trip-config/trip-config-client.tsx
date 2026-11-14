@@ -418,9 +418,9 @@ export function TripConfigClient({
   );
 
   const inputCls =
-    "w-full text-sm border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-emerald-400 bg-slate-50";
+    "w-full text-sm border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-trevu-600 bg-slate-50";
   const selectCls =
-    "w-full text-sm border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-emerald-400 bg-slate-50";
+    "w-full text-sm border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-trevu-600 bg-slate-50";
 
   // ─── Render ────────────────────────────────────────────────────────────────
 
@@ -451,7 +451,7 @@ export function TripConfigClient({
             onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-2 text-sm font-medium transition-colors relative ${
               activeTab === tab.key
-                ? "text-emerald-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-emerald-500"
+                ? "text-trevu-700 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-trevu-600"
                 : "text-slate-500 hover:text-slate-700"
             }`}
           >
@@ -565,7 +565,7 @@ export function TripConfigClient({
                             <button
                               onClick={() => saveCat(cat)}
                               disabled={loading === cat.id}
-                              className="px-2.5 py-1 text-xs bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 disabled:opacity-50 transition-colors"
+                              className="px-2.5 py-1 text-xs bg-trevu-600 text-white rounded-lg hover:bg-trevu-700 disabled:opacity-50 transition-colors"
                             >
                               {t.t_cat_saveCategory}
                             </button>
@@ -609,7 +609,7 @@ export function TripConfigClient({
                         <td className="px-3 py-2.5">
                           <button
                             onClick={() => startEditCat(cat)}
-                            className="px-2.5 py-1 text-xs border border-slate-200 text-slate-600 rounded-lg hover:border-emerald-400 hover:text-emerald-600 transition-colors"
+                            className="px-2.5 py-1 text-xs border border-slate-200 text-slate-600 rounded-lg hover:border-trevu-600 hover:text-trevu-700 transition-colors"
                           >
                             {t.t_cat_editCategory}
                           </button>
@@ -635,7 +635,7 @@ export function TripConfigClient({
                 setSelectedCatForSd(e.target.value);
                 setShowSdForm(false);
               }}
-              className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-hidden focus:border-emerald-400 bg-white"
+              className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-hidden focus:border-trevu-600 bg-white"
             >
               <option value="">{t.t_sd_selectPrompt}</option>
               {initialCategories.map((c) => (
@@ -647,7 +647,7 @@ export function TripConfigClient({
             {selectedCatForSd && (
               <button
                 onClick={openAddSd}
-                className="px-3 py-2 text-sm bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors whitespace-nowrap"
+                className="px-3 py-2 text-sm bg-trevu-600 text-white rounded-lg hover:bg-trevu-700 transition-colors whitespace-nowrap"
               >
                 + {t.t_sd_addSubDiscipline}
               </button>
@@ -720,7 +720,7 @@ export function TripConfigClient({
                 <button
                   onClick={saveSd}
                   disabled={loading === "sd-save"}
-                  className="px-3 py-1.5 text-sm bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 disabled:opacity-50"
+                  className="px-3 py-1.5 text-sm bg-trevu-600 text-white rounded-lg hover:bg-trevu-700 disabled:opacity-50"
                 >
                   {t.t_sd_saveSubDiscipline}
                 </button>
@@ -771,7 +771,7 @@ export function TripConfigClient({
                           <div className="flex gap-1 justify-end">
                             <button
                               onClick={() => openEditSd(sd)}
-                              className="px-2.5 py-1 text-xs border border-slate-200 text-slate-600 rounded-lg hover:border-emerald-400 hover:text-emerald-600 transition-colors"
+                              className="px-2.5 py-1 text-xs border border-slate-200 text-slate-600 rounded-lg hover:border-trevu-600 hover:text-trevu-700 transition-colors"
                             >
                               {t.t_sd_editSubDiscipline}
                             </button>
@@ -805,7 +805,7 @@ export function TripConfigClient({
                 setSelectedCatForP(e.target.value);
                 setShowPForm(false);
               }}
-              className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-hidden focus:border-emerald-400 bg-white"
+              className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-hidden focus:border-trevu-600 bg-white"
             >
               <option value="">{t.t_p_selectPrompt}</option>
               {initialCategories.map((c) => (
@@ -817,7 +817,7 @@ export function TripConfigClient({
             {selectedCatForP && (
               <button
                 onClick={openAddP}
-                className="px-3 py-2 text-sm bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors whitespace-nowrap"
+                className="px-3 py-2 text-sm bg-trevu-600 text-white rounded-lg hover:bg-trevu-700 transition-colors whitespace-nowrap"
               >
                 + {t.t_p_addParameter}
               </button>
@@ -950,7 +950,7 @@ export function TripConfigClient({
                 <button
                   onClick={saveP}
                   disabled={loading === "p-save"}
-                  className="px-3 py-1.5 text-sm bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 disabled:opacity-50"
+                  className="px-3 py-1.5 text-sm bg-trevu-600 text-white rounded-lg hover:bg-trevu-700 disabled:opacity-50"
                 >
                   {t.t_p_saveParameter}
                 </button>
@@ -966,7 +966,7 @@ export function TripConfigClient({
                     {editingPId && (
                       <button
                         onClick={openAddOpt}
-                        className="px-2.5 py-1 text-xs bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+                        className="px-2.5 py-1 text-xs bg-trevu-600 text-white rounded-lg hover:bg-trevu-700 transition-colors"
                       >
                         + {t.t_p_optionsAddOption}
                       </button>
@@ -1053,7 +1053,7 @@ export function TripConfigClient({
                               <button
                                 onClick={saveOpt}
                                 disabled={loading === "opt-save"}
-                                className="px-2.5 py-1 text-xs bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 disabled:opacity-50"
+                                className="px-2.5 py-1 text-xs bg-trevu-600 text-white rounded-lg hover:bg-trevu-700 disabled:opacity-50"
                               >
                                 {t.t_p_optionsSave}
                               </button>
@@ -1111,7 +1111,7 @@ export function TripConfigClient({
                                     <div className="flex gap-1 justify-end">
                                       <button
                                         onClick={() => openEditOpt(opt)}
-                                        className="px-1.5 py-0.5 text-[10px] border border-slate-200 text-slate-600 rounded-sm hover:border-emerald-400 hover:text-emerald-600 transition-colors"
+                                        className="px-1.5 py-0.5 text-[10px] border border-slate-200 text-slate-600 rounded-sm hover:border-trevu-600 hover:text-trevu-700 transition-colors"
                                       >
                                         {t.t_p_editParameter}
                                       </button>
@@ -1203,7 +1203,7 @@ export function TripConfigClient({
                           <div className="flex gap-1 justify-end">
                             <button
                               onClick={() => openEditP(p)}
-                              className="px-2.5 py-1 text-xs border border-slate-200 text-slate-600 rounded-lg hover:border-emerald-400 hover:text-emerald-600 transition-colors"
+                              className="px-2.5 py-1 text-xs border border-slate-200 text-slate-600 rounded-lg hover:border-trevu-600 hover:text-trevu-700 transition-colors"
                             >
                               {t.t_p_editParameter}
                             </button>

@@ -138,7 +138,7 @@ export function AdminTripsClient({
             onClick={() => applyFilter("status", tab.key)}
             className={`px-4 py-2 text-sm font-medium transition-colors relative ${
               activeTab === tab.key
-                ? "text-emerald-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-emerald-500"
+                ? "text-trevu-700 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-trevu-600"
                 : "text-slate-500 hover:text-slate-700"
             }`}
           >
@@ -161,11 +161,11 @@ export function AdminTripsClient({
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t.t_search_placeholder}
             aria-label={t.t_search_placeholder}
-            className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-hidden focus:border-emerald-400 bg-slate-50"
+            className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-hidden focus:border-trevu-600 bg-slate-50"
           />
           <button
             type="submit"
-            className="px-3 py-1.5 bg-emerald-500 text-white text-sm rounded-lg hover:bg-emerald-600 transition-colors"
+            className="px-3 py-1.5 bg-trevu-600 text-white text-sm rounded-lg hover:bg-trevu-700 transition-colors"
             aria-label={t.t_search_button}
           >
             <Icon name="search" size={16} />
@@ -253,7 +253,7 @@ export function AdminTripsClient({
                       <Link
                         href={`/trips/${trip.slug}`}
                         target="_blank"
-                        className="px-2.5 py-1 text-xs border border-slate-200 rounded-lg text-slate-600 hover:border-emerald-400 hover:text-emerald-600 transition-colors"
+                        className="px-2.5 py-1 text-xs border border-slate-200 rounded-lg text-slate-600 hover:border-trevu-600 hover:text-trevu-700 transition-colors"
                       >
                         {t.t_view_trip}
                       </Link>
@@ -261,7 +261,7 @@ export function AdminTripsClient({
                         <button
                           onClick={() => handleStatusChange(trip.id, "published")}
                           disabled={actionLoading === trip.id}
-                          className="px-2.5 py-1 text-xs bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors disabled:opacity-50"
+                          className="px-2.5 py-1 text-xs bg-trevu-600 text-white rounded-lg hover:bg-trevu-700 transition-colors disabled:opacity-50"
                         >
                           {t.t_approve}
                         </button>
@@ -298,7 +298,7 @@ export function AdminTripsClient({
                   href={`/admin/trips?page=${p}&status=${activeTab}`}
                   className={`w-7 h-7 flex items-center justify-center rounded text-xs ${
                     p === page
-                      ? "bg-emerald-500 text-white"
+                      ? "bg-trevu-600 text-white"
                       : "text-slate-500 hover:bg-slate-100"
                   }`}
                 >
