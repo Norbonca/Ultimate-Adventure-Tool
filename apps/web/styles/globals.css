@@ -14,6 +14,14 @@
   }
 }
 
+/* Futásidőben a [data-surface] scope ugyanezt a változónevet írja felül — ezért nem `inline`. */
+@theme {
+  --color-surface: #ffffff; /* futásidőben a :root / [data-surface] scope adja */
+  --color-ghost: #f1f5f9; /* futásidőben a :root / [data-surface] scope adja */
+  --color-glass: rgba(255, 255, 255, 0.85); /* futásidőben a :root / [data-surface] scope adja */
+  --color-scrim: rgba(15, 23, 42, 0.65); /* futásidőben a :root / [data-surface] scope adja */
+}
+
 @theme inline {
   --color-trevu-50: var(--pal-trevu-50, #f0fdfa);
   --color-trevu-100: var(--pal-trevu-100, #ccfbf1);
@@ -57,14 +65,10 @@
   --color-cat-expedition: #8b5cf6;
   --color-cat-motorsport: #b91c1c;
 
-  --color-surface: #ffffff; /* futásidőben a :root / [data-surface] scope adja */
 
 
 
 
-  --color-ghost: #f1f5f9; /* futásidőben a :root / [data-surface] scope adja */
-  --color-glass: rgba(255, 255, 255, 0.85); /* futásidőben a :root / [data-surface] scope adja */
-  --color-scrim: rgba(15, 23, 42, 0.65); /* futásidőben a :root / [data-surface] scope adja */
 
 
   --color-brand-50: var(--pal-brand-50, #f0fdfa);
