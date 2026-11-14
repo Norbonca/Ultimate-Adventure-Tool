@@ -212,6 +212,10 @@ importers:
         version: '@typescript/typescript6@6.0.2'
 
   packages/i18n:
+    dependencies:
+      '@uat/config':
+        specifier: workspace:*
+        version: link:../config
     devDependencies:
       '@typescript/native':
         specifier: npm:typescript@^7.0.2

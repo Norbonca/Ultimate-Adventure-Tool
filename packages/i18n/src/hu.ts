@@ -1,5 +1,5 @@
 /**
- * Magyar (hu) fordítások — Trevu
+ * Magyar (hu) fordítások
  *
  * Struktúra: modul/oldal > szekció > kulcs
  * Konvenció: camelCase kulcsok, nincs HTML a szövegekben
@@ -11,8 +11,8 @@ const hu = {
   common: {
     you: "te",
     retry: "Újrapróbálás",
-    appName: "Trevu",
-    appTagline: "Trek beyond ordinary",
+    appName: "{brand}",
+    appTagline: "{tagline}",
     loading: "Betöltés...",
     back: "Vissza",
     save: "Mentés",
@@ -120,14 +120,14 @@ const hu = {
     },
     login: "Bejelentkezés",
     loginTitle: "Bejelentkezés",
-    loginSubtitle: "Üdvözlünk a Trevu-ban",
+    loginSubtitle: "Üdvözlünk a {brand}-ban",
     loginLoading: "Bejelentkezés...",
     loginWithGoogle: "Bejelentkezés Google-lel",
     loginWithGoogleLoading: "Bejelentkezés...",
 
     register: "Regisztráció",
     registerTitle: "Regisztráció",
-    registerSubtitle: "Csatlakozz a Trevu közösségéhez",
+    registerSubtitle: "Csatlakozz a {brand} közösségéhez",
     registerLoading: "Regisztráció...",
     registerWithGoogle: "Regisztráció Google-lel",
     registerWithGoogleLoading: "Regisztráció...",
@@ -205,7 +205,7 @@ const hu = {
     discover: "Túrák felfedezése",
     discoverTrips: "Túrák felfedezése",
     pricing: "Árazás",
-    getStarted: "Mi a Trevu?",
+    getStarted: "Mi a {brand}?",
     tutorials: "Útmutatók",
     logIn: "Bejelentkezés",
     signUp: "Regisztráció",
@@ -246,7 +246,7 @@ const hu = {
     featureImageAltPlanning: "Okos túratervezés",
     featureImageAltExpenses: "Költségmegosztás",
     featureImageAltOffline: "Offline térképek",
-    heroTitle: "Trevu",
+    heroTitle: "{brand}",
     heroSubtitle: "Tervezd meg a tökéletes kalandot. Szervezz túrákat, oszd meg a költségeket, és találj helyi túravezetőket.",
     ctaRegister: "Regisztráció",
     ctaLogin: "Bejelentkezés",
@@ -255,7 +255,7 @@ const hu = {
 
     // Hero
     heroBadge: "Kalandtúrák szervezése és felfedezése",
-    heroHeadline: "Trek beyond ordinary",
+    heroHeadline: "{tagline}",
     heroSubheadline: "Meghirdetés, jelentkezők, teendők és közös költségek – egy felületen. Kis csoportos kalandtúrák szervezőinek és résztvevőinek.",
     heroCta: "Tervezz ingyen →",
     heroCtaSecondary: "Túrák böngészése",
@@ -268,7 +268,7 @@ const hu = {
     // Problem section
     problemTag: "A KIHÍVÁS",
     problemHeadline: "A túra legyen a kihívás, a szervezés legyen egyszerű.",
-    problemDescription: "Jelentkezők egy táblázatban, költségek egy másikban, teendők üzenetekben szétszórva. A Trevu mindezt egy helyre hozza, hogy a túrára figyelhess.",
+    problemDescription: "Jelentkezők egy táblázatban, költségek egy másikban, teendők üzenetekben szétszórva. A {brand} mindezt egy helyre hozza, hogy a túrára figyelhess.",
     problemCard1Title: "Tervezd meg a kalandod",
     problemCard1Text: "Válassz 8 kalandkategóriából, és a varázsló négy lépésben végigvezet: kategória, alapadatok, részletek, közzététel.",
     problemCard2Title: "Menjetek együtt, osszatok igazságosan",
@@ -290,7 +290,7 @@ const hu = {
     // Categories section
     categoriesTag: "8 KALANDKATEGÓRIA",
     categoriesHeadline: "Egy platform. Minden kaland.",
-    categoriesDescription: "Legyen szó csúcsmászásról, hullámlovaglásról vagy völgyi kerékpározásról — a trevu a sportod nyelvét beszéli.",
+    categoriesDescription: "Legyen szó csúcsmászásról, hullámlovaglásról vagy völgyi kerékpározásról — a {brand} a sportod nyelvét beszéli.",
     categoryHikingLabel: "Távolság, szintkülönbség, terep nehézsége",
     categoryMountainLabel: "Technikai fokozatok, via ferrata, felszereléslista",
     categoryWaterLabel: "Vitorlázás, kajakozás, szörfözés, kite",
@@ -344,7 +344,7 @@ const hu = {
     footerPrivacy: "Adatvédelmi irányelvek",
     footerTerms: "Felhasználási feltételek",
     footerCookies: "Cookie szabályzat",
-    footerCopyright: "© 2026 Trevu. Minden jog fenntartva.",
+    footerCopyright: "© 2026 {brand}. Minden jog fenntartva.",
   },
 
   // ============================================================================
@@ -896,7 +896,7 @@ const hu = {
       notPublicHint: "A túra még nem nyilvános: a link csak a jogosultaknak nyílik meg.",
       more: "Továbbiak",
       openIn: "Megosztás: {platform} (új lapon nyílik)",
-      message: "{title} — nézd meg a Trevu-n!",
+      message: "{title} — nézd meg a {brand}-n!",
       emailSubject: "Túraajánló: {title}",
       platform: {
         facebook: "Facebook",
@@ -909,7 +909,7 @@ const hu = {
         free: "Ingyenes",
         perPerson: "/ fő",
         days: "{count} nap",
-        alt: "{title} — túra a Trevu-n",
+        alt: "{title} — túra a {brand}-n",
       },
     },
 
@@ -1036,7 +1036,7 @@ const hu = {
       inviteSentNewTitle: "Meghívó email elküldve",
       inviteSentNewDesc: "{email} — a felhasználó a regisztráció után automatikusan szervezőként csatlakozik a túrához.",
       inviteAddedExistingTitle: "Felhasználó hozzáadva a csapathoz",
-      inviteAddedExistingDesc: "{name} már regisztrált a Trevu-n. A megadott pozícióval rögtön bekerült a szervezői csapatba.",
+      inviteAddedExistingDesc: "{name} már regisztrált a {brand}-n. A megadott pozícióval rögtön bekerült a szervezői csapatba.",
       inviteAnother: "Új meghívás",
       assignWillAppear: "A személy azonnal résztvevőként megjelenik.",
       applicationsLoading: "Jelentkezések betöltése…",
@@ -1454,19 +1454,19 @@ const hu = {
   // Metadata & SEO
   // ============================================================================
   metadata: {
-    title: "Trevu — Trek beyond ordinary",
+    title: "{brand} — {tagline}",
     description: "Tervezd meg a tökéletes kalandot — túrák szervezése, költségmegosztás, helyi túravezetők",
     keywords: "kaland, túra, utazás, költségmegosztás, túravezető, trekking, outdoor",
     siteTagline: "Kalandtúrák szervezése és felfedezése",
     siteDescription: "Meghirdetés, jelentkezők, teendők és közös költségek – egy felületen. Kis csoportos kalandtúrák szervezőinek és résztvevőinek.",
-    tripFallbackDescription: "Fedezd fel ezt a kalandot a Trevu-n.",
+    tripFallbackDescription: "Fedezd fel ezt a kalandot a {brand}-n.",
     pages: {
       discover: { title: "Túrák felfedezése", description: "Kis csoportos kalandtúrák 8 kategóriában: keress hely, idő és túratípus szerint, csempe-, lista- vagy 3D-térképnézetben, és jelentkezz a választott időpontra." },
-      community: { title: "Közösség", description: "Kalandorok és szervezők a Trevun: kövesd őket, és fedezd fel a túráikat." },
+      community: { title: "Közösség", description: "Kalandorok és szervezők a {brand}-n: kövesd őket, és fedezd fel a túráikat." },
       ideas: { title: "Ötletbörze", description: "Túraötletek, amelyekhez csatlakozhatsz, vagy amelyeket megszervezhetsz: célterület, időablak és az érdeklődők száma egy helyen." },
-      idea: { title: "Ötletbörze", description: "Túraötlet a Trevu Ötletbörzéjén — csatlakozz, vagy szervezd meg." },
-      getStarted: { title: "Mi a Trevu?", description: "Meghirdetés, jelentkezők, teendők és közös költségek – egy felületen. Ismerd meg, hogyan szervezhetsz kis csoportos kalandtúrákat a Trevuval." },
-      pricing: { title: "Árazás", description: "Személyes használatra ingyenes. Előfizetést az fizet, aki üzletszerűen szervez; költségmegosztó túrákhoz a Trevu ingyenes." },
+      idea: { title: "Ötletbörze", description: "Túraötlet a {brand} Ötletbörzéjén — csatlakozz, vagy szervezd meg." },
+      getStarted: { title: "Mi a {brand}?", description: "Meghirdetés, jelentkezők, teendők és közös költségek – egy felületen. Ismerd meg, hogyan szervezhetsz kis csoportos kalandtúrákat a {brand}-val." },
+      pricing: { title: "Árazás", description: "Személyes használatra ingyenes. Előfizetést az fizet, aki üzletszerűen szervez; költségmegosztó túrákhoz a {brand} ingyenes." },
     },
   },
 
@@ -1765,7 +1765,7 @@ const hu = {
     },
     // Fejléc
     header: {
-      title: "Trevu Admin",
+      title: "{brand} Admin",
       lastUpdated: "Utolsó frissítés",
       superAdmin: "Super Admin",
       openMenu: "Menü megnyitása",
@@ -1779,7 +1779,7 @@ const hu = {
       demoRegistrationConfirmed: "Regisztráció megerősítve",
       minutesAgo: "{count} perce",
       title: "Irányítópult",
-      subtitle: "Üdvözlünk! Íme, mi történik a Trevu-ban.",
+      subtitle: "Üdvözlünk! Íme, mi történik a {brand}-ban.",
       totalUsers: "Összes felhasználó",
       newSignups: "Új regisztráció",
       activeTrips: "Aktív túrák",
@@ -2887,8 +2887,8 @@ const hu = {
   // M211 — Útmutatók (D21)
   // ============================================================================
   presentation: {
-    metaTitle: "A Trevu szervezőknek — bemutató",
-    metaDescription: "Meghirdetés, jelentkezők, teendők és közös költségek egy felületen: a Trevu bemutatója kalandtúra-szervezőknek.",
+    metaTitle: "A {brand} szervezőknek — bemutató",
+    metaDescription: "Meghirdetés, jelentkezők, teendők és közös költségek egy felületen: a {brand} bemutatója kalandtúra-szervezőknek.",
     label: "szervezőknek",
     counter: "{n} / {total}",
     controls: "A bemutató vezérlése",
@@ -2903,7 +2903,7 @@ const hu = {
     promoEyebrow: "Szervezőknek",
     promoCta: "Nézd meg a bemutatót",
     promoMeta: "{count} dia · kb. {minutes} perc",
-    videoLabel: "A Trevu bemutatója szervezőknek — videó",
+    videoLabel: "A {brand} bemutatója szervezőknek — videó",
   },
   tutorials: {
     groups: {
@@ -2928,9 +2928,9 @@ const hu = {
       tasks: "Teendők",
     },
     metaTitle: "Útmutatók",
-    metaDescription: "Lépésenkénti képes bemutatók és leírások a Trevu használatáról.",
+    metaDescription: "Lépésenkénti képes bemutatók és leírások a {brand} használatáról.",
     eyebrow: "Útmutatók",
-    title: "Így használd a Trevut",
+    title: "Így használd a {brand}-t",
     lead: "Lépésenkénti képes bemutatók és leírások — egy-egy funkcióhoz, pár perc alatt.",
     searchPlaceholder: "Mit szeretnél megcsinálni?",
     search: "Keresés",

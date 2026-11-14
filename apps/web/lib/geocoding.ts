@@ -21,6 +21,7 @@
  * "not found") are cached, and the wizard asks only for a committed location,
  * not per keystroke (step2-basics.tsx).
  */
+import { BRAND } from "@uat/config";
 
 /** Provenance written to `trips.location_geocode_source` (migration 034 CHECK). */
 export type GeocodeSource = 'nominatim' | 'country_centroid' | 'manual';
@@ -49,7 +50,7 @@ export interface GeocodeProvider {
 // ── Nominatim ──────────────────────────────────────────────────────────────
 
 const NOMINATIM_ENDPOINT = 'https://nominatim.openstreetmap.org/search';
-const USER_AGENT = 'Trevu/1.0 (+https://www.ttvk.hu)';
+const USER_AGENT = `${BRAND.name}/1.0 (+${BRAND.siteUrl})`;
 const REQUEST_TIMEOUT_MS = 6000;
 const MIN_INTERVAL_MS = 1100; // Nominatim: max 1 request/second.
 

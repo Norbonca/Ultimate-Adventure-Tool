@@ -12,6 +12,7 @@
  * A lépések `at` értéke (mp) a videó időbélyege: a lépés felirata eddig a pillanattól a
  * következő lépésig látszik, és a lépésre kattintva ide ugrik a lejátszás.
  */
+import { BRAND } from "@uat/config";
 
 export type TutorialLocale = "hu" | "en";
 export type Localized = Record<TutorialLocale, string>;
@@ -293,11 +294,11 @@ export const TUTORIALS: Tutorial[] = [
     },
     body: {
       hu: [
-        "A Felfedezés a Trevu nyitóoldala. A keresőbe írhatsz túranevet, helyet vagy országot, a szűrőkkel pedig szűkítheted a találatokat kategóriára, időpontra és árra.",
+        `A Felfedezés a ${BRAND.name} nyitóoldala. A keresőbe írhatsz túranevet, helyet vagy országot, a szűrőkkel pedig szűkítheted a találatokat kategóriára, időpontra és árra.`,
         "A találatokat csempékben, listában vagy a 3D térképen nézheted. A több időpontos túrák egy kártyán jelennek meg, az időpontokkal együtt.",
       ],
       en: [
-        "Discover is Trevu’s home page. Type a trip name, place or country into the search, and narrow the results with filters for category, dates and price.",
+        `Discover is ${BRAND.name}’s home page. Type a trip name, place or country into the search, and narrow the results with filters for category, dates and price.`,
         "View the results as tiles, a list or on the 3D map. Trips with several dates show on one card, together with the dates.",
       ],
     },
@@ -667,11 +668,11 @@ export const TUTORIALS: Tutorial[] = [
     },
     body: {
       hu: [
-        "A Beállítások Érdeklődés oldalán kiválasztod, milyen kalandok érdekelnek. Ebből tudja a Trevu, milyen ötleteket és túrákat mutasson neked.",
+        `A Beállítások Érdeklődés oldalán kiválasztod, milyen kalandok érdekelnek. Ebből tudja a ${BRAND.name}, milyen ötleteket és túrákat mutasson neked.`,
         "A Készségek oldalon kategóriánként megadod a tapasztalatodat. A szervező ebből látja, illik-e hozzád a túra.",
       ],
       en: [
-        "On the Interests page of Settings you choose which adventures interest you. Trevu uses this to show you matching ideas and trips.",
+        `On the Interests page of Settings you choose which adventures interest you. ${BRAND.name} uses this to show you matching ideas and trips.`,
         "On the Skills page you set your experience per category, so organizers can see whether a trip suits you.",
       ],
     },

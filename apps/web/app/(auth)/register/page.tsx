@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { BRAND } from "@uat/config";
+import { BrandHead, BrandWordmark } from "@/components/brand/BrandMark";
 import { BrandIcon } from "@/lib/brand-icons";
 import { createClient } from "@/lib/supabase/client";
 import { authErrorKey } from "@/lib/auth-error";
@@ -93,7 +95,10 @@ export default function RegisterPage() {
       {/* Left: Brand Panel */}
       <div className="hidden lg:flex flex-col justify-between w-[560px] shrink-0 bg-linear-to-b from-slate-900 to-trevu-900 p-12 text-white">
         <div>
-          <Link href="/" className="text-2xl font-extrabold tracking-tight text-trevu-400 hover:text-trevu-300 transition-colors">trevu</Link>
+          <Link href="/" className="inline-flex items-center gap-3 text-trevu-400 hover:text-trevu-300 transition-colors" aria-label={BRAND.name}>
+            <BrandHead height={36} />
+            <BrandWordmark height={28} decorative />
+          </Link>
         </div>
 
         <div className="space-y-4">

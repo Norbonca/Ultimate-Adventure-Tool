@@ -1,5 +1,7 @@
 "use client";
 
+import { BRAND } from "@uat/config";
+import { BrandHead, BrandWordmark } from "@/components/brand/BrandMark";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -121,25 +123,24 @@ export function AppHeader({ user }: AppHeaderProps) {
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200 night:bg-glass night:border-line">
       <div className="max-w-7xl mx-auto h-14 px-4 flex items-center">
-        {/* ── BAL ZÓNA: Logo dropdown + Trevu home link ── */}
+        {/* ── BAL ZÓNA: márkajel (menügomb) + szójel (home link) ── */}
         <div className="flex items-center gap-1 shrink-0 relative" ref={menuRef}>
           {/* Logo icon = dropdown trigger */}
           <button
             onClick={() => setMenuOpen((v) => !v)}
-            className="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center hover:bg-teal-700 transition-colors night:bg-accent night:hover:bg-accent-hover"
+            className="h-9 pl-1.5 pr-1 bg-teal-600 rounded-lg flex items-center justify-center gap-0.5 text-white hover:bg-teal-700 transition-colors night:bg-accent night:hover:bg-accent-hover night:text-accent-on"
             aria-label={t('nav.menuLabel')}
             aria-expanded={menuOpen}
           >
-            <span className="text-white font-bold text-sm night:text-accent-on">T</span>
+            <BrandHead height={22} />
             <ChevronDown
               className={`w-3 h-3 text-teal-200 night:text-accent-on ml-0.5 transition-transform ${menuOpen ? "rotate-180" : ""}`}
             />
           </button>
 
-          {/* Trevu text = home link */}
-          <Link href="/" className="font-bold text-base ml-1">
-            <span className="text-teal-600 night:text-accent">Tre</span>
-            <span className="text-slate-900 night:text-ink">vu</span>
+          {/* Szójel = home link (a név a márkakonfigurációból: aria-label) */}
+          <Link href="/" className="ml-2 text-slate-900 night:text-ink" aria-label={BRAND.name}>
+            <BrandWordmark height={20} decorative />
           </Link>
 
           {/* Dropdown menu */}
@@ -165,7 +166,7 @@ export function AppHeader({ user }: AppHeaderProps) {
 
         {/* ── KÖZÉP ZÓNA: egységes fő navigáció (Norbert 2026-11-02: „mindkettő legyen felül, és legyen
             egyértelmű, mi az a funkció”). Design: D02/D09 `Component/Header` — kijelentkezve
-            Túrák felfedezése · Mi a Trevu? · Árazás · Közösség; belépve Túrák felfedezése · Mi a Trevu? ·
+            Túrák felfedezése · Mi a {brand}? · Árazás · Közösség; belépve Túrák felfedezése · Mi a {brand}? ·
             Túratervező · Közösség · Útmutatók. Az `anchors` prop már nem befolyásolja a középső zónát. */}
         <nav className="hidden lg:flex items-center gap-1 mx-auto" data-testid="header-nav">
           {(authChecked && isLoggedIn ? INTERNAL_NAV : PUBLIC_NAV).map((item, i) => {

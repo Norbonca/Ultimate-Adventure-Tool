@@ -3,6 +3,7 @@
  * szövege. A magyar szöveg a jóváhagyott változat — nem módosítható; mellette az angol fordítás.
  * Design: design/D09_Search_Discover.pen „M211b — Bemutató lejátszó” (1440 / 390).
  */
+import { BRAND } from "@uat/config";
 
 export type Lang = "hu" | "en";
 export type L = Record<Lang, string>;
@@ -66,7 +67,7 @@ export const SLIDES: Slide[] = [
     id: "cover",
     kind: "cover",
     tone: "dark",
-    eyebrow: l("trevu", "trevu"),
+    eyebrow: l(BRAND.name, BRAND.name),
     title: l("A kalandtúrád szervezése egy helyen", "Organize your adventure trip in one place"),
     lead: l(
       "Meghirdetés, jelentkezők, teendők és közös költségek – egy felületen.",
@@ -79,7 +80,7 @@ export const SLIDES: Slide[] = [
     kind: "cards",
     tone: "dark",
     columns: 5,
-    eyebrow: l("Mi a Trevu a szervezőnek?", "What is Trevu for organizers?"),
+    eyebrow: l(`Mi a ${BRAND.name} a szervezőnek?`, `What is ${BRAND.name} for organizers?`),
     title: l("Egy felület a meghirdetéstől az elszámolásig", "One platform from listing to settling up"),
     cards: [
       { n: "1", img: img("04-varazslo.jpg"), title: l("Meghirdetés", "Listing"), text: l("Varázsló, több időpont, a helyszín ideje", "Wizard, multiple dates, local time at the destination") },
@@ -375,11 +376,11 @@ export const SLIDES: Slide[] = [
     eyebrow: l("Fejlesztési terv", "Roadmap"),
     title: l("Ami még jön", "What's coming next"),
     cards: [
-      { title: l("Online fizetés és előleg", "Online payment and deposits"), text: l("A résztvevő a Trevun fizet; előleg és részletfizetés", "Participants pay on Trevu; deposits and instalments") },
+      { title: l("Online fizetés és előleg", "Online payment and deposits"), text: l(`A résztvevő a ${BRAND.name}-n fizet; előleg és részletfizetés`, `Participants pay on ${BRAND.name}; deposits and instalments`) },
       { title: l("Túragaléria", "Trip gallery"), text: l("Hivatalos képek tőled, közös album a résztvevőktől", "Official photos from you, a shared album from participants") },
       { title: l("Értékelések", "Reviews"), text: l("Vélemények a túráról és a szervezőről", "Reviews of the trip and the organizer") },
       { title: l("Rugalmas dátum", "Flexible dates"), text: l("„2027. január–március, 8 nap”: a pontos dátumot az érdeklődés után rögzíted", "“January–March 2027, 8 days”: you fix the exact dates once interest is in") },
-      { title: l("Saját arculatú oldal", "Your own branded page"), text: l("A te színeid és logód, a Trevu oldalszerkezetén", "Your colours and logo on Trevu's page structure") },
+      { title: l("Saját arculatú oldal", "Your own branded page"), text: l(`A te színeid és logód, a ${BRAND.name} oldalszerkezetén`, `Your colours and logo on ${BRAND.name}'s page structure`) },
       { title: l("Értesítések", "Notifications"), text: l("E-mail és jelzés a felületen", "Email and in-app alerts") },
     ],
   },

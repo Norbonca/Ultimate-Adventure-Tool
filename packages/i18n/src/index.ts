@@ -9,8 +9,9 @@
  *   setLocale('en');              → switches to English
  */
 
-import hu, { type TranslationKeys } from './hu';
-import en from './en';
+import { BRAND } from '@uat/config';
+import huRaw, { type TranslationKeys } from './hu';
+import enRaw from './en';
 
 // ============================================================================
 // Types
@@ -18,6 +19,24 @@ import en from './en';
 
 export type Locale = 'hu' | 'en';
 export type { TranslationKeys };
+
+/**
+ * A márkanév és a márkamondat nincs beégetve a nyelvi fájlokba: a `{brand}` és a `{tagline}`
+ * helyőrzőt itt, egyszer cseréljük a márkakonfigurációból (`@uat/config` → BRAND), így minden
+ * hozzáférési út (t, createT, getTranslations, getSection) a kész szöveget kapja.
+ */
+function withBrand<T>(node: T, locale: Locale): T {
+  if (typeof node === 'string') {
+    return node.replace(/\{brand\}/g, BRAND.name).replace(/\{tagline\}/g, BRAND.tagline[locale]) as T;
+  }
+  if (node && typeof node === 'object') {
+    return Object.fromEntries(Object.entries(node).map(([k, v]) => [k, withBrand(v, locale)])) as T;
+  }
+  return node;
+}
+
+const hu: TranslationKeys = withBrand(huRaw as TranslationKeys, 'hu');
+const en: TranslationKeys = withBrand(enRaw, 'en');
 
 /** All available translations */
 const translations: Record<Locale, TranslationKeys> = { hu, en };

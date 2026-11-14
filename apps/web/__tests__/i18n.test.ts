@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { t, setLocale, getLocale, SUPPORTED_LOCALES, DEFAULT_LOCALE } from "@uat/i18n";
+import { t, setLocale, getLocale, getTranslations, SUPPORTED_LOCALES, DEFAULT_LOCALE } from "@uat/i18n";
+import { BRAND } from "@uat/config";
 
 describe("i18n system", () => {
   beforeEach(() => {
@@ -51,7 +52,16 @@ describe("i18n system", () => {
     it("handles nested keys", () => {
       setLocale("hu");
       const result = t("common.appName");
-      expect(result).toBe("Trevu");
+      expect(result).toBe(BRAND.name);
+    });
+
+    it("a márkanév és a márkamondat a konfigurációból jön, helyőrző nem marad", () => {
+      setLocale("en");
+      expect(t("common.appTagline")).toBe(BRAND.tagline.en);
+      setLocale("hu");
+      expect(t("nav.getStarted")).toBe(`Mi a ${BRAND.name}?`);
+      expect(JSON.stringify(getTranslations("hu"))).not.toMatch(/\{brand\}|\{tagline\}/);
+      expect(JSON.stringify(getTranslations("en"))).not.toMatch(/\{brand\}|\{tagline\}/);
     });
   });
 
