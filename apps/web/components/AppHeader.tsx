@@ -139,8 +139,8 @@ export function AppHeader({ user }: AppHeaderProps) {
           </button>
 
           {/* Szójel = home link (a név a márkakonfigurációból: aria-label) */}
-          <Link href="/" className="ml-2 text-slate-900 night:text-ink" aria-label={BRAND.name}>
-            <BrandWordmark height={20} decorative />
+          <Link href="/" className="ml-1.5 text-slate-900 night:text-ink sm:ml-2" aria-label={BRAND.name}>
+            <BrandWordmark height={20} decorative className="h-4 w-auto sm:h-5" />
           </Link>
 
           {/* Dropdown menu */}
@@ -193,7 +193,8 @@ export function AppHeader({ user }: AppHeaderProps) {
         </nav>
 
         {/* ── JOBB ZÓNA: Nyelv + User ── */}
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex min-w-0 items-center gap-2 sm:gap-3">
+          {/* 390 px-en a magyar „Bejelentkezés · Regisztráció” is elfér: tömör nyelvváltó, kisebb rések */}
           <LanguageSwitcher />
 
           {authChecked && isLoggedIn && (
@@ -220,13 +221,13 @@ export function AppHeader({ user }: AppHeaderProps) {
             <>
               <Link
                 href="/login"
-                className="text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors night:text-ink-body night:hover:text-ink"
+                className="whitespace-nowrap text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors night:text-ink-body night:hover:text-ink"
               >
                 {t("nav.logIn")}
               </Link>
               <Link
                 href="/register"
-                className="px-4 py-1.5 bg-teal-600 text-white text-sm font-semibold rounded-lg hover:bg-teal-700 transition-colors night:bg-accent night:text-accent-on night:hover:bg-accent-hover"
+                className="whitespace-nowrap px-3 sm:px-4 py-1.5 bg-teal-600 text-white text-sm font-semibold rounded-lg hover:bg-teal-700 transition-colors night:bg-accent night:text-accent-on night:hover:bg-accent-hover"
               >
                 {t("nav.signUp")}
               </Link>
