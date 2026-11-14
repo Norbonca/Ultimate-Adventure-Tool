@@ -14,39 +14,47 @@
   }
 }
 
+/* Futásidőben a [data-surface] scope ugyanezt a változónevet írja felül — ezért nem `inline`. */
 @theme {
-  --color-trevu-50: #f0fdfa;
-  --color-trevu-100: #ccfbf1;
-  --color-trevu-200: #99f6e4;
-  --color-trevu-300: #5eead4;
-  --color-trevu-400: #2dd4bf;
-  --color-trevu-500: #14b8a6;
-  --color-trevu-600: #0d9488;
-  --color-trevu-700: #0f766e;
-  --color-trevu-800: #115e59;
-  --color-trevu-900: #134e4a;
+  --color-surface: #ffffff; /* futásidőben a :root / [data-surface] scope adja */
+  --color-ghost: #f1f5f9; /* futásidőben a :root / [data-surface] scope adja */
+  --color-glass: rgba(255, 255, 255, 0.85); /* futásidőben a :root / [data-surface] scope adja */
+  --color-scrim: rgba(15, 23, 42, 0.65); /* futásidőben a :root / [data-surface] scope adja */
+}
 
-  --color-navy-50: #f8fafc;
-  --color-navy-100: #f1f5f9;
-  --color-navy-200: #e2e8f0;
-  --color-navy-300: #cbd5e1;
-  --color-navy-400: #94a3b8;
-  --color-navy-500: #64748b;
-  --color-navy-600: #475569;
-  --color-navy-700: #334155;
-  --color-navy-800: #1e293b;
-  --color-navy-900: #0f172a;
+@theme inline {
+  --color-trevu-50: var(--pal-trevu-50, #f0fdfa);
+  --color-trevu-100: var(--pal-trevu-100, #ccfbf1);
+  --color-trevu-200: var(--pal-trevu-200, #99f6e4);
+  --color-trevu-300: var(--pal-trevu-300, #5eead4);
+  --color-trevu-400: var(--pal-trevu-400, #2dd4bf);
+  --color-trevu-500: var(--pal-trevu-500, #14b8a6);
+  --color-trevu-600: var(--pal-trevu-600, #0d9488);
+  --color-trevu-700: var(--pal-trevu-700, #0f766e);
+  --color-trevu-800: var(--pal-trevu-800, #115e59);
+  --color-trevu-900: var(--pal-trevu-900, #134e4a);
 
-  --color-coral: #f97066;
-  --color-coral-light: #fca5a1;
+  --color-navy-50: var(--pal-navy-50, #f8fafc);
+  --color-navy-100: var(--pal-navy-100, #f1f5f9);
+  --color-navy-200: var(--pal-navy-200, #e2e8f0);
+  --color-navy-300: var(--pal-navy-300, #cbd5e1);
+  --color-navy-400: var(--pal-navy-400, #94a3b8);
+  --color-navy-500: var(--pal-navy-500, #64748b);
+  --color-navy-600: var(--pal-navy-600, #475569);
+  --color-navy-700: var(--pal-navy-700, #334155);
+  --color-navy-800: var(--pal-navy-800, #1e293b);
+  --color-navy-900: var(--pal-navy-900, #0f172a);
 
-  --color-sage: #6ee7b7;
+  --color-coral: var(--pal-coral, #f97066);
+  --color-coral-light: var(--pal-coral-light, #fca5a1);
 
-  --color-golden: #fbbf24;
+  --color-sage: var(--pal-sage, #6ee7b7);
+
+  --color-golden: var(--pal-golden, #fbbf24);
 
   --color-violet: #8b5cf6;
 
-  --color-orange: #f97316;
+  --color-orange: var(--pal-orange, #f97316);
 
   --color-cat-hiking: #059669;
   --color-cat-climbing: #92400e;
@@ -57,29 +65,25 @@
   --color-cat-expedition: #8b5cf6;
   --color-cat-motorsport: #b91c1c;
 
-  --color-surface: #ffffff; /* futásidőben a :root / [data-surface] scope adja */
 
 
 
 
-  --color-ghost: #f1f5f9; /* futásidőben a :root / [data-surface] scope adja */
-  --color-glass: rgba(255, 255, 255, 0.85); /* futásidőben a :root / [data-surface] scope adja */
-  --color-scrim: rgba(15, 23, 42, 0.65); /* futásidőben a :root / [data-surface] scope adja */
 
 
-  --color-brand-50: #f0fdfa;
-  --color-brand-100: #ccfbf1;
-  --color-brand-200: #99f6e4;
-  --color-brand-300: #5eead4;
-  --color-brand-400: #2dd4bf;
-  --color-brand-500: #14b8a6;
-  --color-brand-600: #0d9488;
-  --color-brand-700: #0f766e;
-  --color-brand-800: #115e59;
-  --color-brand-900: #134e4a;
+  --color-brand-50: var(--pal-brand-50, #f0fdfa);
+  --color-brand-100: var(--pal-brand-100, #ccfbf1);
+  --color-brand-200: var(--pal-brand-200, #99f6e4);
+  --color-brand-300: var(--pal-brand-300, #5eead4);
+  --color-brand-400: var(--pal-brand-400, #2dd4bf);
+  --color-brand-500: var(--pal-brand-500, #14b8a6);
+  --color-brand-600: var(--pal-brand-600, #0d9488);
+  --color-brand-700: var(--pal-brand-700, #0f766e);
+  --color-brand-800: var(--pal-brand-800, #115e59);
+  --color-brand-900: var(--pal-brand-900, #134e4a);
 
-  --font-sans: 'DM Sans', system-ui, sans-serif;
-  --font-display: 'DM Sans', system-ui, sans-serif;
+  --font-sans: var(--font-family-sans, 'DM Sans', system-ui, sans-serif);
+  --font-display: var(--font-family-display, 'DM Sans', system-ui, sans-serif);
 
   --text-hero-display--line-height: 1.1;
   --text-hero-display--letter-spacing: -0.02em;
@@ -89,18 +93,18 @@
   --text-hero-display-mobile--font-weight: 800;
 
 
-  --radius-trevu: 10px;
-  --radius-trevu-lg: 12px;
-  --radius-trevu-xl: 14px;
-  --radius-trevu-2xl: 16px;
-  --radius-trevu-3xl: 20px;
-  --radius-chip: 6px;
+  --radius-trevu: var(--pal-radius-trevu, 10px);
+  --radius-trevu-lg: var(--pal-radius-trevu-lg, 12px);
+  --radius-trevu-xl: var(--pal-radius-trevu-xl, 14px);
+  --radius-trevu-2xl: var(--pal-radius-trevu-2xl, 16px);
+  --radius-trevu-3xl: var(--pal-radius-trevu-3xl, 20px);
+  --radius-chip: var(--pal-radius-chip, 6px);
 
-  --shadow-trevu: 0 2px 8px rgba(13, 148, 136, 0.25);
-  --shadow-trevu-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
-  --shadow-trevu-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
-  --shadow-trevu-xl: 0 24px 80px rgba(15, 23, 42, 0.18);
-  --shadow-trevu-glow: 0 2px 12px rgba(13, 148, 136, 0.12);
+  --shadow-trevu: var(--pal-shadow-trevu, 0 2px 8px rgba(13, 148, 136, 0.25));
+  --shadow-trevu-sm: var(--pal-shadow-trevu-sm, 0 1px 3px rgba(0, 0, 0, 0.06));
+  --shadow-trevu-lg: var(--pal-shadow-trevu-lg, 0 8px 24px rgba(0, 0, 0, 0.08));
+  --shadow-trevu-xl: var(--pal-shadow-trevu-xl, 0 24px 80px rgba(15, 23, 42, 0.18));
+  --shadow-trevu-glow: var(--pal-shadow-trevu-glow, 0 2px 12px rgba(13, 148, 136, 0.12));
 
   --animate-shimmer: shimmer 1.5s infinite;
   --animate-slide-up: slideUp 0.3s ease;
@@ -123,6 +127,139 @@
       opacity: 1;
     }
   }
+
+  /* Témafüggő Tailwind-paletták és -forma (témaréteg, B „Terep"): a készlet `pal-*` tokenje,
+     ennek hiányában a Tailwind alapértéke. */
+  --color-slate-50: var(--pal-slate-50, oklch(98.4% 0.003 247.858));
+  --color-slate-100: var(--pal-slate-100, oklch(96.8% 0.007 247.896));
+  --color-slate-200: var(--pal-slate-200, oklch(92.9% 0.013 255.508));
+  --color-slate-300: var(--pal-slate-300, oklch(86.9% 0.022 252.894));
+  --color-slate-400: var(--pal-slate-400, oklch(70.4% 0.04 256.788));
+  --color-slate-500: var(--pal-slate-500, oklch(55.4% 0.046 257.417));
+  --color-slate-600: var(--pal-slate-600, oklch(44.6% 0.043 257.281));
+  --color-slate-700: var(--pal-slate-700, oklch(37.2% 0.044 257.287));
+  --color-slate-800: var(--pal-slate-800, oklch(27.9% 0.041 260.031));
+  --color-slate-900: var(--pal-slate-900, oklch(20.8% 0.042 265.755));
+  --color-slate-950: var(--pal-slate-950, oklch(12.9% 0.042 264.695));
+  --color-gray-50: var(--pal-gray-50, oklch(98.5% 0.002 247.839));
+  --color-gray-100: var(--pal-gray-100, oklch(96.7% 0.003 264.542));
+  --color-gray-200: var(--pal-gray-200, oklch(92.8% 0.006 264.531));
+  --color-gray-300: var(--pal-gray-300, oklch(87.2% 0.01 258.338));
+  --color-gray-400: var(--pal-gray-400, oklch(70.7% 0.022 261.325));
+  --color-gray-500: var(--pal-gray-500, oklch(55.1% 0.027 264.364));
+  --color-gray-600: var(--pal-gray-600, oklch(44.6% 0.03 256.802));
+  --color-gray-700: var(--pal-gray-700, oklch(37.3% 0.034 259.733));
+  --color-gray-800: var(--pal-gray-800, oklch(27.8% 0.033 256.848));
+  --color-gray-900: var(--pal-gray-900, oklch(21% 0.034 264.665));
+  --color-gray-950: var(--pal-gray-950, oklch(13% 0.028 261.692));
+  --color-stone-50: var(--pal-stone-50, oklch(98.5% 0.001 106.423));
+  --color-stone-100: var(--pal-stone-100, oklch(97% 0.001 106.424));
+  --color-stone-200: var(--pal-stone-200, oklch(92.3% 0.003 48.717));
+  --color-stone-300: var(--pal-stone-300, oklch(86.9% 0.005 56.366));
+  --color-stone-400: var(--pal-stone-400, oklch(70.9% 0.01 56.259));
+  --color-stone-500: var(--pal-stone-500, oklch(55.3% 0.013 58.071));
+  --color-stone-600: var(--pal-stone-600, oklch(44.4% 0.011 73.639));
+  --color-stone-700: var(--pal-stone-700, oklch(37.4% 0.01 67.558));
+  --color-stone-800: var(--pal-stone-800, oklch(26.8% 0.007 34.298));
+  --color-stone-900: var(--pal-stone-900, oklch(21.6% 0.006 56.043));
+  --color-stone-950: var(--pal-stone-950, oklch(14.7% 0.004 49.25));
+  --color-teal-50: var(--pal-teal-50, oklch(98.4% 0.014 180.72));
+  --color-teal-100: var(--pal-teal-100, oklch(95.3% 0.051 180.801));
+  --color-teal-200: var(--pal-teal-200, oklch(91% 0.096 180.426));
+  --color-teal-300: var(--pal-teal-300, oklch(85.5% 0.138 181.071));
+  --color-teal-400: var(--pal-teal-400, oklch(77.7% 0.152 181.912));
+  --color-teal-500: var(--pal-teal-500, oklch(70.4% 0.14 182.503));
+  --color-teal-600: var(--pal-teal-600, oklch(60% 0.118 184.704));
+  --color-teal-700: var(--pal-teal-700, oklch(51.1% 0.096 186.391));
+  --color-teal-800: var(--pal-teal-800, oklch(43.7% 0.078 188.216));
+  --color-teal-900: var(--pal-teal-900, oklch(38.6% 0.063 188.416));
+  --color-teal-950: var(--pal-teal-950, oklch(27.7% 0.046 192.524));
+  --color-red-50: var(--pal-red-50, oklch(97.1% 0.013 17.38));
+  --color-red-100: var(--pal-red-100, oklch(93.6% 0.032 17.717));
+  --color-red-200: var(--pal-red-200, oklch(88.5% 0.062 18.334));
+  --color-red-300: var(--pal-red-300, oklch(80.8% 0.114 19.571));
+  --color-red-400: var(--pal-red-400, oklch(70.4% 0.191 22.216));
+  --color-red-500: var(--pal-red-500, oklch(63.7% 0.237 25.331));
+  --color-red-600: var(--pal-red-600, oklch(57.7% 0.245 27.325));
+  --color-red-700: var(--pal-red-700, oklch(50.5% 0.213 27.518));
+  --color-red-800: var(--pal-red-800, oklch(44.4% 0.177 26.899));
+  --color-red-900: var(--pal-red-900, oklch(39.6% 0.141 25.723));
+  --color-red-950: var(--pal-red-950, oklch(25.8% 0.092 26.042));
+  --color-rose-50: var(--pal-rose-50, oklch(96.9% 0.015 12.422));
+  --color-rose-100: var(--pal-rose-100, oklch(94.1% 0.03 12.58));
+  --color-rose-200: var(--pal-rose-200, oklch(89.2% 0.058 10.001));
+  --color-rose-300: var(--pal-rose-300, oklch(81% 0.117 11.638));
+  --color-rose-400: var(--pal-rose-400, oklch(71.2% 0.194 13.428));
+  --color-rose-500: var(--pal-rose-500, oklch(64.5% 0.246 16.439));
+  --color-rose-600: var(--pal-rose-600, oklch(58.6% 0.253 17.585));
+  --color-rose-700: var(--pal-rose-700, oklch(51.4% 0.222 16.935));
+  --color-rose-800: var(--pal-rose-800, oklch(45.5% 0.188 13.697));
+  --color-rose-900: var(--pal-rose-900, oklch(41% 0.159 10.272));
+  --color-rose-950: var(--pal-rose-950, oklch(27.1% 0.105 12.094));
+  --color-emerald-50: var(--pal-emerald-50, oklch(97.9% 0.021 166.113));
+  --color-emerald-100: var(--pal-emerald-100, oklch(95% 0.052 163.051));
+  --color-emerald-200: var(--pal-emerald-200, oklch(90.5% 0.093 164.15));
+  --color-emerald-300: var(--pal-emerald-300, oklch(84.5% 0.143 164.978));
+  --color-emerald-400: var(--pal-emerald-400, oklch(76.5% 0.177 163.223));
+  --color-emerald-500: var(--pal-emerald-500, oklch(69.6% 0.17 162.48));
+  --color-emerald-600: var(--pal-emerald-600, oklch(59.6% 0.145 163.225));
+  --color-emerald-700: var(--pal-emerald-700, oklch(50.8% 0.118 165.612));
+  --color-emerald-800: var(--pal-emerald-800, oklch(43.2% 0.095 166.913));
+  --color-emerald-900: var(--pal-emerald-900, oklch(37.8% 0.077 168.94));
+  --color-emerald-950: var(--pal-emerald-950, oklch(26.2% 0.051 172.552));
+  --color-green-50: var(--pal-green-50, oklch(98.2% 0.018 155.826));
+  --color-green-100: var(--pal-green-100, oklch(96.2% 0.044 156.743));
+  --color-green-200: var(--pal-green-200, oklch(92.5% 0.084 155.995));
+  --color-green-300: var(--pal-green-300, oklch(87.1% 0.15 154.449));
+  --color-green-400: var(--pal-green-400, oklch(79.2% 0.209 151.711));
+  --color-green-500: var(--pal-green-500, oklch(72.3% 0.219 149.579));
+  --color-green-600: var(--pal-green-600, oklch(62.7% 0.194 149.214));
+  --color-green-700: var(--pal-green-700, oklch(52.7% 0.154 150.069));
+  --color-green-800: var(--pal-green-800, oklch(44.8% 0.119 151.328));
+  --color-green-900: var(--pal-green-900, oklch(39.3% 0.095 152.535));
+  --color-green-950: var(--pal-green-950, oklch(26.6% 0.065 152.934));
+  --color-amber-50: var(--pal-amber-50, oklch(98.7% 0.022 95.277));
+  --color-amber-100: var(--pal-amber-100, oklch(96.2% 0.059 95.617));
+  --color-amber-200: var(--pal-amber-200, oklch(92.4% 0.12 95.746));
+  --color-amber-300: var(--pal-amber-300, oklch(87.9% 0.169 91.605));
+  --color-amber-400: var(--pal-amber-400, oklch(82.8% 0.189 84.429));
+  --color-amber-500: var(--pal-amber-500, oklch(76.9% 0.188 70.08));
+  --color-amber-600: var(--pal-amber-600, oklch(66.6% 0.179 58.318));
+  --color-amber-700: var(--pal-amber-700, oklch(55.5% 0.163 48.998));
+  --color-amber-800: var(--pal-amber-800, oklch(47.3% 0.137 46.201));
+  --color-amber-900: var(--pal-amber-900, oklch(41.4% 0.112 45.904));
+  --color-amber-950: var(--pal-amber-950, oklch(27.9% 0.077 45.635));
+  --color-yellow-50: var(--pal-yellow-50, oklch(98.7% 0.026 102.212));
+  --color-yellow-100: var(--pal-yellow-100, oklch(97.3% 0.071 103.193));
+  --color-yellow-200: var(--pal-yellow-200, oklch(94.5% 0.129 101.54));
+  --color-yellow-300: var(--pal-yellow-300, oklch(90.5% 0.182 98.111));
+  --color-yellow-400: var(--pal-yellow-400, oklch(85.2% 0.199 91.936));
+  --color-yellow-500: var(--pal-yellow-500, oklch(79.5% 0.184 86.047));
+  --color-yellow-600: var(--pal-yellow-600, oklch(68.1% 0.162 75.834));
+  --color-yellow-700: var(--pal-yellow-700, oklch(55.4% 0.135 66.442));
+  --color-yellow-800: var(--pal-yellow-800, oklch(47.6% 0.114 61.907));
+  --color-yellow-900: var(--pal-yellow-900, oklch(42.1% 0.095 57.708));
+  --color-yellow-950: var(--pal-yellow-950, oklch(28.6% 0.066 53.813));
+  --color-white: var(--pal-white, #fff);
+  --color-black: var(--pal-black, #000);
+  --font-mono: var(--font-family-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace);
+  --radius-xs: var(--pal-radius-xs, 0.125rem);
+  --radius-sm: var(--pal-radius-sm, 0.25rem);
+  --radius-md: var(--pal-radius-md, 0.375rem);
+  --radius-lg: var(--pal-radius-lg, 0.5rem);
+  --radius-xl: var(--pal-radius-xl, 0.75rem);
+  --radius-2xl: var(--pal-radius-2xl, 1rem);
+  --radius-3xl: var(--pal-radius-3xl, 1.5rem);
+  --radius-4xl: var(--pal-radius-4xl, 2rem);
+  --shadow-2xs: var(--pal-shadow-2xs, 0 1px rgb(0 0 0 / 0.05));
+  --shadow-xs: var(--pal-shadow-xs, 0 1px 2px 0 rgb(0 0 0 / 0.05));
+  --shadow-sm: var(--pal-shadow-sm, 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1));
+  --shadow-md: var(--pal-shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1));
+  --shadow-lg: var(--pal-shadow-lg, 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1));
+  --shadow-xl: var(--pal-shadow-xl, 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1));
+  --shadow-2xl: var(--pal-shadow-2xl, 0 25px 50px -12px rgb(0 0 0 / 0.25));
+  --shadow: var(--pal-shadow, 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1));
+  --radius: var(--pal-radius, 0.25rem);
 }
 
 /* Futásidejű tokenre mutató témaértékek: `inline`, hogy az utility közvetlenül a
@@ -323,7 +460,7 @@
   }
 
   body {
-    font-family: "DM Sans", system-ui, sans-serif;
+    font-family: var(--font-sans);
     color: var(--text-primary);
     background: var(--arctic-white);
     -webkit-font-smoothing: antialiased;
@@ -331,7 +468,7 @@
   }
 
   ::selection {
-    background: rgba(13, 148, 136, 0.15);
+    background: color-mix(in srgb, var(--color-primary) 25%, transparent);
     color: var(--deep-navy);
   }
 }
@@ -433,6 +570,45 @@
     .text-trevu-700
   ):not([data-surface="day"] *) {
     color: var(--color-primary);
+  }
+
+  body[data-surface="night"] :where(
+    .text-teal-600,
+    .text-teal-700,
+    .text-trevu-800
+  ):not([data-surface="day"] *) {
+    color: var(--color-primary);
+  }
+
+  /* Állapotszínek: a sötét fokozatok világos alapra valók — Night-on a szemantikus állapottoken
+     (2026-11-14, B „Terep”: a meleg szén alapon a sötét zöld, piros és sárga olvashatatlan). */
+  body[data-surface="night"] :where(
+    .text-emerald-500,
+    .text-emerald-600,
+    .text-emerald-700,
+    .text-emerald-800,
+    .text-green-600,
+    .text-green-700
+  ):not([data-surface="day"] *) {
+    color: var(--color-success);
+  }
+
+  body[data-surface="night"] :where(
+    .text-red-500,
+    .text-red-600,
+    .text-red-700
+  ):not([data-surface="day"] *) {
+    color: var(--color-danger);
+  }
+
+  body[data-surface="night"] :where(
+    .text-amber-500,
+    .text-amber-600,
+    .text-amber-700,
+    .text-amber-800,
+    .text-yellow-700
+  ):not([data-surface="day"] *) {
+    color: var(--color-rating);
   }
 
   body[data-surface="night"] :where(

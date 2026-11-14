@@ -1,5 +1,6 @@
 /**
- * Felület-mód tokenek — Brand Guide v2 „Éjszakai túra” (1b) §8.
+ * Felület-mód tokenek — Brand Guide v2 „Éjszakai túra” (1b) §8; az értékek 2026-11-14 óta
+ * a B „Terep” készletéből (packages/config/src/theme/terep.ts).
  * Terv: design/D00_Core_Components.pen#LdX4S, design/D99_Reference.pen#pixZn
  *
  * Őrzi, hogy a Night scope minden szükséges tokent felülírjon, és hogy a
@@ -28,27 +29,39 @@ function block(selector: string): string {
   return css.slice(open + 1, close);
 }
 
+/** Az összes azonos fejlécű blokk egymás után (a globals.css-ben több `@theme inline` is van). */
+function blocks(selector: string): string {
+  const esc = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const re = new RegExp(`(?:^|\\n)[ \\t]*${esc}\\s*\\{`, "g");
+  let out = "";
+  for (const m of css.matchAll(re)) {
+    const open = css.indexOf("{", m.index);
+    out += css.slice(open + 1, css.indexOf("}", open)) + "\n";
+  }
+  return out;
+}
+
 function value(scope: string, token: string): string | undefined {
   const m = scope.match(new RegExp(`${token}\\s*:\\s*([^;]+);`));
   return m?.[1].trim().toUpperCase();
 }
 
 /** Az alaptéma gyökérblokkja a generált stíluslapban. */
-const ROOT = ':root,\n[data-theme="alap"]';
+const ROOT = ':root,\n[data-theme="terep"]';
 
 const NIGHT: Record<string, string> = {
-  "--color-bg": "#0F172A",
-  "--color-surface": "#1E293B",
-  "--color-border": "#334155",
-  "--color-border-strong": "#475569",
-  "--color-text": "#F1F5F9",
-  "--color-text-muted": "#94A3B8",
-  "--color-primary": "#2DD4BF",
-  "--color-primary-hover": "#5EEAD4",
-  "--color-on-primary": "#0F172A",
-  "--color-danger": "#FCA5A1",
-  "--color-success": "#6EE7B7",
-  "--color-rating": "#FCD34D",
+  "--color-bg": "#222520",
+  "--color-surface": "#2C302A",
+  "--color-border": "#5A5D55",
+  "--color-border-strong": "#8E8F86",
+  "--color-text": "#E9E7DE",
+  "--color-text-muted": "#B9B8AE",
+  "--color-primary": "#F15B2A",
+  "--color-primary-hover": "#F47A50",
+  "--color-on-primary": "#222520",
+  "--color-danger": "#F2938A",
+  "--color-success": "#A6CC93",
+  "--color-rating": "#E6C35A",
   "--cat-hiking": "#34D399",
   "--cat-climbing": "#D9A05B",
   "--cat-water": "#2DD4BF",
@@ -92,7 +105,7 @@ describe("felület-mód tokenek (Brand Guide v2 §8)", () => {
     // Tailwind v4: a téma a globals.css @theme blokkjában van. Egy szemantikus szín
     // vagy var(--…)-ra mutat, vagy a téma-változó neve maga az, amit a Night scope
     // felülír (pl. --color-surface) — mindkét esetben a [data-surface] scope hat rá.
-    const inline = block("@theme inline");
+    const inline = blocks("@theme inline");
     const theme = block("@theme") + inline;
     expect(inline).not.toBe("");
     // a futásidejű tokenre mutató értéknek `@theme inline`-ban a helye (különben :root-on oldódik fel)

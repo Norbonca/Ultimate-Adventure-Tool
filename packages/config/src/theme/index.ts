@@ -1,14 +1,16 @@
 import { alap } from "./alap";
+import { terep } from "./terep";
 import type { SurfaceMode, ThemeDefinition } from "./types";
 
 export * from "./types";
 export { renderThemeCss, renderThemesCss, validateTheme } from "./css";
 
 /** A témajegyzék: új megjelenés = új készletfájl + egy sor itt. Komponenskód nem kell hozzá. */
-export const THEMES = [alap] as const satisfies readonly ThemeDefinition[];
+export const THEMES = [terep, alap] as const satisfies readonly ThemeDefinition[];
 
-export const DEFAULT_THEME_ID = alap.id;
-export const DEFAULT_THEME: ThemeDefinition = alap;
+/** 2026-11-14: a B „Terep" az alapmegjelenés (Norbert: „mehet élesbe a B terv"). Visszaállás: `alap`. */
+export const DEFAULT_THEME_ID = terep.id;
+export const DEFAULT_THEME: ThemeDefinition = terep;
 
 export function getTheme(id: string | null | undefined): ThemeDefinition {
   return THEMES.find((t) => t.id === id) ?? DEFAULT_THEME;
