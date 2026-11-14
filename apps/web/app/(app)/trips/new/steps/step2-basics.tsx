@@ -294,12 +294,12 @@ export function Step2Basics({
                 onClick={() => onChange({ difficulty: level.value })}
                 className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all ${
                   formData.difficulty === level.value
-                    ? "text-white shadow-md"
+                    ? "shadow-md"
                     : "bg-navy-50 text-navy-400 hover:bg-navy-100"
                 }`}
                 style={
                   formData.difficulty === level.value
-                    ? { backgroundColor: level.color }
+                    ? { backgroundColor: level.color, color: "var(--color-bg)" }
                     : undefined
                 }
                 title={locale === 'en' ? level.labelEn : level.label}

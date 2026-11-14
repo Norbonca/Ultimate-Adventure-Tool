@@ -45,6 +45,12 @@ export const SURFACE_TOKEN_KEYS = [
   "cat-expedition",
   "cat-motorsport",
   "chip-tint",
+  // Nehézségi szintek (1–5): Day-en sötét, Night-on világos fokozat — a kijelölt szint felirata `--color-bg`
+  "difficulty-1",
+  "difficulty-2",
+  "difficulty-3",
+  "difficulty-4",
+  "difficulty-5",
 ] as const;
 
 export type SurfaceTokenKey = (typeof SURFACE_TOKEN_KEYS)[number];

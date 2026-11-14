@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { DEFAULT_THEME, resolveToken } from "@uat/config";
 import { createT, DEFAULT_LOCALE, type Locale } from "@uat/i18n";
 import { isSupportedLocale, LOCALE_COOKIE } from "@/lib/i18n/negotiate";
 
@@ -13,6 +14,9 @@ function readerLocale(): Locale {
   const fromBrowser = navigator.language?.split("-")[0];
   return isSupportedLocale(fromBrowser) ? fromBrowser : DEFAULT_LOCALE;
 }
+// A gyökér hibahatár a globális stíluslap nélkül renderelhet — a színek és a betű a témából, CSS nélkül.
+const tok = (name: string, fallback: string) => resolveToken(DEFAULT_THEME, "night", name) ?? fallback;
+
 export default function GlobalError({
   error,
   reset,
@@ -43,24 +47,24 @@ export default function GlobalError({
           alignItems: "center",
           justifyContent: "center",
           minHeight: "100vh",
-          fontFamily: "DM Sans, Arial, sans-serif",
-          backgroundColor: "#F8FAFC",
-          color: "#0F172A",
+          fontFamily: tok("font-family-sans", "Arial, sans-serif"),
+          backgroundColor: tok("color-bg", "#222520"),
+          color: tok("color-text", "#E9E7DE"),
         }}>
           <h2 style={{ fontSize: "1.5rem", fontWeight: "bold", marginBottom: "1rem" }}>
             {t("errors.unexpectedTitle")}
           </h2>
-          <p style={{ color: "#64748B", marginBottom: "1.5rem" }}>
+          <p style={{ color: tok("color-text-muted", "#B9B8AE"), marginBottom: "1.5rem" }}>
             {t("errors.reportedAutomatically")}
           </p>
           <button
             onClick={reset}
             style={{
               padding: "0.75rem 1.5rem",
-              backgroundColor: "#10B981",
-              color: "white",
+              backgroundColor: tok("color-primary", "#F15B2A"),
+              color: tok("color-on-primary", "#222520"),
               border: "none",
-              borderRadius: "0.75rem",
+              borderRadius: tok("radius-m", "0px"),
               fontWeight: 600,
               cursor: "pointer",
             }}

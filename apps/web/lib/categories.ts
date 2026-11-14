@@ -134,11 +134,12 @@ export function getCategoryName(cat: CategoryDisplay, locale: Locale = 'hu'): st
 
 /** Difficulty level labels */
 export const DIFFICULTY_LEVELS = [
-  { value: 1, label: "Könnyű", labelEn: "Easy", color: "#64748B" },
-  { value: 2, label: "Mérsékelt", labelEn: "Moderate", color: "#D97706" },
-  { value: 3, label: "Közepes", labelEn: "Intermediate", color: "#3B82F6" },
-  { value: 4, label: "Nehéz", labelEn: "Hard", color: "#8B5CF6" },
-  { value: 5, label: "Extrém", labelEn: "Extreme", color: "#0F172A" },
+  // A szín a témából jön (`--difficulty-N`, felülettől függően); a kijelölt szint felirata `var(--color-bg)`.
+  { value: 1, label: "Könnyű", labelEn: "Easy", color: "var(--difficulty-1)" },
+  { value: 2, label: "Mérsékelt", labelEn: "Moderate", color: "var(--difficulty-2)" },
+  { value: 3, label: "Közepes", labelEn: "Intermediate", color: "var(--difficulty-3)" },
+  { value: 4, label: "Nehéz", labelEn: "Hard", color: "var(--difficulty-4)" },
+  { value: 5, label: "Extrém", labelEn: "Extreme", color: "var(--difficulty-5)" },
 ];
 
 /**

@@ -667,3 +667,11 @@
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* B „Terep”: a forma zárt, minden szögletes — a kapszula (rounded-full) is, avatarral és haladássávval
+   együtt. A forgó töltésjelző kivétel. A Tailwind a `rounded-full`-t nem témaváltozóból adja, ezért itt. */
+@layer utilities {
+  [data-theme="terep"] .rounded-full:not(.animate-spin) {
+    border-radius: 0;
+  }
+}
