@@ -436,6 +436,25 @@ export default function DiscoverClient({
     </>
   );
 
+  const filtersButton = (
+  <button
+    type="button"
+    onClick={() => setFiltersOpen(true)}
+    aria-haspopup="dialog"
+    aria-expanded={filtersOpen}
+    data-testid="discover-filters-open"
+    className="inline-flex h-11 items-center gap-2 rounded-trevu border border-line bg-ghost px-4 text-sm font-semibold text-ink hover:border-line-strong focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
+  >
+    <SlidersHorizontal size={16} aria-hidden />
+    <span className="md:hidden">
+      {mobileFilterCount > 0 ? t('discover.filtersActive').replace('{count}', String(mobileFilterCount)) : t('discover.filters')}
+    </span>
+    <span className="hidden md:inline">
+      {advancedCount > 0 ? t('discover.filtersActive').replace('{count}', String(advancedCount)) : t('discover.filters')}
+    </span>
+  </button>
+  );
+
   // B „Terep”: asztalon a kategóriák verzál fülsorként két vonal között (a mobil szűrőlapon OptionChip marad).
   const categoryTabs = (testIdPrefix: string) => (
     <>
@@ -527,11 +546,11 @@ export default function DiscoverClient({
               Fotó: Unsplash photo-1504681869696 (D03 Landing hero, @hdbernd) — public/discover/hero.jpg; Norbert választása 2026-09-16 */}
           <section data-surface="night" className="bg-canvas text-ink">
             {/* B „Terep” (ZHO_B_Nyitooldal): osztott hero — balra a cím, jobbra a panorámafotó; mobilon a kép felül. */}
-            <div className="mx-auto grid max-w-7xl md:min-h-[520px] md:grid-cols-[minmax(0,6fr)_minmax(0,5fr)]">
+            <div className="grid md:min-h-[520px] md:grid-cols-[minmax(0,6fr)_minmax(0,5fr)]">
               <div className="relative order-1 h-[220px] md:order-2 md:h-auto">
                 <Image src="/discover/hero.jpg" alt="" fill priority sizes="(min-width: 768px) 45vw, 100vw" className="object-cover" />
               </div>
-              <div className="order-2 flex flex-col justify-center gap-4 px-5 py-10 md:order-1 md:gap-6 md:py-16 md:pl-[120px] md:pr-12">
+              <div className="order-2 flex flex-col justify-center gap-4 px-5 py-10 md:order-1 md:gap-6 md:py-16 md:pl-[max(120px,calc((100vw-1280px)/2+120px))] md:pr-12">
                 <p className="font-mono text-[13px] uppercase tracking-[0.06em] text-ink-muted">
                   {t('discover.heroStats')
                     .replace('{trips}', String(allCardCount))
@@ -572,26 +591,6 @@ export default function DiscoverClient({
             <div className="relative flex items-start justify-between gap-4">
               <div id="categories" className="hidden flex-1 flex-wrap items-center gap-x-6 gap-y-1 border-y border-line md:flex" data-testid="discover-category-pills">
                 {categoryTabs('category-pill')}
-              </div>
-              <div className="flex flex-1 items-center gap-3 md:flex-none">
-                <button
-                  type="button"
-                  onClick={() => setFiltersOpen(true)}
-                  aria-haspopup="dialog"
-                  aria-expanded={filtersOpen}
-                  data-testid="discover-filters-open"
-                  className="inline-flex h-11 items-center gap-2 rounded-trevu border border-line bg-ghost px-4 text-sm font-semibold text-ink hover:border-line-strong focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
-                >
-                  <SlidersHorizontal size={16} aria-hidden />
-                  <span className="md:hidden">
-                    {mobileFilterCount > 0 ? t('discover.filtersActive').replace('{count}', String(mobileFilterCount)) : t('discover.filters')}
-                  </span>
-                  <span className="hidden md:inline">
-                    {advancedCount > 0 ? t('discover.filtersActive').replace('{count}', String(advancedCount)) : t('discover.filters')}
-                  </span>
-                </button>
-                <span className="flex-1 md:hidden" />
-                {viewToggle}
               </div>
 
               <FilterSheet
@@ -663,7 +662,7 @@ export default function DiscoverClient({
           </div>
 
           <main id="discover-results" className="mx-auto max-w-7xl px-4 pb-10 md:px-[120px] md:pb-16">
-            <div className="flex items-end justify-between gap-4 border-b border-line pb-4 pt-6 md:pb-6 md:pt-10">
+            <div className="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-4 pt-6 md:pb-6 md:pt-10">
               <div className="flex flex-col gap-2">
                 <p className="font-mono text-[13px] font-medium uppercase tracking-[0.06em] text-accent">{t('discover.sectionDepartures')}</p>
                 <div className="flex flex-wrap items-center gap-3">
@@ -676,6 +675,9 @@ export default function DiscoverClient({
                 <TutorialHelp anchor="discover" />
                 </div>
               </div>
+              <div className="flex shrink-0 items-center gap-3">
+              {filtersButton}
+              {viewToggle}
               <label className="hidden items-center gap-2 text-sm text-ink-secondary md:flex">
                 <span>{t('discover.sortLabel')}:</span>
                 <select
@@ -691,6 +693,7 @@ export default function DiscoverClient({
                   ))}
                 </select>
               </label>
+              </div>
             </div>
 
             {filters.currency !== 'all' && (
