@@ -29,7 +29,6 @@ export function TutorialCard({ tutorial, locale, roleLabel, badge, lengthLabel, 
     >
       <span className="relative block h-[68px] w-[120px] shrink-0 overflow-hidden rounded-trevu border border-line sm:aspect-video sm:h-auto sm:w-full sm:rounded-trevu-xl">
         <Image src={posterUrl(tutorial.slug)} alt="" fill sizes="(min-width: 1024px) 336px, (min-width: 640px) 50vw, 120px" className="object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
-        <span aria-hidden className="absolute inset-0 bg-hero-scrim" />
         <span className="absolute bottom-1 right-1 inline-flex items-center gap-1 rounded-chip bg-scrim px-1.5 py-0.5 text-[11px] font-semibold text-white sm:bottom-2 sm:right-2 sm:text-xs">
           {lengthLabel}
         </span>

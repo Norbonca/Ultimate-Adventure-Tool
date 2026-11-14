@@ -139,7 +139,6 @@ export function VideoPlayer({ ref, tutorial, onTime, compact = false, priority =
       {phase !== "video" && (
         <>
           <Image src={posterUrl(tutorial.slug)} alt="" fill sizes="(min-width: 1024px) 820px, 100vw" className="object-cover" priority={priority} />
-          <div aria-hidden className="absolute inset-0 bg-hero-scrim" />
         </>
       )}
 
