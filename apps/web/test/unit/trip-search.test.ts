@@ -162,4 +162,11 @@ describe("trip search — szabadszavas, relevancia szerint (2026-11-15)", () => 
   it("csak töltelékszó: mindent átenged", () => {
     expect(createTripSearch("túra")(text, ...junes)).toBe(true);
   });
+
+  it("a rövid rokon szó nem illeszkedik szórészletre („si” ≠ „sisak”)", () => {
+    const mtb = buildTripSearchText({ title: "Alpok MTB gravity trip", description: "full-face sisak javasolt", location_country: "AT", categories: { name: "Cycling", name_localized: { hu: "Kerékpározás" } } });
+    const ski = buildTripSearchText({ title: "Osztrák sípálya hét — Schladming", short_description: "7 napos síelés", location_country: "AT", categories: { name: "Winter Sports", name_localized: { hu: "Téli sportok" } } });
+    const rank = createTripRanker("szeretnék síelni az Alpokban");
+    expect(rank(ski, "2026-11-14", "2026-11-20", "Osztrák sípálya hét — Schladming")).toBeGreaterThan(rank(mtb, "2027-07-12", "2027-07-14", "Alpok MTB gravity trip"));
+  });
 });
