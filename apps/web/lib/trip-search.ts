@@ -262,17 +262,155 @@ export function splitSearchQuery(input: string): { where: string; when: string }
   };
 }
 
+// ── Szabadszavas, relevancia szerinti keresés ───────────────────────────────
+// Norbert, 2026-11-15: „szabadszavasan is működnie kellene és megtalálni a kapcsolódó túrákat”.
+// A korábbi szabály (minden szónak szó szerint szerepelnie kell) egy mondatnyi keresésnél
+// („hegyi túra Horvátországban nyáron”) semmit sem talált. Most:
+//  - a töltelékszavak (a, az, és, túra, kaland, szeretnék …) kimaradnak;
+//  - a szavak toldalékkal és kis elírással is illeszkednek („horvátországban” → Horvátország,
+//    „hegyi” → hegy, „vitorlas” → vitorlás);
+//  - a fogalmi rokonok is találatot adnak („tenger” → vízi sport, sziget, vitorlás, búvár);
+//  - elég egy szó egyezése; a pontszám a sorrendet adja (cím > egyéb szöveg > rokon fogalom,
+//    és előrébb kerül, amelyik minden szóra illeszkedik);
+//  - az időrész (év, hónap, évszak, dátum) továbbra is kemény szűrő.
+
+const STOPWORDS = new Set([
+  'a', 'az', 'egy', 'es', 'vagy', 'de', 'is', 'meg', 'mar', 'csak', 'nem', 'ha', 'hogy', 'ami', 'amely', 'mint', 'hol',
+  'hova', 'mikor', 'mire', 'mit', 'vagyok', 'vagyunk', 'szeretnek', 'szeretnenk', 'akarok', 'akarunk', 'keresek',
+  'keresunk', 'valami', 'valamilyen', 'jo', 'szep', 'kozel', 'kb', 'kell', 'lenne', 'menni', 'mennek', 'mennenk',
+  'el', 'ki', 'be', 'fel', 'le', 'at', 'ra', 're', 'ban', 'ben', 'bol', 'val', 'vel', 'nal', 'nel', 'kozott',
+  'tura', 'turak', 'turat', 'turara', 'turan', 'kaland', 'kalandot', 'kalandos', 'kalandtura', 'utazas', 'utazni',
+  'program', 'programot', 'nap', 'napos', 'het', 'hetes', 'ejszaka',
+  'the', 'an', 'and', 'or', 'of', 'in', 'on', 'at', 'to', 'for', 'with', 'from', 'by', 'some', 'any', 'want', 'looking',
+  'trip', 'trips', 'tour', 'tours', 'adventure', 'adventures', 'travel', 'day', 'days', 'week', 'weekend', 'holiday',
+  'holidays', 'vacation',
+]);
+
+/** Fogalmi rokonok: ha a keresett szó az első lista valamelyikével kezdődik, a második lista szavai is találatot adnak. */
+const CONCEPTS: Array<[string[], string[]]> = [
+  [['tenger', 'strand', 'beach', 'sea', 'ocean', 'part'], ['tenger', 'part', 'strand', 'sziget', 'vizi', 'water', 'vitorl', 'sail', 'buvar', 'diving', 'beach', 'island', 'adria']],
+  [['hegy', 'mountain', 'csucs', 'peak', 'alpok', 'alps'], ['hegy', 'csucs', 'turaz', 'hiking', 'mountain', 'alp', 'vulkan', 'trek', 'masz', 'climb']],
+  [['turaz', 'hiking', 'hike', 'trek', 'gyalog', 'seta', 'walk'], ['turaz', 'hiking', 'trek', 'gyalog']],
+  [['vitorl', 'sail', 'hajo', 'boat', 'yacht', 'jacht', 'katamaran'], ['vitorl', 'sail', 'hajo', 'katamaran', 'yacht', 'jacht']],
+  [['buvar', 'merul', 'diving', 'dive', 'snorkel', 'sznork'], ['buvar', 'diving', 'snorkel', 'sznork', 'merul']],
+  [['si', 'siel', 'sip', 'ski', 'snowboard', 'havas', 'ho', 'snow', 'teli', 'winter', 'gleccser'], ['teli', 'ski', 'snow', 'havas', 'winter', 'snowboard', 'si', 'siel', 'sip']],
+  [['bicikli', 'bringa', 'kerekpar', 'bike', 'cycl', 'mtb', 'gravel'], ['kerekpar', 'bike', 'cycl', 'bicikl', 'bring', 'mtb']],
+  [['motor', 'enduro', 'gokart', 'kart', 'auto', 'car', 'race', 'verseny', 'trackday', 'palya', 'track'], ['motor', 'enduro', 'kart', 'trackday', 'race', 'palya', 'track']],
+  [['fut', 'run', 'maraton', 'marathon', 'trail', 'ultra'], ['futas', 'running', 'run', 'maraton', 'marathon', 'trail', 'ultra']],
+  [['expedic', 'expedition', 'sarkkor', 'arctic'], ['expedic', 'expedition']],
+  [['vulkan', 'volcan', 'lava'], ['vulkan', 'volcan', 'teide', 'etna', 'lava']],
+  [['sziget', 'island'], ['sziget', 'island', 'szigetek', 'islands']],
+  [['kajak', 'kenu', 'canoe', 'kayak', 'evez', 'rafting', 'folyo', 'river'], ['kajak', 'kenu', 'canoe', 'kayak', 'rafting', 'evez', 'vizi', 'water']],
+  [['masz', 'climb', 'ferrata', 'hegymasz', 'szikla', 'rock'], ['hegymasz', 'climb', 'ferrata', 'masz', 'szikla']],
+  [['fjord'], ['fjord', 'norveg', 'norway']],
+  [['alp'], ['alp', 'ausztria', 'austria', 'svajc', 'switzerland', 'dolomit', 'chamonix', 'tirol']],
+  [['osztrak'], ['ausztria', 'austria']],
+  [['spanish'], ['spain', 'spanyol']],
+  [['italian'], ['italy', 'olasz']],
+  [['french'], ['france', 'francia']],
+  [['greek'], ['greece', 'gorog']],
+  [['norwegian'], ['norway', 'norveg']],
+  [['portuguese'], ['portugal']],
+  [['hungarian'], ['hungary', 'magyar']],
+  [['german'], ['germany', 'nemet']],
+  [['swiss'], ['switzerland', 'svajc']],
+  [['karib', 'caribbean'], ['karib', 'caribbean', 'antigua', 'guadeloupe', 'martinique', 'grenad']],
+];
+
+const wordsOf = (text: string) => normalizeSearchText(text).split(/[^a-z0-9]+/).filter(Boolean);
+
+/** Legfeljebb 1 elírás: egy betű be/ki/csere, vagy két szomszédos betű felcserélése. */
+function withinOneEdit(a: string, b: string): boolean {
+  if (Math.abs(a.length - b.length) > 1) return false;
+  if (a.length === b.length) {
+    const diff = [...a].flatMap((ch, k) => (ch === b[k] ? [] : [k]));
+    if (diff.length === 2 && diff[1] === diff[0] + 1 && a[diff[0]] === b[diff[1]] && a[diff[1]] === b[diff[0]]) return true;
+  }
+  let i = 0;
+  let j = 0;
+  let edits = 0;
+  while (i < a.length && j < b.length) {
+    if (a[i] === b[j]) { i++; j++; continue; }
+    if (++edits > 1) return false;
+    if (a.length > b.length) i++;
+    else if (a.length < b.length) j++;
+    else { i++; j++; }
+  }
+  return edits + (a.length - i) + (b.length - j) <= 1;
+}
+
+/** Illeszkedik-e egy keresett szó egy szöveg-szóra: előtag, toldalék, közös tő vagy egy elírás. */
+export function wordMatches(token: string, word: string): boolean {
+  if (token.length < 3) return word === token;
+  if (word.startsWith(token)) return true;
+  if (word.length >= 4 && token.startsWith(word)) return true;
+  let p = 0;
+  while (p < token.length && p < word.length && token[p] === word[p]) p++;
+  if (p >= 4 && p >= Math.min(token.length, word.length) - 2) return true;
+  return token.length >= 5 && word.length >= 5 && withinOneEdit(token, word);
+}
+
+const anyWordMatches = (token: string, words: string[]) => words.some((word) => wordMatches(token, word));
+
+/** A keresett szöveg tartalmi szavai (töltelékszavak nélkül). */
+export function contentTokens(text: string): string[] {
+  return wordsOf(text).filter((t) => !STOPWORDS.has(t) && !/^\d{1,2}$/.test(t));
+}
+
+/** Egy túra szövegének pontszáma a keresett szavakra (0 = nem találat). */
+export function scoreText(tokens: string[], haystack: string, title = ''): number {
+  if (tokens.length === 0) return 1;
+  const all = wordsOf(haystack);
+  const titleWords = wordsOf(title);
+  let score = 0;
+  let matched = 0;
+  for (const token of tokens) {
+    let s = 0;
+    if (titleWords.length && anyWordMatches(token, titleWords)) s = 3;
+    else if (anyWordMatches(token, all)) s = 2;
+    else {
+      const related = CONCEPTS.filter(([keys]) => keys.some((k) => (k.length < 3 ? token === k : token.startsWith(k)))).flatMap(([, rel]) => rel);
+      if (related.some((r) => all.some((word) => word.startsWith(r)))) s = 1;
+    }
+    if (s > 0) matched++;
+    score += s;
+  }
+  if (matched === 0) return 0;
+  return score + (matched === tokens.length ? tokens.length * 2 : 0);
+}
+
 /**
- * A pirula-kereső predikátuma. Egy túra akkor találat, ha
- *  (a) a nem időre utaló szavak mind szerepelnek a szövegében ÉS az időrész illeszkedik, vagy
- *  (b) a teljes szöveg szavai mind szerepelnek — így a „Tel Aviv” vagy a „Nyaralás” helynévként is működik.
+ * A pirula-kereső pontozója: 0 = nem találat, nagyobb = relevánsabb.
+ * Az időrész kemény szűrő; a helyrész szabadszavas (lásd fent). Ha a teljes szöveg szó szerint
+ * szerepel (pl. „Tel Aviv”, ami időszónak is látszik), az is találat.
  */
-export function createTripSearch(input: string): (haystack: string, start: string | null, end: string | null) => boolean {
+export function createTripRanker(input: string): (haystack: string, start: string | null, end: string | null, title?: string) => number {
   const query = input.trim();
-  if (!query) return () => true;
+  if (!query) return () => 1;
   const { where, when } = splitSearchQuery(query);
   const whenFilter = when ? parseWhen(when) : null;
-  return (haystack, start, end) =>
-    (whenFilter !== null && matchesQuery(haystack, where) && tripMatchesWhen(whenFilter, start, end)) ||
-    matchesQuery(haystack, query);
+  const whereTokens = contentTokens(where);
+  const allTokens = contentTokens(query);
+  const seasonTokens = wordsOf(when).filter((token) => seasonOf(token) && !monthOf(token));
+  return (haystack, start, end, title = '') => {
+    const literal = matchesQuery(haystack, query) ? 100 : 0;
+    if (whenFilter && !whenFilter.invalid) {
+      if (!tripMatchesWhen(whenFilter, start, end)) {
+        // Az évszakszó jelzőként is állhat („téli túra” = téli sport, „nyári tábor”): ha a túra szövegében
+        // szerepel, szöveges találat — a hónap, az év és a dátum viszont kemény szűrő marad.
+        const textWords = wordsOf(haystack);
+        const seasonHit = seasonTokens.some((token) => anyWordMatches(token, textWords));
+        return seasonHit ? Math.max(literal, scoreText([...whereTokens, ...seasonTokens], haystack, title)) : literal;
+      }
+      return Math.max(literal, where.trim() && whereTokens.length === 0 ? 1 : scoreText(whereTokens, haystack, title));
+    }
+    if (allTokens.length === 0) return wordsOf(query).length === 0 || literal ? Math.max(literal, 1) : 1;
+    return Math.max(literal, scoreText(allTokens, haystack, title));
+  };
+}
+
+/** Logikai változat (találat-e) — a pontozó > 0. */
+export function createTripSearch(input: string): (haystack: string, start: string | null, end: string | null) => boolean {
+  const rank = createTripRanker(input);
+  return (haystack, start, end) => rank(haystack, start, end) > 0;
 }

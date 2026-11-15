@@ -6,6 +6,7 @@
  * jobbra az ár / fő és a nyíl. A teljes sor egy link. Sorozatnál a meta az időpontok számát és a
  * következő időpontot mutatja; az egyes időpontok a túraoldalon választhatók.
  * Felület: vonal választja el a sorokat, árnyék és lekerekítés nincs; hover: háttérváltás, a nyíl lép.
+ * Tipográfia a terv szerint: a cím és az ár Anton verzál, a meta monospace verzál.
  */
 
 import Link from "next/link";
@@ -37,10 +38,10 @@ export function TripRow({ href, title, imageUrl, meta, category, price, priceCap
         {imageUrl && <CoverImage src={imageUrl} alt="" sizes="112px" className="object-cover" />}
       </div>
       <div className="min-w-0">
-        <p className="truncate text-base font-bold text-ink md:text-lg" data-testid="trip-row-title">{title}</p>
-        <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-sm text-ink-muted">
+        <p className="truncate font-[family-name:var(--font-family-heading)] text-[20px] uppercase leading-[1.12] text-ink md:text-[24px]" data-testid="trip-row-title">{title}</p>
+        <p className="mt-1 flex flex-wrap items-center gap-x-2 font-mono text-[12px] uppercase tracking-[0.06em] text-ink-muted">
           {category && CategoryIcon && (
-            <span className={`inline-flex items-center gap-1 font-semibold ${CATEGORY_TEXT[category.token]}`}>
+            <span className={`inline-flex items-center gap-1 font-medium ${CATEGORY_TEXT[category.token]}`}>
               <CategoryIcon size={14} aria-hidden />
               {category.label}
             </span>
@@ -54,7 +55,7 @@ export function TripRow({ href, title, imageUrl, meta, category, price, priceCap
         </p>
       </div>
       <p className="col-start-2 whitespace-nowrap text-left md:col-start-auto md:text-right">
-        <span className="text-base font-bold text-ink md:text-lg">{price}</span>{" "}
+        <span className="font-[family-name:var(--font-family-heading)] text-[20px] uppercase leading-[1.12] text-ink md:text-[26px]">{price}</span>{" "}
         <span className="text-xs text-ink-muted">{priceCaption}</span>
       </p>
       <ArrowRight

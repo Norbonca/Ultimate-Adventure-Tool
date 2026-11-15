@@ -32,8 +32,9 @@ export function PresentationPromo({ className = "", eyebrow }: { className?: str
   }, []);
 
   return (
-    <section data-surface="night" className={`bg-canvas px-4 py-8 md:px-[120px] md:py-12 ${className}`} data-testid="presentation-promo">
-      <div className="mx-auto grid max-w-7xl items-center gap-6 md:grid-cols-[5fr_7fr] md:gap-12">
+    <section data-surface="night" className={`bg-canvas py-8 md:py-12 ${className}`} data-testid="presentation-promo">
+      {/* A belső margó a max-w-7xl konténeren belül van, így a bal szél egyezik a többi szakasszal (B „Terep”). */}
+      <div className="mx-auto grid max-w-7xl items-center gap-6 px-5 md:grid-cols-[5fr_7fr] md:gap-12 md:px-[120px]">
         <div className="order-2 flex flex-col gap-4 md:order-1 md:gap-5">
           <p className="font-mono text-[13px] font-medium uppercase tracking-[0.06em] text-accent">{eyebrow ?? t("presentation.promoEyebrow")}</p>
           <h2 className="text-[36px] text-ink md:text-[56px]">{cover.title[lang]}</h2>

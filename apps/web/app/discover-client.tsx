@@ -50,11 +50,13 @@ import {
   rememberDiscoverView,
   type DiscoverView,
 } from '@/lib/discover-view';
-import { buildTripSearchText, createTripSearch } from '@/lib/trip-search';
+import { buildTripSearchText, createTripRanker } from '@/lib/trip-search';
 import { matchesAdvanced, NO_FILTERS, type AdvancedFilters, type Choice } from '@/lib/discover-filters';
 import { groupTripsForDiscover, todayUtc, type DiscoverCard } from '@/lib/trip-series';
 import { TutorialHelp } from '@/components/tutorials/TutorialHelp';
 import { PresentationPromo } from '@/components/presentation/PresentationPromo';
+import { BrandHead } from '@/components/brand/BrandMark';
+import { TopoRoute } from '@/components/brand/TopoRoute';
 import { useAuthState } from '@/lib/auth/useAuthState';
 
 // The globe (d3-geo + tiles) only runs in the browser and is a large chunk —
@@ -210,7 +212,7 @@ export default function DiscoverClient({
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<Choice>('all');
   const [filters, setFilters] = useState<AdvancedFilters>(NO_FILTERS);
-  const [sortBy, setSortBy] = useState('recent');
+  const [sortBy, setSortBy] = useState('date'); // alapértelmezés: időrend, a legközelebbi indulás elöl (Norbert, 2026-11-15)
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [page, setPage] = useState({ key: '', count: PAGE_SIZE });
 
@@ -234,16 +236,25 @@ export default function DiscoverClient({
     [trips, categoryDisplay]
   );
 
-  const search = useMemo(() => createTripSearch(query), [query]);
+  // Szabadszavas kereső (lib/trip-search.ts createTripRanker): 0 = nem találat; keresés közben a
+  // relevancia adja az elsődleges sorrendet, a választott rendezés csak az egyenlő pontszámúakon belül.
+  const rank = useMemo(() => createTripRanker(query), [query]);
+  const scores = new Map(
+    trips.map((trip) => [trip.id, rank(searchTexts.get(trip.id) ?? trip.title, trip.start_date, trip.end_date, trip.title)] as const)
+  );
 
   const filteredTrips = trips.filter(
     (trip) =>
       (activeCategory === 'all' || trip.category_id === activeCategory) &&
-      search(searchTexts.get(trip.id) ?? trip.title, trip.start_date, trip.end_date) &&
+      (scores.get(trip.id) ?? 0) > 0 &&
       matchesAdvanced(trip, filters)
   );
 
   const sortedTrips = [...filteredTrips].sort((a, b) => {
+    if (query) {
+      const byScore = (scores.get(b.id) ?? 0) - (scores.get(a.id) ?? 0);
+      if (byScore !== 0) return byScore;
+    }
     if (sortBy === 'price-low') return (a.price_amount || 0) - (b.price_amount || 0);
     if (sortBy === 'price-high') return (b.price_amount || 0) - (a.price_amount || 0);
     if (sortBy === 'date') {
@@ -347,7 +358,7 @@ export default function DiscoverClient({
     setFilters((current) => ({ ...current, currency,
       price: currency === 'all' && current.price !== 'free' ? 'all' : current.price,
     }));
-    if (currency === 'all' && sortBy.startsWith('price-')) setSortBy('recent');
+    if (currency === 'all' && sortBy.startsWith('price-')) setSortBy('date');
   };
   const setFilter = (key: keyof AdvancedFilters, value: Choice) =>
     setFilters((current) => ({ ...current,
@@ -359,12 +370,12 @@ export default function DiscoverClient({
   const clearFilters = () => {
     setFilters(NO_FILTERS);
     setActiveCategory('all');
-    if (sortBy.startsWith('price-')) setSortBy('recent');
+    if (sortBy.startsWith('price-')) setSortBy('date');
   };
 
   const sortOptions: Array<[string, string]> = [
-    ['recent', t('discover.sortRecent')],
     ['date', t('discover.sortSoonestLong')],
+    ['recent', t('discover.sortRecent')],
     ['price-low', `${t('discover.priceLowHigh')} (${priceCurrency})`],
     ['price-high', `${t('discover.priceHighLow')} (${priceCurrency})`],
   ];
@@ -459,19 +470,19 @@ export default function DiscoverClient({
   // B „Terep”: asztalon a kategóriák verzál fülsorként két vonal között (a mobil szűrőlapon OptionChip marad).
   const categoryTabs = (testIdPrefix: string) => (
     <>
-      {[{ id: 'all', label: t('discover.allTrips') }, ...categories.map((c) => ({ id: c.id, label: categoryLabel(c.name) }))].map((item) => {
+      {categories.map((c) => ({ id: c.id, label: categoryLabel(c.name) })).map((item) => {
         const selected = activeCategory === item.id;
         return (
           <button
             key={item.id}
             type="button"
             aria-pressed={selected}
-            onClick={() => setActiveCategory(selected && item.id !== 'all' ? 'all' : item.id)}
+            onClick={() => setActiveCategory(selected ? 'all' : item.id)}
             data-testid={`${testIdPrefix}-${item.id}`}
             className={[
-              '-mb-px inline-flex min-h-12 items-center border-b-2 text-[13px] font-bold uppercase tracking-[0.06em] transition-colors',
+              '-mb-px inline-flex min-h-12 items-center border-b-2 text-[14px] font-bold uppercase tracking-[0.08em] transition-colors md:min-h-14 md:text-[15px]',
               'focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)',
-              selected ? 'border-accent text-accent' : 'border-transparent text-ink-secondary hover:text-ink',
+              selected ? 'border-accent text-accent' : 'border-transparent text-ink hover:text-accent',
             ].join(' ')}
           >
             {item.label}
@@ -546,12 +557,12 @@ export default function DiscoverClient({
               asztalin és mobilon), alulról kötelező olvashatósági gradienssel (--hero-scrim).
               Fotó: Unsplash photo-1504681869696 (D03 Landing hero, @hdbernd) — public/discover/hero.jpg; Norbert választása 2026-09-16 */}
           <section data-surface="night" className="bg-canvas text-ink">
-            {/* B „Terep” (ZHO_B_Nyitooldal): osztott hero — balra a cím, jobbra a panorámafotó; mobilon a kép felül. */}
+            {/* B „Terep” (ZHO_B_Nyitooldal): osztott hero — balra a cím és a gomb, jobbra a panorámafotó; mobilon a szöveg felül, a kép alatta. */}
             <div className="grid md:min-h-[520px] md:grid-cols-[minmax(0,6fr)_minmax(0,5fr)]">
-              <div className="relative order-1 h-[220px] md:order-2 md:h-auto">
+              <div className="relative order-2 h-[220px] md:h-auto">
                 <Image src="/discover/hero.jpg" alt="" fill priority sizes="(min-width: 768px) 45vw, 100vw" className="object-cover" />
               </div>
-              <div className="order-2 flex flex-col justify-center gap-4 px-5 py-10 md:order-1 md:gap-6 md:py-16 md:pl-[max(120px,calc((100vw-1280px)/2+120px))] md:pr-12">
+              <div className="order-1 flex flex-col justify-center gap-4 px-5 py-10 md:gap-6 md:py-16 md:pl-[max(120px,calc((100vw-1280px)/2+120px))] md:pr-12">
                 <p className="font-mono text-[13px] uppercase tracking-[0.06em] text-ink-muted">
                   {t('discover.heroStats')
                     .replace('{trips}', String(allCardCount))
@@ -561,12 +572,20 @@ export default function DiscoverClient({
                   {t('discover.heroTitle')}
                 </h1>
                 <p className="max-w-[560px] text-lg text-ink-body">{t('discover.heroSubtitle')}</p>
+                <a
+                  href="#discover-find"
+                  data-testid="discover-hero-cta"
+                  className="mt-1 inline-flex h-14 w-full items-center justify-center gap-2 bg-accent px-6 text-base font-bold text-accent-on transition-colors hover:bg-accent-hover focus-visible:outline-hidden focus-visible:shadow-(--focus-ring) md:w-fit"
+                >
+                  {t('discover.heroCta')}
+                  <ArrowRight size={18} aria-hidden />
+                </a>
               </div>
             </div>
           </section>
 
           {/* 01 / TALÁLD MEG — kereső sáv a hero alatt (csont munkafelület) */}
-          <div className="mx-auto max-w-7xl px-4 pt-6 md:px-[120px] md:pt-8">
+          <div id="discover-find" className="mx-auto max-w-7xl scroll-mt-20 px-4 pt-6 md:px-[120px] md:pt-8">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-8">
               <p className="shrink-0 font-mono text-[13px] font-medium uppercase tracking-[0.06em] text-accent">{t('discover.sectionFind')}</p>
               <SearchPill
@@ -590,7 +609,9 @@ export default function DiscoverClient({
           {/* TOOLBAR — asztali: kategória-pirulák | Szűrők + nézetváltó; mobil: Szűrők (n) + nézetváltó */}
           <div className="mx-auto max-w-7xl px-4 pb-2 pt-5 md:px-[120px] md:pb-5 md:pt-7">
             <div className="relative flex items-start justify-between gap-4">
-              <div id="categories" className="hidden flex-1 flex-wrap items-center gap-x-6 gap-y-1 border-y border-line md:flex" data-testid="discover-category-pills">
+              {/* B „Terep” (ZHO_B_Nyitooldal / ZHO_B_Mobil): sötét vonalak között, asztalon a teljes szélességen
+                  elosztva, mobilon két oszlopban. Nincs „Összes” fül: a kiválasztott kategória újra kattintva kikapcsol. */}
+              <div id="categories" className="grid flex-1 grid-cols-2 gap-x-4 border-y border-ink md:flex md:flex-wrap md:items-center md:justify-between md:gap-x-8" data-testid="discover-category-pills">
                 {categoryTabs('category-pill')}
               </div>
 
@@ -643,23 +664,6 @@ export default function DiscoverClient({
                 </div>
               </FilterSheet>
             </div>
-
-            {/* mobil: aktív kategória chipként */}
-            {activeCategory !== 'all' && (
-              <div className="mt-3 flex md:hidden">
-                {(() => {
-                  const category = categories.find((c) => c.id === activeCategory);
-                  if (!category) return null;
-                  const meta = categoryMeta(category.name);
-                  const Icon = meta.icon;
-                  return (
-                    <OptionChip selected onClick={() => setActiveCategory('all')} icon={<Icon size={16} aria-hidden />}>
-                      {categoryLabel(category.name)}
-                    </OptionChip>
-                  );
-                })()}
-              </div>
-            )}
           </div>
 
           <main id="discover-results" className="mx-auto max-w-7xl px-4 pb-10 md:px-[120px] md:pb-16">
@@ -667,14 +671,15 @@ export default function DiscoverClient({
               <div className="flex flex-col gap-2">
                 <p className="font-mono text-[13px] font-medium uppercase tracking-[0.06em] text-accent">{t('discover.sectionDepartures')}</p>
                 <div className="flex flex-wrap items-center gap-3">
-                <h2 className="text-[34px] text-ink md:text-[56px]" data-testid="discover-count">
-                  {filteredTrips.length === 0
-                    ? t('discover.noTripsYet')
-                    : t('discover.tripsAvailable').replace('{count}', String(cards.length))}
-                </h2>
+                <h2 className="text-[34px] text-ink md:text-[56px]">{t('discover.departuresTitle')}</h2>
                 {/* M211 — súgó a címsor mellett (D21 elhelyezési szabály) */}
                 <TutorialHelp anchor="discover" />
                 </div>
+                <p className="font-mono text-[13px] uppercase tracking-[0.06em] text-ink-muted" data-testid="discover-count">
+                  {filteredTrips.length === 0
+                    ? t('discover.noTripsYet')
+                    : t('discover.tripsAvailable').replace('{count}', String(cards.length))}
+                </p>
               </div>
               <div className="flex shrink-0 items-center gap-3">
               {filtersButton}
@@ -784,7 +789,8 @@ export default function DiscoverClient({
                     })}
                   </ul>
                 ) : (
-                <ul className="flex flex-col border-t border-line" data-testid="discover-trip-list">
+                <div className="flex items-start gap-8">
+                <ul className="flex min-w-0 flex-1 flex-col border-t border-line" data-testid="discover-trip-list">
                   {/* B „Terep”: tömör sorok (TripRow) — egy túra egy sor; az időpontok a túraoldalon választhatók */}
                   {visibleCards.map((card) => {
                     const trip = card.kind === 'single' ? card.trip : card.representative;
@@ -814,6 +820,11 @@ export default function DiscoverClient({
                     );
                   })}
                 </ul>
+                {/* B „Terep”: díszítő domborzati sáv a lista mellett, széles kijelzőn (ZHO_B_Nyitooldal) */}
+                <div aria-hidden className="sticky top-24 hidden h-[420px] w-[240px] shrink-0 border-l border-ink text-ink lg:block" data-testid="discover-topo">
+                  <TopoRoute />
+                </div>
+                </div>
                 )}
 
                 {remaining > 0 && (
@@ -844,8 +855,13 @@ export default function DiscoverClient({
       {viewMode !== 'globe' && (
         <>
           {/* 03 / ÍGY MEGY — szén sáv három lépéssel (ZHO_B_Nyitooldal) */}
-          <section data-surface="night" className="bg-canvas text-ink" data-testid="discover-how">
-            <div className="mx-auto max-w-7xl px-5 py-12 md:px-[120px] md:py-20">
+          <section data-surface="night" className="relative overflow-hidden bg-canvas text-ink" data-testid="discover-how">
+            {/* B „Terep”: halvány fej-ikon a sáv jobb felső sarkában (ZHO_B_Nyitooldal) — díszítő */}
+            <span aria-hidden className="pointer-events-none absolute -right-8 -top-16 rotate-[-12deg] text-ink opacity-[0.14] md:-top-[70px]">
+              <span className="block md:hidden"><BrandHead height={140} /></span>
+              <span className="hidden md:block"><BrandHead height={220} /></span>
+            </span>
+            <div className="relative mx-auto max-w-7xl px-5 py-12 md:px-[120px] md:py-20">
               <p className="font-mono text-[13px] font-medium uppercase tracking-[0.06em] text-accent">{t('discover.sectionHow')}</p>
               <h2 className="mt-2 text-[44px] text-ink md:text-[66px]">{t('discover.howTitle')}</h2>
               <ol className="mt-8 grid gap-6 md:mt-10 md:grid-cols-3 md:gap-0">

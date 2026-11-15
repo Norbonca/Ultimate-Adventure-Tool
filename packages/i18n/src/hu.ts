@@ -1445,6 +1445,8 @@ const hu = {
     ctaSubtitle: "Hozz létre túrát, állíts be pozíciókat, és a kalandorok megtalálnak.",
     priceCaption: "ár / fő",
     heroStats: "{trips} túra · {countries} ország",
+    heroCta: "Keress egy túrát",
+    departuresTitle: "Következő kalandok",
     searchPill: "Hova, mikor, mire vágysz?",
     searchPillHint: "Például: Horvátország 2027 június",
     filters: "Szűrők",
