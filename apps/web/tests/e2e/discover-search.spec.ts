@@ -64,13 +64,14 @@ test.describe('Discover — hero search', () => {
       : desktopPills.locator('button');
     test.skip((await pills.count()) < 2, 'no categories in the local data');
 
-    await pills.nth(1).click();
-    await expect(pills.nth(1)).toHaveAttribute('aria-pressed', 'true');
-    await expect(pills.first()).toHaveAttribute('aria-pressed', 'false');
+    // Mobilon a szűrőlap első gombja az „Összes”; a fülsorban nincs ilyen, ott újrakattintás kapcsol ki.
+    const target = pills.nth(1);
+    await target.click();
+    await expect(target).toHaveAttribute('aria-pressed', 'true');
     if (mobile) await expect(page.getByTestId('discover-filters-open')).toContainText('(1)');
 
-    await pills.first().click();
-    await expect(pills.first()).toHaveAttribute('aria-pressed', 'true');
+    await target.click();
+    await expect(target).toHaveAttribute('aria-pressed', 'false');
     if (mobile) await page.getByTestId('discover-filter-sheet-apply').click();
   });
 

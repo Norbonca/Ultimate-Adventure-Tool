@@ -50,7 +50,7 @@ import {
   rememberDiscoverView,
   type DiscoverView,
 } from '@/lib/discover-view';
-import { buildTripSearchText, createTripSearch } from '@/lib/trip-search';
+import { buildTripSearchText, createTripRanker } from '@/lib/trip-search';
 import { matchesAdvanced, NO_FILTERS, type AdvancedFilters, type Choice } from '@/lib/discover-filters';
 import { groupTripsForDiscover, todayUtc, type DiscoverCard } from '@/lib/trip-series';
 import { TutorialHelp } from '@/components/tutorials/TutorialHelp';
@@ -212,7 +212,7 @@ export default function DiscoverClient({
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<Choice>('all');
   const [filters, setFilters] = useState<AdvancedFilters>(NO_FILTERS);
-  const [sortBy, setSortBy] = useState('recent');
+  const [sortBy, setSortBy] = useState('date'); // alapértelmezés: időrend, a legközelebbi indulás elöl (Norbert, 2026-11-15)
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [page, setPage] = useState({ key: '', count: PAGE_SIZE });
 
@@ -236,16 +236,25 @@ export default function DiscoverClient({
     [trips, categoryDisplay]
   );
 
-  const search = useMemo(() => createTripSearch(query), [query]);
+  // Szabadszavas kereső (lib/trip-search.ts createTripRanker): 0 = nem találat; keresés közben a
+  // relevancia adja az elsődleges sorrendet, a választott rendezés csak az egyenlő pontszámúakon belül.
+  const rank = useMemo(() => createTripRanker(query), [query]);
+  const scores = new Map(
+    trips.map((trip) => [trip.id, rank(searchTexts.get(trip.id) ?? trip.title, trip.start_date, trip.end_date, trip.title)] as const)
+  );
 
   const filteredTrips = trips.filter(
     (trip) =>
       (activeCategory === 'all' || trip.category_id === activeCategory) &&
-      search(searchTexts.get(trip.id) ?? trip.title, trip.start_date, trip.end_date) &&
+      (scores.get(trip.id) ?? 0) > 0 &&
       matchesAdvanced(trip, filters)
   );
 
   const sortedTrips = [...filteredTrips].sort((a, b) => {
+    if (query) {
+      const byScore = (scores.get(b.id) ?? 0) - (scores.get(a.id) ?? 0);
+      if (byScore !== 0) return byScore;
+    }
     if (sortBy === 'price-low') return (a.price_amount || 0) - (b.price_amount || 0);
     if (sortBy === 'price-high') return (b.price_amount || 0) - (a.price_amount || 0);
     if (sortBy === 'date') {
@@ -349,7 +358,7 @@ export default function DiscoverClient({
     setFilters((current) => ({ ...current, currency,
       price: currency === 'all' && current.price !== 'free' ? 'all' : current.price,
     }));
-    if (currency === 'all' && sortBy.startsWith('price-')) setSortBy('recent');
+    if (currency === 'all' && sortBy.startsWith('price-')) setSortBy('date');
   };
   const setFilter = (key: keyof AdvancedFilters, value: Choice) =>
     setFilters((current) => ({ ...current,
@@ -361,12 +370,12 @@ export default function DiscoverClient({
   const clearFilters = () => {
     setFilters(NO_FILTERS);
     setActiveCategory('all');
-    if (sortBy.startsWith('price-')) setSortBy('recent');
+    if (sortBy.startsWith('price-')) setSortBy('date');
   };
 
   const sortOptions: Array<[string, string]> = [
-    ['recent', t('discover.sortRecent')],
     ['date', t('discover.sortSoonestLong')],
+    ['recent', t('discover.sortRecent')],
     ['price-low', `${t('discover.priceLowHigh')} (${priceCurrency})`],
     ['price-high', `${t('discover.priceHighLow')} (${priceCurrency})`],
   ];
@@ -461,19 +470,19 @@ export default function DiscoverClient({
   // B „Terep”: asztalon a kategóriák verzál fülsorként két vonal között (a mobil szűrőlapon OptionChip marad).
   const categoryTabs = (testIdPrefix: string) => (
     <>
-      {[{ id: 'all', label: t('discover.allTrips') }, ...categories.map((c) => ({ id: c.id, label: categoryLabel(c.name) }))].map((item) => {
+      {categories.map((c) => ({ id: c.id, label: categoryLabel(c.name) })).map((item) => {
         const selected = activeCategory === item.id;
         return (
           <button
             key={item.id}
             type="button"
             aria-pressed={selected}
-            onClick={() => setActiveCategory(selected && item.id !== 'all' ? 'all' : item.id)}
+            onClick={() => setActiveCategory(selected ? 'all' : item.id)}
             data-testid={`${testIdPrefix}-${item.id}`}
             className={[
-              '-mb-px inline-flex min-h-11 items-center border-b-2 text-[13px] md:min-h-12 font-bold uppercase tracking-[0.06em] transition-colors',
+              '-mb-px inline-flex min-h-12 items-center border-b-2 text-[14px] font-bold uppercase tracking-[0.08em] transition-colors md:min-h-14 md:text-[15px]',
               'focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)',
-              selected ? 'border-accent text-accent' : 'border-transparent text-ink-secondary hover:text-ink',
+              selected ? 'border-accent text-accent' : 'border-transparent text-ink hover:text-accent',
             ].join(' ')}
           >
             {item.label}
@@ -600,8 +609,9 @@ export default function DiscoverClient({
           {/* TOOLBAR — asztali: kategória-pirulák | Szűrők + nézetváltó; mobil: Szűrők (n) + nézetváltó */}
           <div className="mx-auto max-w-7xl px-4 pb-2 pt-5 md:px-[120px] md:pb-5 md:pt-7">
             <div className="relative flex items-start justify-between gap-4">
-              {/* B „Terep”: mobilon is látszik — két oszlopban (ZHO_B_Mobil), asztalon egy sorban */}
-              <div id="categories" className="grid flex-1 grid-cols-2 gap-x-4 border-y border-line md:flex md:flex-wrap md:items-center md:gap-x-6 md:gap-y-1" data-testid="discover-category-pills">
+              {/* B „Terep” (ZHO_B_Nyitooldal / ZHO_B_Mobil): sötét vonalak között, asztalon a teljes szélességen
+                  elosztva, mobilon két oszlopban. Nincs „Összes” fül: a kiválasztott kategória újra kattintva kikapcsol. */}
+              <div id="categories" className="grid flex-1 grid-cols-2 gap-x-4 border-y border-ink md:flex md:flex-wrap md:items-center md:justify-between md:gap-x-8" data-testid="discover-category-pills">
                 {categoryTabs('category-pill')}
               </div>
 
@@ -661,14 +671,15 @@ export default function DiscoverClient({
               <div className="flex flex-col gap-2">
                 <p className="font-mono text-[13px] font-medium uppercase tracking-[0.06em] text-accent">{t('discover.sectionDepartures')}</p>
                 <div className="flex flex-wrap items-center gap-3">
-                <h2 className="text-[34px] text-ink md:text-[56px]" data-testid="discover-count">
-                  {filteredTrips.length === 0
-                    ? t('discover.noTripsYet')
-                    : t('discover.tripsAvailable').replace('{count}', String(cards.length))}
-                </h2>
+                <h2 className="text-[34px] text-ink md:text-[56px]">{t('discover.departuresTitle')}</h2>
                 {/* M211 — súgó a címsor mellett (D21 elhelyezési szabály) */}
                 <TutorialHelp anchor="discover" />
                 </div>
+                <p className="font-mono text-[13px] uppercase tracking-[0.06em] text-ink-muted" data-testid="discover-count">
+                  {filteredTrips.length === 0
+                    ? t('discover.noTripsYet')
+                    : t('discover.tripsAvailable').replace('{count}', String(cards.length))}
+                </p>
               </div>
               <div className="flex shrink-0 items-center gap-3">
               {filtersButton}
