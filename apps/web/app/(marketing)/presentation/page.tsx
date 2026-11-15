@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t("presentation.metaTitle"),
     description: t("presentation.metaDescription"),
     path: "/presentation",
-    image: { url: "/videos/trevu-bemutato-poster.jpg", width: 1280, height: 720, alt: t("presentation.metaTitle") },
+    image: { url: "/videos/bemutato-poster.jpg", width: 1280, height: 720, alt: t("presentation.metaTitle") },
   });
 }
 

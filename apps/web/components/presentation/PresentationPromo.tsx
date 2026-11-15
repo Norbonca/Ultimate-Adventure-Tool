@@ -13,8 +13,10 @@ import { Icon } from "@/components/Icon";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { SLIDES, SLIDE_SECONDS } from "@/lib/presentation/content";
 
-const VIDEO = "/videos/trevu-bemutato.mp4";
-const POSTER = "/videos/trevu-bemutato-poster.jpg";
+// Nyelvenként külön felvétel (a diák szövege nyelvfüggő); a borító felirat nélküli, közös.
+// Újrafelvétel: scripts/presentation-video.mjs (LOCALE=hu és LOCALE=en).
+const VIDEO = { hu: "/videos/bemutato.mp4", en: "/videos/bemutato-en.mp4" } as const;
+const POSTER = "/videos/bemutato-poster.jpg";
 
 export function PresentationPromo({ className = "", eyebrow }: { className?: string; eyebrow?: string }) {
   const { t, locale } = useTranslation();
@@ -54,7 +56,8 @@ export function PresentationPromo({ className = "", eyebrow }: { className?: str
         <div className="order-1 overflow-hidden border border-line bg-canvas md:order-2">
           <video
             ref={videoRef}
-            src={VIDEO}
+            key={lang}
+            src={VIDEO[lang]}
             poster={POSTER}
             muted
             loop
