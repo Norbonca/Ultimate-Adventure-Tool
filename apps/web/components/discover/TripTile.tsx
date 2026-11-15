@@ -3,7 +3,8 @@
  *
  * Design: design/D02_Trip_Management.pen#KjUcp (Component/TripCard/Tile, Night),
  * képernyőn: #GRID1440 és #GRID390 (lásd DESIGN_INDEX).
- * Felül 200 px-es borítókép, rajta bal oldalt kategória-chip, jobb oldalt szabad helyek;
+ * 2026-11-14 (Norbert: „a csempét is lehet kompaktabbra venni?”): tömör csempe — 140 px-es kép, egy sor hely,
+ * egy sor dátum · szervező, kisebb belső tér, négy oszlop asztalon. Korábban: felül 200 px-es borítókép, rajta bal oldalt kategória-chip, jobb oldalt szabad helyek;
  * alatta cím (H4), hely, dátum, szervező; elválasztó után nehézség és ár / fő.
  * Az egész csempe egy link; emelés árnyék nélkül, a keret világosodik.
  *
@@ -62,7 +63,7 @@ export function SeriesRows({ series, testId }: { series: TripTileSeries; testId:
             <Link
               href={row.href}
               data-testid="series-row"
-              className="flex min-h-11 items-center justify-between gap-3 rounded-trevu bg-ghost px-3 text-sm hover:bg-line focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
+              className="flex min-h-9 items-center justify-between gap-3 rounded-trevu bg-ghost px-2.5 text-sm hover:bg-line focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
             >
               <span className={row.full ? "text-ink-muted line-through" : "font-semibold text-ink"}>{row.label}</span>
               <span className={row.full ? "text-xs font-semibold text-(--color-danger)" : "text-xs font-medium text-ink-secondary"}>
@@ -94,11 +95,11 @@ export function TripTile({ href, title, imageUrl, place, dates, spots, host, dif
   const SpotsIcon = isSeries ? CalendarDays : Users;
   const body = (
     <>
-      <div className="relative h-[200px] shrink-0 bg-line">
+      <div className="relative h-[140px] shrink-0 bg-line">
         {imageUrl && (
-          <CoverImage src={imageUrl} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" />
+          <CoverImage src={imageUrl} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" />
         )}
-        <div className="absolute inset-x-3 top-3 flex items-center justify-between gap-2">
+        <div className="absolute inset-x-2 top-2 flex items-center justify-between gap-2">
           {category && CatIcon ? (
             <span className={`inline-flex items-center gap-1.5 rounded-chip bg-glass px-2.5 py-1 text-xs font-semibold backdrop-blur-sm ${CATEGORY_TEXT[category.token]}`}>
               <CatIcon size={14} aria-hidden />
@@ -114,8 +115,8 @@ export function TripTile({ href, title, imageUrl, place, dates, spots, host, dif
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-2.5 px-[18px] pb-[18px] pt-4">
-        <h3 data-testid="trip-tile-title" className="line-clamp-2 text-lg font-semibold leading-tight text-ink">
+      <div className="flex flex-1 flex-col gap-1.5 px-3.5 pb-3 pt-3">
+        <h3 data-testid="trip-tile-title" className="line-clamp-2 text-base font-semibold leading-tight text-ink">
           {isSeries ? (
             <Link href={href} className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-hidden">
               {title}
@@ -128,29 +129,27 @@ export function TripTile({ href, title, imageUrl, place, dates, spots, host, dif
           <MapPin size={14} aria-hidden className="shrink-0" />
           <span className="line-clamp-1">{place}</span>
         </p>
-        {dates && !isSeries && (
+        {((dates && !isSeries) || host) && (
           <p className="flex items-center gap-2 text-sm text-ink-muted">
-            <Calendar size={14} aria-hidden className="shrink-0" />
-            <span className="line-clamp-1">{dates}</span>
-          </p>
-        )}
-        {host && (
-          <p className="flex items-center gap-2 text-sm text-ink-muted">
-            <UserCircle size={14} aria-hidden className="shrink-0" />
-            <span className="line-clamp-1">{host}</span>
+            {dates && !isSeries ? (
+              <Calendar size={14} aria-hidden className="shrink-0" />
+            ) : (
+              <UserCircle size={14} aria-hidden className="shrink-0" />
+            )}
+            <span className="line-clamp-1">{[dates && !isSeries ? dates : null, host].filter(Boolean).join(" · ")}</span>
           </p>
         )}
         {isSeries && series && <SeriesRows series={series} testId="trip-tile-series" />}
       </div>
 
-      <div className="flex items-center justify-between gap-3 border-t border-line px-[18px] py-3.5">
+      <div className="flex items-center justify-between gap-3 border-t border-line px-3.5 py-2.5">
         {difficulty ? (
           <span className="rounded-chip bg-ghost px-2.5 py-1 text-xs font-semibold text-ink-secondary">{difficulty}</span>
         ) : (
           <span />
         )}
         <span className="flex items-baseline gap-1.5 whitespace-nowrap">
-          <span className="text-lg font-bold text-ink">{price}</span>
+          <span className="text-base font-bold text-ink">{price}</span>
           <span className="text-xs font-medium text-ink-secondary">{priceCaption}</span>
         </span>
       </div>
