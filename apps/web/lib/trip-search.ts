@@ -370,7 +370,8 @@ export function scoreText(tokens: string[], haystack: string, title = ''): numbe
     else if (anyWordMatches(token, all)) s = 2;
     else {
       const related = CONCEPTS.filter(([keys]) => keys.some((k) => (k.length < 3 ? token === k : token.startsWith(k)))).flatMap(([, rel]) => rel);
-      if (related.some((r) => all.some((word) => word.startsWith(r)))) s = 1;
+      // A rövid rokon szó (pl. „si”) csak egész szóként számít, különben a „sisak” is síelésnek látszana.
+      if (related.some((r) => all.some((word) => (r.length < 3 ? word === r : word.startsWith(r))))) s = 1;
     }
     if (s > 0) matched++;
     score += s;

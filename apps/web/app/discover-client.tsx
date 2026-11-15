@@ -236,6 +236,9 @@ export default function DiscoverClient({
     [trips, categoryDisplay]
   );
 
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const isPastTrip = (trip: Trip) => (trip.end_date ?? trip.start_date ?? todayKey).slice(0, 10) < todayKey;
+
   // Szabadszavas kereső (lib/trip-search.ts createTripRanker): 0 = nem találat; keresés közben a
   // relevancia adja az elsődleges sorrendet, a választott rendezés csak az egyenlő pontszámúakon belül.
   const rank = useMemo(() => createTripRanker(query), [query]);
@@ -260,6 +263,10 @@ export default function DiscoverClient({
     if (sortBy === 'date') {
       if (!a.start_date) return 1;
       if (!b.start_date) return -1;
+      // A már lezajlott túrák a lista végére kerülnek, hogy elöl a valóban következő indulások álljanak.
+      const pastA = isPastTrip(a);
+      const pastB = isPastTrip(b);
+      if (pastA !== pastB) return pastA ? 1 : -1;
       return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
     }
     return 0; // recent: published order, as Supabase returns it
