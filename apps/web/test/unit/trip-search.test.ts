@@ -8,6 +8,8 @@ import {
   tripMatchesWhen,
   splitSearchQuery,
   createTripSearch,
+  createTripRanker,
+  wordMatches,
 } from "@/lib/trip-search";
 
 const split = {
@@ -121,5 +123,43 @@ describe("trip search — egyetlen pirula-kereső (Brand Guide v2)", () => {
   it("időszónak látszó helynév is találat, ha a szövegben szerepel", () => {
     const telAviv = buildTripSearchText({ ...split, title: "Tel Aviv városi futás", location_city: "Tel Aviv" });
     expect(createTripSearch("Tel Aviv")(telAviv, "2027-01-10", "2027-01-12")).toBe(true);
+  });
+});
+
+describe("trip search — szabadszavas, relevancia szerint (2026-11-15)", () => {
+  const text = buildTripSearchText(split, ["Vízi sport"]);
+  const teide = buildTripSearchText({
+    title: "Teide vulkán — csúcstúra napfelkeltére (3715 m)",
+    location_city: "Puerto de la Cruz",
+    location_country: "ES",
+    categories: { name: "Hiking", name_localized: { hu: "Túrázás" } },
+  });
+  const junes: [string, string] = ["2027-06-05", "2027-06-12"];
+
+  it("toldalékkal és elírással is illeszkedik", () => {
+    expect(wordMatches("horvatorszagban", "horvatorszag")).toBe(true);
+    expect(wordMatches("hegyi", "hegyek")).toBe(true);
+    expect(wordMatches("vitorlas", "vitorlazas")).toBe(true);
+    expect(wordMatches("vitrolas", "vitorlas")).toBe(true);
+    expect(wordMatches("tatra", "tura")).toBe(false);
+  });
+
+  it("mondatnyi keresésre is talál", () => {
+    expect(createTripSearch("vitorlázás Horvátországban nyáron")(text, ...junes)).toBe(true);
+    expect(createTripSearch("szeretnék egy tengeri túrát")(text, ...junes)).toBe(true);
+    expect(createTripSearch("spanyol vulkán")(teide, "2026-11-12", "2026-11-15")).toBe(true);
+    expect(createTripSearch("volcano in spain")(teide, "2026-11-12", "2026-11-15")).toBe(true);
+  });
+
+  it("a rokon fogalom is találat, de a pontosabb előrébb kerül", () => {
+    const rank = createTripRanker("tenger");
+    expect(rank(text, ...junes)).toBeGreaterThan(0);
+    expect(rank(teide, "2026-11-12", "2026-11-15")).toBe(0);
+    const r2 = createTripRanker("hegyi túra Spanyolország");
+    expect(r2(teide, "2026-11-12", "2026-11-15", "Teide vulkán")).toBeGreaterThan(r2(text, ...junes));
+  });
+
+  it("csak töltelékszó: mindent átenged", () => {
+    expect(createTripSearch("túra")(text, ...junes)).toBe(true);
   });
 });
