@@ -1,7 +1,7 @@
 // M211b — A bemutató videója és borítóképe a /presentation lejátszóból, az aktuális arculattal.
 // Kimenet: public/videos/bemutato.mp4 (LOCALE=en: bemutato-en.mp4; 1280×720, H.264, hang nélkül)
 // és public/videos/bemutato-poster.jpg (nyelvfüggetlen, a magyar futás írja).
-// A felvétel a vezérlők, a fejléc és a haladásjelző nélkül, az automatikus léptetéssel megy végig a diákon.
+// Nyitókép a nagy márkafejjel és a szójellel, utána a diák a vezérlők, a fejléc és a haladásjelző nélkül.
 // A borító felirat nélküli: a nyitódia háttérképe a márkafejjel (képre nem kerül beégetett szöveg vagy név).
 // Használat: BASE=http://localhost:3000 [LOCALE=hu] node scripts/presentation-video.mjs   (kell: ffmpeg)
 import { chromium } from "@playwright/test";
@@ -12,6 +12,9 @@ import { mkdirSync, readFileSync, readdirSync, rmSync } from "node:fs";
 const PATHS = readFileSync(new URL("../components/brand/paths.ts", import.meta.url), "utf8");
 const headBlock = PATHS.slice(PATHS.indexOf("export const HEAD"));
 const HEAD = { viewBox: headBlock.match(/viewBox: "([^"]+)"/)[1], d: headBlock.match(/d: "([^"]+)"/)[1] };
+const wordBlock = PATHS.slice(PATHS.indexOf("export const WORDMARK"));
+const WORDMARK = { viewBox: wordBlock.match(/viewBox: "([^"]+)"/)[1], d: wordBlock.match(/d: "([^"]+)"/)[1] };
+const INTRO_SECONDS = 3.5; // nyitókép: nagy fej-ikon és szójel (Norbert, 2026-11-15) — URL nélkül, mert a domain változik
 
 const BASE = process.env.BASE ?? "http://localhost:3000";
 const LOCALE = process.env.LOCALE === "en" ? "en" : "hu";
@@ -65,16 +68,39 @@ const lead = (Date.now() - t0) / 1000; // a betöltés ideje — ezt vágjuk le 
 await p.waitForTimeout(SLIDES * SLIDE_SECONDS * 1000 + 1500);
 await ctx.close();
 
-// 3) Kódolás: WebM → MP4 (H.264, faststart), a betöltés levágva
+// 3) Nyitókép: a márkafej és a szójel a sötét felületen (a színek a téma tokenjeiből)
+{
+  const c = await browser.newContext({ viewport: { width: 1280, height: 720 } });
+  const q = await c.newPage();
+  await q.goto(`${BASE}/presentation#1`, { waitUntil: "networkidle" });
+  await q.evaluate(({ head, word }) => {
+    const box = document.createElement("div");
+    box.setAttribute("data-surface", "night");
+    box.style.cssText = "position:fixed;inset:0;z-index:2147483647;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;background:var(--color-bg)";
+    box.innerHTML =
+      `<svg viewBox="${head.viewBox}" height="300" aria-hidden="true" style="color:var(--color-primary)"><path fill="currentColor" fill-rule="evenodd" d="${head.d}"/></svg>` +
+      `<svg viewBox="${word.viewBox}" height="120" aria-hidden="true" style="color:var(--color-text)"><path fill="currentColor" fill-rule="evenodd" d="${word.d}"/></svg>`;
+    document.body.appendChild(box);
+  }, { head: HEAD, word: WORDMARK });
+  await q.waitForTimeout(500);
+  await q.screenshot({ path: `${TMP}/intro.png` });
+  await c.close();
+}
+
+// 4) Kódolás: nyitókép (beúszás) + a diák felvétele áttűnéssel → MP4 (H.264, faststart)
 const webm = readdirSync(TMP).find((f) => f.endsWith(".webm"));
+const body = SLIDES * SLIDE_SECONDS + 1;
 execFileSync("ffmpeg", [
-  "-y", "-v", "error", "-ss", String(Math.max(0, lead + 0.3)), "-i", `${TMP}/${webm}`,
-  "-t", String(SLIDES * SLIDE_SECONDS + 1),
-  "-c:v", "libx264", "-preset", "veryfast", "-crf", "28", "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-an",
+  "-y", "-v", "error",
+  "-loop", "1", "-t", String(INTRO_SECONDS), "-framerate", "25", "-i", `${TMP}/intro.png`,
+  "-ss", String(Math.max(0, lead + 0.3)), "-t", String(body), "-i", `${TMP}/${webm}`,
+  "-filter_complex",
+  `[0:v]format=yuv420p,fade=t=in:st=0:d=0.6,setsar=1[i];[1:v]fps=25,format=yuv420p,setsar=1[b];[i][b]xfade=transition=fade:duration=0.6:offset=${INTRO_SECONDS - 0.6}[v]`,
+  "-map", "[v]", "-c:v", "libx264", "-preset", "veryfast", "-crf", "28", "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-an",
   `${OUT}/${VIDEO_NAME}`,
 ]);
 
-// 4) Borító: a nyitódia háttere szöveg nélkül, a márkafejjel (csak a magyar futásnál)
+// 5) Borító: a nyitódia háttere szöveg nélkül, a márkafejjel (csak a magyar futásnál)
 if (LOCALE === "hu") {
   const c = await browser.newContext({ viewport: { width: 1280, height: 720 } });
   await c.addCookies([{ name: "trevu-locale", value: LOCALE, url: BASE }]);

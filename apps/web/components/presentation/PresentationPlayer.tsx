@@ -234,9 +234,7 @@ function SlideView({ slide, tx, t }: { slide: Slide; tx: (v: L) => string; t: TF
                 {t("presentation.discover")}
               </Link>
             </div>
-          ) : (
-            <p className={`${s.rise} text-base text-ink-muted md:text-lg`} style={delay(420)}>www.ttvk.hu</p>
-          )}
+          ) : null}
         </div>
       </section>
     );
