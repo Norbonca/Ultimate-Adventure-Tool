@@ -55,6 +55,8 @@ import { matchesAdvanced, NO_FILTERS, type AdvancedFilters, type Choice } from '
 import { groupTripsForDiscover, todayUtc, type DiscoverCard } from '@/lib/trip-series';
 import { TutorialHelp } from '@/components/tutorials/TutorialHelp';
 import { PresentationPromo } from '@/components/presentation/PresentationPromo';
+import { BrandHead } from '@/components/brand/BrandMark';
+import { TopoRoute } from '@/components/brand/TopoRoute';
 import { useAuthState } from '@/lib/auth/useAuthState';
 
 // The globe (d3-geo + tiles) only runs in the browser and is a large chunk —
@@ -469,7 +471,7 @@ export default function DiscoverClient({
             onClick={() => setActiveCategory(selected && item.id !== 'all' ? 'all' : item.id)}
             data-testid={`${testIdPrefix}-${item.id}`}
             className={[
-              '-mb-px inline-flex min-h-12 items-center border-b-2 text-[13px] font-bold uppercase tracking-[0.06em] transition-colors',
+              '-mb-px inline-flex min-h-11 items-center border-b-2 text-[13px] md:min-h-12 font-bold uppercase tracking-[0.06em] transition-colors',
               'focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)',
               selected ? 'border-accent text-accent' : 'border-transparent text-ink-secondary hover:text-ink',
             ].join(' ')}
@@ -546,12 +548,12 @@ export default function DiscoverClient({
               asztalin és mobilon), alulról kötelező olvashatósági gradienssel (--hero-scrim).
               Fotó: Unsplash photo-1504681869696 (D03 Landing hero, @hdbernd) — public/discover/hero.jpg; Norbert választása 2026-09-16 */}
           <section data-surface="night" className="bg-canvas text-ink">
-            {/* B „Terep” (ZHO_B_Nyitooldal): osztott hero — balra a cím, jobbra a panorámafotó; mobilon a kép felül. */}
+            {/* B „Terep” (ZHO_B_Nyitooldal): osztott hero — balra a cím és a gomb, jobbra a panorámafotó; mobilon a szöveg felül, a kép alatta. */}
             <div className="grid md:min-h-[520px] md:grid-cols-[minmax(0,6fr)_minmax(0,5fr)]">
-              <div className="relative order-1 h-[220px] md:order-2 md:h-auto">
+              <div className="relative order-2 h-[220px] md:h-auto">
                 <Image src="/discover/hero.jpg" alt="" fill priority sizes="(min-width: 768px) 45vw, 100vw" className="object-cover" />
               </div>
-              <div className="order-2 flex flex-col justify-center gap-4 px-5 py-10 md:order-1 md:gap-6 md:py-16 md:pl-[max(120px,calc((100vw-1280px)/2+120px))] md:pr-12">
+              <div className="order-1 flex flex-col justify-center gap-4 px-5 py-10 md:gap-6 md:py-16 md:pl-[max(120px,calc((100vw-1280px)/2+120px))] md:pr-12">
                 <p className="font-mono text-[13px] uppercase tracking-[0.06em] text-ink-muted">
                   {t('discover.heroStats')
                     .replace('{trips}', String(allCardCount))
@@ -561,12 +563,20 @@ export default function DiscoverClient({
                   {t('discover.heroTitle')}
                 </h1>
                 <p className="max-w-[560px] text-lg text-ink-body">{t('discover.heroSubtitle')}</p>
+                <a
+                  href="#discover-find"
+                  data-testid="discover-hero-cta"
+                  className="mt-1 inline-flex h-14 w-full items-center justify-center gap-2 bg-accent px-6 text-base font-bold text-accent-on transition-colors hover:bg-accent-hover focus-visible:outline-hidden focus-visible:shadow-(--focus-ring) md:w-fit"
+                >
+                  {t('discover.heroCta')}
+                  <ArrowRight size={18} aria-hidden />
+                </a>
               </div>
             </div>
           </section>
 
           {/* 01 / TALÁLD MEG — kereső sáv a hero alatt (csont munkafelület) */}
-          <div className="mx-auto max-w-7xl px-4 pt-6 md:px-[120px] md:pt-8">
+          <div id="discover-find" className="mx-auto max-w-7xl scroll-mt-20 px-4 pt-6 md:px-[120px] md:pt-8">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-8">
               <p className="shrink-0 font-mono text-[13px] font-medium uppercase tracking-[0.06em] text-accent">{t('discover.sectionFind')}</p>
               <SearchPill
@@ -590,7 +600,8 @@ export default function DiscoverClient({
           {/* TOOLBAR — asztali: kategória-pirulák | Szűrők + nézetváltó; mobil: Szűrők (n) + nézetváltó */}
           <div className="mx-auto max-w-7xl px-4 pb-2 pt-5 md:px-[120px] md:pb-5 md:pt-7">
             <div className="relative flex items-start justify-between gap-4">
-              <div id="categories" className="hidden flex-1 flex-wrap items-center gap-x-6 gap-y-1 border-y border-line md:flex" data-testid="discover-category-pills">
+              {/* B „Terep”: mobilon is látszik — két oszlopban (ZHO_B_Mobil), asztalon egy sorban */}
+              <div id="categories" className="grid flex-1 grid-cols-2 gap-x-4 border-y border-line md:flex md:flex-wrap md:items-center md:gap-x-6 md:gap-y-1" data-testid="discover-category-pills">
                 {categoryTabs('category-pill')}
               </div>
 
@@ -643,23 +654,6 @@ export default function DiscoverClient({
                 </div>
               </FilterSheet>
             </div>
-
-            {/* mobil: aktív kategória chipként */}
-            {activeCategory !== 'all' && (
-              <div className="mt-3 flex md:hidden">
-                {(() => {
-                  const category = categories.find((c) => c.id === activeCategory);
-                  if (!category) return null;
-                  const meta = categoryMeta(category.name);
-                  const Icon = meta.icon;
-                  return (
-                    <OptionChip selected onClick={() => setActiveCategory('all')} icon={<Icon size={16} aria-hidden />}>
-                      {categoryLabel(category.name)}
-                    </OptionChip>
-                  );
-                })()}
-              </div>
-            )}
           </div>
 
           <main id="discover-results" className="mx-auto max-w-7xl px-4 pb-10 md:px-[120px] md:pb-16">
@@ -784,7 +778,8 @@ export default function DiscoverClient({
                     })}
                   </ul>
                 ) : (
-                <ul className="flex flex-col border-t border-line" data-testid="discover-trip-list">
+                <div className="flex items-start gap-8">
+                <ul className="flex min-w-0 flex-1 flex-col border-t border-line" data-testid="discover-trip-list">
                   {/* B „Terep”: tömör sorok (TripRow) — egy túra egy sor; az időpontok a túraoldalon választhatók */}
                   {visibleCards.map((card) => {
                     const trip = card.kind === 'single' ? card.trip : card.representative;
@@ -814,6 +809,11 @@ export default function DiscoverClient({
                     );
                   })}
                 </ul>
+                {/* B „Terep”: díszítő domborzati sáv a lista mellett, széles kijelzőn (ZHO_B_Nyitooldal) */}
+                <div aria-hidden className="sticky top-24 hidden h-[420px] w-[240px] shrink-0 border-l border-ink text-ink lg:block" data-testid="discover-topo">
+                  <TopoRoute />
+                </div>
+                </div>
                 )}
 
                 {remaining > 0 && (
@@ -844,8 +844,13 @@ export default function DiscoverClient({
       {viewMode !== 'globe' && (
         <>
           {/* 03 / ÍGY MEGY — szén sáv három lépéssel (ZHO_B_Nyitooldal) */}
-          <section data-surface="night" className="bg-canvas text-ink" data-testid="discover-how">
-            <div className="mx-auto max-w-7xl px-5 py-12 md:px-[120px] md:py-20">
+          <section data-surface="night" className="relative overflow-hidden bg-canvas text-ink" data-testid="discover-how">
+            {/* B „Terep”: halvány fej-ikon a sáv jobb felső sarkában (ZHO_B_Nyitooldal) — díszítő */}
+            <span aria-hidden className="pointer-events-none absolute -right-8 -top-16 rotate-[-12deg] text-ink opacity-[0.14] md:-top-[70px]">
+              <span className="block md:hidden"><BrandHead height={140} /></span>
+              <span className="hidden md:block"><BrandHead height={220} /></span>
+            </span>
+            <div className="relative mx-auto max-w-7xl px-5 py-12 md:px-[120px] md:py-20">
               <p className="font-mono text-[13px] font-medium uppercase tracking-[0.06em] text-accent">{t('discover.sectionHow')}</p>
               <h2 className="mt-2 text-[44px] text-ink md:text-[66px]">{t('discover.howTitle')}</h2>
               <ol className="mt-8 grid gap-6 md:mt-10 md:grid-cols-3 md:gap-0">

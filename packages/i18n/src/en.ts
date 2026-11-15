@@ -1418,6 +1418,7 @@ const en: TranslationKeys = {
     ctaSubtitle: "Create a trip, set crew positions, and let adventurers find you.",
     priceCaption: "per person",
     heroStats: "{trips} trips · {countries} countries",
+    heroCta: "Find a trip",
     searchPill: "Where, when, what do you fancy?",
     searchPillHint: "For example: Croatia June 2027",
     filters: "Filters",
