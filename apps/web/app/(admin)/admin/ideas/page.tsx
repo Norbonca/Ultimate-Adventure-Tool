@@ -1,5 +1,5 @@
 /**
- * M22 — Ötletbörze moderáció `/admin/ideas` (FR-M22-013, BR-M22-009). V1 minimum: a jelentési küszöböt
+ * M22 — Túraötletek moderáció `/admin/ideas` (FR-M22-013, BR-M22-009). V1 minimum: a jelentési küszöböt
  * elért (under_review) ötletek listája, visszaállítás vagy eltávolítás. Admin-kliens (RLS-mentes), audit log.
  */
 

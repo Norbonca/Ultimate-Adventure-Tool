@@ -1,5 +1,5 @@
 /**
- * M22 — Ötletbörze `/ideas` (FR-M22-003). Design: D22 `EQOlq` (1440), `o7In2` (390).
+ * M22 — Túraötletek `/ideas` (FR-M22-003). Design: D22 `EQOlq` (1440), `o7In2` (390).
  * Szerveroldalon renderelt, bejelentkezés nélkül is elérhető (NK-M22-001); a szűrők az URL-ben.
  */
 

@@ -106,7 +106,7 @@ export const SLIDES: Slide[] = [
       { img: img("07-idovonal.jpg"), title: l("Menetrend", "Timeline"), text: l("Fázisok, mérföldkövek, feladatok", "Phases, milestones, tasks") },
       { img: img("08a-koltsegek.jpg"), title: l("Közös költségek", "Shared costs"), text: l("Több pénznem, kiegyenlítés", "Multiple currencies, settling up") },
       { img: img("09b-naptar-figyelmeztetes.jpg"), title: l("Naptár és időzóna", "Calendar and time zone"), text: l("Ünnepek és időeltérés előre jelezve", "Holidays and time differences flagged in advance") },
-      { img: img("10a-otletborze.jpg"), title: l("Ötletbörze", "Idea board"), text: l("Látod, mire várnak a kalandorok", "See what adventurers are waiting for") },
+      { img: img("10a-otletborze.jpg"), title: l("Túraötletek", "Trip ideas"), text: l("Látod, mire várnak a kalandorok", "See what adventurers are waiting for") },
     ],
   },
   {
@@ -238,7 +238,7 @@ export const SLIDES: Slide[] = [
     id: "otletborze",
     kind: "split",
     tone: "dark",
-    eyebrow: l("Ötletbörze", "Idea board"),
+    eyebrow: l("Túraötletek", "Trip ideas"),
     title: l("Megmutatja, mire várnak a kalandorok", "Shows what adventurers are waiting for"),
     lead: l(
       "A közösség kitűzi az elképzelését, mások csatlakoznak, te elvállalod és túrává alakítod.",

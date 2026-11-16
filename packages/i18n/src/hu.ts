@@ -219,7 +219,7 @@ const hu = {
     tripPlanner: "Túratervező",
     travelPlanner: "Utazástervező",
     community: "Közösség",
-    tripIdeas: "Ötletbörze",
+    tripIdeas: "Túraötletek",
     home: "Főoldal",
     profile: "Profil",
     settings: "Beállítások",
@@ -314,7 +314,7 @@ const hu = {
     secondaryTimelineDesc: "Fázisok, mérföldkövek és feladatok sablonból, a meghirdetéstől a túra napjáig.",
     secondaryCalendar: "Naptár és időzóna",
     secondaryCalendarDesc: "A túraoldal előre jelzi az iskolai szünetet, a munkaszüneti napokat és az időeltérést a néző saját naptára szerint.",
-    secondaryIdeas: "Ötletbörze",
+    secondaryIdeas: "Túraötletek",
     secondaryIdeasDesc: "Látod, mire várnak a kalandorok: a közösség ötleteit elvállalod és túrává alakítod.",
     secondaryMap: "3D térkép",
     secondaryMapDesc: "A résztvevők a földgömbön, helyszín és évszak szerint böngészik a túrákat.",
@@ -1482,8 +1482,8 @@ const hu = {
     pages: {
       discover: { title: "Túrák felfedezése", description: "Kis csoportos kalandtúrák 8 kategóriában: keress hely, idő és túratípus szerint, csempe-, lista- vagy 3D-térképnézetben, és jelentkezz a választott időpontra." },
       community: { title: "Közösség", description: "Kalandorok és szervezők a {brand}-n: kövesd őket, és fedezd fel a túráikat." },
-      ideas: { title: "Ötletbörze", description: "Túraötletek, amelyekhez csatlakozhatsz, vagy amelyeket megszervezhetsz: célterület, időablak és az érdeklődők száma egy helyen." },
-      idea: { title: "Ötletbörze", description: "Túraötlet a {brand} Ötletbörzéjén — csatlakozz, vagy szervezd meg." },
+      ideas: { title: "Túraötletek", description: "Túraötletek, amelyekhez csatlakozhatsz, vagy amelyeket megszervezhetsz: célterület, időablak és az érdeklődők száma egy helyen." },
+      idea: { title: "Túraötletek", description: "Túraötlet a {brand} Túraötletei között — csatlakozz, vagy szervezd meg." },
       getStarted: { title: "Mi a {brand}?", description: "Meghirdetés, jelentkezők, teendők és közös költségek – egy felületen. Ismerd meg, hogyan szervezhetsz kis csoportos kalandtúrákat a {brand}-val." },
       pricing: { title: "Árazás", description: "Személyes használatra ingyenes. Előfizetést az fizet, aki üzletszerűen szervez; költségmegosztó túrákhoz a {brand} ingyenes." },
     },
@@ -1662,7 +1662,7 @@ const hu = {
       alerts: "Riasztások",
       users: "Felhasználók",
       trips: "Túrák",
-      ideas: "Ötletbörze",
+      ideas: "Túraötletek",
       routes: "Útvonalak",
       support: "Support",
       dashboards: "Irányítópultok",
@@ -1768,9 +1768,9 @@ const hu = {
         },
       },
     },
-    // M22 — Ötletbörze moderáció
+    // M22 — Túraötletek moderáció
     ideas: {
-      title: "Ötletbörze — moderáció",
+      title: "Túraötletek — moderáció",
       subtitle: "A jelentési küszöböt elért ötletek. Visszaállítás: visszakerül a táblára. Eltávolítás: senki nem látja.",
       empty: "Nincs felülvizsgálatra váró ötlet.",
       colIdea: "Ötlet",
@@ -2299,7 +2299,7 @@ const hu = {
   // ============================================================================
   // M23 — Calendar (naptár)
   // ============================================================================
-  // ── M22 Trip Ideas — Ötletbörze (spec 15.1, 11. fejezet) ──
+  // ── M22 Trip Ideas — Túraötletek (spec 15.1, 11. fejezet) ──
   ideas: {
     common: {
       or: "vagy",
@@ -2318,8 +2318,8 @@ const hu = {
     intent: { seeking_organizer: "Szervezőt keres", seeking_companions: "Társakat keres", will_organize: "Megszervezem, ha összejön" },
     visibility: {
       public: "Nyilvános", public_hint: "mindenki látja, kereshető",
-      followers_only: "Csak követőknek", followers_only_hint: "az Ötletbörzén csak a követőid látják",
-      link_only: "Csak linkkel", link_only_hint: "nem jelenik meg az Ötletbörzén",
+      followers_only: "Csak követőknek", followers_only_hint: "a Túraötletek között csak a követőid látják",
+      link_only: "Csak linkkel", link_only_hint: "nem jelenik meg a Túraötletek között",
     },
     closeReason: { realized: "Megvalósult", no_longer_relevant: "Már nem aktuális", other: "Egyéb" },
     difficulty: { 1: "Könnyű", 2: "Mérsékelt", 3: "Közepes", 4: "Nehéz", 5: "Extrém" },
@@ -2408,7 +2408,7 @@ const hu = {
     },
     report: {
       title: "Bejelented ezt az ötletet?",
-      body: "A bejelentést az adminok nézik át. Ha elég különböző felhasználó jelenti, az ötlet addig eltűnik az Ötletbörzéről.",
+      body: "A bejelentést az adminok nézik át. Ha elég különböző felhasználó jelenti, az ötlet addig eltűnik a Túraötletek közül.",
       confirm: "Bejelentem",
       doneToast: "Köszönjük, a bejelentést rögzítettük.",
       reason_hidden_commercial: "Rejtett kereskedelmi ajánlat",
@@ -2485,7 +2485,7 @@ const hu = {
       empty_mine: "Még nincs ötleted.",
       empty_joined: "Még nem csatlakoztál ötlethez.",
       empty_offered: "Még nem vállaltál ötletet.",
-      browse: "Böngészd az Ötletbörzét",
+      browse: "Böngészd a Túraötleteket",
       first: "Dobd be az első ötletedet",
       offers: "{count} vállalás",
     },
@@ -2931,7 +2931,7 @@ const hu = {
       timeline: "Menetrend",
       costs: "Költségek",
       discover: "Felfedezés és jelentkezés",
-      ideas: "Ötletbörze",
+      ideas: "Túraötletek",
       profile: "Profil",
     },
     tagFilter: "Címkék",
