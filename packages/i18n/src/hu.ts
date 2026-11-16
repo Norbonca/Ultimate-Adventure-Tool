@@ -5,6 +5,28 @@
  * Konvenció: camelCase kulcsok, nincs HTML a szövegekben
  */
 const hu = {
+  zhoStories: {
+    title: "Ismerd meg ZHO-t",
+    opening: "A Himalája ösvényein a zho viszi a málhát, és veled tart hágóról hágóra. A helyi pásztorok között számtalan mese és legenda szól arról, hogyan nyújt támaszt a hétköznapokban és segít a bajban.\nA hegyek meséiben néha csak biztonságosan elkíséri a gyerekeket egyik faluból a másikba a nehéz hegyi ösvényeken, máskor a szarvával vizet fakaszt a földből, amikor a szárazság már elviselhetetlen, vagy utat mutat az eltévedt zarándoknak a hóban.",
+    emphasis: "A ZHO-t a mindig megbízható társ ereje és találékonysága ihlette. Ahogy az életben, a hétköznapokban és a kalandokban egyaránt ott van amikor a legnagyobb szükséged van rá és segít abban, amiben tud, néha meglepő helyzetekben is.",
+    ending: "Már a készülődésnél melléd szegődik és végigkísér az úton, sőt utána is. A málhájában ott van szinte minden, amire szükséged lehet út közben.",
+    bhutanTitle: "Zhaw Laga forrása",
+    bhutanOpening: "Domche úgy meséli, hogy a bhutáni Laya falu jakjai mind egyetlen állattól származnak. Zhaw Lagának hívták, és nagy becsben tartották.",
+    bhutanSpring: "Egyszer Tongrában a szarvával feltúrta a száraz földet, és víz fakadt a nyomában. A környéken másutt is őrzik tetteinek emlékét.",
+    bhutanEnding: "Amikor az elöljárók Gasa erődjébe vitték, hogy végezzenek vele, Zhaw Laga eltűnt. Úgy tartják, belőle lett az erőddel szemben magasodó hegy. Áldása Daganába is eljutott. A mese szerint ezért él ott annyi kiváló jak.",
+    tibetTitle: "A jak, amely utat mutatott a hóban",
+    tibetOpening: "A tibeti legenda szerint Götsangpa a szent Kailásza hegy körül kereste az utat. Egy nőstény jak tűnt fel előtte. Götsangpa követte, az állat pedig járatlan úton vezette át a havon.",
+    tibetEnding: "A hegy északi oldalán a jak eltűnt egy barlangban. A legenda szerint szarvának nyoma ma is látható a sziklán. A helyet Drira Phuknak hívják, vagyis a nőstény jak szarvának barlangja.",
+    read: "A teljes történet",
+    bhutan: "Bhután",
+    tibet: "Tibet",
+    bhutanAlt: "ZHO szarva mellett víz fakad a sziklás réten.",
+    tibetAlt: "ZHO utat tör a mély hóban, Götsangpa a kitaposott sávban követi.",
+    bhutanSource: "Forrás · Damchoe elbeszélése, Bhutan Cultural Library",
+    tibetSource: "Forrás · Ekai Kawaguchi: Three Years in Tibet, 171. o.",
+    tibetTradition: "A Drira Phukhoz kötődő tibeti hagyomány",
+  },
+
   // ============================================================================
   // Közös (minden oldalon használt)
   // ============================================================================

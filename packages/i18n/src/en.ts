@@ -6,6 +6,28 @@
 import type { TranslationKeys } from './hu';
 
 const en: TranslationKeys = {
+  zhoStories: {
+    title: "Meet ZHO",
+    opening: "On Himalayan trails, a zho carries the load and stays with you from one mountain pass to the next. Local herders tell stories about the help these animals offer in everyday life and in times of trouble.\nIn the mountain stories, they guide children safely from village to village, bring water out of parched ground with their horns, and show a pilgrim the way through the snow.",
+    emphasis: "ZHO was inspired by the strength and resourcefulness of a companion you can count on. On everyday outings and bigger adventures, ZHO is there when you need a hand, sometimes in ways you might never expect.",
+    ending: "ZHO is with you from the first plans through the trip and beyond, with a pack full of tools for the journey.",
+    read: "Read the full story",
+    bhutan: "Bhutan",
+    tibet: "Tibet",
+    bhutanTitle: "Zhaw Laga’s spring",
+    bhutanOpening: "As Damchoe tells it, all the yaks of Laya, Bhutan, descended from one animal. His name was Zhaw Laga, and the villagers held him in great esteem.",
+    bhutanSpring: "One day in Tongra, he dug into the dry ground with his horns and water sprang up. Other places in the area also bear traces of his deeds.",
+    bhutanEnding: "When officials took him to the fortress of Gasa to kill him, Zhaw Laga vanished. People say he became the mountain opposite the fortress. His blessing reached Dagana, where the story says some of the finest yaks are still found today.",
+    tibetTitle: "The yak that showed the way through the snow",
+    tibetOpening: "In a Tibetan legend, Götsangpa was looking for a route around sacred Mount Kailash when a female yak appeared. He followed her, and she led him across the snow where no path had been trodden.",
+    tibetEnding: "On the north side of the mountain, the yak disappeared into a cave. Legend has it that the mark of her horn can still be seen in the rock. The place is called Drira Phuk, the Cave of the Female Yak’s Horn.",
+    bhutanAlt: "Water springs from the rocky meadow beside ZHO’s horn.",
+    tibetAlt: "ZHO breaks a trail through deep snow, and Götsangpa follows in his tracks.",
+    bhutanSource: "Source · Damchoe’s account, Bhutan Cultural Library",
+    tibetSource: "Source · Ekai Kawaguchi, Three Years in Tibet, p. 171",
+    tibetTradition: "The Tibetan tradition of Drira Phuk",
+  },
+
   // ============================================================================
   // Common
   // ============================================================================
