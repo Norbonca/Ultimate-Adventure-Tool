@@ -27,7 +27,6 @@ const HIDDEN_PREFIXES = [
   "/account-restore",
   "/callback",
   "/presentation",
-  "/get-started",
 ];
 
 const LINKS = [

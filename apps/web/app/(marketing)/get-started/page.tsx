@@ -13,7 +13,6 @@
 // jobban szolgálja a marketing iterációt.
 import Link from 'next/link';
 import Image from 'next/image';
-import { BrandWordmark } from "@/components/brand/BrandMark";
 import { CoverImage } from '@/components/ui/CoverImage';
 import {
   MapPin,
@@ -38,7 +37,6 @@ import {
 import { useTranslation } from '@/lib/i18n/useTranslation';
 import { AppHeader } from '@/components/AppHeader';
 import { PresentationPromo } from '@/components/presentation/PresentationPromo';
-import { BrandIcon } from '@/lib/brand-icons';
 
 export default function HomePage() {
   const { t } = useTranslation();
@@ -749,98 +747,6 @@ export default function HomePage() {
           color: var(--text-muted, #94A3B8);
         }
 
-        /* Footer */
-        .footer {
-          background: var(--deep-navy, #0F172A);
-          color: var(--border-medium, #CBD5E1);
-          padding: 4rem 2rem 2rem;
-        }
-
-        .footer-content {
-          max-width: 1280px;
-          margin: 0 auto;
-        }
-
-        .footer-top {
-          display: grid;
-          grid-template-columns: 2fr 1fr 1fr 1fr;
-          gap: 3rem;
-          margin-bottom: 3rem;
-        }
-
-        .footer-brand {
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-        }
-
-        .footer-logo {
-          font-size: 20px;
-          font-weight: 800;
-          color: var(--color-primary-hover, #14B8A6);
-        }
-
-        .footer-tagline {
-          font-size: 14px;
-          line-height: 1.6;
-          color: var(--text-muted, #94A3B8);
-        }
-
-        .footer-column h3 {
-          font-size: 14px;
-          font-weight: 700;
-          margin-bottom: 1.5rem;
-          color: white;
-        }
-
-        .footer-column ul {
-          list-style: none;
-        }
-
-        .footer-column li {
-          margin-bottom: 1rem;
-        }
-
-        .footer-column a {
-          color: var(--border-medium, #CBD5E1);
-          text-decoration: none;
-          font-size: 14px;
-          transition: color 0.2s;
-        }
-
-        .footer-column a:hover {
-          color: var(--color-primary-hover, #14B8A6);
-        }
-
-        .footer-divider {
-          border-top: 1px solid var(--pal-navy-700, #334155);
-          margin: 2rem 0;
-        }
-
-        .footer-bottom {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          font-size: 14px;
-        }
-
-        .social-icons {
-          display: flex;
-          gap: 1.5rem;
-        }
-
-        .social-icon {
-          color: var(--border-medium, #CBD5E1);
-          width: 20px;
-          height: 20px;
-          cursor: pointer;
-          transition: color 0.2s;
-        }
-
-        .social-icon:hover {
-          color: var(--color-primary-hover, #14B8A6);
-        }
-
         /* Teljes Night felület — a Discover oldal szemantikus tokenjeivel. */
         body {
           color: var(--color-text);
@@ -848,8 +754,7 @@ export default function HomePage() {
         }
 
         .problem,
-        .categories,
-        .footer {
+        .categories {
           background: var(--color-bg);
         }
 
@@ -876,8 +781,7 @@ export default function HomePage() {
         .testimonial-text,
         .testimonial-role,
         .trust-text,
-        .category-label,
-        .footer-tagline {
+        .category-label {
           color: var(--color-text-muted);
         }
 
@@ -894,15 +798,11 @@ export default function HomePage() {
         }
 
         .category-name,
-        .categories .section-headline,
-        .footer-column h3 {
+        .categories .section-headline {
           color: var(--color-text);
         }
 
         .categories .section-description,
-        .footer-column a,
-        .footer-bottom,
-        .social-icon,
         .final-subline,
         .final-trust {
           color: var(--color-text-secondary);
@@ -920,15 +820,11 @@ export default function HomePage() {
         }
 
         .stat-item,
-        .testimonial,
-        .footer-divider {
+        .testimonial {
           border-color: var(--color-border);
         }
 
-        .stat-number,
-        .footer-logo,
-        .footer-column a:hover,
-        .social-icon:hover {
+        .stat-number {
           color: var(--color-primary);
         }
 
@@ -1020,16 +916,6 @@ export default function HomePage() {
             grid-template-columns: 1fr;
           }
 
-          .footer-top {
-            grid-template-columns: 1fr;
-          }
-
-          .footer-bottom {
-            flex-direction: column;
-            gap: 1.5rem;
-            text-align: center;
-          }
-
           .trust-hero {
             flex-direction: column;
             gap: 1rem;
@@ -1038,7 +924,7 @@ export default function HomePage() {
 
         /* ── B „Terep” (2026-11-14): szögletes forma, árnyék nélkül; címkék mono verzálként; ikonok vonalas
            keretben pasztell háttér helyett. Csak a terep témában — az „alap” változatlan. ── */
-        [data-theme="terep"] body:has(.section-tag) :is(section, footer) *:not(.badge-dot) {
+        [data-theme="terep"] body:has(.section-tag) section *:not(.badge-dot) {
           border-radius: 0 !important;
           box-shadow: none !important;
         }
@@ -1317,82 +1203,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="footer">
-        <div className="footer-content">
-          <div className="footer-top">
-            <div className="footer-brand">
-              <div className="footer-logo"><BrandWordmark height={28} /></div>
-              <p className="footer-tagline">
-                {t('landing.footerTagline')}
-              </p>
-            </div>
-
-            <div className="footer-column">
-              <h3>{t('landing.footerProduct')}</h3>
-              <ul>
-                <li>
-                  <a href="#features">{t('landing.footerFeatures')}</a>
-                </li>
-                <li>
-                  <a href="#categories">{t('landing.footerCategories')}</a>
-                </li>
-                <li>
-                  <a href="/pricing">{t('landing.footerPricing')}</a>
-                </li>
-                <li>
-                  <a aria-disabled="true">{t('landing.footerRoadmap')}</a>
-                </li>
-              </ul>
-            </div>
-
-            <div className="footer-column">
-              <h3>{t('landing.footerCompany')}</h3>
-              <ul>
-                <li>
-                  <a aria-disabled="true">{t('landing.footerAbout')}</a>
-                </li>
-                <li>
-                  <a aria-disabled="true">{t('landing.footerBlog')}</a>
-                </li>
-                <li>
-                  <a aria-disabled="true">{t('landing.footerCareers')}</a>
-                </li>
-                <li>
-                  <a aria-disabled="true">{t('landing.footerContact')}</a>
-                </li>
-              </ul>
-            </div>
-
-            <div className="footer-column">
-              <h3>{t('landing.footerLegal')}</h3>
-              <ul>
-                <li>
-                  <a aria-disabled="true">{t('landing.footerPrivacy')}</a>
-                </li>
-                <li>
-                  <a aria-disabled="true">{t('landing.footerTerms')}</a>
-                </li>
-                <li>
-                  <a aria-disabled="true">{t('landing.footerCookies')}</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="footer-divider"></div>
-
-          <div className="footer-bottom">
-            <div>{t('landing.footerCopyright')}</div>
-            <div className="social-icons">
-              <BrandIcon name="brand.instagram" className="social-icon" />
-              <BrandIcon name="brand.x" className="social-icon" />
-              <BrandIcon name="brand.facebook" className="social-icon" />
-              <BrandIcon name="brand.youtube" className="social-icon" />
-            </div>
-          </div>
-        </div>
-      </footer>
     </>
   );
 }
