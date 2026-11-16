@@ -37,6 +37,7 @@ import {
 import { useTranslation } from '@/lib/i18n/useTranslation';
 import { AppHeader } from '@/components/AppHeader';
 import { PresentationPromo } from '@/components/presentation/PresentationPromo';
+import { ZhoStories } from '@/components/marketing/ZhoStories';
 
 export default function HomePage() {
   const { t } = useTranslation();
@@ -1188,6 +1189,8 @@ export default function HomePage() {
 
         </div>
       </section>
+
+      <ZhoStories />
 
       {/* Final CTA */}
       <section data-surface="night" className="final-cta">
