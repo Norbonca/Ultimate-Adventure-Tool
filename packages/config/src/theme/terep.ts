@@ -144,6 +144,13 @@ export const terep: ThemeDefinition = {
     "color-navy-800": SZEN_EMELT,
     "color-warning": "#B08A10",
     "color-warning-text": "#7A5E00",
+    // A B palettájában nincs kék és lila (v3, 4.): a tájékoztató és a „special” szerep a meleg
+    // semleges skálára esik, ahogy a kék/lila palettaosztályok is. Enélkül a stíluslap kék
+    // `--color-info`-t (#3B82F6) és lila `--dusk-violet`-et (#8B5CF6) adna ki.
+    "dusk-violet": KO,
+    "color-info": KO,
+    "color-info-subtle": "#DEDCD1",
+    "color-special-subtle": "#DEDCD1",
     "dark-bg": SZEN,
     "dark-surface": SZEN_EMELT,
     "dark-border": KO,

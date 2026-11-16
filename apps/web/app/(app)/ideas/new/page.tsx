@@ -32,7 +32,7 @@ export default async function NewIdeaPage({ searchParams }: Props) {
   return (
     <main className="min-h-screen bg-slate-50">
       <div data-surface="night" className="contents"><AppHeader user={{ email: user.email ?? "", displayName: user.user_metadata?.full_name }} /></div>
-      <div className="mx-auto max-w-3xl px-5 py-8">
+      <div className="mx-auto max-w-3xl px-4 py-8 md:px-6">
         <span className="inline-flex items-center gap-1.5 rounded-chip bg-trevu-50 px-2.5 py-1 text-xs font-semibold text-trevu-700"><Icon name="lightbulb" size={14} aria-hidden />{t("ideas.form.badge")}</span>
         <h1 className="mt-3 text-3xl font-extrabold text-navy-900">{t("ideas.form.newTitle")}</h1>
         <p className="mt-1 mb-6 text-sm text-navy-500">{t("ideas.form.newSubtitle")}</p>
