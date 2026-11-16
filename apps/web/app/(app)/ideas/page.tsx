@@ -105,6 +105,20 @@ export default async function IdeasBoardPage({ searchParams }: PageProps) {
   ];
   const activeCount = [filters.intent, filters.hasOffer || null, filters.includeClosed || null, filters.sort !== "members" || null, filters.q].filter(Boolean).length;
 
+  /** A „Szűrők (n)” gomb és a lapja — mobilon a fülrács mellett, asztalon a 02-es fejlécben. */
+  const ideasFilters = (
+    <IdeasFilters
+      groups={filterGroups}
+      activeCount={activeCount}
+      clearHref="/ideas"
+      filtersLabel={t("ideas.board.filters")}
+      filtersActiveLabel={t("ideas.board.filtersActive")}
+      closeLabel={t("ideas.board.filtersClose")}
+      clearLabel={t("ideas.board.filtersClear")}
+      applyLabel={t("ideas.board.filtersApply", { count: total })}
+    />
+  );
+
   return (
     <div className="min-h-screen bg-canvas text-ink">
       <AppHeader user={user ? { email: user.email ?? "", displayName: user.user_metadata?.full_name } : null} />
@@ -112,7 +126,7 @@ export default async function IdeasBoardPage({ searchParams }: PageProps) {
       {/* HERO — osztott Night szakasz: balra a szöveg és az egyetlen elsődleges akció, jobbra a fotó
           (D22b #Lista; a Felfedezés hero-jának mintája). Mobilon a szöveg felül, a kép alatta. */}
       <section data-surface="night" className="bg-canvas text-ink" data-testid="ideas-hero">
-        <div className="grid md:min-h-[460px] md:grid-cols-[minmax(0,6fr)_minmax(0,5fr)]">
+        <div className="grid md:min-h-[520px] md:grid-cols-[minmax(0,6fr)_minmax(0,5fr)]">
           <div className="relative order-2 h-[200px] md:h-auto">
             <Image src="/discover/hero.jpg" alt="" fill priority sizes="(min-width: 768px) 45vw, 100vw" className="object-cover" />
           </div>
@@ -146,7 +160,7 @@ export default async function IdeasBoardPage({ searchParams }: PageProps) {
       {/* KATEGÓRIA-FÜLSOR — verzál fülek két szén vonal között, asztalon a teljes szélességen
           elosztva, mobilon két oszlopban. Nincs „Összes” fül: a kiválasztott újrakattintva kikapcsol. */}
       <div className="mx-auto max-w-7xl px-4 pb-2 pt-5 md:px-[120px] md:pb-5 md:pt-7">
-        <div className="relative flex items-start justify-between gap-4">
+        <div className="flex items-start justify-between gap-4">
           <nav
             aria-label={t("ideas.board.categoriesLabel")}
             className="grid flex-1 grid-cols-2 gap-x-4 border-y border-ink md:flex md:flex-wrap md:items-center md:justify-between md:gap-x-8"
@@ -169,16 +183,8 @@ export default async function IdeasBoardPage({ searchParams }: PageProps) {
             })}
           </nav>
 
-          <IdeasFilters
-            groups={filterGroups}
-            activeCount={activeCount}
-            clearHref="/ideas"
-            filtersLabel={t("ideas.board.filters")}
-            filtersActiveLabel={t("ideas.board.filtersActive")}
-            closeLabel={t("ideas.board.filtersClose")}
-            clearLabel={t("ideas.board.filtersClear")}
-            applyLabel={t("ideas.board.filtersApply", { count: total })}
-          />
+          {/* Mobilon a fülrács mellett marad; asztalon a 02-es fejlécbe kerül, mint a Felfedezésen. */}
+          <div className="relative md:hidden">{ideasFilters}</div>
         </div>
       </div>
 
@@ -196,6 +202,7 @@ export default async function IdeasBoardPage({ searchParams }: PageProps) {
               {t("ideas.board.boardCount", { count: total })}
             </p>
           </div>
+          <div className="relative hidden shrink-0 items-center gap-3 md:flex">{ideasFilters}</div>
         </div>
 
         {items.length === 0 ? (
@@ -224,7 +231,6 @@ export default async function IdeasBoardPage({ searchParams }: PageProps) {
                     owner={ownerText(idea, tr)}
                     statusLabel={st.label}
                     statusTone={st.tone}
-                    avatarCount={idea.member_count}
                     detailsLabel={t("ideas.board.details")}
                   />
                 </li>

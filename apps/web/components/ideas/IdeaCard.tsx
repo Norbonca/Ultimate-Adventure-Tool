@@ -27,7 +27,6 @@ export interface IdeaCardProps {
   owner: string | null; // „Viktor K. ötlete”
   statusLabel: string; // „Szervezőt keres” / „Szervező jelentkezett” / „Túra lett belőle” / „Lejárt”
   statusTone?: "neutral" | "rating" | "success" | "muted";
-  avatarCount: number;
   detailsLabel: string;
 }
 
@@ -37,9 +36,6 @@ const STATUS_CLASS: Record<NonNullable<IdeaCardProps["statusTone"]>, string> = {
   success: "bg-[color-mix(in_srgb,var(--color-success)_18%,transparent)] text-(--color-success)",
   muted: "bg-ghost text-ink-muted",
 };
-
-/** Az avatárfoltok a B szerepszíneiből; a kártyán legfeljebb négy látszik. */
-const AVATAR_FILL = ["bg-accent", "bg-(--color-rating)", "bg-(--color-success)", "bg-line-strong"];
 
 export function IdeaCard(p: IdeaCardProps) {
   return (
@@ -73,14 +69,7 @@ export function IdeaCard(p: IdeaCardProps) {
       </div>
       <div className="flex items-center justify-between gap-3 border-t border-line px-3.5 py-2.5">
         <span className={`rounded-chip px-2.5 py-1 text-xs font-semibold ${STATUS_CLASS[p.statusTone ?? "neutral"]}`}>{p.statusLabel}</span>
-        <span className="flex items-center gap-2.5">
-          <span className="flex -space-x-1.5" aria-hidden>
-            {Array.from({ length: Math.min(4, Math.max(0, p.avatarCount)) }).map((_, i) => (
-              <span key={i} className={`h-[22px] w-[22px] rounded-full border-2 border-surface ${AVATAR_FILL[i % AVATAR_FILL.length]}`} />
-            ))}
-          </span>
-          <span className="text-sm font-semibold text-accent">{p.detailsLabel}</span>
-        </span>
+        <span className="text-sm font-semibold text-accent">{p.detailsLabel}</span>
       </div>
     </Link>
   );
