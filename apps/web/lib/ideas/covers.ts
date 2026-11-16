@@ -1,5 +1,5 @@
 /**
- * Kategória-borítókép választása a ref_cover_images soraiból (M22 Ötletbörze).
+ * Kategória-borítókép választása a ref_cover_images soraiból (M22 Túraötletek).
  *
  * A seed-sample-data.mjs mintaképei (`source = "uploaded"`) véletlen Picsum-fotók, kategóriától
  * függetlenül — a „Vízi sportok” kiemelt mintaképe egy gitár volt (2026-11-01). Ezért a kiemelés

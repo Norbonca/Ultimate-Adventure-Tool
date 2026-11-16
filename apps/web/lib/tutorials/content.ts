@@ -393,7 +393,7 @@ export const TUTORIALS: Tutorial[] = [
   {
     slug: "otlet-kituzese",
     role: "traveler",
-    topic: { hu: "Ötletbörze", en: "Trip ideas" },
+    topic: { hu: "Túraötletek", en: "Trip ideas" },
     title: { hu: "Ötlet kitűzése", en: "Posting a trip idea" },
     summary: {
       hu: "Nincs kedvedre való túra? Dobd be ötletként, mások csatlakozhatnak, egy szervező felveheti.",
@@ -401,7 +401,7 @@ export const TUTORIALS: Tutorial[] = [
     },
     body: {
       hu: [
-        "Az Ötletbörzén azt írod le, milyen túrára mennél: mit, hová, nagyjából mikor. Ez érdeklődés, nem jelentkezés.",
+        "A Túraötleteknél azt írod le, milyen túrára mennél: mit, hová, nagyjából mikor. Ez érdeklődés, nem jelentkezés.",
         "Aki ugyanerre vágyik, csatlakozhat; a szervezők látják, hányan érdeklődnek, és vállalhatják a megszervezését.",
       ],
       en: [
@@ -410,7 +410,7 @@ export const TUTORIALS: Tutorial[] = [
       ],
     },
     steps: [
-      { at: 0, text: { hu: "Nyisd meg az Ötletbörzét", en: "Open Trip ideas" } },
+      { at: 0, text: { hu: "Nyisd meg a Túraötleteket", en: "Open Trip ideas" } },
       { at: 6, text: { hu: "Nyomd meg a „Dobd be ötletként” gombot", en: "Press “Pin an idea”" } },
       { at: 12, text: { hu: "Add meg a címet, a kategóriát, az időablakot és a célterületet", en: "Enter the title, category, time window and destination" } },
       { at: 27, text: { hu: "Küldd be: „Beküldöm az ötletet”", en: "Submit it: “Submit idea”" } },
@@ -627,7 +627,7 @@ export const TUTORIALS: Tutorial[] = [
   {
     slug: "mire-varnak",
     role: "organizer",
-    topic: { hu: "Ötletbörze", en: "Trip ideas" },
+    topic: { hu: "Túraötletek", en: "Trip ideas" },
     title: { hu: "Ötletből túra: „Mire várnak”", en: "From idea to trip: “In demand”" },
     summary: {
       hu: "A Túráim „Mire várnak” fülén látod a kategóriáidba eső ötleteket, és túrává alakíthatod őket.",
@@ -635,7 +635,7 @@ export const TUTORIALS: Tutorial[] = [
     },
     body: {
       hu: [
-        "A „Mire várnak” fülön az Ötletbörze azon ötletei jelennek meg, amelyek a te kategóriáidba esnek, a csatlakozók száma szerint rendezve.",
+        "A „Mire várnak” fülön a Túraötletek közül azok jelennek meg, amelyek a te kategóriáidba esnek, a csatlakozók száma szerint rendezve.",
         "A „Megszervezem” gombbal vállalod az ötletet; a varázsló ekkor az ötlet adataival indul, így a túra alapjai már kitöltve várnak.",
       ],
       en: [
@@ -789,7 +789,7 @@ export const TUTORIALS: Tutorial[] = [
   {
     slug: "otlet-csatlakozas",
     role: "traveler",
-    topic: { hu: "Ötletbörze", en: "Trip ideas" },
+    topic: { hu: "Túraötletek", en: "Trip ideas" },
     title: { hu: "Csatlakozás egy ötlethez", en: "Joining a trip idea" },
     summary: {
       hu: "Jelzed, hogy te is mennél — létszámmal, hónapokkal, akár névtelenül.",

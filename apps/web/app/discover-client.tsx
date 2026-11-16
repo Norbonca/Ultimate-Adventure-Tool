@@ -846,7 +846,7 @@ export default function DiscoverClient({
                     </button>
                   </div>
                 )}
-                {/* M22 FR-M22-009 — egysoros lista-végi belépő az Ötletbörzébe (D22 `XXcOv` lista-vég). */}
+                {/* M22 FR-M22-009 — egysoros lista-végi belépő a Túraötletekhez (D22 `XXcOv` lista-vég). */}
                 <p className="pt-6 text-center text-sm text-ink-secondary" data-testid="discover-list-end-idea">
                   <Link href="/ideas/new" className="inline-flex items-center gap-1.5 font-semibold text-accent hover:underline">
                     <Lightbulb size={14} aria-hidden />

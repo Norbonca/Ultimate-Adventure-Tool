@@ -220,7 +220,7 @@ const en: TranslationKeys = {
     tripPlanner: "Trip Planner",
     travelPlanner: "Travel Planner",
     community: "Community",
-    tripIdeas: "Idea board",
+    tripIdeas: "Trip ideas",
     home: "Home",
     profile: "Profile",
     settings: "Settings",
@@ -315,7 +315,7 @@ const en: TranslationKeys = {
     secondaryTimelineDesc: "Phases, milestones and tasks from a template, from listing to the day of the trip.",
     secondaryCalendar: "Calendar and time zone",
     secondaryCalendarDesc: "The trip page flags school holidays, public holidays and the time difference based on the viewer's own calendar.",
-    secondaryIdeas: "Idea board",
+    secondaryIdeas: "Trip ideas",
     secondaryIdeasDesc: "See what adventurers are waiting for: take on community ideas and turn them into trips.",
     secondaryMap: "3D map",
     secondaryMapDesc: "Participants browse trips on the globe by location and season.",
@@ -1455,8 +1455,8 @@ const en: TranslationKeys = {
     pages: {
       discover: { title: "Explore trips", description: "Small-group adventure trips in 8 categories: search by place, time and trip type in tile, list or 3D map view, and apply for the date you choose." },
       community: { title: "Community", description: "Adventurers and organizers on {brand}: follow them and discover their trips." },
-      ideas: { title: "Idea board", description: "Trip ideas you can join or organize: destination, time window and the number of people interested, all in one place." },
-      idea: { title: "Idea board", description: "A trip idea on the {brand} idea board — join it or organize it." },
+      ideas: { title: "Trip ideas", description: "Trip ideas you can join or organize: destination, time window and the number of people interested, all in one place." },
+      idea: { title: "Trip ideas", description: "A trip idea on {brand} — join it or organize it." },
       getStarted: { title: "What is {brand}?", description: "Listings, applicants, tasks and shared costs – in one place. See how you can organize small-group adventure trips with {brand}." },
       pricing: { title: "Pricing", description: "Free for personal use. Subscriptions are for those who organize as a business; for cost-sharing trips {brand} is free." },
     },
@@ -1635,7 +1635,7 @@ const en: TranslationKeys = {
       alerts: "Alerts",
       users: "Users",
       trips: "Trip Trips",
-      ideas: "Idea board",
+      ideas: "Trip ideas",
       routes: "Routes",
       support: "Support",
       dashboards: "Dashboards",
@@ -1741,9 +1741,9 @@ const en: TranslationKeys = {
         },
       },
     },
-    // M22 — Idea board moderation
+    // M22 — Trip ideas moderation
     ideas: {
-      title: "Idea board — moderation",
+      title: "Trip ideas — moderation",
       subtitle: "Ideas that reached the report threshold. Restore: back on the board. Remove: hidden from everyone.",
       empty: "No ideas waiting for review.",
       colIdea: "Idea",
@@ -2272,7 +2272,7 @@ const en: TranslationKeys = {
   // ============================================================================
   // M23 — Calendar
   // ============================================================================
-  // ── M22 Trip Ideas — Idea board ──
+  // ── M22 Trip Ideas ──
   ideas: {
     common: {
       or: "or",
@@ -2458,7 +2458,7 @@ const en: TranslationKeys = {
       empty_mine: "You have no ideas yet.",
       empty_joined: "You haven't joined any idea yet.",
       empty_offered: "You haven't offered to organize any idea yet.",
-      browse: "Browse the idea board",
+      browse: "Browse trip ideas",
       first: "Pin your first idea",
       offers: "{count} offers",
     },
@@ -2902,7 +2902,7 @@ const en: TranslationKeys = {
       timeline: "Timeline",
       costs: "Costs",
       discover: "Discover and apply",
-      ideas: "Idea board",
+      ideas: "Trip ideas",
       profile: "Profile",
     },
     tagFilter: "Tags",

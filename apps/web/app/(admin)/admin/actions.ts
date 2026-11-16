@@ -411,7 +411,7 @@ export async function updateTripStatus(
   return { success: true };
 }
 
-// ─── M22 Ötletbörze moderáció (FR-M22-013, BR-M22-009) ───────────────────────
+// ─── M22 Túraötletek moderáció (FR-M22-013, BR-M22-009) ───────────────────────
 
 export interface AdminIdeaRow {
   id: string;

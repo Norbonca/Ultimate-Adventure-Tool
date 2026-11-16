@@ -32,7 +32,7 @@ function normalize(row: Record<string, unknown>): IdeaListItem {
   return { ...r, destinations: [...(r.destinations ?? [])].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)) };
 }
 
-/** Ötletbörze (FR-M22-003): a `link_only` sosem; lezárt/lejárt csak kérésre. */
+/** Túraötletek (FR-M22-003): a `link_only` sosem; lezárt/lejárt csak kérésre. */
 export async function listIdeas(f: BoardFilters): Promise<{ items: IdeaListItem[]; total: number }> {
   const supabase = await createClient();
   const page = Math.max(1, f.page ?? 1);
