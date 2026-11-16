@@ -68,8 +68,13 @@ function extractKeys(content, prefix = '') {
   return { keys, values };
 }
 
+// A márkanév névtől függő magyar alakjai (packages/config brand.ts → hu): a toldalékos alak
+// ({brand_ban}, {brand_n}, {brand_t}, {brand_val}) a {brand} megfelelője, a névelő ({nevelo},
+// {Nevelo}) csak a magyarban létezik — a két nyelv helyőrzőinek összevetésébe így számítanak.
 function findPlaceholders(str) {
-  const matches = str.match(/\{(\w+)\}/g) || [];
+  const matches = (str.match(/\{(\w+)\}/g) || [])
+    .filter((m) => m !== '{nevelo}' && m !== '{Nevelo}')
+    .map((m) => (/^\{brand_(ban|n|t|val)\}$/.test(m) ? '{brand}' : m));
   return matches.sort();
 }
 

@@ -120,14 +120,14 @@ const hu = {
     },
     login: "Bejelentkezés",
     loginTitle: "Bejelentkezés",
-    loginSubtitle: "Üdvözlünk a {brand}-ban",
+    loginSubtitle: "Üdvözlünk {nevelo} {brand_ban}",
     loginLoading: "Bejelentkezés...",
     loginWithGoogle: "Bejelentkezés Google-lel",
     loginWithGoogleLoading: "Bejelentkezés...",
 
     register: "Regisztráció",
     registerTitle: "Regisztráció",
-    registerSubtitle: "Csatlakozz a {brand} közösségéhez",
+    registerSubtitle: "Csatlakozz {nevelo} {brand} közösségéhez",
     registerLoading: "Regisztráció...",
     registerWithGoogle: "Regisztráció Google-lel",
     registerWithGoogleLoading: "Regisztráció...",
@@ -197,7 +197,7 @@ const hu = {
 
   footer: {
     label: "Lábléc",
-    mascotAlt: "A {brand} túratárs: málhát cipelő zho, a lábléc felé lép",
+    mascotAlt: "{Nevelo} {brand} túratárs: málhát cipelő zho, a lábléc felé lép",
   },
 
   // ============================================================================
@@ -210,7 +210,7 @@ const hu = {
     discover: "Túrák felfedezése",
     discoverTrips: "Túrák felfedezése",
     pricing: "Árazás",
-    getStarted: "Mi a {brand}?",
+    getStarted: "Mi {nevelo} {brand}?",
     tutorials: "Útmutatók",
     logIn: "Bejelentkezés",
     signUp: "Regisztráció",
@@ -273,7 +273,7 @@ const hu = {
     // Problem section
     problemTag: "A KIHÍVÁS",
     problemHeadline: "A túra legyen a kihívás, a szervezés legyen egyszerű.",
-    problemDescription: "Jelentkezők egy táblázatban, költségek egy másikban, teendők üzenetekben szétszórva. A {brand} mindezt egy helyre hozza, hogy a túrára figyelhess.",
+    problemDescription: "Jelentkezők egy táblázatban, költségek egy másikban, teendők üzenetekben szétszórva. {Nevelo} {brand} mindezt egy helyre hozza, hogy a túrára figyelhess.",
     problemCard1Title: "Tervezd meg a kalandod",
     problemCard1Text: "Válassz 8 kalandkategóriából, és a varázsló négy lépésben végigvezet: kategória, alapadatok, részletek, közzététel.",
     problemCard2Title: "Menjetek együtt, osszatok igazságosan",
@@ -295,7 +295,7 @@ const hu = {
     // Categories section
     categoriesTag: "8 KALANDKATEGÓRIA",
     categoriesHeadline: "Egy platform. Minden kaland.",
-    categoriesDescription: "Legyen szó csúcsmászásról, hullámlovaglásról vagy völgyi kerékpározásról — a {brand} a sportod nyelvét beszéli.",
+    categoriesDescription: "Legyen szó csúcsmászásról, hullámlovaglásról vagy völgyi kerékpározásról — {nevelo} {brand} a sportod nyelvét beszéli.",
     categoryHikingLabel: "Távolság, szintkülönbség, terep nehézsége",
     categoryMountainLabel: "Technikai fokozatok, via ferrata, felszereléslista",
     categoryWaterLabel: "Vitorlázás, kajakozás, szörfözés, kite",
@@ -901,7 +901,7 @@ const hu = {
       notPublicHint: "A túra még nem nyilvános: a link csak a jogosultaknak nyílik meg.",
       more: "Továbbiak",
       openIn: "Megosztás: {platform} (új lapon nyílik)",
-      message: "{title} — nézd meg a {brand}-n!",
+      message: "{title} — nézd meg {nevelo} {brand_n}!",
       emailSubject: "Túraajánló: {title}",
       platform: {
         facebook: "Facebook",
@@ -914,7 +914,7 @@ const hu = {
         free: "Ingyenes",
         perPerson: "/ fő",
         days: "{count} nap",
-        alt: "{title} — túra a {brand}-n",
+        alt: "{title} — túra {nevelo} {brand_n}",
       },
     },
 
@@ -1041,7 +1041,7 @@ const hu = {
       inviteSentNewTitle: "Meghívó email elküldve",
       inviteSentNewDesc: "{email} — a felhasználó a regisztráció után automatikusan szervezőként csatlakozik a túrához.",
       inviteAddedExistingTitle: "Felhasználó hozzáadva a csapathoz",
-      inviteAddedExistingDesc: "{name} már regisztrált a {brand}-n. A megadott pozícióval rögtön bekerült a szervezői csapatba.",
+      inviteAddedExistingDesc: "{name} már regisztrált {nevelo} {brand_n}. A megadott pozícióval rögtön bekerült a szervezői csapatba.",
       inviteAnother: "Új meghívás",
       assignWillAppear: "A személy azonnal résztvevőként megjelenik.",
       applicationsLoading: "Jelentkezések betöltése…",
@@ -1353,7 +1353,7 @@ const hu = {
     // B „Terep” nyitóoldal (2026-11-14): számozott szakaszok a terv szerint
     sectionFind: "01 / Találd meg",
     sectionDepartures: "02 / Indulások",
-    sectionHow: "03 / Mi a {brand}?",
+    sectionHow: "03 / Mi {nevelo} {brand}?",
     howTitle: "Így megy",
     howStep1Title: "Válassz túrát",
     howStep1Text: "Szűrj úti cél, időpont és kalandtípus szerint.",
@@ -1478,14 +1478,14 @@ const hu = {
     keywords: "kaland, túra, utazás, költségmegosztás, túravezető, trekking, outdoor",
     siteTagline: "Kalandtúrák szervezése és felfedezése",
     siteDescription: "Meghirdetés, jelentkezők, teendők és közös költségek – egy felületen. Kis csoportos kalandtúrák szervezőinek és résztvevőinek.",
-    tripFallbackDescription: "Fedezd fel ezt a kalandot a {brand}-n.",
+    tripFallbackDescription: "Fedezd fel ezt a kalandot {nevelo} {brand_n}.",
     pages: {
       discover: { title: "Túrák felfedezése", description: "Kis csoportos kalandtúrák 8 kategóriában: keress hely, idő és túratípus szerint, csempe-, lista- vagy 3D-térképnézetben, és jelentkezz a választott időpontra." },
-      community: { title: "Közösség", description: "Kalandorok és szervezők a {brand}-n: kövesd őket, és fedezd fel a túráikat." },
+      community: { title: "Közösség", description: "Kalandorok és szervezők {nevelo} {brand_n}: kövesd őket, és fedezd fel a túráikat." },
       ideas: { title: "Ötletbörze", description: "Túraötletek, amelyekhez csatlakozhatsz, vagy amelyeket megszervezhetsz: célterület, időablak és az érdeklődők száma egy helyen." },
-      idea: { title: "Ötletbörze", description: "Túraötlet a {brand} Ötletbörzéjén — csatlakozz, vagy szervezd meg." },
-      getStarted: { title: "Mi a {brand}?", description: "Meghirdetés, jelentkezők, teendők és közös költségek – egy felületen. Ismerd meg, hogyan szervezhetsz kis csoportos kalandtúrákat a {brand}-val." },
-      pricing: { title: "Árazás", description: "Személyes használatra ingyenes. Előfizetést az fizet, aki üzletszerűen szervez; költségmegosztó túrákhoz a {brand} ingyenes." },
+      idea: { title: "Ötletbörze", description: "Túraötlet {nevelo} {brand} Ötletbörzéjén — csatlakozz, vagy szervezd meg." },
+      getStarted: { title: "Mi {nevelo} {brand}?", description: "Meghirdetés, jelentkezők, teendők és közös költségek – egy felületen. Ismerd meg, hogyan szervezhetsz kis csoportos kalandtúrákat {nevelo} {brand_val}." },
+      pricing: { title: "Árazás", description: "Személyes használatra ingyenes. Előfizetést az fizet, aki üzletszerűen szervez; költségmegosztó túrákhoz {nevelo} {brand} ingyenes." },
     },
   },
 
@@ -1798,7 +1798,7 @@ const hu = {
       demoRegistrationConfirmed: "Regisztráció megerősítve",
       minutesAgo: "{count} perce",
       title: "Irányítópult",
-      subtitle: "Üdvözlünk! Íme, mi történik a {brand}-ban.",
+      subtitle: "Üdvözlünk! Íme, mi történik {nevelo} {brand_ban}.",
       totalUsers: "Összes felhasználó",
       newSignups: "Új regisztráció",
       activeTrips: "Aktív túrák",
@@ -2906,8 +2906,8 @@ const hu = {
   // M211 — Útmutatók (D21)
   // ============================================================================
   presentation: {
-    metaTitle: "A {brand} szervezőknek — bemutató",
-    metaDescription: "Meghirdetés, jelentkezők, teendők és közös költségek egy felületen: a {brand} bemutatója kalandtúra-szervezőknek.",
+    metaTitle: "{Nevelo} {brand} szervezőknek — bemutató",
+    metaDescription: "Meghirdetés, jelentkezők, teendők és közös költségek egy felületen: {nevelo} {brand} bemutatója kalandtúra-szervezőknek.",
     label: "szervezőknek",
     counter: "{n} / {total}",
     controls: "A bemutató vezérlése",
@@ -2922,7 +2922,7 @@ const hu = {
     promoEyebrow: "Szervezőknek",
     promoCta: "Nézd meg a bemutatót",
     promoMeta: "{count} dia · kb. {minutes} perc",
-    videoLabel: "A {brand} bemutatója szervezőknek — videó",
+    videoLabel: "{Nevelo} {brand} bemutatója szervezőknek — videó",
   },
   tutorials: {
     groups: {
@@ -2947,9 +2947,9 @@ const hu = {
       tasks: "Teendők",
     },
     metaTitle: "Útmutatók",
-    metaDescription: "Lépésenkénti képes bemutatók és leírások a {brand} használatáról.",
+    metaDescription: "Lépésenkénti képes bemutatók és leírások {nevelo} {brand} használatáról.",
     eyebrow: "Útmutatók",
-    title: "Így használd a {brand}-t",
+    title: "Így használd {nevelo} {brand_t}",
     lead: "Lépésenkénti képes bemutatók és leírások — egy-egy funkcióhoz, pár perc alatt.",
     searchPlaceholder: "Mit szeretnél megcsinálni?",
     search: "Keresés",
