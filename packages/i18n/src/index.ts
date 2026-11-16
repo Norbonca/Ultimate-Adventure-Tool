@@ -20,19 +20,40 @@ import enRaw from './en';
 export type Locale = 'hu' | 'en';
 export type { TranslationKeys };
 
+/** Amit a márkakonfigurációból a szövegekbe helyettesítünk. */
+export interface BrandTexts {
+  name: string;
+  tagline: Record<Locale, string>;
+  hu: { article: string; forms: { ban: string; n: string; t: string; val: string } };
+}
+
 /**
- * A márkanév és a márkamondat nincs beégetve a nyelvi fájlokba: a `{brand}` és a `{tagline}`
- * helyőrzőt itt, egyszer cseréljük a márkakonfigurációból (`@uat/config` → BRAND), így minden
- * hozzáférési út (t, createT, getTranslations, getSection) a kész szöveget kapja.
+ * A márkanév, a márkamondat és a névtől függő magyar nyelvtani alakok nincsenek beégetve a
+ * nyelvi fájlokba: a helyőrzőket itt, egyszer cseréljük a márkakonfigurációból (`@uat/config` → BRAND),
+ * így minden hozzáférési út (t, createT, getTranslations, getSection) a kész szöveget kapja.
+ *
+ *   {brand} {tagline}                              — név, márkamondat
+ *   {nevelo} {Nevelo}                              — határozott névelő a név előtt (a/az · A/Az)
+ *   {brand_ban} {brand_n} {brand_t} {brand_val}    — toldalékos alakok
  */
-function withBrand<T>(node: T, locale: Locale): T {
+export function applyBrand<T>(node: T, locale: Locale, brand: BrandTexts): T {
   if (typeof node === 'string') {
-    return node.replace(/\{brand\}/g, BRAND.name).replace(/\{tagline\}/g, BRAND.tagline[locale]) as T;
+    const article = brand.hu.article;
+    return node
+      .replace(/\{brand_(ban|n|t|val)\}/g, (_m, form: keyof BrandTexts['hu']['forms']) => brand.hu.forms[form])
+      .replace(/\{nevelo\}/g, article)
+      .replace(/\{Nevelo\}/g, article.charAt(0).toUpperCase() + article.slice(1))
+      .replace(/\{brand\}/g, brand.name)
+      .replace(/\{tagline\}/g, brand.tagline[locale]) as T;
   }
   if (node && typeof node === 'object') {
-    return Object.fromEntries(Object.entries(node).map(([k, v]) => [k, withBrand(v, locale)])) as T;
+    return Object.fromEntries(Object.entries(node).map(([k, v]) => [k, applyBrand(v, locale, brand)])) as T;
   }
   return node;
+}
+
+function withBrand<T>(node: T, locale: Locale): T {
+  return applyBrand(node, locale, BRAND);
 }
 
 const hu: TranslationKeys = withBrand(huRaw as TranslationKeys, 'hu');

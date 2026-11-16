@@ -59,7 +59,7 @@ describe("i18n system", () => {
       setLocale("en");
       expect(t("common.appTagline")).toBe(BRAND.tagline.en);
       setLocale("hu");
-      expect(t("nav.getStarted")).toBe(`Mi a ${BRAND.name}?`);
+      expect(t("nav.getStarted")).toBe(`Mi ${BRAND.hu.article} ${BRAND.name}?`);
       expect(JSON.stringify(getTranslations("hu"))).not.toMatch(/\{brand\}|\{tagline\}/);
       expect(JSON.stringify(getTranslations("en"))).not.toMatch(/\{brand\}|\{tagline\}/);
     });
