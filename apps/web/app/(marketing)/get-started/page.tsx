@@ -1003,6 +1003,8 @@ export default function HomePage() {
       {/* M211b — promó blokk a szervezői bemutatóhoz (D09 „M211b — Promó blokk”). */}
       <PresentationPromo />
 
+      <ZhoStories />
+
       {/* Problem Section */}
       <section className="problem">
         <div className="section-container">
@@ -1189,8 +1191,6 @@ export default function HomePage() {
 
         </div>
       </section>
-
-      <ZhoStories />
 
       {/* Final CTA */}
       <section data-surface="night" className="final-cta">
