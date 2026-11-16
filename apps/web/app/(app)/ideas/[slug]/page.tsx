@@ -88,7 +88,7 @@ export default async function IdeaDetailPage({ params }: Props) {
             <div className="flex flex-wrap items-center gap-2">
               {chip && <span className={`inline-flex w-fit items-center gap-1.5 rounded-chip bg-glass px-2.5 py-1 text-xs font-semibold backdrop-blur-sm ${CATEGORY_TEXT[chip.token]}`}><Icon name={chip.icon} size={14} />{chip.label}</span>}
               {underReview && <span className="inline-flex items-center gap-1.5 rounded-chip bg-(--color-warning-subtle) px-2.5 py-1 text-xs font-semibold text-(--color-warning-text)"><Icon name="flag" size={12} />{t("ideas.detail.underReview")}</span>}
-              {!joinable && !underReview && <span className="inline-flex items-center gap-1.5 rounded-chip bg-glass px-2.5 py-1 text-xs font-semibold text-ink"><Icon name="x-circle" size={12} />{st.label}</span>}
+              {!underReview && <span className="inline-flex items-center gap-1.5 rounded-chip bg-glass px-2.5 py-1 text-xs font-semibold text-ink backdrop-blur-sm"><Icon name={joinable ? "lightbulb" : "x-circle"} size={12} />{st.label}</span>}
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
               <h1 className="text-[30px] font-extrabold leading-[1.1] tracking-[-0.02em] text-ink text-balance md:text-hero-display">{idea.title}</h1>
@@ -101,10 +101,9 @@ export default async function IdeaDetailPage({ params }: Props) {
               <span className="inline-flex items-center gap-1.5"><Icon name="users" size={16} className="text-ink-secondary" />{membersText(idea, tr)}</span>
             </p>
           </div>
-          <div className="hidden flex-col items-end gap-2.5 md:flex">
-            <span className="text-lg font-semibold text-ink">{st.label}</span>
-            <div className="w-56"><IdeaActions ideaId={idea.id} slug={idea.slug} joinable={joinable} isOwner={isOwner} userId={rel.userId} member={rel.member} offered={rel.offered} reported={rel.reported} windowMonths={months} layout="sticky" /></div>
-          </div>
+          {/* Nincs gomb a heróban: az oldalsó csatlakozás-doboz egyszerre látszik vele (Norbert, 2026-11-02 —
+              ugyanez a szabály a túra adatlapján). Mobilon és tableten a ragadós sáv mutatja. Az állapot a
+              fenti chipsorban áll. */}
         </div>
       </section>
 

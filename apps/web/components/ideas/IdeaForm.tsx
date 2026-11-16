@@ -202,19 +202,26 @@ export function IdeaForm({ mode, initial, categories, countries, currencies }: P
             <select value={em} onChange={(e) => { setEm(Number(e.target.value)); setPeriodKey(null); setYearOverride(null); }} className={`${inputCls} mt-1 font-normal`}>{MONTHS.map((m) => <option key={m} value={m}>{monthName(m, locale)}</option>)}</select>
           </label>
         </div>
-        <div className="mt-3 flex items-center gap-3 rounded-xl bg-navy-50 px-3.5 py-2.5" data-testid="idea-window-hint">
-          <Icon name="calendar-range" size={16} className="shrink-0 text-trevu-700" aria-hidden />
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-navy-900">{formatWindow({ startMonth: sm, endMonth: em, year }, locale)}</p>
-            <p className="text-xs text-navy-400">{t("ideas.form.yearAuto", { year })} · {t("ideas.form.seasonChips")}</p>
+        {/* Az évválasztó nem `input-trevu`: az a segédosztály `w-full`, és a sorban kiszorítaná
+            a súgószöveget (a szöveg egy keskeny oszlopba tördelődött a legördülő mögé). */}
+        <div className="mt-3 flex flex-wrap items-center gap-3 rounded-trevu bg-ghost px-3.5 py-2.5" data-testid="idea-window-hint">
+          <Icon name="calendar-range" size={16} className="shrink-0 text-accent" aria-hidden />
+          <div className="min-w-[160px] flex-1">
+            <p className="text-sm font-semibold text-ink">{formatWindow({ startMonth: sm, endMonth: em, year }, locale)}</p>
+            <p className="text-xs text-ink-muted">{t("ideas.form.yearAuto", { year })} · {t("ideas.form.seasonChips")}</p>
           </div>
-          <select aria-label={t("ideas.form.yearChange")} value={year} onChange={(e) => setYearOverride(Number(e.target.value))} className="input-trevu px-2 py-1.5 text-xs">
+          <select
+            aria-label={t("ideas.form.yearChange")}
+            value={year}
+            onChange={(e) => setYearOverride(Number(e.target.value))}
+            className="h-11 w-auto shrink-0 rounded-trevu border-[1.5px] border-line-strong bg-surface px-2 text-sm text-ink outline-hidden focus:border-accent"
+          >
             {[now.getFullYear(), now.getFullYear() + 1, now.getFullYear() + 2].map((y) => <option key={y} value={y}>{y}</option>)}
           </select>
         </div>
         <div className="mt-2 flex flex-wrap gap-2">
           {(Object.keys(SEASON_MONTHS) as (keyof typeof SEASON_MONTHS)[]).map((s) => (
-            <button key={s} type="button" aria-pressed={periodKey === s} onClick={() => { const [a, b] = SEASON_MONTHS[s]; setSm(a); setEm(b); setPeriodKey(s); setYearOverride(null); }} className={`rounded-chip px-3 py-1.5 text-xs font-semibold ${periodKey === s ? "bg-trevu-50 text-trevu-700" : "bg-navy-50 text-navy-600"}`}>{t(`ideas.period.${s}`)}</button>
+            <button key={s} type="button" aria-pressed={periodKey === s} onClick={() => { const [a, b] = SEASON_MONTHS[s]; setSm(a); setEm(b); setPeriodKey(s); setYearOverride(null); }} className={`inline-flex min-h-11 items-center rounded-chip px-3 text-sm font-semibold ${periodKey === s ? "bg-accent text-accent-on" : "bg-ghost text-ink-secondary hover:bg-line"}`}>{t(`ideas.period.${s}`)}</button>
           ))}
         </div>
         {windowErr && <p role="alert" className="mt-1 text-xs text-(--color-danger)">{t(`ideas.errors.${windowErr}`)}</p>}

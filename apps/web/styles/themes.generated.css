@@ -21,7 +21,7 @@
   --sunrise-coral: #A3271C;
   --trail-sage: #3D6A33;
   --golden-hour: #E6C35A;
-  --dusk-violet: #8B5CF6;
+  --dusk-violet: #5A5D55;
   --radius-s: 0px;
   --radius-m: 0px;
   --radius-l: 0px;
@@ -56,10 +56,10 @@
   --color-success-text: #3D6A33;
   --color-danger-subtle: #F9E4E1;
   --color-warning-subtle: #F6EFD6;
-  --color-info-subtle: #DBEAFE;
-  --color-special-subtle: #EDE9FE;
+  --color-info-subtle: #DEDCD1;
+  --color-special-subtle: #DEDCD1;
   --color-navy-800: #2C302A;
-  --color-info: #3B82F6;
+  --color-info: #5A5D55;
   --color-warning: #B08A10;
   --gradient-trevu: linear-gradient(#F15B2A, #F15B2A);
   --gradient-dawn: linear-gradient(#F15B2A, #F15B2A);

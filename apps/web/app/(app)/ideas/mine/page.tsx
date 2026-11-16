@@ -35,7 +35,8 @@ export default async function MyIdeasPage({ searchParams }: Props) {
   return (
     <main className="min-h-screen bg-slate-50">
       <div data-surface="night" className="contents"><AppHeader user={{ email: user.email ?? "", displayName: user.user_metadata?.full_name }} /></div>
-      <div className="mx-auto max-w-6xl px-5 py-8">
+      {/* A konténer a többi belső oldaléval egyezik: ugyanaz a bal szél, mint a fejlécben és a Túráimon. */}
+      <div className="mx-auto max-w-7xl px-4 py-8 md:px-[120px]">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-3xl font-extrabold text-navy-900">{t("ideas.mine.title")}</h1>
           <Link href="/ideas/new" className="inline-flex h-10 items-center gap-2 rounded-trevu bg-trevu-600 px-4 text-sm font-semibold text-white"><Icon name="lightbulb" size={16} aria-hidden />{t("ideas.board.newIdea")}</Link>
