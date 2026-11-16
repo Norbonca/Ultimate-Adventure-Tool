@@ -17,6 +17,8 @@ import { BRAND } from "@uat/config";
 import { BrandHead, BrandWordmark } from "@/components/brand/BrandMark";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useTranslation } from "@/lib/i18n/useTranslation";
+import { visibleNavItems } from "@/lib/nav/items";
+import { useAuthUser } from "@/lib/nav/useAuthUser";
 
 const HIDDEN_PREFIXES = [
   "/admin",
@@ -29,17 +31,13 @@ const HIDDEN_PREFIXES = [
   "/presentation",
 ];
 
-// Csak a kijelentkezve is értelmes, élő oldalak (a bejelentkezéshez kötött menüpontok a fejlécben vannak;
-// az Árazás nem látszik, amíg fizetni sem lehet — Norbert, 2026-11-16). Elöl a funkciók, hátul a tájékoztató.
-const LINKS = [
-  { key: "nav.discover", href: "/" },
-  { key: "nav.tripIdeas", href: "/ideas" },
-  { key: "nav.getStarted", href: "/get-started" },
-] as const;
+// A lábléc menüje a fejlécével szinkronban (lib/nav/items.ts — Norbert, 2026-11-16).
 
 export function SiteFooter() {
   const pathname = usePathname() ?? "/";
   const { t } = useTranslation();
+  const { checked, user } = useAuthUser();
+  const links = visibleNavItems(checked && !!user);
   if (HIDDEN_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`))) return null;
 
   return (
@@ -67,7 +65,7 @@ export function SiteFooter() {
         </div>
         <div className="flex flex-col gap-4 md:items-end">
           <nav aria-label={t("footer.label")} className="flex flex-wrap gap-x-6 gap-y-1 text-base font-medium">
-            {LINKS.map((l) => (
+            {links.map((l) => (
               <Link key={l.href} href={l.href} className="flex min-h-11 items-center hover:text-accent">
                 {t(l.key)}
               </Link>

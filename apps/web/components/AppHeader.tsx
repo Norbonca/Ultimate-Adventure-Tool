@@ -7,7 +7,9 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { ChevronDown, Home, Sparkles, Users, Map, Lightbulb, CirclePlay } from "@/lib/icons";
+import { ChevronDown } from "@/lib/icons";
+import { NAV_ITEMS, visibleNavItems } from "@/lib/nav/items";
+import { useAuthUser } from "@/lib/nav/useAuthUser";
 
 // ── Types ──────────────────────────────────────────────────────────
 interface AppHeaderProps {
@@ -21,22 +23,6 @@ interface AppHeaderProps {
   } | null;
 }
 
-// ── Navigáció — egyetlen lista, minden menü ebből szűr ──────────────
-// Elvek (Norbert, 2026-11-16):
-//  1. Ami csak bejelentkezve értelmes (Túratervező, Közösség, Útmutatók), csak bejelentkezve látszik.
-//  2. Elöl a funkciók, hátul a leírások és tájékoztatók.
-//  3. Ami még nem élő funkció, egyáltalán nem látszik (pl. Árazás, amíg fizetni sem lehet).
-// Túratervező = M02 túraszervezés (a My Trips oldalról indul); nem az M20 Utazástervező.
-// `center: false` — csak a bal oldali (logó alatti) lenyíló menüben szerepel.
-const NAV_ITEMS = [
-  { key: "nav.discover", href: "/", icon: Home, auth: false, center: true },
-  { key: "nav.tripIdeas", href: "/ideas", icon: Lightbulb, auth: false, center: false }, // M22 — a Felfedezés alatt (NyK-08)
-  { key: "nav.tripPlanner", href: "/trips", icon: Map, auth: true, center: true },
-  { key: "nav.community", href: "/community", icon: Users, auth: true, center: true },
-  { key: "nav.tutorials", href: "/tutorials", icon: CirclePlay, auth: true, center: true }, // M211 — Útmutatók
-  { key: "nav.getStarted", href: "/get-started", icon: Sparkles, auth: false, center: true },
-] as const;
-
 // ── Component ─────────────────────────────────────────────────────
 export function AppHeader({ user }: AppHeaderProps) {
   const { t } = useTranslation();
@@ -46,31 +32,8 @@ export function AppHeader({ user }: AppHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Auth state — a prop az igazság, ha a szülő adta; különben a kliensoldali ellenőrzés eredménye
-  // (derive-during-render, nincs prop→state szinkron effect; D12, 2026-10-30).
-  const [fetched, setFetched] = useState<{ checked: boolean; user: AppHeaderProps["user"] }>({ checked: false, user: null });
-  const authChecked = user !== undefined || fetched.checked;
-  const resolvedUser = user !== undefined ? user : fetched.user;
-
-  // Client-side auth check if no user prop
-  useEffect(() => {
-    if (user !== undefined) return;
-    let fetchedUser: AppHeaderProps["user"] = null;
-    fetch("/api/v1/auth/check")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        if (d?.authenticated && d?.email) {
-          fetchedUser = {
-            email: d.email,
-            displayName: d.displayName ?? undefined,
-            firstName: d.firstName ?? undefined,
-            lastName: d.lastName ?? undefined,
-          };
-        }
-      })
-      .catch(() => {})
-      .finally(() => setFetched({ checked: true, user: fetchedUser }));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // Belépési állapot — a prop az igazság, ha a szülő adta; különben a közös kliensoldali ellenőrzés.
+  const { checked: authChecked, user: resolvedUser } = useAuthUser(user);
 
   // Close dropdown on outside click or ESC
   useEffect(() => {
@@ -131,7 +94,7 @@ export function AppHeader({ user }: AppHeaderProps) {
           {/* Dropdown menu */}
           {menuOpen && (
             <div className="absolute top-full left-0 mt-1 w-52 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 z-50 night:bg-surface night:border-line night:shadow-none">
-              {NAV_ITEMS.filter((item) => isLoggedIn || !item.auth).map((item) => {
+              {visibleNavItems(isLoggedIn).map((item) => {
                 const Icon = item.icon;
                 return (
                   <Link
