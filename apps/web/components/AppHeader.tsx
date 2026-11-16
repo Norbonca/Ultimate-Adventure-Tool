@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { ChevronDown, Home, Sparkles, Users, CreditCard, Map , Lightbulb, CirclePlay } from "@/lib/icons";
+import { ChevronDown, Home, Sparkles, Users, Map, Lightbulb, CirclePlay } from "@/lib/icons";
 
 // ── Types ──────────────────────────────────────────────────────────
 interface AppHeaderProps {
@@ -21,35 +21,20 @@ interface AppHeaderProps {
   } | null;
 }
 
-// ── Navigation menu items (static) ────────────────────────────────
+// ── Navigáció — egyetlen lista, minden menü ebből szűr ──────────────
+// Elvek (Norbert, 2026-11-16):
+//  1. Ami csak bejelentkezve értelmes (Túratervező, Közösség, Útmutatók), csak bejelentkezve látszik.
+//  2. Elöl a funkciók, hátul a leírások és tájékoztatók.
+//  3. Ami még nem élő funkció, egyáltalán nem látszik (pl. Árazás, amíg fizetni sem lehet).
+// Túratervező = M02 túraszervezés (a My Trips oldalról indul); nem az M20 Utazástervező.
+// `center: false` — csak a bal oldali (logó alatti) lenyíló menüben szerepel.
 const NAV_ITEMS = [
-  { key: "nav.discover", href: "/", icon: Home },
-  { key: "nav.tripIdeas", href: "/ideas", icon: Lightbulb }, // M22 — az Ötletbörze a Felfedezés alatt (NyK-08)
-  { key: "nav.tripPlanner", href: "/trips", icon: Map },
-  { key: "nav.getStarted", href: "/get-started", icon: Sparkles },
-  { key: "nav.tutorials", href: "/tutorials", icon: CirclePlay }, // M211 — Útmutatók (ND-06)
-  { key: "nav.community", href: "/community", icon: Users },
-  { key: "nav.pricing", href: "/pricing", icon: CreditCard },
-] as const;
-
-// ── Belső funkciók menüje — a KÖZÉP zóna alapértelmezett tartalma
-// bejelentkezve, minden app-oldalon (spec 1.4).
-// Túratervező = M02 túraszervezés (a My Trips oldalról indul);
-// nem keverendő az M20 Utazástervezővel (per-túra oda-/hazaút tervezés).
-const INTERNAL_NAV = [
-  { key: "nav.discover", href: "/" },
-  { key: "nav.getStarted", href: "/get-started" },
-  { key: "nav.tripPlanner", href: "/trips" },
-  { key: "nav.community", href: "/community" },
-  { key: "nav.tutorials", href: "/tutorials" }, // M211 — csak belépve
-] as const;
-
-// Kijelentkezve a középső zóna (minden nyilvános oldalon azonos)
-const PUBLIC_NAV = [
-  { key: "nav.discover", href: "/" },
-  { key: "nav.getStarted", href: "/get-started" },
-  { key: "nav.pricing", href: "/pricing" },
-  { key: "nav.community", href: "/community" },
+  { key: "nav.discover", href: "/", icon: Home, auth: false, center: true },
+  { key: "nav.tripIdeas", href: "/ideas", icon: Lightbulb, auth: false, center: false }, // M22 — a Felfedezés alatt (NyK-08)
+  { key: "nav.tripPlanner", href: "/trips", icon: Map, auth: true, center: true },
+  { key: "nav.community", href: "/community", icon: Users, auth: true, center: true },
+  { key: "nav.tutorials", href: "/tutorials", icon: CirclePlay, auth: true, center: true }, // M211 — Útmutatók
+  { key: "nav.getStarted", href: "/get-started", icon: Sparkles, auth: false, center: true },
 ] as const;
 
 // ── Component ─────────────────────────────────────────────────────
@@ -146,7 +131,7 @@ export function AppHeader({ user }: AppHeaderProps) {
           {/* Dropdown menu */}
           {menuOpen && (
             <div className="absolute top-full left-0 mt-1 w-52 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 z-50 night:bg-surface night:border-line night:shadow-none">
-              {NAV_ITEMS.filter((item) => isLoggedIn || item.href !== "/tutorials").map((item) => {
+              {NAV_ITEMS.filter((item) => isLoggedIn || !item.auth).map((item) => {
                 const Icon = item.icon;
                 return (
                   <Link
@@ -164,12 +149,11 @@ export function AppHeader({ user }: AppHeaderProps) {
           )}
         </div>
 
-        {/* ── KÖZÉP ZÓNA: egységes fő navigáció (Norbert 2026-11-02: „mindkettő legyen felül, és legyen
-            egyértelmű, mi az a funkció”). Design: D02/D09 `Component/Header` — kijelentkezve
-            Túrák felfedezése · Mi a {brand}? · Árazás · Közösség; belépve Túrák felfedezése · Mi a {brand}? ·
-            Túratervező · Közösség · Útmutatók. Az `anchors` prop már nem befolyásolja a középső zónát. */}
+        {/* ── KÖZÉP ZÓNA: a fő navigáció a NAV_ITEMS elvei szerint — kijelentkezve
+            Túrák felfedezése · Mi a {brand}?; belépve Túrák felfedezése · Túratervező · Közösség ·
+            Útmutatók · Mi a {brand}?. Az `anchors` prop nem befolyásolja a középső zónát. */}
         <nav className="hidden lg:flex items-center gap-1 mx-auto" data-testid="header-nav">
-          {(authChecked && isLoggedIn ? INTERNAL_NAV : PUBLIC_NAV).map((item, i) => {
+          {NAV_ITEMS.filter((item) => item.center && (!item.auth || (authChecked && isLoggedIn))).map((item, i) => {
             const active = item.href === "/" ? pathname === "/" : pathname?.startsWith(item.href);
             return (
               <span key={item.href} className="flex items-center">
