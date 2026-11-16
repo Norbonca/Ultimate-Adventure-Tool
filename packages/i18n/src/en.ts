@@ -23,6 +23,8 @@ const en: TranslationKeys = {
     tibetEnding: "On the north side of the mountain, the yak disappeared into a cave. Legend has it that the mark of her horn can still be seen in the rock. The place is called Drira Phuk, the Cave of the Female Yak’s Horn.",
     bhutanAlt: "Water springs from the rocky meadow beside ZHO’s horn.",
     tibetAlt: "ZHO breaks a trail through deep snow, and Götsangpa follows in his tracks.",
+    bhutanVideo: "The original account in Dzongkha",
+    videoFallback: "The video is also available at the source linked below.",
     bhutanSource: "Source · Damchoe’s account, Bhutan Cultural Library",
     tibetSource: "Source · Ekai Kawaguchi, Three Years in Tibet, p. 171",
     tibetTradition: "The Tibetan tradition of Drira Phuk",

@@ -8,6 +8,7 @@ const stories = [
     title: "zhoStories.bhutanTitle",
     alt: "zhoStories.bhutanAlt",
     image: "/brand/stories/zhaw-laga.png",
+    video: "/brand/stories/zhaw-laga.mp4",
     paragraphs: ["zhoStories.bhutanOpening", "zhoStories.bhutanSpring", "zhoStories.bhutanEnding"],
     sources: [
       { label: "zhoStories.bhutanSource", href: "https://av.mandala.library.virginia.edu/video/account-yak-shaw-lagar-0" },
@@ -52,6 +53,21 @@ export function ZhoStories() {
                 <summary className="min-h-11 cursor-pointer px-4 py-3 text-sm font-semibold">{t("zhoStories.read")}</summary>
                 <div className="space-y-4 px-4 pb-4 font-serif text-lg leading-relaxed sm:px-6">
                   {story.paragraphs.map((paragraph) => <p key={paragraph}>{t(paragraph)}</p>)}
+                  {"video" in story && (
+                    <div className="space-y-2">
+                      <p id="zhaw-laga-video-label" className="text-base font-semibold">{t("zhoStories.bhutanVideo")}</p>
+                      <video
+                        aria-labelledby="zhaw-laga-video-label"
+                        controls
+                        playsInline
+                        preload="none"
+                        className="aspect-video w-full bg-ink"
+                      >
+                        <source src={story.video} type="video/mp4" />
+                        {t("zhoStories.videoFallback")}
+                      </video>
+                    </div>
+                  )}
                   <ul className="space-y-2 border-t border-line pt-3 font-sans text-sm">
                     {story.sources.map((source) => (
                       <li key={source.href}><a href={source.href} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">{t(source.label)}</a></li>

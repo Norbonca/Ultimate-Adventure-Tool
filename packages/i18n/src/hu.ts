@@ -22,6 +22,8 @@ const hu = {
     tibet: "Tibet",
     bhutanAlt: "ZHO szarva mellett víz fakad a sziklás réten.",
     tibetAlt: "ZHO utat tör a mély hóban, Götsangpa a kitaposott sávban követi.",
+    bhutanVideo: "Az eredeti elbeszélés dzongkha nyelven",
+    videoFallback: "A videó a lent megadott forrásnál is elérhető.",
     bhutanSource: "Forrás · Damchoe elbeszélése, Bhutan Cultural Library",
     tibetSource: "Forrás · Ekai Kawaguchi: Three Years in Tibet, 171. o.",
     tibetTradition: "A Drira Phukhoz kötődő tibeti hagyomány",
