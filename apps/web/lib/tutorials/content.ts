@@ -294,7 +294,7 @@ export const TUTORIALS: Tutorial[] = [
     },
     body: {
       hu: [
-        `A Felfedezés a ${BRAND.name} nyitóoldala. A keresőbe írhatsz túranevet, helyet vagy országot, a szűrőkkel pedig szűkítheted a találatokat kategóriára, időpontra és árra.`,
+        `A Felfedezés ${BRAND.hu.article} ${BRAND.name} nyitóoldala. A keresőbe írhatsz túranevet, helyet vagy országot, a szűrőkkel pedig szűkítheted a találatokat kategóriára, időpontra és árra.`,
         "A találatokat csempékben, listában vagy a 3D térképen nézheted. A több időpontos túrák egy kártyán jelennek meg, az időpontokkal együtt.",
       ],
       en: [
@@ -668,7 +668,7 @@ export const TUTORIALS: Tutorial[] = [
     },
     body: {
       hu: [
-        `A Beállítások Érdeklődés oldalán kiválasztod, milyen kalandok érdekelnek. Ebből tudja a ${BRAND.name}, milyen ötleteket és túrákat mutasson neked.`,
+        `A Beállítások Érdeklődés oldalán kiválasztod, milyen kalandok érdekelnek. Ebből tudja ${BRAND.hu.article} ${BRAND.name}, milyen ötleteket és túrákat mutasson neked.`,
         "A Készségek oldalon kategóriánként megadod a tapasztalatodat. A szervező ebből látja, illik-e hozzád a túra.",
       ],
       en: [
