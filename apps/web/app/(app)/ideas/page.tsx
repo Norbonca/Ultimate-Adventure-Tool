@@ -1,23 +1,30 @@
 /**
- * M22 — Túraötletek `/ideas` (FR-M22-003). Design: D22 `EQOlq` (1440), `o7In2` (390).
+ * M22 — Túraötletek `/ideas` (FR-M22-003).
+ *
+ * Design: design/claude/D22b_Turaotletek#Lista (1440), #Lista_390 (390), #Ures (üres találat),
+ * #Szuro_390 (szűrőlap); archív: design/D22_Trip_Ideas.pen#EQOlq / #o7In2 („Éjszakai túra”).
  * Szerveroldalon renderelt, bejelentkezés nélkül is elérhető (NK-M22-001); a szűrők az URL-ben.
+ *
+ * B „Terep” (2026-11-16): a lap formanyelve a Felfedezésé (`/`) — osztott Night hero, mono verzál
+ * szekciócímkék (01 / 02 / 03), Anton verzál címsorok, verzál kategória-fülsor két szén vonal
+ * között, `FilterSheet`, négy oszlopos tömör rács, szögletes elsődleges gombok, 120 px-es asztali
+ * margó. A tartalom és a logika nem változott: ugyanazok a szűrők, ugyanaz a kártyatartalom.
  */
 
 import { pageMeta } from "@/lib/seo";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getServerT } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
 import { Icon } from "@/components/Icon";
-import { CoverImage } from "@/components/ui/CoverImage";
 import { IdeaCard } from "@/components/ideas/IdeaCard";
+import { IdeasSearch, IdeasFilters, type IdeasFilterGroup } from "@/components/ideas/IdeasToolbar";
 import { TutorialHelp } from "@/components/tutorials/TutorialHelp";
 import { BOARD_PAGE_SIZE, listIdeas } from "@/lib/ideas/queries";
 import { categoryChip, destinationsText, getCategoryCovers, membersText, ownerText, statusChip, windowText } from "@/lib/ideas/present";
 import { fetchCategories } from "../trips/actions";
-import { CATEGORY_DISPLAY } from "@/lib/categories";
-import { CATEGORY_TEXT } from "@/components/discover/TripBand";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t, locale } = await getServerT();
@@ -63,85 +70,131 @@ export default async function IdeasBoardPage({ searchParams }: PageProps) {
     return `/ideas${s ? `?${s}` : ""}`;
   };
 
-  const intents = [
-    { key: null, label: t("ideas.board.intentAll"), icon: "lightbulb" },
-    { key: "seeking_organizer", label: t("ideas.intent.seeking_organizer"), icon: "clipboard-check" },
-  ];
   const pages = Math.max(1, Math.ceil(total / BOARD_PAGE_SIZE));
+  const newIdeaHref = user ? `/ideas/new${filters.category ? `?category=${filters.category}` : ""}` : "/register?redirect=/ideas/new";
+
+  /** A szűrőlap csoportjai — a kategória nem itt van, hanem a fülsorban. */
+  const filterGroups: IdeasFilterGroup[] = [
+    {
+      key: "intent",
+      label: t("ideas.board.intentFilter"),
+      options: [
+        { label: t("ideas.board.intentAll"), href: link({ intent: null, offer: null, page: null }), selected: !filters.intent && !filters.hasOffer, testId: "ideas-intent-all" },
+        { label: t("ideas.intent.seeking_organizer"), href: link({ intent: "seeking_organizer", offer: null, page: null }), selected: filters.intent === "seeking_organizer", testId: "ideas-intent-seeking" },
+        { label: t("ideas.board.hasOffer"), href: link({ intent: null, offer: filters.hasOffer ? null : "1", page: null }), selected: filters.hasOffer, testId: "ideas-has-offer" },
+      ],
+    },
+    {
+      key: "sort",
+      label: t("ideas.board.sort"),
+      options: (["members", "newest", "soonest"] as const).map((s) => ({
+        label: t(`ideas.board.sort_${s}`),
+        href: link({ sort: s === "members" ? null : s, page: null }),
+        selected: filters.sort === s,
+        testId: `ideas-sort-${s}`,
+      })),
+    },
+    {
+      key: "closed",
+      label: t("ideas.board.closedFilter"),
+      options: [
+        { label: t("ideas.board.hideClosed"), href: link({ closed: null, page: null }), selected: !filters.includeClosed },
+        { label: t("ideas.board.showClosed"), href: link({ closed: "1", page: null }), selected: filters.includeClosed },
+      ],
+    },
+  ];
+  const activeCount = [filters.intent, filters.hasOffer || null, filters.includeClosed || null, filters.sort !== "members" || null, filters.q].filter(Boolean).length;
 
   return (
     <div className="min-h-screen bg-canvas text-ink">
       <AppHeader user={user ? { email: user.email ?? "", displayName: user.user_metadata?.full_name } : null} />
 
-      {/* HERO — D22 EQOlq R7kD1o */}
-      <section data-surface="night" className="relative overflow-hidden bg-canvas" data-testid="ideas-hero">
-        <CoverImage src="/discover/hero.jpg" sizes="100vw" priority />
-        <div aria-hidden className="absolute inset-0 bg-hero-scrim-mobile md:bg-hero-scrim" />
-        <div className="relative mx-auto flex min-h-[320px] max-w-7xl flex-col justify-end gap-4 px-5 pb-8 pt-24 md:min-h-[420px] md:px-8 md:pb-10">
-          <p className="text-sm font-medium text-ink-secondary">{t("ideas.board.stats", { count: total })}</p>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <h1 className="max-w-[720px] text-hero-display-mobile text-ink text-balance md:text-hero-display">{t("ideas.board.title")}</h1>
-            {/* M211 — súgó a cím mellett (D21 elhelyezési szabály) */}
-            <TutorialHelp anchor="ideas" />
+      {/* HERO — osztott Night szakasz: balra a szöveg és az egyetlen elsődleges akció, jobbra a fotó
+          (D22b #Lista; a Felfedezés hero-jának mintája). Mobilon a szöveg felül, a kép alatta. */}
+      <section data-surface="night" className="bg-canvas text-ink" data-testid="ideas-hero">
+        <div className="grid md:min-h-[460px] md:grid-cols-[minmax(0,6fr)_minmax(0,5fr)]">
+          <div className="relative order-2 h-[200px] md:h-auto">
+            <Image src="/discover/hero.jpg" alt="" fill priority sizes="(min-width: 768px) 45vw, 100vw" className="object-cover" />
           </div>
-          <p className="hidden max-w-[720px] text-lg text-ink-body md:block">{t("ideas.board.subtitle")}</p>
-          <form action="/ideas" className="flex max-w-[720px] items-center gap-2 rounded-full border border-line bg-surface/80 px-4 py-2 backdrop-blur-sm" role="search">
-            {filters.category && <input type="hidden" name="category" value={filters.category} />}
-            <Icon name="search" size={18} className="shrink-0 text-ink-muted" aria-hidden />
-            <input name="q" defaultValue={filters.q ?? ""} placeholder={t("ideas.board.searchPlaceholder")} aria-label={t("ideas.board.searchPlaceholder")} className="min-w-0 flex-1 bg-transparent text-sm text-ink outline-hidden placeholder:text-ink-muted" />
-            <button type="submit" className="inline-flex h-9 items-center rounded-full bg-accent px-4 text-sm font-semibold text-accent-on">{t("common.search")}</button>
-          </form>
+          <div className="order-1 flex flex-col justify-center gap-4 px-5 py-10 md:gap-6 md:py-16 md:pl-[max(120px,calc((100vw-1280px)/2+120px))] md:pr-12">
+            <p className="font-mono text-[13px] uppercase tracking-[0.06em] text-ink-muted">{t("ideas.board.stats", { count: total })}</p>
+            <h1 className="text-hero-display-mobile text-ink text-balance md:text-hero-display">{t("ideas.board.title")}</h1>
+            <p className="max-w-[560px] text-lg text-ink-body">{t("ideas.board.subtitle")}</p>
+            <Link
+              href={newIdeaHref}
+              data-testid="ideas-new"
+              className="mt-1 inline-flex h-14 w-full items-center justify-center gap-2 bg-accent px-6 text-base font-bold text-accent-on transition-colors hover:bg-accent-hover focus-visible:outline-hidden focus-visible:shadow-(--focus-ring) md:w-fit"
+            >
+              <Icon name="lightbulb" size={18} aria-hidden />
+              {t("ideas.board.newIdea")}
+            </Link>
+          </div>
         </div>
       </section>
 
-      <main className="mx-auto max-w-7xl px-5 py-6 md:px-8" id="ideas-list">
-        {/* Toolbar — kategória-pillek · szándék-váltó · elsődleges „Dobd be ötletként” */}
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap gap-2" data-testid="ideas-category-pills">
-            <Link href={link({ category: null, page: null })} className={`inline-flex h-10 items-center gap-2 rounded-trevu px-4 text-sm font-semibold ${!filters.category ? "bg-accent text-accent-on" : "bg-ghost text-ink hover:bg-ghost-strong"}`}>
-              <Icon name="lightbulb" size={16} aria-hidden />{t("ideas.board.allCategories")}
-            </Link>
+      {/* 01 / KERESD MEG — szabadszavas kereső a hero alatt (csont munkafelület) */}
+      <IdeasSearch
+        initialQuery={filters.q ?? ""}
+        action={link({ q: null, page: null })}
+        sectionLabel={t("ideas.board.sectionFind")}
+        placeholder={t("ideas.board.searchPlaceholder")}
+        submitLabel={t("common.search")}
+        label={t("ideas.board.searchPlaceholder")}
+        hint={t("ideas.board.searchHint")}
+      />
+
+      {/* KATEGÓRIA-FÜLSOR — verzál fülek két szén vonal között, asztalon a teljes szélességen
+          elosztva, mobilon két oszlopban. Nincs „Összes” fül: a kiválasztott újrakattintva kikapcsol. */}
+      <div className="mx-auto max-w-7xl px-4 pb-2 pt-5 md:px-[120px] md:pb-5 md:pt-7">
+        <div className="relative flex items-start justify-between gap-4">
+          <nav
+            aria-label={t("ideas.board.categoriesLabel")}
+            className="grid flex-1 grid-cols-2 gap-x-4 border-y border-ink md:flex md:flex-wrap md:items-center md:justify-between md:gap-x-8"
+            data-testid="ideas-category-tabs"
+          >
             {categories.map((c) => {
               const chip = categoryChip({ id: c.id, name: c.name, name_localized: c.name_localized as Record<string, string> | null, icon_name: c.icon_name, color_hex: c.color_hex }, locale);
               const active = filters.category === c.id;
               return (
-                <Link key={c.id} href={link({ category: active ? null : c.id, page: null })} className={`inline-flex h-10 items-center gap-2 rounded-trevu px-4 text-sm font-semibold ${active ? "bg-accent text-accent-on" : "bg-ghost text-ink hover:bg-ghost-strong"}`}>
-                  <Icon name={chip?.icon ?? CATEGORY_DISPLAY[c.name]?.icon ?? "mountain"} size={16} aria-hidden className={active ? "" : CATEGORY_TEXT[chip?.token ?? "hiking"]} />
+                <Link
+                  key={c.id}
+                  href={link({ category: active ? null : c.id, page: null })}
+                  aria-current={active ? "true" : undefined}
+                  data-testid={`ideas-category-${c.id}`}
+                  className={`-mb-px inline-flex min-h-12 items-center border-b-2 text-[14px] font-bold uppercase tracking-[0.08em] transition-colors md:min-h-14 md:text-[15px] focus-visible:outline-hidden focus-visible:shadow-(--focus-ring) ${active ? "border-accent text-accent" : "border-transparent text-ink hover:text-accent"}`}
+                >
                   {chip?.label ?? c.name}
                 </Link>
               );
             })}
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="inline-flex rounded-trevu bg-ghost p-1" role="group" aria-label={t("ideas.board.intentFilter")}>
-              {intents.map((i) => (
-                <Link key={i.key ?? "all"} href={link({ intent: i.key, offer: null, page: null })} className={`inline-flex h-8 items-center gap-1.5 rounded-[8px] px-3 text-xs font-semibold ${filters.intent === i.key && !filters.hasOffer ? "bg-surface text-ink" : "text-ink-secondary"}`}>
-                  <Icon name={i.icon} size={14} aria-hidden />{i.label}
-                </Link>
-              ))}
-              <Link href={link({ intent: null, offer: filters.hasOffer ? null : "1", page: null })} className={`inline-flex h-8 items-center gap-1.5 rounded-[8px] px-3 text-xs font-semibold ${filters.hasOffer ? "bg-surface text-ink" : "text-ink-secondary"}`}>
-                <Icon name="hand" size={14} aria-hidden />{t("ideas.board.hasOffer")}
-              </Link>
-            </div>
-            <Link href={user ? "/ideas/new" : "/register?redirect=/ideas/new"} className="inline-flex h-10 items-center gap-2 rounded-trevu bg-accent px-4 text-sm font-semibold text-accent-on" data-testid="ideas-new">
-              <Icon name="lightbulb" size={16} aria-hidden />{t("ideas.board.newIdea")}
-            </Link>
-          </div>
-        </div>
+          </nav>
 
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs font-semibold uppercase tracking-wider text-ink-muted">{t("ideas.board.resultHead", { count: total })}</p>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-ink-secondary">
-            <Link href={link({ closed: filters.includeClosed ? null : "1", page: null })} className="underline-offset-2 hover:underline">{filters.includeClosed ? t("ideas.board.hideClosed") : t("ideas.board.showClosed")}</Link>
-            <span aria-hidden>·</span>
-            <label className="inline-flex flex-wrap items-center gap-2">
-              {t("ideas.board.sort")}
-              <span className="inline-flex flex-wrap gap-1">
-                {(["members", "newest", "soonest"] as const).map((s) => (
-                  <Link key={s} href={link({ sort: s === "members" ? null : s, page: null })} className={`rounded-chip px-2 py-0.5 ${filters.sort === s ? "bg-ghost font-semibold text-ink" : ""}`}>{t(`ideas.board.sort_${s}`)}</Link>
-                ))}
-              </span>
-            </label>
+          <IdeasFilters
+            groups={filterGroups}
+            activeCount={activeCount}
+            clearHref="/ideas"
+            filtersLabel={t("ideas.board.filters")}
+            filtersActiveLabel={t("ideas.board.filtersActive")}
+            closeLabel={t("ideas.board.filtersClose")}
+            clearLabel={t("ideas.board.filtersClear")}
+            applyLabel={t("ideas.board.filtersApply", { count: total })}
+          />
+        </div>
+      </div>
+
+      <main className="mx-auto max-w-7xl px-4 pb-10 md:px-[120px] md:pb-16" id="ideas-list">
+        {/* 02 / ÖTLETEK — a találati szakasz fejléce (D22b #Lista) */}
+        <div className="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-4 pt-6 md:pb-6 md:pt-10">
+          <div className="flex flex-col gap-2">
+            <p className="font-mono text-[13px] font-medium uppercase tracking-[0.06em] text-accent">{t("ideas.board.sectionBoard")}</p>
+            <div className="flex flex-wrap items-center gap-3">
+              <h2 className="text-[34px] text-ink md:text-[56px]">{t("ideas.board.boardTitle")}</h2>
+              {/* M211 — súgó a címsor mellett (D21 elhelyezési szabály) */}
+              <TutorialHelp anchor="ideas" />
+            </div>
+            <p className="font-mono text-[13px] uppercase tracking-[0.06em] text-ink-muted" data-testid="ideas-count">
+              {t("ideas.board.boardCount", { count: total })}
+            </p>
           </div>
         </div>
 
@@ -150,10 +203,12 @@ export default async function IdeasBoardPage({ searchParams }: PageProps) {
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-ghost"><Icon name="lightbulb" size={36} aria-hidden className="text-ink-muted" /></div>
             <h2 className="text-lg font-bold text-ink">{t("ideas.board.emptyTitle")}</h2>
             <p className="max-w-[420px] text-sm text-ink-muted">{t("ideas.board.emptyHint")}</p>
-            <Link href={user ? `/ideas/new${filters.category ? `?category=${filters.category}` : ""}` : "/register?redirect=/ideas/new"} className="inline-flex h-10 items-center gap-2 rounded-trevu bg-accent px-4 text-sm font-semibold text-accent-on"><Icon name="lightbulb" size={16} aria-hidden />{t("ideas.board.newIdea")}</Link>
+            <Link href={newIdeaHref} className="inline-flex h-12 items-center gap-2 bg-accent px-5 text-base font-bold text-accent-on hover:bg-accent-hover focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)">
+              <Icon name="lightbulb" size={16} aria-hidden />{t("ideas.board.newIdea")}
+            </Link>
           </section>
         ) : (
-          <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6" data-testid="ideas-grid">
+          <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4" data-testid="ideas-grid">
             {items.map((idea) => {
               const st = statusChip(idea, tr);
               return (
@@ -180,21 +235,30 @@ export default async function IdeasBoardPage({ searchParams }: PageProps) {
 
         {pages > 1 && (
           <nav className="mt-8 flex items-center justify-center gap-2" aria-label={t("ideas.board.pagination")}>
-            {filters.page > 1 && <Link href={link({ page: String(filters.page - 1) })} className="rounded-trevu bg-ghost px-4 py-2 text-sm font-semibold text-ink">←</Link>}
-            <span className="text-sm text-ink-secondary">{filters.page} / {pages}</span>
-            {filters.page < pages && <Link href={link({ page: String(filters.page + 1) })} className="rounded-trevu bg-ghost px-4 py-2 text-sm font-semibold text-ink">→</Link>}
+            {filters.page > 1 && <Link href={link({ page: String(filters.page - 1) })} className="inline-flex h-12 items-center rounded-trevu bg-ghost px-4 text-sm font-semibold text-ink hover:bg-line">←</Link>}
+            <span className="font-mono text-[13px] uppercase tracking-[0.06em] text-ink-muted">{filters.page} / {pages}</span>
+            {filters.page < pages && <Link href={link({ page: String(filters.page + 1) })} className="inline-flex h-12 items-center rounded-trevu bg-ghost px-4 text-sm font-semibold text-ink hover:bg-line">→</Link>}
           </nav>
         )}
-
-        {/* CTA — D22 EfmFE */}
-        <section className="mt-10 flex flex-col items-start justify-between gap-4 rounded-trevu-2xl border border-line bg-surface px-6 py-6 md:flex-row md:items-center">
-          <div>
-            <h2 className="text-xl font-bold text-ink">{t("ideas.board.ctaTitle")}</h2>
-            <p className="mt-1 text-sm text-ink-muted">{t("ideas.board.ctaSub")}</p>
-          </div>
-          <Link href={user ? "/ideas/new" : "/register?redirect=/ideas/new"} className="inline-flex h-11 items-center gap-2 rounded-trevu bg-accent px-5 text-sm font-semibold text-accent-on"><Icon name="lightbulb" size={16} aria-hidden />{t("ideas.board.newIdea")}</Link>
-        </section>
       </main>
+
+      {/* 03 / DOBD BE — szén sáv a halvány fej-ikonnal (D22b #Lista; a Felfedezés 03/04 mintája) */}
+      <section data-surface="night" className="relative overflow-hidden border-t border-line bg-canvas text-ink" data-testid="ideas-cta">
+        <div className="relative mx-auto flex max-w-7xl flex-col gap-5 px-5 py-12 md:flex-row md:items-end md:justify-between md:px-[120px] md:py-16">
+          <div className="flex max-w-[640px] flex-col gap-3">
+            <p className="font-mono text-[13px] font-medium uppercase tracking-[0.06em] text-accent">{t("ideas.board.sectionCta")}</p>
+            <h2 className="text-[36px] text-ink md:text-[56px]">{t("ideas.board.ctaTitle")}</h2>
+            <p className="text-base text-ink-secondary md:text-lg">{t("ideas.board.ctaSub")}</p>
+          </div>
+          <Link
+            href={newIdeaHref}
+            className="inline-flex h-14 shrink-0 items-center justify-center gap-2 bg-accent px-6 text-base font-bold text-accent-on hover:bg-accent-hover focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
+          >
+            <Icon name="lightbulb" size={18} aria-hidden />
+            {t("ideas.board.newIdea")}
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

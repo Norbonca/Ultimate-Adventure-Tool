@@ -61,10 +61,12 @@ export function membersText(idea: Pick<IdeaListItem, "member_count" | "party_siz
 }
 
 /** Állapot/szándék címke és tónusa (kártya lábléce, adatlap). */
-export function statusChip(idea: Pick<IdeaListItem, "status" | "intent">, t: T): { label: string; tone: "neutral" | "info" | "success" | "muted" } {
+export function statusChip(idea: Pick<IdeaListItem, "status" | "intent">, t: T): { label: string; tone: "neutral" | "rating" | "success" | "muted" } {
   const s: IdeaStatus = idea.status;
   if (s === "converted") return { label: t("ideas.status.converted"), tone: "success" };
-  if (s === "organizing") return { label: t("ideas.status.organizing"), tone: "info" };
+  // B „Terep”: a „Szervező jelentkezett” a meleg jelzőszínt kapja — a korábbi `info` tónus a
+  // --color-info tokenre épült, az pedig a terep készletben is kék (#3B82F6), a B palettáján kívül.
+  if (s === "organizing") return { label: t("ideas.status.organizing"), tone: "rating" };
   if (s === "expired") return { label: t("ideas.status.expired"), tone: "muted" };
   if (s === "closed") return { label: t("ideas.status.closed"), tone: "muted" };
   return { label: t(`ideas.intent.${idea.intent}`), tone: "neutral" };

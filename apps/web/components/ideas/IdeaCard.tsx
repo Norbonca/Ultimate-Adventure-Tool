@@ -1,8 +1,14 @@
 /**
- * M22 — IdeaCard/Tile (design: D22 `p1baQq` Component/IdeaCard/Tile).
+ * M22 — IdeaCard/Tile.
+ *
+ * Design: design/claude/D22b_Turaotletek#Lista (1440), #Lista_390 (390);
+ * archív: design/D22_Trip_Ideas.pen#p1baQq (Component/IdeaCard/Tile, „Éjszakai túra”).
  * Hook nélkül; a szövegeket a hívó fordítja (szerver- és kliensoldalon is használható).
- * Szerkezet a TripTile-lal azonos: kép + kategória-chip + csatlakozók; cím; célterület; időablak; ötletgazda;
+ * Szerkezet a TripTile-lal azonos, a 2026-11-14-i tömör arányokkal (140 px-es kép, 14 px belső
+ * tér, 16 px-es cím): kép + kategória-chip + csatlakozók; cím; célterület; időablak; ötletgazda;
  * lábléc: állapot/szándék-chip · avatárok · „Részletek →”.
+ * B „Terep”: minden szín szemantikus tokenből — az állapotchip és az avatárok is (a korábbi
+ * `--color-info` kék és a beégetett avatár-hexek a B palettáján kívül voltak).
  */
 
 import Link from "next/link";
@@ -20,19 +26,20 @@ export interface IdeaCardProps {
   window: string; // „2027. júl.–aug. · legalább 10 nap”
   owner: string | null; // „Viktor K. ötlete”
   statusLabel: string; // „Szervezőt keres” / „Szervező jelentkezett” / „Túra lett belőle” / „Lejárt”
-  statusTone?: "neutral" | "info" | "success" | "muted";
+  statusTone?: "neutral" | "rating" | "success" | "muted";
   avatarCount: number;
   detailsLabel: string;
 }
 
 const STATUS_CLASS: Record<NonNullable<IdeaCardProps["statusTone"]>, string> = {
   neutral: "bg-ghost text-ink-secondary",
-  info: "bg-[color-mix(in_srgb,var(--color-info)_18%,transparent)] text-(--color-info)",
+  rating: "bg-[color-mix(in_srgb,var(--color-rating)_18%,transparent)] text-(--color-rating)",
   success: "bg-[color-mix(in_srgb,var(--color-success)_18%,transparent)] text-(--color-success)",
   muted: "bg-ghost text-ink-muted",
 };
 
-const AVATAR_FILL = ["bg-accent", "bg-[#F59E0B]", "bg-[#60A5FA]", "bg-[#A78BFA]", "bg-[#F472B6]"];
+/** Az avatárfoltok a B szerepszíneiből; a kártyán legfeljebb négy látszik. */
+const AVATAR_FILL = ["bg-accent", "bg-(--color-rating)", "bg-(--color-success)", "bg-line-strong"];
 
 export function IdeaCard(p: IdeaCardProps) {
   return (
@@ -41,9 +48,9 @@ export function IdeaCard(p: IdeaCardProps) {
       data-testid="idea-card"
       className="group flex h-full flex-col overflow-hidden rounded-trevu-2xl border border-line bg-surface transition duration-150 hover:-translate-y-px hover:border-line-strong focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
     >
-      <div className="relative h-[200px] shrink-0 bg-line">
-        {p.imageUrl && <CoverImage src={p.imageUrl} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" />}
-        <div className="absolute inset-x-3 top-3 flex items-center justify-between gap-2">
+      <div className="relative h-[140px] shrink-0 bg-line">
+        {p.imageUrl && <CoverImage src={p.imageUrl} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" />}
+        <div className="absolute inset-x-2 top-2 flex items-center justify-between gap-2">
           {p.category ? (
             <span className={`inline-flex items-center gap-1.5 rounded-chip bg-glass px-2.5 py-1 text-xs font-semibold backdrop-blur-sm ${CATEGORY_TEXT[p.category.token]}`}>
               <Icon name={p.category.icon} size={14} aria-hidden />
@@ -58,13 +65,13 @@ export function IdeaCard(p: IdeaCardProps) {
           </span>
         </div>
       </div>
-      <div className="flex flex-1 flex-col gap-2.5 px-[18px] pb-[18px] pt-4">
-        <h3 data-testid="idea-card-title" className="line-clamp-2 text-lg font-semibold leading-tight text-ink">{p.title}</h3>
+      <div className="flex flex-1 flex-col gap-1.5 px-3.5 pb-3 pt-3">
+        <h3 data-testid="idea-card-title" className="line-clamp-2 text-base font-semibold leading-tight text-ink">{p.title}</h3>
         <p className="flex items-center gap-2 text-sm text-ink-muted"><Icon name="map-pin" size={14} aria-hidden className="shrink-0" /><span className="line-clamp-1">{p.destinations}</span></p>
         <p className="flex items-center gap-2 text-sm text-ink-muted"><Icon name="calendar-range" size={14} aria-hidden className="shrink-0" /><span className="line-clamp-1">{p.window}</span></p>
         {p.owner && <p className="flex items-center gap-2 text-sm text-ink-muted"><Icon name="lightbulb" size={14} aria-hidden className="shrink-0" /><span className="line-clamp-1">{p.owner}</span></p>}
       </div>
-      <div className="flex items-center justify-between gap-3 border-t border-line px-[18px] py-3.5">
+      <div className="flex items-center justify-between gap-3 border-t border-line px-3.5 py-2.5">
         <span className={`rounded-chip px-2.5 py-1 text-xs font-semibold ${STATUS_CLASS[p.statusTone ?? "neutral"]}`}>{p.statusLabel}</span>
         <span className="flex items-center gap-2.5">
           <span className="flex -space-x-1.5" aria-hidden>
