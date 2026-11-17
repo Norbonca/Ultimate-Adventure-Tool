@@ -46,6 +46,8 @@ export interface Todo {
   action: TodoAction;
   /** Nem sürgős, nem szorít: halványan, a sor végén. */
   soft: boolean;
+  /** Hány azonos nevű feladat áll e mögött a sor mögött ugyanazon a túrán. */
+  same?: number;
 }
 
 export interface NextTrip {
@@ -62,6 +64,9 @@ export interface NextTrip {
 export interface DashboardData {
   organizer: Todo[];
   participant: Todo[];
+  /** Hány sor maradt ki a sávonkénti korlát miatt. */
+  organizerMore: number;
+  participantMore: number;
   nextTrip: NextTrip | null;
   stats: { trips: number; days: number; countries: number } | null;
   /** Van-e bármilyen múltja a felhasználónak: ettől függ, hogy az „új felhasználó” lapot kapja-e. */
@@ -78,6 +83,32 @@ const napok = (datum: string | null): number | null => {
 };
 
 const surgos = (t: Todo) => t.days !== null && t.days <= 2;
+
+/** Sávonként legfeljebb ennyi sor; a többit a „mind” hivatkozás viszi tovább. */
+export const SAV_MAX = 5;
+
+/**
+ * Ugyanazon a túrán ugyanazzal a névvel álló feladatok egy sorrá válnak: a legközelebbi
+ * határidővel és egy darabszámmal. Négy egyforma „Tankolás, gyülekező” sor hibának látszik,
+ * nem munkának.
+ */
+function osszevon(items: Todo[]): Todo[] {
+  const map = new Map<string, Todo>();
+  for (const t of items) {
+    const kulcs = `${t.kind}|${t.trip}|${t.params.name ?? ""}`;
+    const meglevo = map.get(kulcs);
+    if (!meglevo) {
+      map.set(kulcs, { ...t, same: 1 });
+      continue;
+    }
+    meglevo.same = (meglevo.same ?? 1) + 1;
+    if (meglevo.days === null || (t.days !== null && t.days < meglevo.days)) {
+      meglevo.days = t.days;
+      meglevo.href = t.href;
+    }
+  }
+  return [...map.values()];
+}
 
 /** Lejárt elöl, utána a közeli határidő; a határidő nélküli és a halvány a végén. */
 const rangsor = (a: Todo, b: Todo) => {
@@ -310,8 +341,8 @@ export async function fetchDashboard(userId: string, locale: string): Promise<Da
     }
   }
 
-  organizer.sort(rangsor);
-  participant.sort(rangsor);
+  const organizerOsszes = osszevon(organizer).sort(rangsor);
+  const participantOsszes = osszevon(participant).sort(rangsor);
 
   // ── A következő túra: a legközelebbi, amin szervezőként vagy résztvevőként ott vagy ──
   const jovobeli: NextTrip[] = [];
@@ -354,8 +385,10 @@ export async function fetchDashboard(userId: string, locale: string): Promise<Da
   const hasHistory = sajatTurak.length > 0 || reszvetelek.length > 0;
 
   return {
-    organizer,
-    participant,
+    organizer: organizerOsszes.slice(0, SAV_MAX),
+    participant: participantOsszes.slice(0, SAV_MAX),
+    organizerMore: Math.max(0, organizerOsszes.length - SAV_MAX),
+    participantMore: Math.max(0, participantOsszes.length - SAV_MAX),
     nextTrip,
     stats: hasHistory ? { trips: osszes.length, days: Math.round(napSzam), countries: orszagok } : null,
     hasHistory,

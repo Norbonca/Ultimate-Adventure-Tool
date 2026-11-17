@@ -66,6 +66,8 @@ export {
 
   // ── Status & feedback (§4) ────────────────────────────────────
   AlertCircle,
+  CircleAlert,
+  FilePen,
   AlertTriangle,
   Archive,
   BadgeCheck,

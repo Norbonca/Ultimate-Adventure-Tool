@@ -16,6 +16,9 @@ import { AKCIO_KULCS, hatarido, savSzamlalo, todoCim, type Ford } from "@/lib/da
 
 interface TodoLaneProps {
   items: Todo[];
+  /** Hány sor maradt ki a korlát miatt; ennyinél jelenik meg a „mind” hivatkozás. */
+  more?: number;
+  moreHref?: string;
   /** A szervezői sáv szén (Night), a résztvevői csont (Day). */
   night?: boolean;
   titleKey: TranslationKey;
@@ -23,7 +26,7 @@ interface TodoLaneProps {
   testId: string;
 }
 
-export async function TodoLane({ items, night = false, titleKey, hintKey, testId }: TodoLaneProps) {
+export async function TodoLane({ items, more = 0, moreHref = "/trips", night = false, titleKey, hintKey, testId }: TodoLaneProps) {
   if (items.length === 0) return null;
   const { t } = await getServerT();
   const ford = t as Ford;
@@ -61,7 +64,10 @@ export async function TodoLane({ items, night = false, titleKey, hintKey, testId
                   </span>
                   <span className="flex min-w-0 flex-1 flex-col gap-[3px]">
                     <span className="text-base font-bold leading-snug md:text-lg">{todoCim(ford, todo)}</span>
-                    <span className="text-sm text-ink-muted md:text-[15px]">{todo.trip}</span>
+                    <span className="text-sm text-ink-muted md:text-[15px]">
+                      {todo.trip}
+                      {(todo.same ?? 1) > 1 && ` · ${ford("dashboard.todoSameCount", { count: todo.same as number })}`}
+                    </span>
                     <span className="mt-1 flex items-center justify-between gap-3 md:hidden">
                       <span className={`font-mono text-[13px] font-medium uppercase tracking-[0.06em] ${surgos ? "text-accent" : "text-ink-muted"}`}>
                         {szoveg}
@@ -86,6 +92,16 @@ export async function TodoLane({ items, night = false, titleKey, hintKey, testId
             );
           })}
         </ul>
+
+        {more > 0 && (
+          <Link
+            href={moreHref}
+            className="inline-flex min-h-11 items-center gap-1.5 self-start text-[15px] font-bold text-accent focus-visible:outline-hidden focus-visible:shadow-(--focus-ring)"
+          >
+            {ford("dashboard.laneShowAll", { count: items.length + more })}
+            <Icon name="arrow-right" size={15} aria-hidden />
+          </Link>
+        )}
       </div>
     </section>
   );
