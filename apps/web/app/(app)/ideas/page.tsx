@@ -6,7 +6,7 @@
  * Szerveroldalon renderelt, bejelentkezés nélkül is elérhető (NK-M22-001); a szűrők az URL-ben.
  *
  * B „Terep” (2026-11-16): a lap formanyelve a Felfedezésé (`/`) — osztott Night hero, mono verzál
- * szekciócímkék (01 / 02 / 03), Anton verzál címsorok, verzál kategória-fülsor két szén vonal
+ * mono verzál szekciócímkék, Anton verzál címsorok, verzál kategória-fülsor két szén vonal
  * között, `FilterSheet`, négy oszlopos tömör rács, szögletes elsődleges gombok, 120 px-es asztali
  * margó. A tartalom és a logika nem változott: ugyanazok a szűrők, ugyanaz a kártyatartalom.
  */
@@ -146,7 +146,7 @@ export default async function IdeasBoardPage({ searchParams }: PageProps) {
         </div>
       </section>
 
-      {/* 01 / KERESD MEG — szabadszavas kereső a hero alatt (csont munkafelület) */}
+      {/* KERESD MEG — szabadszavas kereső a hero alatt (csont munkafelület) */}
       <IdeasSearch
         initialQuery={filters.q ?? ""}
         action={link({ q: null, page: null })}
