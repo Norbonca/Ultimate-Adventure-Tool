@@ -42,23 +42,29 @@ export default async function DashboardPage() {
     (user.user_metadata?.full_name as string | undefined)?.split(" ").slice(-1)[0] ||
     "";
 
-  const teendok = adat.organizer.length + adat.participant.length;
-  const surgos = [...adat.organizer, ...adat.participant].filter((i) => i.days !== null && i.days <= 2).length;
-  const ujFelhasznalo = !adat.hasHistory && teendok === 0;
+  const sorok = [...adat.organizer, ...adat.participant];
+  // Csak a szorító teendő számít „vár rád”-nak; a ráérős sor nem állít fel az asztaltól.
+  const szorito = sorok.filter((i) => !i.soft).length + adat.organizerMore + adat.participantMore;
+  const surgos = sorok.filter((i) => i.days !== null && i.days <= 2).length;
+  const ujFelhasznalo = !adat.hasHistory && sorok.length === 0;
 
   // Állapotsor: a cím maga mondja meg, hol tartunk — nem köszönés.
   const cim = ujFelhasznalo
     ? t("dashboard.titleNew")
-    : teendok === 0
-      ? t("dashboard.titleEmpty")
-      : teendok === 1
+    : szorito === 0
+      ? sorok.length === 0
+        ? t("dashboard.titleEmpty")
+        : t("dashboard.titleSoftOnly")
+      : szorito === 1
         ? t("dashboard.titleTodoOne")
-        : t("dashboard.titleTodo", { count: teendok });
+        : t("dashboard.titleTodo", { count: szorito });
 
   const alcim = ujFelhasznalo
     ? t("dashboard.subtitleNew")
-    : teendok === 0
-      ? t("dashboard.subtitleEmpty")
+    : szorito === 0
+      ? sorok.length === 0
+        ? t("dashboard.subtitleEmpty")
+        : t("dashboard.subtitleSoftOnly")
       : surgos === 0
         ? t("dashboard.subtitleTodoCalm")
         : surgos === 1
@@ -95,6 +101,8 @@ export default async function DashboardPage() {
 
       <TodoLane
         items={adat.organizer}
+        more={adat.organizerMore}
+        moreHref="/trips"
         night
         titleKey="dashboard.laneOrganizer"
         hintKey="dashboard.laneOrganizerHint"
@@ -102,6 +110,8 @@ export default async function DashboardPage() {
       />
       <TodoLane
         items={adat.participant}
+        more={adat.participantMore}
+        moreHref="/trips"
         titleKey="dashboard.laneParticipant"
         hintKey="dashboard.laneParticipantHint"
         testId="dash-lane-participant"
@@ -109,11 +119,11 @@ export default async function DashboardPage() {
 
       {adat.nextTrip && <NextTripBand trip={adat.nextTrip} />}
 
-      {teendok === 0 && <PathCards titleKey={ujFelhasznalo ? "dashboard.pathsTitleNew" : "dashboard.pathsTitle"} />}
+      {szorito === 0 && <PathCards titleKey={ujFelhasznalo ? "dashboard.pathsTitleNew" : "dashboard.pathsTitle"} />}
 
       <SuggestionGrid trips={ajanlatok} idea={otlet} />
 
-      {adat.stats && teendok === 0 && <RoadSoFar stats={adat.stats} />}
+      {adat.stats && szorito === 0 && <RoadSoFar stats={adat.stats} />}
     </div>
   );
 }
