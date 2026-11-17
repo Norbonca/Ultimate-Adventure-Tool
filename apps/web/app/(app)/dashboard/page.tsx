@@ -26,7 +26,7 @@ export default async function DashboardPage() {
           {t('dashboard.welcomeMessage', { name: user.user_metadata?.full_name || t('dashboard.welcomeDefault') })}
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           {/* Quick Action Cards */}
           <Link
             href="/trips"
@@ -57,26 +57,6 @@ export default async function DashboardPage() {
               {t('dashboard.newTripDescription')}
             </p>
           </Link>
-
-          <div className="p-6 bg-white rounded-2xl border border-navy-200 opacity-60">
-            <div className="w-12 h-12 rounded-xl bg-navy-100 flex items-center justify-center mb-4">
-              <Icon name="wallet" size={24} className="text-navy-500" />
-            </div>
-            <h3 className="font-semibold text-navy-900">{t('dashboard.expenses')}</h3>
-            <p className="text-sm text-navy-500 mt-1">
-              {t('common.comingSoon')}
-            </p>
-          </div>
-
-          <div className="p-6 bg-white rounded-2xl border border-navy-200 opacity-60">
-            <div className="w-12 h-12 rounded-xl bg-navy-100 flex items-center justify-center mb-4">
-              <Icon name="compass" size={24} className="text-navy-500" />
-            </div>
-            <h3 className="font-semibold text-navy-900">{t('dashboard.guides')}</h3>
-            <p className="text-sm text-navy-500 mt-1">
-              {t('common.comingSoon')}
-            </p>
-          </div>
         </div>
       </div>
     </main>

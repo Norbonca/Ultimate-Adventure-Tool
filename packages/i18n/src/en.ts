@@ -388,8 +388,6 @@ const en: TranslationKeys = {
     myTripsDescription: "Manage your existing trips",
     newTrip: "New trip",
     newTripDescription: "Create a new adventure",
-    expenses: "Expenses",
-    guides: "Guides",
   },
 
   // ============================================================================
