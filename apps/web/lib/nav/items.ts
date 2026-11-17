@@ -1,4 +1,4 @@
-import { Home, Lightbulb, Map, Users, CirclePlay, Sparkles } from "@/lib/icons";
+import { Home, Lightbulb, LayoutDashboard, Map, Users, CirclePlay, Sparkles } from "@/lib/icons";
 
 /**
  * A webhely navigációja — egyetlen lista; a fejléc (középső és lenyíló menü) és a lábléc is ebből szűr.
@@ -7,10 +7,12 @@ import { Home, Lightbulb, Map, Users, CirclePlay, Sparkles } from "@/lib/icons";
  *  2. Elöl a funkciók, hátul a leírások és tájékoztatók.
  *  3. Ami még nem élő funkció, egyáltalán nem látszik (pl. Árazás, amíg fizetni sem lehet).
  *  4. A lábléc ugyanezt mutatja, mint a fejléc menüje (szinkronban), plusz a fix jogi linkeket.
+ *  5. A Dashboard a belépés utáni kiindulópont, ezért elöl áll — és csak bejelentkezve (Norbert, 2026-11-17).
  * Túratervező = M02 túraszervezés (a My Trips oldalról indul); nem az M20 Utazástervező.
  * `center: false` — a fejléc középső zónájában nem szerepel (csak a lenyíló menüben és a láblécben).
  */
 export const NAV_ITEMS = [
+  { key: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard, auth: true, center: true }, // belépés utáni nyitóoldal
   { key: "nav.discover", href: "/", icon: Home, auth: false, center: true },
   { key: "nav.tripIdeas", href: "/ideas", icon: Lightbulb, auth: false, center: false }, // M22 — a Felfedezés alatt (NyK-08)
   { key: "nav.tripPlanner", href: "/trips", icon: Map, auth: true, center: true },

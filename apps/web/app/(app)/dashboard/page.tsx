@@ -1,64 +1,119 @@
-import { createClient } from "@/lib/supabase/server";
+/**
+ * A bejelentkezés utáni nyitóoldal — „mit kell most csinálnom?”
+ *
+ * Design: design/claude/D25_Nyitooldal#Teli (1440), #Ures, #Uj, #Teli_390, #Ures_390.
+ *
+ * A lap három állapota ugyanaz a szerkezet, csak más réteg kerül előre:
+ *  - teli nap: állapotsor → Szervezőként (szén) → Résztvevőként (csont) → következő túra → ajánlások
+ *  - üres nap: állapotsor → következő túra → Merre indulj? → ajánlások → az utad eddig
+ *  - új felhasználó: állapotsor → Válassz utat → ajánlások
+ * Üres sáv nem jelenik meg, és nem marad üres doboz a helyén.
+ */
+
 import { redirect } from "next/navigation";
-import Link from "next/link";
-import { getServerT } from "@/lib/i18n/server";
+import { createClient } from "@/lib/supabase/server";
+import { getServerT, getServerLocale } from "@/lib/i18n/server";
 import { AppHeader } from "@/components/AppHeader";
-import { Icon } from "@/components/Icon";
+import { TodoLane } from "@/components/dashboard/TodoLane";
+import { NextTripBand } from "@/components/dashboard/NextTripBand";
+import { PathCards } from "@/components/dashboard/PathCards";
+import { RoadSoFar } from "@/components/dashboard/RoadSoFar";
+import { SuggestionGrid } from "@/components/dashboard/SuggestionGrid";
+import { getDemandIdeas } from "@/lib/ideas/queries";
+import { membersText, windowText } from "@/lib/ideas/present";
+import { fetchDashboard, fetchSuggestions } from "./queries";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  const { t } = await getServerT();
+  if (!user) redirect("/login");
 
-  if (!user) {
-    redirect("/login");
-  }
+  const { t } = await getServerT();
+  const locale = await getServerLocale();
+
+  const [adat, ajanlatok, kereslet] = await Promise.all([
+    fetchDashboard(user.id, locale),
+    fetchSuggestions(user.id, locale),
+    getDemandIdeas(user.id),
+  ]);
+
+  const keresztnev =
+    (user.user_metadata?.first_name as string | undefined) ||
+    (user.user_metadata?.full_name as string | undefined)?.split(" ").slice(-1)[0] ||
+    "";
+
+  const teendok = adat.organizer.length + adat.participant.length;
+  const surgos = [...adat.organizer, ...adat.participant].filter((i) => i.days !== null && i.days <= 2).length;
+  const ujFelhasznalo = !adat.hasHistory && teendok === 0;
+
+  // Állapotsor: a cím maga mondja meg, hol tartunk — nem köszönés.
+  const cim = ujFelhasznalo
+    ? t("dashboard.titleNew")
+    : teendok === 0
+      ? t("dashboard.titleEmpty")
+      : teendok === 1
+        ? t("dashboard.titleTodoOne")
+        : t("dashboard.titleTodo", { count: teendok });
+
+  const alcim = ujFelhasznalo
+    ? t("dashboard.subtitleNew")
+    : teendok === 0
+      ? t("dashboard.subtitleEmpty")
+      : surgos === 0
+        ? t("dashboard.subtitleTodoCalm")
+        : surgos === 1
+          ? t("dashboard.subtitleTodoOneUrgent")
+          : t("dashboard.subtitleTodo", { count: surgos });
+
+  const fejsor = ujFelhasznalo && keresztnev
+    ? t("dashboard.greetingNew", { name: keresztnev })
+    : new Intl.DateTimeFormat(locale === "en" ? "en-US" : "hu-HU", {
+        year: "numeric", month: "long", day: "numeric", weekday: "long",
+      }).format(new Date());
+
+  const otlet = kereslet.items[0]
+    ? {
+        slug: kereslet.items[0].slug,
+        title: kereslet.items[0].title,
+        members: membersText(kereslet.items[0], t as (k: string, p?: Record<string, string | number>) => string),
+        window: windowText(kereslet.items[0], t as (k: string, p?: Record<string, string | number>) => string, locale),
+      }
+    : null;
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <AppHeader
-        user={{ email: user.email ?? "", displayName: user.user_metadata?.full_name }}
+    <div className="min-h-screen bg-canvas text-ink">
+      <AppHeader user={{ email: user.email ?? "", displayName: user.user_metadata?.full_name }} />
+
+      {/* ÁLLAPOTSOR — a lap válasza egy mondatban */}
+      <section data-testid="dash-state" className="border-b border-ink">
+        <div className="mx-auto flex max-w-7xl flex-col gap-2.5 px-4 py-7 md:gap-3.5 md:px-[120px] md:py-13">
+          <p className="font-mono text-[13px] font-medium uppercase tracking-[0.06em] text-ink-muted">{fejsor}</p>
+          <h1 className="text-[38px] uppercase leading-[0.95] text-balance md:text-[clamp(48px,5vw,76px)]">{cim}</h1>
+          <p className="max-w-[680px] text-base text-ink-body md:text-xl">{alcim}</p>
+        </div>
+      </section>
+
+      <TodoLane
+        items={adat.organizer}
+        night
+        titleKey="dashboard.laneOrganizer"
+        hintKey="dashboard.laneOrganizerHint"
+        testId="dash-lane-organizer"
+      />
+      <TodoLane
+        items={adat.participant}
+        titleKey="dashboard.laneParticipant"
+        hintKey="dashboard.laneParticipantHint"
+        testId="dash-lane-participant"
       />
 
-      {/* Dashboard Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <h2 className="text-2xl font-bold text-navy-900 mb-6">
-          {t('dashboard.welcomeMessage', { name: user.user_metadata?.full_name || t('dashboard.welcomeDefault') })}
-        </h2>
+      {adat.nextTrip && <NextTripBand trip={adat.nextTrip} />}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          {/* Quick Action Cards */}
-          <Link
-            href="/trips"
-            className="p-6 bg-white rounded-2xl border border-navy-200 hover:border-trevu-400 hover:shadow-trevu-lg transition-all group"
-          >
-            <div className="w-12 h-12 rounded-xl bg-trevu-50 flex items-center justify-center mb-4">
-              <Icon name="backpack" size={24} className="text-trevu-600" />
-            </div>
-            <h3 className="font-semibold text-navy-900 group-hover:text-trevu-600 transition-colors">
-              {t('dashboard.myTrips')}
-            </h3>
-            <p className="text-sm text-navy-500 mt-1">
-              {t('dashboard.myTripsDescription')}
-            </p>
-          </Link>
+      {teendok === 0 && <PathCards titleKey={ujFelhasznalo ? "dashboard.pathsTitleNew" : "dashboard.pathsTitle"} />}
 
-          <Link
-            href="/trips/new"
-            className="p-6 bg-white rounded-2xl border border-navy-200 hover:border-trevu-400 hover:shadow-trevu-lg transition-all group"
-          >
-            <div className="w-12 h-12 rounded-xl bg-trevu-50 flex items-center justify-center mb-4">
-              <Icon name="plus" size={24} className="text-trevu-600" />
-            </div>
-            <h3 className="font-semibold text-navy-900 group-hover:text-trevu-600 transition-colors">
-              {t('dashboard.newTrip')}
-            </h3>
-            <p className="text-sm text-navy-500 mt-1">
-              {t('dashboard.newTripDescription')}
-            </p>
-          </Link>
-        </div>
-      </div>
-    </main>
+      <SuggestionGrid trips={ajanlatok} idea={otlet} />
+
+      {adat.stats && teendok === 0 && <RoadSoFar stats={adat.stats} />}
+    </div>
   );
 }
