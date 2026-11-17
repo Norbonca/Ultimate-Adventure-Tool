@@ -12,49 +12,7 @@ import { Icon } from "@/components/Icon";
 import { getServerT } from "@/lib/i18n/server";
 import type { Todo } from "@/app/(app)/dashboard/queries";
 import type { TranslationKey } from "@uat/i18n";
-
-const SZOVEG: Record<Todo["kind"], TranslationKey> = {
-  pendingApplications: "dashboard.todoPendingApplications",
-  organizerTask: "dashboard.todoOrganizerTask",
-  staleDraft: "dashboard.todoStaleDraft",
-  deadlineSoon: "dashboard.todoDeadlineSoon",
-  participantTask: "dashboard.todoParticipantTask",
-  applicationPending: "dashboard.todoApplicationPending",
-  waitlisted: "dashboard.todoWaitlisted",
-  tripSoon: "dashboard.todoTripSoon",
-  ideaJoiners: "dashboard.todoIdeaJoiners",
-};
-
-const AKCIO: Record<Todo["action"], TranslationKey> = {
-  review: "dashboard.actionReview",
-  open: "dashboard.actionOpen",
-  continue: "dashboard.actionContinue",
-  share: "dashboard.actionShare",
-  check: "dashboard.actionCheck",
-};
-
-type Ford = (key: TranslationKey, params?: Record<string, string | number>) => string;
-
-/** Egy teendő címe — az egyes és a többes számú változat külön kulcs. */
-function cim(t: Ford, todo: Todo): string {
-  if (todo.kind === "pendingApplications" && todo.params.count === 1) return t("dashboard.todoPendingApplicationsOne");
-  if (todo.kind === "ideaJoiners" && todo.params.count === 1) return t("dashboard.todoIdeaJoinersOne");
-  if (todo.kind === "deadlineSoon" && todo.days === 0) return t("dashboard.todoDeadlineToday");
-  if (todo.kind === "tripSoon" && todo.days === 0) return t("dashboard.todoTripToday");
-  return t(SZOVEG[todo.kind], todo.params);
-}
-
-/** A határidő szövege. A „sürgős” fogalma: lejárt, ma vagy holnap. */
-function hatarido(t: Ford, todo: Todo): { szoveg: string; surgos: boolean } {
-  if (todo.days === null) return { szoveg: t("dashboard.dueNone"), surgos: false };
-  if (todo.days < 0) {
-    const n = Math.abs(todo.days);
-    return { szoveg: n === 1 ? t("dashboard.dueOverdueOne") : t("dashboard.dueOverdue", { days: n }), surgos: true };
-  }
-  if (todo.days === 0) return { szoveg: t("dashboard.dueToday"), surgos: true };
-  if (todo.days === 1) return { szoveg: t("dashboard.dueTomorrow"), surgos: true };
-  return { szoveg: t("dashboard.dueDays", { days: todo.days }), surgos: todo.days <= 2 };
-}
+import { AKCIO_KULCS, hatarido, savSzamlalo, todoCim, type Ford } from "@/lib/dashboard/present";
 
 interface TodoLaneProps {
   items: Todo[];
@@ -70,14 +28,7 @@ export async function TodoLane({ items, night = false, titleKey, hintKey, testId
   const { t } = await getServerT();
   const ford = t as Ford;
 
-  const kemeny = items.filter((i) => !i.soft).length;
-  const lagy = items.length - kemeny;
-  const szamlalo =
-    kemeny === 0
-      ? ford("dashboard.laneCountSoftOnly", { soft: lagy })
-      : lagy === 0
-        ? ford("dashboard.laneCount", { count: kemeny })
-        : ford("dashboard.laneCountWithSoft", { count: kemeny, soft: lagy });
+  const szamlalo = savSzamlalo(ford, items);
 
   return (
     <section
@@ -109,14 +60,14 @@ export async function TodoLane({ items, night = false, titleKey, hintKey, testId
                     <Icon name={todo.icon} size={22} aria-hidden />
                   </span>
                   <span className="flex min-w-0 flex-1 flex-col gap-[3px]">
-                    <span className="text-base font-bold leading-snug md:text-lg">{cim(ford, todo)}</span>
+                    <span className="text-base font-bold leading-snug md:text-lg">{todoCim(ford, todo)}</span>
                     <span className="text-sm text-ink-muted md:text-[15px]">{todo.trip}</span>
                     <span className="mt-1 flex items-center justify-between gap-3 md:hidden">
                       <span className={`font-mono text-[13px] font-medium uppercase tracking-[0.06em] ${surgos ? "text-accent" : "text-ink-muted"}`}>
                         {szoveg}
                       </span>
                       <span className="inline-flex items-center gap-1.5 text-[15px] font-bold text-accent">
-                        {ford(AKCIO[todo.action])}
+                        {ford(AKCIO_KULCS[todo.action])}
                         <Icon name="arrow-right" size={15} aria-hidden />
                       </span>
                     </span>
@@ -126,7 +77,7 @@ export async function TodoLane({ items, night = false, titleKey, hintKey, testId
                   </span>
                   <span className="hidden w-[120px] justify-end md:flex">
                     <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-[15px] font-bold text-accent">
-                      {ford(AKCIO[todo.action])}
+                      {ford(AKCIO_KULCS[todo.action])}
                       <Icon name="arrow-right" size={15} aria-hidden />
                     </span>
                   </span>
