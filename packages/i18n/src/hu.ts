@@ -388,8 +388,6 @@ const hu = {
     myTripsDescription: "Meglévő túrák kezelése",
     newTrip: "Új túra",
     newTripDescription: "Hozz létre egy új kalandot",
-    expenses: "Költségek",
-    guides: "Túravezetők",
   },
 
   // ============================================================================
