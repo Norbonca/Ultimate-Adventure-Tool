@@ -591,7 +591,7 @@ export default function DiscoverClient({
             </div>
           </section>
 
-          {/* 01 / TALÁLD MEG — kereső sáv a hero alatt (csont munkafelület) */}
+          {/* TALÁLD MEG — kereső sáv a hero alatt (csont munkafelület) */}
           <div id="discover-find" className="mx-auto max-w-7xl scroll-mt-20 px-4 pt-6 md:px-[120px] md:pt-8">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-8">
               <p className="shrink-0 font-mono text-[13px] font-medium uppercase tracking-[0.06em] text-accent">{t('discover.sectionFind')}</p>

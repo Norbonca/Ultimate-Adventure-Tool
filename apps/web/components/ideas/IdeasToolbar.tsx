@@ -3,7 +3,7 @@
 /**
  * M22 — a Túraötletek lista kereső- és szűrősávja.
  *
- * Design: design/claude/D22b_Turaotletek#Lista (01 / Keresd meg + „Szűrők (n)”),
+ * Design: design/claude/D22b_Turaotletek#Lista (Keresd meg + „Szűrők (n)”),
  * #Szuro_390 (mobil alsó lap). A Felfedezés (`/`) mintája: a kereső önálló, mono
  * címkés szakasz a hero alatt, a szűrők a `FilterSheet`-ben (mobilon alsó lap,
  * asztalon a gomb alatti panel).
