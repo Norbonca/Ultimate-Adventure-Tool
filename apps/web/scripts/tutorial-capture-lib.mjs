@@ -170,7 +170,8 @@ export const TUTORIALS = [
     ["/", null, [tid("discover-search-query")]],
     ["/", null, [tid("discover-filters-open")]],
     ["/", null, [((p) => p.getByLabel(tr("Nézet kiválasztása")).filter({ visible: true }).first())]],
-    ["/", async (p) => { await into(p, tid("discover-trip-grid")(p), 140); }, [css('[data-testid="discover-trip-grid"] a')]],
+    // A Felfedezés alapnézete a lista (B „Terep”, #121) — a rács csak nézetváltás után van a lapon.
+    ["/", async (p) => { await into(p, tid("discover-trip-list")(p), 140); }, [css('[data-testid="discover-trip-list"] a')]],
   ]],
   ["3d-terkep", null, [
     ["/", null, [tid("view-toggle-globe")]],

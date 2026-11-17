@@ -27,8 +27,8 @@
         "apps/web/components/expenses/"
       ],
       "felveve": {
-        "hu": "5e71da7",
-        "en": "5e71da7"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "kiegyenlites": {
@@ -37,8 +37,8 @@
         "apps/web/components/expenses/"
       ],
       "felveve": {
-        "hu": "5e71da7",
-        "en": "5e71da7"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "uj-idopont": {
@@ -49,8 +49,8 @@
         "apps/web/components/trip-series/"
       ],
       "felveve": {
-        "hu": "5e71da7",
-        "en": "5e71da7"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "jelentkezok-elbiralasa": {
@@ -60,8 +60,8 @@
         "apps/web/components/trip-forms/"
       ],
       "felveve": {
-        "hu": "5e71da7",
-        "en": "5e71da7"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "menetrend-teendok": {
@@ -72,8 +72,8 @@
         "apps/web/components/trip-forms/"
       ],
       "felveve": {
-        "hu": "5e71da7",
-        "en": "5e71da7"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "elso-tura-meghirdetese": {
@@ -83,8 +83,8 @@
         "apps/web/components/ideas/"
       ],
       "felveve": {
-        "hu": "03e108a",
-        "en": "03e108a"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "kereses-es-szures": {
@@ -94,8 +94,8 @@
         "apps/web/components/discover/"
       ],
       "felveve": {
-        "hu": "5e71da7",
-        "en": "5e71da7"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "3d-terkep": {
@@ -105,8 +105,8 @@
         "apps/web/components/discover/"
       ],
       "felveve": {
-        "hu": "5e71da7",
-        "en": "5e71da7"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "jelentkezes-idopontra": {
@@ -117,8 +117,8 @@
         "apps/web/components/trip-series/"
       ],
       "felveve": {
-        "hu": "5e71da7",
-        "en": "5e71da7"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "otlet-kituzese": {
@@ -128,8 +128,8 @@
         "apps/web/components/ideas/"
       ],
       "felveve": {
-        "hu": "03e108a",
-        "en": "03e108a"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "szerepek-es-stabhelyek": {
@@ -139,8 +139,8 @@
         "apps/web/components/trip-forms/"
       ],
       "felveve": {
-        "hu": "5e71da7",
-        "en": "5e71da7"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "check-in": {
@@ -150,8 +150,8 @@
         "apps/web/components/trip-forms/"
       ],
       "felveve": {
-        "hu": "5e71da7",
-        "en": "5e71da7"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "boritokep": {
@@ -161,8 +161,8 @@
         "apps/web/components/trip-forms/"
       ],
       "felveve": {
-        "hu": "5e71da7",
-        "en": "5e71da7"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "tura-beallitasok": {
@@ -172,8 +172,8 @@
         "apps/web/components/trip-forms/"
       ],
       "felveve": {
-        "hu": "5e71da7",
-        "en": "5e71da7"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "koltseg-beallitasok": {
@@ -183,8 +183,8 @@
         "apps/web/components/trip-forms/"
       ],
       "felveve": {
-        "hu": "5e71da7",
-        "en": "5e71da7"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "tura-lemondasa": {
@@ -194,8 +194,8 @@
         "apps/web/components/trip-forms/"
       ],
       "felveve": {
-        "hu": "5e71da7",
-        "en": "5e71da7"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "mire-varnak": {
@@ -204,8 +204,8 @@
         "apps/web/components/ideas/"
       ],
       "felveve": {
-        "hu": "03e108a",
-        "en": "03e108a"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "keszsegek-es-erdeklodes": {
@@ -213,8 +213,8 @@
         "apps/web/app/(app)/settings/"
       ],
       "felveve": {
-        "hu": "5e71da7",
-        "en": "5e71da7"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "jelentkezes-allapota": {
@@ -225,8 +225,8 @@
         "apps/web/components/trip-series/"
       ],
       "felveve": {
-        "hu": "5e71da7",
-        "en": "5e71da7"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "resztvevoi-menetrend": {
@@ -235,8 +235,8 @@
         "apps/web/components/timeline/"
       ],
       "felveve": {
-        "hu": "5e71da7",
-        "en": "5e71da7"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "naptar-es-idozona": {
@@ -247,8 +247,8 @@
         "apps/web/components/trip-series/"
       ],
       "felveve": {
-        "hu": "5e71da7",
-        "en": "5e71da7"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     },
     "otlet-csatlakozas": {
@@ -257,8 +257,8 @@
         "apps/web/components/ideas/"
       ],
       "felveve": {
-        "hu": "03e108a",
-        "en": "03e108a"
+        "hu": "2b23625",
+        "en": "2b23625"
       }
     }
   }
