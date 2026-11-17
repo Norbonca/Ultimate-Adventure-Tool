@@ -238,7 +238,7 @@ const hu = {
     tutorials: "Útmutatók",
     logIn: "Bejelentkezés",
     signUp: "Regisztráció",
-    dashboard: "Irányítópult",
+    dashboard: "Dashboard",
     myTrips: "Saját túráim",
     tripPlanner: "Túratervező",
     travelPlanner: "Utazástervező",
@@ -380,10 +380,100 @@ const hu = {
   // Dashboard
   // ============================================================================
   dashboard: {
-    welcomeMessage: "Üdvözlünk, {name}!",
-    welcomeDefault: "Kalandor",
+    // Állapotsor — a lap egy mondatban megmondja, hol tartasz (D25 #Teli / #Ures / #Uj)
+    titleTodo: "{count} dolog vár rád ma",
+    titleTodoOne: "Egy dolog vár rád ma",
+    titleEmpty: "Ma nincs teendőd.",
+    titleNew: "Kezdjük el.",
+    subtitleTodo: "{count} sürgős. A többi ráér, de itt van, hogy ne felejtsd el.",
+    subtitleTodoOneUrgent: "Egy sürgős. A többi ráér, de itt van, hogy ne felejtsd el.",
+    subtitleTodoCalm: "Egyik sem szorít — akkor csinálod, amikor kedved van.",
+    subtitleEmpty: "A túráidon minden rendben.",
+    subtitleNew: "Két út van, és bármelyiket választod, pár percbe telik. Később a másikat is kipróbálhatod.",
+    greetingNew: "Üdv a fedélzeten, {name}",
 
-    // Quick action cards
+    // Teendő-sávok
+    laneOrganizer: "Szervezőként",
+    laneOrganizerHint: "Ezekre mások várnak: jelentkezők, a csapatod, a menetrend.",
+    laneParticipant: "Résztvevőként",
+    laneParticipantHint: "Ezek a te túráid, amikre mész.",
+    laneCount: "{count} teendő",
+    laneCountWithSoft: "{count} teendő + {soft} ráér",
+    laneCountSoftOnly: "{soft} ráér",
+
+    // Teendő-sorok
+    todoPendingApplications: "{count} jelentkezés vár elbírálásra",
+    todoPendingApplicationsOne: "Egy jelentkezés vár elbírálásra",
+    todoOrganizerTask: "{name}",
+    todoStaleDraft: "A piszkozat {days} napja nem ment ki",
+    todoDeadlineSoon: "{days} nap a jelentkezési határidőig",
+    todoDeadlineToday: "Ma jár le a jelentkezési határidő",
+    todoParticipantTask: "{name}",
+    todoApplicationPending: "A jelentkezésed elbírálás alatt",
+    todoWaitlisted: "Várólistán vagy",
+    todoTripSoon: "{days} nap múlva indulsz — készülj",
+    todoTripToday: "Ma indulsz",
+    todoIdeaJoiners: "{count} csatlakozó az ötletedhez",
+    todoIdeaJoinersOne: "Valaki csatlakozott az ötletedhez",
+
+    // Akciók a sor végén
+    actionReview: "Elbírálom",
+    actionOpen: "Megnyitom",
+    actionContinue: "Folytatom",
+    actionShare: "Megosztom",
+    actionCheck: "Megnézem",
+
+    // Határidő — a sürgősséget szöveg is hordozza, nem csak szín
+    dueOverdue: "{days} napja lejárt",
+    dueOverdueOne: "Egy napja lejárt",
+    dueToday: "ma",
+    dueTomorrow: "holnap",
+    dueDays: "{days} nap",
+    dueNone: "nincs határidő",
+
+    // Következő túra — a teendők után
+    nextTrip: "A következő túrád",
+    nextTripOrganizer: "szervezed",
+    nextTripParticipant: "résztvevőként mész",
+    nextTripDays: "nap múlva indul",
+    nextTripToday: "Ma indul",
+    nextTripRunning: "Most tart",
+    nextTripOpen: "Megnyitom a túrát",
+
+    // Két út — üres napon és új felhasználónál
+    pathsTitle: "Merre indulj?",
+    pathsTitleNew: "Válassz utat",
+    pathParticipantLabel: "Résztvevőként",
+    pathParticipantTitle: "Menj egy túrára",
+    pathParticipantLead: "Nézd meg, mi indul a kedvenc kalandtípusaidban, és jelentkezz.",
+    pathParticipantPoint1: "Meghirdetett túrák, amikre még van hely",
+    pathParticipantPoint2: "Szűrhetsz helyszínre, időszakra és nehézségre",
+    pathParticipantPoint3: "A szervező profilját és korábbi túráit előre látod",
+    pathParticipantCta: "Túrák felfedezése",
+    pathOrganizerLabel: "Szervezőként",
+    pathOrganizerTitle: "Szervezz egyet",
+    pathOrganizerLead: "A menetrend sablonból indul — nem üres lapról kezded.",
+    pathOrganizerPoint1: "Túraötletek, amik szervezőre várnak",
+    pathOrganizerPoint2: "Sablon menetrend: meghirdetés, jelentkezés, előkészület",
+    pathOrganizerPoint3: "Piszkozatként is elmentheted, nem kell egyszerre kész",
+    pathOrganizerCta: "Új túra indítása",
+
+    // Felfedezés réteg
+    discoverTitle: "Ami még érdekelhet",
+    discoverLead: "A kedvenc kalandtípusaid és a korábbi túráid alapján.",
+    discoverAll: "Minden túra",
+    discoverEmpty: "Most nincs ajánlatunk — nézd meg a Felfedezést.",
+    demandLabel: "Mire várnak",
+    demandCta: "Megszervezem",
+    demandMembers: "{count} csatlakozó",
+
+    // Az utad eddig
+    statsTitle: "Az utad eddig",
+    statTrips: "túra",
+    statDays: "nap terepen",
+    statCountries: "ország",
+
+    // Régi kulcsok, a két úthoz
     myTrips: "Túráim",
     myTripsDescription: "Meglévő túrák kezelése",
     newTrip: "Új túra",
